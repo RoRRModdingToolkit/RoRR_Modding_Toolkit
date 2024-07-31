@@ -50,7 +50,7 @@ Net.register = function(func_id, func, override)
 end
 
 
-Net.send = function(target, player_name, func_id, ...)
+Net.send = function(func_id, target, player_name, ...)
     local my_player = gm.variable_global_get("my_player")
     local message = "[RMT_NET]"..func_id.."|||"..Helper.table_to_string({...})
 
