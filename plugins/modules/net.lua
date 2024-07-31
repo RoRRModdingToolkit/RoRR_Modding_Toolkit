@@ -93,9 +93,9 @@ gm.pre_script_hook(gm.constants.chat_add_user_message, function(self, other, res
 
             -- Run function
             local func_id = data[1]
-            local func_args = table.unpack(Helper.string_to_table(data[2]))
+            local func_args = Helper.string_to_table(data[2])
 
-            if registered[func_id] then registered[func_id](func_args) end
+            if registered[func_id] then registered[func_id](table.unpack(func_args)) end
 
             return false
         end

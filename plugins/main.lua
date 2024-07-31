@@ -17,8 +17,8 @@ require("./modules/player")
 -- log.info(Helper.table_to_string)
 -- log.info(Net.get_type())
 
-function test(a, b, ...)
-    return {...}
-end
+-- function test(a, b, ...)
+--     return {...}
+-- end
 
-log.info(test(1, 2, 3, 4, 5)[2])
+-- log.info(test(1, 2, 3, 4, 5)[2])
