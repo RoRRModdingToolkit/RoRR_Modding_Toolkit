@@ -4,12 +4,6 @@ Instance = {}
 
 
 
--- ========== Enums ==========
-
-
-
-
-
 -- ========== Functions ==========
 
 Instance.exists = function(inst)

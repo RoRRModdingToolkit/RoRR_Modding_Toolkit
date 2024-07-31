@@ -2,6 +2,9 @@
 
 Net = {}
 
+local registered = {}
+local received = false
+
 
 
 -- ========== Enums ==========
@@ -13,15 +16,88 @@ Net.TYPE = {
 }
 
 
+Net.TARGET = {
+    all         = 0,
+    only        = 1,
+    exclude     = 2
+}
+
+
 
 -- ========== Functions ==========
 
 Net.get_type = function()
-    local oInit = Helper.instance_find(gm.constants.oInit)
-    if oInit then
-        if oInit.m_id == 1.0 then return Net.TYPE.host
-        elseif oInit.m_id > 1.0 then return Net.TYPE.client
+    local oPrePlayer = Instance.find(gm.constants.oPrePlayer)
+    if oPrePlayer then
+        if oPrePlayer.m_id == 1.0 then return Net.TYPE.host
+        elseif oPrePlayer.m_id > 1.0 then return Net.TYPE.client
         end
     end
+
+    local p = Player.get_client()
+    if p then
+        if p.m_id == 1.0 then return Net.TYPE.host
+        elseif p.m_id > 1.0 then return Net.TYPE.client
+        end
+    end
+
     return Net.TYPE.single
 end
+
+
+Net.register = function(func_id, func, override)
+    if (override or not registered[func_id]) then registered[func_id] = func end
+end
+
+
+Net.send = function(target, player_name, func_id, ...)
+    local my_player = gm.variable_global_get("my_player")
+    local message = "[RMT_NET]"..func_id.."|||"..Helper.table_to_string({...})
+
+    if target == Net.TARGET.only or target == Net.TARGET.exclude then
+        if not player_name then player_name == " " end
+        message = message.."|||"..target.."|||"..player_name end
+    end
+    
+    my_player:net_send_instance_message(4, message)
+end
+
+
+
+-- ========== Hooks ==========
+
+-- Net communication
+gm.pre_script_hook(104659.0, function(self, other, result, args)
+    received = true
+end)
+
+gm.pre_script_hook(gm.constants.chat_add_user_message, function(self, other, result, args)
+    if received then
+        received = false
+
+        local player = args[1].value.user_name
+        local text = args[2].value
+
+        if string.sub(text, 1, 9) == "[RMT_NET]" then
+            local data = gm.string_split(string.sub(text, 10, #text), "|||")
+
+            -- Check only/exclude
+            local name = ""
+            local oInit = Instance.find(gm.constants.oInit)
+            if oInit then name = oInit.pref_name end
+
+            if (data[3] == Net.TARGET.only and name ~= data[4])
+            or (data[3] == Net.TARGET.exclude and name == data[4]) then
+                return false
+            end
+
+            -- Run function
+            local func_id = data[1]
+            local func_args = table.unpack(Helper.string_to_table(data[2]))
+
+            if registered[func_id] then registered[func_id](func_args) end
+
+            return false
+        end
+    end
+end)

@@ -9,6 +9,7 @@ mods.on_all_mods_loaded(function()
             Instance = m.Instance
             Item = m.Item
             Net = m.Net
+            Player = m.Player
             break
         end
     end
