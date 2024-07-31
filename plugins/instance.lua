@@ -51,7 +51,8 @@ Instance.find_all = function(index)
 
     for _, ind in ipairs(index) do
         for n = 0, gm.instance_number(ind) - 1 do
-            table.insert(insts, gm.instance_find(ind, n))
+            local inst = gm.instance_find(ind, n)
+            if Instance.exists(inst) then table.insert(insts, inst) end
         end
     end
 

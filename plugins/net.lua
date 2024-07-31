@@ -45,8 +45,8 @@ Net.get_type = function()
 end
 
 
-Net.register = function(func_id, func, override)
-    if (override or not registered[func_id]) then registered[func_id] = func end
+Net.register = function(func_id, func, replace)
+    if replace or not registered[func_id] then registered[func_id] = func end
 end
 
 
@@ -56,7 +56,7 @@ Net.send = function(func_id, target, player_name, ...)
 
     if target == Net.TARGET.only or target == Net.TARGET.exclude then
         if not player_name then player_name = " " end
-        message = message.."|||"..target.."|||"..player_name end
+        message = message.."|||"..target.."|||"..player_name
     end
     
     my_player:net_send_instance_message(4, message)
