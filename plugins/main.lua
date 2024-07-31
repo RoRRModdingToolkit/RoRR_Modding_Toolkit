@@ -3,7 +3,12 @@
 log.info("Successfully loaded ".._ENV["!guid"]..".")
 --mods.on_all_mods_loaded(function() for k, v in pairs(mods) do if type(v) == "table" and v.hfuncs then Helper = v end end end)
 
-require("helper")
+RoRR_Modding_Toolkit = true
+
+require("instance")
+require("item")
+require("net")
+require("player")
 
 
 
