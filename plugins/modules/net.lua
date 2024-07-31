@@ -82,13 +82,15 @@ gm.pre_script_hook(gm.constants.chat_add_user_message, function(self, other, res
             local data = gm.string_split(string.sub(text, 10, #text), "|||")
 
             -- Check only/exclude
-            local name = ""
-            local oInit = Instance.find(gm.constants.oInit)
-            if oInit then name = oInit.pref_name end
+            if #data > 2 then
+                local name = ""
+                local oInit = Instance.find(gm.constants.oInit)
+                if oInit then name = oInit.pref_name end
 
-            if (data[3] == Net.TARGET.only and name ~= data[4])
-            or (data[3] == Net.TARGET.exclude and name == data[4]) then
-                return false
+                if (data[3] == Net.TARGET.only and name ~= data[4])
+                or (data[3] == Net.TARGET.exclude and name == data[4]) then
+                    return false
+                end
             end
 
             -- Run function
