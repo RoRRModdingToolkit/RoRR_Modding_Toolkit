@@ -1,0 +1,9 @@
+﻿{
+	"name": "RoRR_Modding_Toolkit",
+	"version_number": "1.0.0",
+	"website_url": "",
+	"description": "",
+	"dependencies": [
+		"ReturnOfModding-ReturnOfModding-1.0.34"
+	]
+}
