@@ -53,7 +53,8 @@ Item.create = function(namespace, identifier)
         identifier,
         nil,
         Item.TIER.notier,
-        gm.object_add_w(namespace, identifier, gm.constants.pPickupItem)
+        gm.object_add_w(namespace, identifier, gm.constants.pPickupItem),
+        0
     )
 
     return item
@@ -98,10 +99,13 @@ Item.set_tier = function(item, tier)
 end
 
 
--- Item.on_pickup = function(item, func)
---     local array = gm.variable_global_get("class_item")[item + 1]
---     callbacks[array[5]] = func
--- end
+Item.set_loot_tags = function(item, ...)
+    local tags = 0
+    for _, t in ipairs{...} do tags = tags + t end
+
+    local array = gm.variable_global_get("class_item")[item + 1]
+    gm.array_set(array, 14, tags)
+end
 
 
 Item.add_callback = function(item, callback, func)
@@ -115,9 +119,12 @@ Item.add_callback = function(item, callback, func)
         if not callbacks[array[6]] then callbacks[array[6]] = {} end
         table.insert(callbacks[array[6]], func)
 
-    elseif callback == "onHit" then
-        if not callbacks["onHit"] then callbacks["onHit"] = {} end
-        table.insert(callbacks["onHit"], {item, func})
+    elseif callback == "onShoot"
+        or callback == "onHit"
+        or callback == "onKill"
+        then
+            if not callbacks[callback] then callbacks[callback] = {} end
+            table.insert(callbacks[callback], {item, func})
 
     end
 end
@@ -125,6 +132,21 @@ end
 
 
 -- ========== Internal ==========
+
+function onShoot(self, other, result, args)
+    if callbacks["onShoot"] then
+        for _, c in ipairs(callbacks["onShoot"]) do
+            local item = c[1]
+            local count = Item.get_stack_count(self, item)
+            if count > 0 then
+                local func = c[2]
+                func(self, args[2].value, count)   -- Attacker, Damager attack_info, Stack count
+            end
+        end
+    end
+end
+Callback.add("onAttackCreate", "RMT.onShoot", onShoot, true)
+
 
 function onHit(self, other, result, args)
     -- log.info(gm.object_get_name(self.object_index))
@@ -138,24 +160,38 @@ function onHit(self, other, result, args)
     -- log.info("")
 
     -- local attack_info = self.attack_info
-    -- log.info(attack_info)
-    -- log.info(attack_info.type)
     -- local names = gm.struct_get_names(attack_info)
-    -- for _, n in ipairs(names) do log.info(n) end
+    -- for _, n in ipairs(names) do
+    --     log.info(n.." = "..tostring(gm.struct_get(attack_info, n)))
+    -- end
 
     if callbacks["onHit"] then
         for _, c in ipairs(callbacks["onHit"]) do
             local item = c[1]
             local count = Item.get_stack_count(args[2].value, item)
-
             if count > 0 then
                 local func = c[2]
-                func(self.attack_info, args[3].value)
+                func(args[2].value, args[3].value, self.attack_info, count)   -- Attacker, Victim, Damager attack_info, Stack count
             end
         end
     end
 end
 Callback.add("onHitProc", "RMT.onHit", onHit, true)
+
+
+function onKill(self, other, result, args)
+    if callbacks["onKill"] then
+        for _, c in ipairs(callbacks["onKill"]) do
+            local item = c[1]
+            local count = Item.get_stack_count(args[3].value, item)
+            if count > 0 then
+                local func = c[2]
+                func(args[3].value, args[2].value, count)   -- Attacker, Victim, Stack count
+            end
+        end
+    end
+end
+Callback.add("onKillProc", "RMT.onKill", onKill, true)
 
 
 

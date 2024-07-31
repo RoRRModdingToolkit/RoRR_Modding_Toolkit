@@ -20,18 +20,22 @@ local spr = gm.sprite_add(_ENV["!plugins_mod_folder_path"].."/plugins/sCancel.pn
 gui.add_imgui(function()
     if ImGui.Begin("RoRR Modding Toolkit") then
 
+
         if ImGui.Button("Destroy all chests") then
             local chests = Instance.find_all(Instance.chests)
             for _, c in ipairs(chests) do
                 gm.instance_destroy(c)
             end
 
+
         elseif ImGui.Button("Log Net.TYPE") then
             log.info(Net.get_type())
+
 
         elseif ImGui.Button("Kill self") then
             local player = Player.get_client()
             if player then player.hp = -1.0 end
+
 
         elseif ImGui.Button("Create new item") then
             gm.translate_load_file(gm.variable_global_get("_language_map"), _ENV["!plugins_mod_folder_path"].."/plugins/language/english.json")
@@ -39,24 +43,49 @@ gui.add_imgui(function()
             local item = Item.create("rmt", "customItem")
             Item.set_sprite(item, spr)
             Item.set_tier(item, Item.TIER.uncommon)
+            Item.set_loot_tags(item, Item.LOOT_TAG.category_damage, Item.LOOT_TAG.category_healing)
+
             Item.add_callback(item, "onPickup", function(player, stack)
                 player.maxhp = player.maxhp + 10.0 * stack
                 player.hp = player.hp + 10.0 * stack
                 player.infusion_hp = player.infusion_hp + 10.0 * stack
             end)
+
             Item.add_callback(item, "onRemove", function(player, stack)
                 player.maxhp = player.maxhp - 10.0 * stack
                 player.infusion_hp = player.infusion_hp - 10.0 * stack
             end)
-            Item.add_callback(item, "onHit", function(damager, hit)
-                hit.hp = -1.0
+
+            Item.add_callback(item, "onShoot", function(attacker, damager, stack)
+                -- Crit every 6 shots
+                if not attacker.six_shooter then attacker.six_shooter = 0 end
+                attacker.six_shooter = attacker.six_shooter + 1
+                if attacker.six_shooter >= 6 then
+                    attacker.six_shooter = 0
+                    damager.critical = true
+                end
             end)
+
+            Item.add_callback(item, "onHit", function(attacker, victim, damager, stack)
+                -- Reduce victim health to 50% if over that
+                local ceil = victim.maxhp * 0.5
+                if victim.hp > ceil then victim.hp = ceil end
+            end)
+
+            Item.add_callback(item, "onKill", function(attacker, victim, stack)
+                -- Increase maximum shield
+                attacker.maxshield = attacker.maxshield + 5.0 * stack
+                attacker.maxshield_base = attacker.maxshield_base + 5.0 * stack
+                attacker.shield = attacker.shield + 5.0 * stack
+            end)
+
 
         elseif ImGui.Button("Give new item") then
             gm.item_give(Player.get_client(), gm.item_find("rmt-customItem"), 1, false)
 
         elseif ImGui.Button("Give new item temp") then
             gm.item_give(Player.get_client(), gm.item_find("rmt-customItem"), 1, true)
+            
             
         end
     end
