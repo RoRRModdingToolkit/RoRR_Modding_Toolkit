@@ -45,15 +45,15 @@ gui.add_imgui(function()
             Item.set_tier(item, Item.TIER.uncommon)
             Item.set_loot_tags(item, Item.LOOT_TAG.category_damage, Item.LOOT_TAG.category_healing)
 
-            Item.add_callback(item, "onPickup", function(player, stack)
-                player.maxhp = player.maxhp + 10.0 * stack
-                player.hp = player.hp + 10.0 * stack
-                player.infusion_hp = player.infusion_hp + 10.0 * stack
+            Item.add_callback(item, "onPickup", function(actor, stack)
+                actor.maxhp = actor.maxhp + 10.0 * stack
+                actor.hp = actor.hp + 10.0 * stack
+                actor.infusion_hp = actor.infusion_hp + 10.0 * stack
             end)
 
-            Item.add_callback(item, "onRemove", function(player, stack)
-                player.maxhp = player.maxhp - 10.0 * stack
-                player.infusion_hp = player.infusion_hp - 10.0 * stack
+            Item.add_callback(item, "onRemove", function(actor, stack)
+                actor.maxhp = actor.maxhp - 10.0 * stack
+                actor.infusion_hp = actor.infusion_hp - 10.0 * stack
             end)
 
             Item.add_callback(item, "onShoot", function(attacker, damager, stack)
