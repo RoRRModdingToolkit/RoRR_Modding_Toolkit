@@ -55,7 +55,7 @@ Net.send = function(func_id, target, player_name, ...)
     local message = "[RMT_NET]"..func_id.."|||"..Helper.table_to_string({...})
 
     if target == Net.TARGET.only or target == Net.TARGET.exclude then
-        if not player_name then player_name == " " end
+        if not player_name then player_name = " " end
         message = message.."|||"..target.."|||"..player_name end
     end
     

@@ -4,11 +4,11 @@ log.info("Successfully loaded ".._ENV["!guid"]..".")
 
 RoRR_Modding_Toolkit = true
 
-require("./modules/helper")
-require("./modules/instance")
-require("./modules/item")
-require("./modules/net")
-require("./modules/player")
+require("./helper")
+require("./instance")
+require("./item")
+require("./net")
+require("./player")
 
 
 
@@ -22,3 +22,8 @@ require("./modules/player")
 -- end
 
 -- log.info(test(1, 2, 3, 4, 5)[2])
+
+-- log.info(4 or nil)
+-- log.info(nil or 5)
+-- log.info(nil or nil)
+-- log.info(4 or 5)
