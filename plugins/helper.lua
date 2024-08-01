@@ -7,6 +7,21 @@ Helper = {}
 
 -- ========== Functions ==========
 
+Helper.ease_in = function(x, n)
+    return gm.power(x, n or 2)
+end
+
+
+Helper.ease_out = function(x, n)
+    return 1 - gm.power(1 - x, n or 2)
+end
+
+
+Helper.chance = function(n)
+    return gm.random_range(0, 1) <= n
+end
+
+
 Helper.table_merge = function(...)
     local new = {}
     for _, t in ipairs{...} do
