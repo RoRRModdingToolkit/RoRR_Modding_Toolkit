@@ -134,7 +134,12 @@ gui.add_imgui(function()
 
         elseif ImGui.Button("Give new item temp") then
             gm.item_give(Player.get_client(), gm.item_find("rmt-customItem"), 1, true)
-            
+
+        elseif ImGui.Button("Destroy oChest1 and oChest2") then
+            local cs = Instance.find_all(gm.constants.oChest1, gm.constants.oChest2)
+            for _, c in ipairs(cs) do
+                gm.instance_destroy(c)
+            end
             
         end
     end

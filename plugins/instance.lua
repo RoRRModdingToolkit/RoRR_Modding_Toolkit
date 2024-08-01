@@ -33,10 +33,11 @@ Instance.exists = function(inst)
 end
 
 
-Instance.find = function(index)
-    if type(index) ~= "table" then index = {index} end
+Instance.find = function(...)
+    local t = {...}
+    if type(t[1]) == "table" then t = t[1] end
 
-    for _, ind in ipairs(index) do
+    for _, ind in ipairs(t) do
         local inst = gm.instance_find(ind, 0)
         if Instance.exists(inst) then return inst end
     end
@@ -45,12 +46,13 @@ Instance.find = function(index)
 end
 
 
-Instance.find_all = function(index)
-    if type(index) ~= "table" then index = {index} end
+Instance.find_all = function(...)
+    local t = {...}
+    if type(t[1]) == "table" then t = t[1] end
 
     local insts = {}
 
-    for _, ind in ipairs(index) do
+    for _, ind in ipairs(t) do
         for n = 0, gm.instance_number(ind) - 1 do
             local inst = gm.instance_find(ind, n)
             if Instance.exists(inst) then table.insert(insts, inst) end
