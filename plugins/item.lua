@@ -59,6 +59,30 @@ Item.find_all = function(...)
 end
 
 
+Item.get_data = function(item)
+    local array = gm.variable_global_get("class_item")
+    local item_arr = array[item + 1]
+    return {
+        namespace       = item_arr[1],
+        identifier      = item_arr[2],
+        token_name      = item_arr[3],
+        token_text      = item_arr[4],
+        on_acquired     = item_arr[5],
+        on_removed      = item_arr[6],
+        tier            = item_arr[7],
+        sprite_id       = item_arr[8],
+        object_id       = item_arr[9],
+        item_log_id     = item_arr[10],
+        achievement_id  = item_arr[11],
+        is_hidden       = item_arr[12],
+        effect_display  = item_arr[13],
+        actor_component = item_arr[14],
+        loot_tags       = item_arr[15],
+        is_new_item     = item_arr[16]
+    }
+end
+
+
 Item.get_random = function(...)
     local items = Item.find_all(...)
     return items[gm.irandom_range(1, #items)]
