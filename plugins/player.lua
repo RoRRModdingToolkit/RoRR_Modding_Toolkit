@@ -1,4 +1,5 @@
 -- Player
+-- Original HelperFunctions written by Klehrik, with edits by SmoothSpatula
 
 Player = {}
 
