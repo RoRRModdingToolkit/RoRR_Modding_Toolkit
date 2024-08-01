@@ -1,4 +1,5 @@
 -- Net
+-- Original HelperFunctions written by Klehrik
 
 Net = {}
 

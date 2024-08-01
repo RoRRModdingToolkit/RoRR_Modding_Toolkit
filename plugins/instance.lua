@@ -1,4 +1,5 @@
 -- Instance
+-- Original HelperFunctions written by Klehrik
 
 Instance = {}
 

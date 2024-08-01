@@ -109,8 +109,8 @@ gui.add_imgui(function()
 
             Item.add_callback(item, "onEquipmentUse", function(actor, equipment, stack)
                 -- Increase max health
-                actor.maxhp = actor.maxhp + 20.0
-                actor.infusion_hp = actor.infusion_hp + 20.0
+                actor.maxhp = actor.maxhp + 20.0 * stack
+                actor.infusion_hp = actor.infusion_hp + 20.0 * stack
             end)
 
             Item.add_callback(item, "onStep", function(actor, stack)

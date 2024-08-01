@@ -1,4 +1,5 @@
 -- Callback
+-- Original system written by SmoothSpatula
 
 Callback = {}
 

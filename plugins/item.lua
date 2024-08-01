@@ -1,4 +1,5 @@
 -- Item
+-- Original custom items mod written by GrooveSalad
 
 Item = {}
 
