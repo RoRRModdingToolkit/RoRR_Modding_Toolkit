@@ -128,7 +128,7 @@ Instance.spawn_crate = function(x, y, tier, items, depth)
         end
     end
 
-    -- [Host]  Send spawn data to clients
+    -- [Host] Send spawn data to clients
     if Net.type() == Net.TYPE.host then Net.send("RMT.spawnCrate", x, y, tier, items, depth) end
 
     return c
