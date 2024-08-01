@@ -189,6 +189,28 @@ end)
 -- log.info(gm.object_get_name(gm.ds_list_find_value(drop, 0)))    -- oNugget
 
 
+-- local test = {1, 2, true, false, 5}
+-- local str = Helper.table_to_string(test)
+-- local test2 = Helper.string_to_table(str)
+-- log.info(test2[3])
+-- log.info(test2[3] == true)
+-- log.info(test2[4])
+-- log.info(test2[4] == true)
+-- log.info(test2[4] == false)
+
+-- local function func2(...)
+--     for _, i in ipairs{...} do
+--         log.info(i)
+--     end
+-- end
+
+-- local function func1(...)
+--     func2(...)
+-- end
+
+-- log.info(func1(1, 3, 4, 56))
+
+
 -- Code Storage
 
 -- local names = gm.struct_get_names(damager)
@@ -204,12 +226,3 @@ end)
 --     log.info(a.value)
 -- end
 -- log.info("")
-
--- local test = {1, 2, true, false, 5}
--- local str = Helper.table_to_string(test)
--- local test2 = Helper.string_to_table(str)
--- log.info(test2[3])
--- log.info(test2[3] == true)
--- log.info(test2[4])
--- log.info(test2[4] == true)
--- log.info(test2[4] == false)

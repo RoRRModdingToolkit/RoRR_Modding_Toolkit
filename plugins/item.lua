@@ -43,6 +43,28 @@ Item.find = function(namespace, identifier)
 end
 
 
+Item.find_all = function(...)
+    local array = gm.variable_global_get("class_item")
+    local tiers = {...}
+    local items = {}
+    for i = 1, gm.array_length(array) do
+        for _, tier in ipairs(tiers) do
+            if array[i][7] == tier then
+                table.insert(items, i - 1)
+                break
+            end
+        end
+    end
+    return items
+end
+
+
+Item.get_random = function(...)
+    local items = Item.find_all(...)
+    return items[gm.irandom_range(1, #items)]
+end
+
+
 Item.get_stack_count = function(actor, item)
     return gm.item_count(actor, item, false) + gm.item_count(actor, item, true)
 end
