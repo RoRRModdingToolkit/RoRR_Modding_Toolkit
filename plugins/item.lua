@@ -196,7 +196,7 @@ function onDamaged(self, other, result, args)
             local count = Item.get_stack_count(args[2].value, item)
             if count > 0 then
                 local func = c[2]
-                func(args[2].value, args[3].value.attack_info, count)   -- Victim, Damager attack_info, Stack count
+                func(args[2].value, args[3].value.attack_info, count)   -- Actor, Damager attack_info, Stack count
             end
         end
     end
@@ -211,7 +211,7 @@ function onDamageBlocked(self, other, result, args)
             local count = Item.get_stack_count(self, item)
             if count > 0 then
                 local func = c[2]
-                func(self, other.attack_info, count)   -- Victim, Damager attack_info, Stack count
+                func(self, other.attack_info, count)   -- Actor, Damager attack_info, Stack count
             end
         end
     end

@@ -86,17 +86,17 @@ gui.add_imgui(function()
                 attacker.shield = attacker.shield + 5.0 * stack
             end)
 
-            Item.add_callback(item, "onDamaged", function(victim, damager, stack)
+            Item.add_callback(item, "onDamaged", function(actor, damager, stack)
                 -- Increase max health
                 -- Also make attacker take damage
-                victim.maxhp = victim.maxhp + 2.0 * stack
-                victim.infusion_hp = victim.infusion_hp + 2.0 * stack
+                actor.maxhp = actor.maxhp + 2.0 * stack
+                actor.infusion_hp = actor.infusion_hp + 2.0 * stack
                 if Instance.exists(damager.parent) then
                     damager.parent.hp = damager.parent.hp - (damager.parent.maxhp * 0.1)
                 end
             end)
 
-            Item.add_callback(item, "onDamageBlocked", function(victim, damager, stack)
+            Item.add_callback(item, "onDamageBlocked", function(actor, damager, stack)
                 -- Kill attacker
                 damager.parent.hp = -1.0
             end)
@@ -140,6 +140,9 @@ gui.add_imgui(function()
             for _, c in ipairs(cs) do
                 gm.instance_destroy(c)
             end
+
+        elseif ImGui.Button("Find non-existent item") then
+            log.info(Item.find("test1-test2"))
             
         end
     end
