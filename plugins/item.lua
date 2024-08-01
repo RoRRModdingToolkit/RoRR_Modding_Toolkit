@@ -110,21 +110,6 @@ Item.create = function(namespace, identifier)
     )
 
     return item
-
-    -- gm.array_set(array, 2)  -- token_name       "item.IDENTIFIER.name"  (default)
-    -- gm.array_set(array, 3)  -- token_text       "item.IDENTIFIER.pickup"
-    -- gm.array_set(array, 4)  -- on_acquired      callback id 3108.0
-    -- gm.array_set(array, 5)  -- on_removed       callback id 3109.0
-    -- gm.array_set(array, 6)  -- tier             7.0
-    -- gm.array_set(array, 7)  -- sprite_id        sprite id 1628.0
-    -- gm.array_set(array, 8)  -- object_id        object id 851.0
-    -- gm.array_set(array, 9)  -- item_log_id      nil
-    -- gm.array_set(array, 10) -- achievement_id   nil
-    -- gm.array_set(array, 11) -- is_hidden        false
-    -- gm.array_set(array, 12) -- effect_display   nil
-    -- gm.array_set(array, 13) -- actor_component  nil
-    -- gm.array_set(array, 14) -- loot_tags        0.0
-    -- gm.array_set(array, 15) -- is_new_item      true
 end
 
 
