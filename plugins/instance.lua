@@ -63,7 +63,7 @@ Instance.find_all = function(...)
 end
 
 
-Instance.spawn_crate = function(x, y, rarity, items, depth)
+Instance.spawn_crate = function(x, y, tier, items, depth)
     local lang_map = gm.variable_global_get("_language_map")
     local class_item = gm.variable_global_get("class_item")
 
@@ -95,10 +95,10 @@ Instance.spawn_crate = function(x, y, rarity, items, depth)
     c.cam_rect_x2 = x + 100
     c.cam_rect_y2 = y + 100
     c.contents = nil
-    c.inventory = 74.0 + (rarity * 2.0)
+    c.inventory = 76.0 + (tier * 2.0)
     c.flash = 0.0
-    c.interact_scroll_index = isi[rarity]
-    c.interact_scroll_index_inactive = isii[rarity]
+    c.interact_scroll_index = isi[tier + 1]
+    c.interact_scroll_index_inactive = isii[tier + 1]
     c.surf_text_cost_large = -1.0
     c.surf_text_cost_small = -1.0
     c.translation_key = "interactable.pInteractableCrate"
@@ -109,16 +109,16 @@ Instance.spawn_crate = function(x, y, rarity, items, depth)
     c.cost_type = 0.0
     c.selection = 0.0
     c.select_cd = 0.0
-    c.sprite_index = sprites[rarity]
-    c.sprite_death = sprites_use[rarity]
+    c.sprite_index = sprites[tier + 1]
+    c.sprite_death = sprites_use[tier + 1]
     c.fade_alpha = 0.0
-    c.col_index = rarity - 1.0
+    c.col_index = tier
     c.m_id = gm.set_m_id(true)  -- I have no idea what the argument is supposed to be, but this works
     c.my_player = -4.0
-    c.__custom_id = rarity - 1.0
-    c.__object_index = 799.0 + rarity
+    c.__custom_id = tier
+    c.__object_index = 800.0 + tier
     c.image_speed = 0.06
-    c.tier = rarity - 1.0
+    c.tier = tier
 
     -- Replace default crate items with custom set
     if items then
@@ -129,7 +129,7 @@ Instance.spawn_crate = function(x, y, rarity, items, depth)
     end
 
     -- [Host]  Send spawn data to clients
-    if Net.type() == Net.TYPE.host then Net.send("RMT.spawnCrate", x, y, rarity, items, depth) end
+    if Net.type() == Net.TYPE.host then Net.send("RMT.spawnCrate", x, y, tier, items, depth) end
 
     return c
 end
