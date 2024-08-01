@@ -145,13 +145,14 @@ end
 -- ========== Internal ==========
 
 function onShoot(self, other, result, args)
+    if not args[2].value.proc then return end
     if callbacks["onShoot"] then
         for _, c in ipairs(callbacks["onShoot"]) do
             local item = c[1]
             local count = Item.get_stack_count(self, item)
             if count > 0 then
                 local func = c[2]
-                func(self, args[2].value, count)    -- Attacker, Damager attack_info, Stack count
+                func(self, args[2].value, count)    -- Actor, Damager attack_info, Stack count
             end
         end
     end
@@ -160,6 +161,7 @@ Callback.add("onAttackCreate", "RMT.onShoot", onShoot, true)
 
 
 function onHit(self, other, result, args)
+    if not self.attack_info.proc then return end
     if callbacks["onHit"] then
         for _, c in ipairs(callbacks["onHit"]) do
             local item = c[1]

@@ -11,11 +11,11 @@ require("./item")
 require("./net")
 require("./player")
 
-local spr = gm.sprite_add(_ENV["!plugins_mod_folder_path"].."/plugins/sCancel.png", 1, false, false, 16, 16)
-
 
 
 -- ========== Testing ==========
+
+local spr = gm.sprite_add(_ENV["!plugins_mod_folder_path"].."/plugins/sCancel.png", 1, false, false, 16, 16)
 
 gui.add_imgui(function()
     if ImGui.Begin("RoRR Modding Toolkit") then
@@ -58,13 +58,13 @@ gui.add_imgui(function()
                 actor.infusion_hp = actor.infusion_hp - 10.0 * stack
             end)
 
-            Item.add_callback(item, "onShoot", function(attacker, damager, stack)
+            Item.add_callback(item, "onShoot", function(actor, damager, stack)
                 -- Crit every 6 shots
                 -- Additional stacks increase the shot's damage by 20%
-                if not attacker.six_shooter then attacker.six_shooter = 0 end
-                attacker.six_shooter = attacker.six_shooter + 1
-                if attacker.six_shooter >= 6 then
-                    attacker.six_shooter = 0
+                if not actor.six_shooter then actor.six_shooter = 0 end
+                actor.six_shooter = actor.six_shooter + 1
+                if actor.six_shooter >= 6 then
+                    actor.six_shooter = 0
                     damager.damage = damager.damage * 2.0
                     damager.critical = true
                     if stack > 1 then
