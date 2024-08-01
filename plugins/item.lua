@@ -50,8 +50,7 @@ end
 
 
 Item.create = function(namespace, identifier)
-    local check = Item.find(namespace, identifier)
-    if check then return check end
+    if Item.find(namespace, identifier) then return nil end
 
     local item = gm.item_create(
         namespace,
