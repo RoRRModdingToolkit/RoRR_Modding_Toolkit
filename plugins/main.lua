@@ -143,6 +143,18 @@ gui.add_imgui(function()
 
         elseif ImGui.Button("Find non-existent item") then
             log.info(Item.find("test1-test2"))
+
+        elseif ImGui.Button("Spawn green crate with custom") then
+            local player = Player.get_client()
+            Instance.spawn_crate(player.x, player.y, Item.TIER.uncommon, {Item.find("ror-fireShield"), Item.find("ror-redWhip")})
+
+        elseif ImGui.Button("Spawn all crates") then
+            local player = Player.get_client()
+            Instance.spawn_crate(player.x - 80, player.y, Item.TIER.common)
+            Instance.spawn_crate(player.x - 40, player.y, Item.TIER.uncommon)
+            Instance.spawn_crate(player.x, player.y, Item.TIER.rare)
+            Instance.spawn_crate(player.x + 40, player.y, Item.TIER.equipment)
+            Instance.spawn_crate(player.x + 80, player.y, Item.TIER.boss)
             
         end
     end
