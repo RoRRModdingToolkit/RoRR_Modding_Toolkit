@@ -20,9 +20,10 @@ end)
 ^^^ this will get compacted into one line later like previously  
 
 ### Current Functionality
+* General-purpose helper functions
 * Instance finding
 * Callback system
-* Custom items
+* Item finding and Custom items
 * Network syncing
 
 ---
