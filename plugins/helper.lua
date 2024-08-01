@@ -3,9 +3,17 @@
 
 Helper = {}
 
+local init = false
+local init_funcs = {}
+
 
 
 -- ========== Functions ==========
+
+Helper.initialize = function(func)
+    table.insert(init_funcs, func)
+end
+
 
 Helper.chance = function(n)
     return gm.random_range(0, 1) <= n
@@ -79,3 +87,16 @@ Helper.string_to_table = function(string_)
     end
     return parsed
 end
+
+
+
+-- ========== Hooks ==========
+
+gm.pre_script_hook(gm.constants.__input_system_tick, function()
+    if not init then
+        init = true
+        for _, fn in ipairs(init_funcs) do
+            fn()
+        end
+    end
+end)
