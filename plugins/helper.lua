@@ -1,5 +1,5 @@
 -- Helper
--- Original HelperFunctions written by Klehrik
+-- Originally in HelperFunctions by Klehrik
 
 Helper = {}
 
