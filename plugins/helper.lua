@@ -55,6 +55,8 @@ Helper.string_to_table = function(string_)
         else
             local value = raw[i]
             if tonumber(value) then value = tonumber(value)
+            elseif value == "true" then value = true
+            elseif value == "false" then value = false
             elseif value == "nil" then value = nil
             end
             table.insert(parsed, value)
