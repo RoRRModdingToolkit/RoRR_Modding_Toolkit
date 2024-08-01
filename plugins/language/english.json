@@ -2,9 +2,9 @@
     "item" : {
         "customItem" : {
             "name" : "Custom Item!!",
-            "pickup" : "ye",
+            "pickup" : "pickup text",
             "description" : "long description",
-            "destination" : "your mom's house",
+            "destination" : "destination",
             "date" : "1/1/2056",
             "story" : "lore"
         }
