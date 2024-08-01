@@ -1,4 +1,5 @@
 Friendly abstractions of the game's internal functions for easier modding.  
+Documentation can be found [here](https://github.com/RoRRModdingToolkit/RoRR_Modding_Toolkit/wiki).  
 
 To use, include the following line in your code:  
 ```lua
