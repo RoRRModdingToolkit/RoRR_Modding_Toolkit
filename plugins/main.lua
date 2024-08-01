@@ -6,6 +6,7 @@ RoRR_Modding_Toolkit = true
 
 require("./callback")
 require("./helper")
+require("./initialize")
 require("./instance")
 require("./item")
 require("./net")
