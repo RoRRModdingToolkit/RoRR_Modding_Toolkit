@@ -96,6 +96,33 @@ gui.add_imgui(function()
                 end
             end)
 
+            Item.add_callback(item, "onDamageBlocked", function(victim, damager, stack)
+                -- Kill attacker
+                damager.parent.hp = -1.0
+            end)
+
+            Item.add_callback(item, "onInteract", function(actor, interactable, stack)
+                -- Increase max health
+                actor.maxhp = actor.maxhp + 50.0
+                actor.infusion_hp = actor.infusion_hp + 50.0
+            end)
+
+            Item.add_callback(item, "onEquipmentUse", function(actor, equipment, stack)
+                -- Increase max health
+                actor.maxhp = actor.maxhp + 20.0
+                actor.infusion_hp = actor.infusion_hp + 20.0
+            end)
+
+            Item.add_callback(item, "onStep", function(actor, stack)
+                -- Spawn a chest every 7 seconds
+                if not actor.spawn_chest then actor.spawn_chest = 0 end
+                actor.spawn_chest = actor.spawn_chest + 1
+                if actor.spawn_chest >= 420 then
+                    actor.spawn_chest = 0
+                    gm.instance_create_depth(actor.x, actor.y, 0, gm.constants.oChest1)
+                end
+            end)
+
             Item.add_callback(item, "onDraw", function(actor, stack)
                 -- Draw a circle around actor that expands with more stacks
                 gm.draw_circle(actor.x, actor.y, 60.0 + (20.0 * stack), true)
@@ -139,3 +166,20 @@ end)
 -- log.info(drop)
 -- log.info(gm.ds_list_size(drop))
 -- log.info(gm.object_get_name(gm.ds_list_find_value(drop, 0)))    -- oNugget
+
+
+-- Code Storage
+
+-- local names = gm.struct_get_names(damager)
+-- log.info(names)
+-- for _, n in ipairs(names) do
+--     log.info(n.." = "..tostring(gm.struct_get(damager, n)))
+-- end
+
+-- log.info(gm.object_get_name(self.object_index))
+-- log.info(gm.object_get_name(other.object_index))
+-- log.info(result.value)
+-- for _, a in ipairs(args) do
+--     log.info(a.value)
+-- end
+-- log.info("")
