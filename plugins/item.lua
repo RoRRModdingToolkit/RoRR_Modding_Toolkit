@@ -93,6 +93,8 @@ end
 
 
 Item.set_tier = function(item, tier)
+    -- TODO: Remove from previous loot pool
+
     -- Set class_item tier
     local array = gm.variable_global_get("class_item")[item + 1]
     gm.array_set(array, 6, tier)
