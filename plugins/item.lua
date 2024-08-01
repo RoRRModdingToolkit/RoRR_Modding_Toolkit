@@ -124,6 +124,7 @@ Item.add_callback = function(item, callback, func)
         or callback == "onHit"
         or callback == "onKill"
         or callback == "onDamaged"
+        or callback == "onDraw"
         then
             if not callbacks[callback] then callbacks[callback] = {} end
             table.insert(callbacks[callback], {item, func})
@@ -142,7 +143,7 @@ function onShoot(self, other, result, args)
             local count = Item.get_stack_count(self, item)
             if count > 0 then
                 local func = c[2]
-                func(self, args[2].value, count)   -- Attacker, Damager attack_info, Stack count
+                func(self, args[2].value, count)    -- Attacker, Damager attack_info, Stack count
             end
         end
     end
@@ -157,7 +158,7 @@ function onHit(self, other, result, args)
             local count = Item.get_stack_count(args[2].value, item)
             if count > 0 then
                 local func = c[2]
-                func(args[2].value, args[3].value, self.attack_info, count)   -- Attacker, Victim, Damager attack_info, Stack count
+                func(args[2].value, args[3].value, self.attack_info, count) -- Attacker, Victim, Damager attack_info, Stack count
             end
         end
     end
@@ -181,13 +182,6 @@ Callback.add("onKillProc", "RMT.onKill", onKill, true)
 
 
 function onDamaged(self, other, result, args)
-    -- log.info(gm.object_get_name(self.object_index))
-    -- log.info(gm.object_get_name(other.object_index))
-    -- log.info(result.value)
-    -- for _, a in ipairs(args) do
-    --     log.info(a.value)
-    -- end
-
     if callbacks["onDamaged"] then
         for _, c in ipairs(callbacks["onDamaged"]) do
             local item = c[1]
@@ -200,6 +194,32 @@ function onDamaged(self, other, result, args)
     end
 end
 Callback.add("onDamagedProc", "RMT.onDamaged", onDamaged, true)
+
+
+function onDraw(self, other, result, args)
+    -- log.info(gm.object_get_name(self.object_index))
+    -- log.info(gm.object_get_name(other.object_index))
+    -- log.info(result.value)
+    -- for _, a in ipairs(args) do
+    --     log.info(a.value)
+    -- end
+    -- log.info("")
+
+    if callbacks["onDraw"] then
+        for _, c in ipairs(callbacks["onDraw"]) do
+            local actors = Instance.find_all(gm.constants.pActor)
+            for _, a in ipairs(actors) do
+                local item = c[1]
+                local count = Item.get_stack_count(a, item)
+                if count > 0 then
+                    local func = c[2]
+                    func(a, count)  -- Actor, Stack count
+                end
+            end
+        end
+    end
+end
+Callback.add("postHUDDraw", "RMT.onDraw", onDraw, true)
 
 
 

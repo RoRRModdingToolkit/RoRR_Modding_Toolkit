@@ -96,6 +96,11 @@ gui.add_imgui(function()
                 end
             end)
 
+            Item.add_callback(item, "onDraw", function(actor, stack)
+                -- Draw a circle around actor that expands with more stacks
+                gm.draw_circle(actor.x, actor.y, 60.0 + (20.0 * stack), true)
+            end)
+
 
         elseif ImGui.Button("Give new item") then
             gm.item_give(Player.get_client(), gm.item_find("rmt-customItem"), 1, false)
