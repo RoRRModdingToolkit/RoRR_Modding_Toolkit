@@ -125,6 +125,7 @@ Item.add_callback = function(item, callback, func)
         table.insert(callbacks[array[6]], func)
 
     elseif callback == "onShoot"
+        or callback == "onPostShoot"
         or callback == "onHit"
         or callback == "onKill"
         or callback == "onDamaged"
@@ -158,6 +159,22 @@ function onShoot(self, other, result, args)
     end
 end
 Callback.add("onAttackCreate", "RMT.onShoot", onShoot, true)
+
+
+function onPostShoot(self, other, result, args)
+    if not args[2].value.proc or not args[2].value.parent then return end
+    if callbacks["onPostShoot"] then
+        for _, c in ipairs(callbacks["onPostShoot"]) do
+            local item = c[1]
+            local count = Item.get_stack_count(args[2].value.parent, item)
+            if count > 0 then
+                local func = c[2]
+                func(args[2].value.parent, args[2].value, count)    -- Actor, Damager attack_info, Stack count
+            end
+        end
+    end
+end
+Callback.add("onAttackHandleEnd", "RMT.onPostShoot", onPostShoot, true)
 
 
 function onHit(self, other, result, args)
