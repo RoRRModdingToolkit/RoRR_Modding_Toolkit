@@ -1,6 +1,6 @@
-description
+Friendly abstractions of the game's internal functions for easier modding.  
 
-To use, include the following line in your code:
+To use, include the following line in your code:  
 ```lua
 mods.on_all_mods_loaded(function()
     for _, m in pairs(mods) do
@@ -16,7 +16,13 @@ mods.on_all_mods_loaded(function()
     end
 end)
 ```
-^^^ this will get compacted into one line later like previously
+^^^ this will get compacted into one line later like previously  
+
+### Current Functionality
+* Instance finding
+* Callback system
+* Custom items
+* Network syncing
 
 ---
 

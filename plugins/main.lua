@@ -38,6 +38,8 @@ gui.add_imgui(function()
 
 
         elseif ImGui.Button("Create new item") then
+            if Item.find("rmt-customItem") then return end
+
             gm.translate_load_file(gm.variable_global_get("_language_map"), _ENV["!plugins_mod_folder_path"].."/plugins/language/english.json")
 
             local item = Item.create("rmt", "customItem")
@@ -58,11 +60,16 @@ gui.add_imgui(function()
 
             Item.add_callback(item, "onShoot", function(attacker, damager, stack)
                 -- Crit every 6 shots
+                -- Additional stacks increase the shot's damage by 20%
                 if not attacker.six_shooter then attacker.six_shooter = 0 end
                 attacker.six_shooter = attacker.six_shooter + 1
                 if attacker.six_shooter >= 6 then
                     attacker.six_shooter = 0
+                    damager.damage = damager.damage * 2.0
                     damager.critical = true
+                    if stack > 1 then
+                        damager.damage = damager.damage * (0.8 + (0.2 * stack))
+                    end
                 end
             end)
 
@@ -77,6 +84,16 @@ gui.add_imgui(function()
                 attacker.maxshield = attacker.maxshield + 5.0 * stack
                 attacker.maxshield_base = attacker.maxshield_base + 5.0 * stack
                 attacker.shield = attacker.shield + 5.0 * stack
+            end)
+
+            Item.add_callback(item, "onDamaged", function(victim, damager, stack)
+                -- Increase max health
+                -- Also make attacker take damage
+                victim.maxhp = victim.maxhp + 2.0 * stack
+                victim.infusion_hp = victim.infusion_hp + 2.0 * stack
+                if Instance.exists(damager.parent) then
+                    damager.parent.hp = damager.parent.hp - (damager.parent.maxhp * 0.1)
+                end
             end)
 
 

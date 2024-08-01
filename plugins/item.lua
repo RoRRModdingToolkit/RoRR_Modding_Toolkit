@@ -38,6 +38,7 @@ Item.LOOT_TAG = {
 -- ========== Functions ==========
 
 Item.find = function(namespace, identifier)
+    if not identifier then return gm.item_find(namespace) end
     return gm.item_find(namespace.."-"..identifier)
 end
 
@@ -122,6 +123,7 @@ Item.add_callback = function(item, callback, func)
     elseif callback == "onShoot"
         or callback == "onHit"
         or callback == "onKill"
+        or callback == "onDamaged"
         then
             if not callbacks[callback] then callbacks[callback] = {} end
             table.insert(callbacks[callback], {item, func})
@@ -149,22 +151,6 @@ Callback.add("onAttackCreate", "RMT.onShoot", onShoot, true)
 
 
 function onHit(self, other, result, args)
-    -- log.info(gm.object_get_name(self.object_index))
-    -- log.info(gm.object_get_name(other.object_index))
-    -- log.info(result.value)
-    -- for _, a in ipairs(args) do
-    --     log.info(a.value)
-    -- end
-    -- log.info(gm.object_get_name(args[2].value.object_index))
-    -- log.info(gm.object_get_name(args[3].value.object_index))
-    -- log.info("")
-
-    -- local attack_info = self.attack_info
-    -- local names = gm.struct_get_names(attack_info)
-    -- for _, n in ipairs(names) do
-    --     log.info(n.." = "..tostring(gm.struct_get(attack_info, n)))
-    -- end
-
     if callbacks["onHit"] then
         for _, c in ipairs(callbacks["onHit"]) do
             local item = c[1]
@@ -192,6 +178,28 @@ function onKill(self, other, result, args)
     end
 end
 Callback.add("onKillProc", "RMT.onKill", onKill, true)
+
+
+function onDamaged(self, other, result, args)
+    -- log.info(gm.object_get_name(self.object_index))
+    -- log.info(gm.object_get_name(other.object_index))
+    -- log.info(result.value)
+    -- for _, a in ipairs(args) do
+    --     log.info(a.value)
+    -- end
+
+    if callbacks["onDamaged"] then
+        for _, c in ipairs(callbacks["onDamaged"]) do
+            local item = c[1]
+            local count = Item.get_stack_count(args[2].value, item)
+            if count > 0 then
+                local func = c[2]
+                func(args[2].value, args[3].value.attack_info, count)   -- Victim, Damager attack_info, Stack count
+            end
+        end
+    end
+end
+Callback.add("onDamagedProc", "RMT.onDamaged", onDamaged, true)
 
 
 
