@@ -35,7 +35,7 @@ Item.LOOT_TAG = {
 
 
 
--- ========== Functions ==========
+-- ========== General Functions ==========
 
 Item.find = function(namespace, identifier)
     if not identifier then return gm.item_find(namespace) end
@@ -47,6 +47,9 @@ Item.get_stack_count = function(actor, item)
     return gm.item_count(actor, item, false) + gm.item_count(actor, item, true)
 end
 
+
+
+-- ========== Custom Item Functions ==========
 
 Item.create = function(namespace, identifier)
     if Item.find(namespace, identifier) then return nil end
