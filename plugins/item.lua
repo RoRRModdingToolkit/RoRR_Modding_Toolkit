@@ -4,7 +4,6 @@
 Item = {}
 
 local callbacks = {}
-local callbacks = {}
 
 
 
