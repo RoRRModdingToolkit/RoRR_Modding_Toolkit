@@ -87,6 +87,7 @@ Instance.spawn_crate = function(x, y, tier, items, depth)
     c.can_activate_frame = 0.0
     c.mouse_x_last = 0.0
     c.mouse_y_last = 0.0
+    c.mouse_hovered_last = 0.0
     c.last_move_was_mouse = false
     c.using_mouse = false
     c.last_activated_frame = -1.0
