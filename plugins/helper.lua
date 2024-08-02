@@ -22,6 +22,14 @@ Helper.ease_out = function(x, n)
 end
 
 
+Helper.table_has = function(table_, value)
+    for k, v in pairs(table_) do
+        if v == value then return true end
+    end
+    return false
+end
+
+
 Helper.table_merge = function(...)
     local new = {}
     for _, t in ipairs{...} do
