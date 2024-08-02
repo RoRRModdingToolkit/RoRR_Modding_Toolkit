@@ -11,6 +11,8 @@ require("./instance")
 require("./item")
 require("./net")
 require("./player")
+require("./resources")
+require("./survivor")
 
 
 
@@ -59,7 +61,7 @@ gui.add_imgui(function()
                 actor.infusion_hp = actor.infusion_hp - 10.0 * stack
             end)
 
-            Item.add_callback(item, "onShoot", function(actor, damager, stack)
+            Item.add_callback(item, "onAttack", function(actor, damager, stack)
                 -- Crit every 6 shots
                 -- Additional stacks increase the shot's damage by 20%
                 if not actor.six_shooter then actor.six_shooter = 0 end
