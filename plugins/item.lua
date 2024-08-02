@@ -390,7 +390,9 @@ gm.pre_script_hook(gm.constants.skill_util_update_heaven_cracker, function(self,
     if callbacks["onBasicUse"] then
         for _, fn in pairs(callbacks["onBasicUse"]) do
             local count = Item.get_stack_count(args[1].value, fn[1])
-            fn[2](args[1].value, count)   -- Actor, Stack count
+            if count > 0 then
+                fn[2](args[1].value, count)   -- Actor, Stack count
+            end
         end
     end
 end)
