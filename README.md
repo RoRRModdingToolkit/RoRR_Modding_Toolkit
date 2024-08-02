@@ -12,6 +12,8 @@ mods.on_all_mods_loaded(function()
             Item = m.Item
             Net = m.Net
             Player = m.Player
+            Survivor = m.Survivor
+            Resources = m.Resources
             break
         end
     end
