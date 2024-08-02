@@ -184,8 +184,9 @@ Item.add_callback = function(item, callback, func)
         if not callbacks[array[6]] then callbacks[array[6]] = {} end
         table.insert(callbacks[array[6]], func)
 
-    elseif callback == "onShoot"
-        or callback == "onPostShoot"
+    elseif callback == "onBasicUse"
+        or callback == "onAttack"
+        or callback == "onPostAttack"
         or callback == "onHit"
         or callback == "onKill"
         or callback == "onDamaged"
@@ -205,10 +206,10 @@ end
 
 -- ========== Internal ==========
 
-function onShoot(self, other, result, args)
+function onAttack(self, other, result, args)
     if not args[2].value.proc then return end
-    if callbacks["onShoot"] then
-        for _, c in ipairs(callbacks["onShoot"]) do
+    if callbacks["onAttack"] then
+        for _, c in ipairs(callbacks["onAttack"]) do
             local item = c[1]
             local count = Item.get_stack_count(self, item)
             if count > 0 then
@@ -218,13 +219,13 @@ function onShoot(self, other, result, args)
         end
     end
 end
-Callback.add("onAttackCreate", "RMT.onShoot", onShoot, true)
+Callback.add("onAttackCreate", "RMT.onAttack", onAttack, true)
 
 
-function onPostShoot(self, other, result, args)
+function onPostAttack(self, other, result, args)
     if not args[2].value.proc or not args[2].value.parent then return end
-    if callbacks["onPostShoot"] then
-        for _, c in ipairs(callbacks["onPostShoot"]) do
+    if callbacks["onPostAttack"] then
+        for _, c in ipairs(callbacks["onPostAttack"]) do
             local item = c[1]
             local count = Item.get_stack_count(args[2].value.parent, item)
             if count > 0 then
@@ -234,7 +235,7 @@ function onPostShoot(self, other, result, args)
         end
     end
 end
-Callback.add("onAttackHandleEnd", "RMT.onPostShoot", onPostShoot, true)
+Callback.add("onAttackHandleEnd", "RMT.onPostAttack", onPostAttack, true)
 
 
 function onHit(self, other, result, args)
@@ -371,6 +372,16 @@ gm.post_script_hook(gm.constants.callback_execute, function(self, other, result,
     if callbacks[args[1].value] then
         for _, fn in pairs(callbacks[args[1].value]) do
             fn(args[2].value, args[3].value)
+        end
+    end
+end)
+
+
+gm.pre_script_hook(gm.constants.skill_util_update_heaven_cracker, function(self, other, result, args)
+    if callbacks["onBasicUse"] then
+        for _, fn in pairs(callbacks["onBasicUse"]) do
+            local count = Item.get_stack_count(args[1].value, fn[1])
+            fn[2](args[1].value, count)   -- Actor, Stack count
         end
     end
 end)
