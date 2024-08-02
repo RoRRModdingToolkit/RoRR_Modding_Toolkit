@@ -28,11 +28,11 @@ Buff.apply = function(actor, buff, time, stack)
     -- Clamp to max stack or under
     -- Funny stuff happens if this is exceeded
     local max_stack = gm.variable_global_get("class_buff")[buff + 1][10]
-    gm.array_set(actor.buff_stack, buff, math.min(Buff.get_stack(actor, buff), max_stack))
+    gm.array_set(actor.buff_stack, buff, math.min(Buff.get_stack_count(actor, buff), max_stack))
 end
 
 
-Buff.get_stack = function(actor, buff)
+Buff.get_stack_count = function(actor, buff)
     return actor.buff_stack[buff + 1]
 end
 
@@ -84,7 +84,7 @@ end
 gm.post_script_hook(gm.constants.callback_execute, function(self, other, result, args)
     if callbacks[args[1].value] then
         for _, fn in pairs(callbacks[args[1].value]) do
-            local stack = Buff.get_stack(args[2].value, fn[1])
+            local stack = Buff.get_stack_count(args[2].value, fn[1])
             fn[2](args[2].value, stack)   -- Actor, Buff stack
         end
     end
