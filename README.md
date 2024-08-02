@@ -6,6 +6,7 @@ To use, include the following line in your code:
 mods.on_all_mods_loaded(function()
     for _, m in pairs(mods) do
         if type(m) == "table" and m.RoRR_Modding_Toolkit then
+            Buff = m.Buff
             Callback = m.Callback
             Helper = m.Helper
             Instance = m.Instance
