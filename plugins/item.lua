@@ -143,16 +143,24 @@ end
 
 
 Item.set_tier = function(item, tier)
-    -- TODO: Remove from previous loot pool
-
     -- Set class_item tier
     local array = gm.variable_global_get("class_item")[item + 1]
     gm.array_set(array, 6, tier)
 
-    -- Add to loot pool
-    local pool = gm.variable_global_get("treasure_loot_pools")[tier + 1]
+    local obj = array[9]
+    local pools = gm.variable_global_get("treasure_loot_pools")
+
+    -- Remove from all loot pools (if found)
+    for _, p in ipairs(pools) do
+        local drops = p.drop_pool
+        local pos = gm.ds_list_find_index(obj)
+        if pos >= 0 then gm.ds_list_delete(drops, pos) end
+    end
+
+    -- Add to new loot pool
+    local pool = pools[tier + 1]
     local drops = pool.drop_pool
-    gm.ds_list_add(drops, array[9])
+    gm.ds_list_add(drops, obj)
 end
 
 
