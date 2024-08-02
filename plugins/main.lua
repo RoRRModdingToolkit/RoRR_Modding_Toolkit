@@ -156,6 +156,23 @@ gui.add_imgui(function()
             Instance.spawn_crate(player.x, player.y, Item.TIER.rare)
             Instance.spawn_crate(player.x + 40, player.y, Item.TIER.equipment)
             Instance.spawn_crate(player.x + 80, player.y, Item.TIER.boss)
+
+        -- elseif ImGui.Button("Add item log") then
+        --     local item = Item.find("rmt-customItem")
+        --     local data = Item.get_data(item)
+            --gm.item_log_create("rmt", "customItem", nil, data.sprite_id, data.object_id)
+            --gm.item_log_create("rmt", "test")
+
+            -- local logs = gm.variable_global_get("class_item_log")
+            -- log.info(logs)
+            -- for _, a in ipairs(logs) do
+            --     for _, v in ipairs(a) do
+            --         local str = _.." : "
+            --         if v then str = str..v end
+            --         log.info(str)
+            --     end
+            --     log.info("")
+            -- end
             
         end
     end

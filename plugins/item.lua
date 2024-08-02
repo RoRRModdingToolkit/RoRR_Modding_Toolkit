@@ -94,12 +94,21 @@ Item.get_stack_count = function(actor, item)
 end
 
 
+Item.get_log = function(namespace, identifier)
+    local array = gm.variable_global_get("class_item_log")
+    for _, log in ipairs(array) do
+        if log[1] == namespace and log[2] == identifier then return log end
+    end
+end
+
+
 
 -- ========== Custom Item Functions ==========
 
 Item.create = function(namespace, identifier)
     if Item.find(namespace, identifier) then return nil end
 
+    -- Create item
     local item = gm.item_create(
         namespace,
         identifier,
@@ -108,6 +117,19 @@ Item.create = function(namespace, identifier)
         gm.object_add_w(namespace, identifier, gm.constants.pPickupItem),
         0
     )
+
+    -- Create item log
+    local log = gm.item_log_create(
+        namespace,
+        identifier,
+        nil,
+        nil,
+        Item.get_data(item).object_id
+    )
+
+    -- Set item log ID into item array
+    local array = gm.variable_global_get("class_item")[item + 1]
+    gm.array_set(array, 9, log)
 
     return item
 end
@@ -121,6 +143,10 @@ Item.set_sprite = function(item, sprite)
     -- Set item object sprite
     local obj = array[9]
     gm.object_set_sprite_w(obj, sprite)
+
+    -- Set item log sprite
+    local log_array = Item.get_log(array[1], array[2])
+    gm.array_set(log_array, 9, sprite)
 end
 
 
