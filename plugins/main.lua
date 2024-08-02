@@ -14,3 +14,8 @@ require("./net")
 require("./player")
 require("./resources")
 require("./survivor")
+
+
+
+-- Testing
+require("./testing")
