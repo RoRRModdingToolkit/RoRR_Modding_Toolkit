@@ -106,7 +106,7 @@ end
 
 -- ========== Custom Item Functions ==========
 
-Item.create = function(namespace, identifier)
+Item.create = function(namespace, identifier, no_log)
     if Item.find(namespace, identifier) then return nil end
 
     -- Create item
@@ -119,18 +119,20 @@ Item.create = function(namespace, identifier)
         0
     )
 
-    -- Create item log
-    local array = gm.variable_global_get("class_item")[item + 1]
-    local log = gm.item_log_create(
-        namespace,
-        identifier,
-        nil,
-        nil,
-        array[9]
-    )
+    if not no_log then
+        -- Create item log
+        local array = gm.variable_global_get("class_item")[item + 1]
+        local log = gm.item_log_create(
+            namespace,
+            identifier,
+            nil,
+            nil,
+            array[9]
+        )
 
-    -- Set item log ID into item array
-    gm.array_set(array, 9, log)
+        -- Set item log ID into item array
+        gm.array_set(array, 9, log)
+    end
 
     return item
 end
@@ -146,8 +148,10 @@ Item.set_sprite = function(item, sprite)
     gm.object_set_sprite_w(obj, sprite)
 
     -- Set item log sprite
-    local log_array = gm.variable_global_get("class_item_log")[array[10] + 1]
-    gm.array_set(log_array, 9, sprite)
+    if array[10] then
+        local log_array = gm.variable_global_get("class_item_log")[array[10] + 1]
+        gm.array_set(log_array, 9, sprite)
+    end
 end
 
 
