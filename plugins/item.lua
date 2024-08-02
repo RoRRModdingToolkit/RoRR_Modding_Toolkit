@@ -153,7 +153,7 @@ Item.set_tier = function(item, tier)
     -- Remove from all loot pools (if found)
     for _, p in ipairs(pools) do
         local drops = p.drop_pool
-        local pos = gm.ds_list_find_index(obj)
+        local pos = gm.ds_list_find_index(drops, obj)
         if pos >= 0 then gm.ds_list_delete(drops, pos) end
     end
 
