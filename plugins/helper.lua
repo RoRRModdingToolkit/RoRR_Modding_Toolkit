@@ -79,3 +79,11 @@ Helper.string_to_table = function(string_)
     end
     return parsed
 end
+
+
+Helper.mixed_hyperbolic = function(stack_count, chance, base_chance)
+    local base_chance = base_chance or chance
+    local diff = base_chance - chance
+    local stacks_chance = chance * stack_count
+    return math.max(stacks_chance / (stacks_chance + 1), chance) + diff
+end
