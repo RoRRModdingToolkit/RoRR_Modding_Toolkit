@@ -34,6 +34,13 @@ Item.LOOT_TAG = {
 }
 
 
+Item.TYPE = {
+    all         = 0,
+    real        = 1,
+    temporary   = 2
+}
+
+
 
 -- ========== General Functions ==========
 
@@ -89,7 +96,9 @@ Item.get_random = function(...)
 end
 
 
-Item.get_stack_count = function(actor, item)
+Item.get_stack_count = function(actor, item, type_)
+    if type_ == Item.TYPE.real then return gm.item_count(actor, item, false) end
+    if type_ == Item.TYPE.temporary then return gm.item_count(actor, item, true) end
     return gm.item_count(actor, item, false) + gm.item_count(actor, item, true)
 end
 
