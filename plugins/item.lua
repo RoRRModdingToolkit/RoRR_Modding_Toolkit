@@ -94,14 +94,6 @@ Item.get_stack_count = function(actor, item)
 end
 
 
-Item.get_log = function(namespace, identifier)
-    local array = gm.variable_global_get("class_item_log")
-    for _, log in ipairs(array) do
-        if log[1] == namespace and log[2] == identifier then return log end
-    end
-end
-
-
 
 -- ========== Custom Item Functions ==========
 
