@@ -119,16 +119,16 @@ Item.create = function(namespace, identifier)
     )
 
     -- Create item log
+    local array = gm.variable_global_get("class_item")[item + 1]
     local log = gm.item_log_create(
         namespace,
         identifier,
         nil,
         nil,
-        Item.get_data(item).object_id
+        array[9]
     )
 
     -- Set item log ID into item array
-    local array = gm.variable_global_get("class_item")[item + 1]
     gm.array_set(array, 9, log)
 
     return item
