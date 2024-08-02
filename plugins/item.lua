@@ -137,7 +137,7 @@ Item.set_sprite = function(item, sprite)
     gm.object_set_sprite_w(obj, sprite)
 
     -- Set item log sprite
-    local log_array = Item.get_log(array[1], array[2])
+    local log_array = gm.variable_global_get("class_item_log")[array[10] + 1]
     gm.array_set(log_array, 9, sprite)
 end
 
