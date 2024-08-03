@@ -76,6 +76,9 @@ Buff.create = function(namespace, identifier)
         identifier
     )
 
+    -- Set default stack_number_col to pure white
+    Buff.set_property(buff, Buff.PROPERTY.stack_number_col, gm.array_create(1, 16777215))
+
     return buff
 end
 
