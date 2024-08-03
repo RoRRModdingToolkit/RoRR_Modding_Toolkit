@@ -1,5 +1,26 @@
 -- Testing stuff
 
+
+-- expanded README setup
+
+-- mods.on_all_mods_loaded(function()
+--     for _, m in pairs(mods) do
+--         if type(m) == "table" and m.RoRR_Modding_Toolkit then
+--             Buff = m.Buff
+--             Callback = m.Callback
+--             Helper = m.Helper
+--             Instance = m.Instance
+--             Item = m.Item
+--             Net = m.Net
+--             Player = m.Player
+--             Resources = m.Resources
+--             Survivor = m.Survivor
+--             break
+--         end
+--     end
+-- end)
+
+
 local spr = gm.sprite_add(_ENV["!plugins_mod_folder_path"].."/plugins/sCancel.png", 1, false, false, 16, 16)
 
 gui.add_imgui(function()
