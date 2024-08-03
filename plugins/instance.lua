@@ -130,15 +130,7 @@ Instance.spawn_crate = function(x, y, tier, items, depth)
     end
 
     -- [Host] Send spawn data to clients
-    if Net.get_type() == Net.TYPE.host then Net.send("RMT.spawnCrate", x, y, tier, items, depth) end
+    if Net.get_type() == Net.TYPE.host then Net.send("RMT.spawnCrate", Net.TARGET.all, nil, x, y, tier, items, depth) end
 
     return c
 end
-
-
-
--- ========== Internal ==========
-
-mods.on_all_mods_loaded(function()
-    Net.register("RMT.spawnCrate", Instance.spawn_crate)
-end)

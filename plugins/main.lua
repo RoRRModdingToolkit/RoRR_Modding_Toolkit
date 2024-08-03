@@ -15,6 +15,10 @@ require("./player")
 require("./resources")
 require("./survivor")
 
+function __initialize()
+    Net.register("RMT.spawnCrate", Instance.spawn_crate)
+end
+
 
 
 -- Testing
