@@ -10,12 +10,19 @@ Helper = {}
 Helper.log_hook = function(self, other, result, args)
     log.info("----------")
 
+    local obj_ind = function(val)
+        if val.object_index then val = gm.object_get_name(val.object_index) end
+        return val
+    end
+
     local value = tostring(self)
-    if self.object_index then value = gm.object_get_name(self.object_index) end
+    local bool, val = pcall(obj_ind, self)
+    if bool then value = val end
     log.info("[self]  "..value)
 
     local value = tostring(other)
-    if other.object_index then value = gm.object_get_name(other.object_index) end
+    local bool, val = pcall(obj_ind, other)
+    if bool then value = val end
     log.info("[other]  "..value)
 
     local value = tostring(result.value)
@@ -26,10 +33,7 @@ Helper.log_hook = function(self, other, result, args)
         local value = tostring(a.value)
 
         -- If value is CInstance, print object name
-        local bool, val = pcall(function(val)
-            if val.object_index then val = gm.object_get_name(a.value.object_index) end
-            return val
-        end, a.value)
+        local bool, val = pcall(obj_ind, a.value)
         if bool then value = val end
 
         log.info(value)

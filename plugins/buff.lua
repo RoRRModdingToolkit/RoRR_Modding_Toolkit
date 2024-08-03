@@ -6,7 +6,7 @@ local callbacks = {}
 
 
 
--- ========== General Functions ==========
+-- ========== Enums ==========
 
 Buff.PROPERTY = {
     show_icon               = 2,    -- Whether or not to show the buff icon. <br>`true` by default.
