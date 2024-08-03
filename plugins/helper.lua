@@ -7,6 +7,53 @@ Helper = {}
 
 -- ========== Functions ==========
 
+Helper.log_hook = function(self, other, result, args)
+    log.info("----------")
+
+    local value = tostring(self)
+    if self.object_index then value = gm.object_get_name(self.object_index) end
+    log.info("[self]  "..value)
+
+    local value = tostring(other)
+    if other.object_index then value = gm.object_get_name(other.object_index) end
+    log.info("[other]  "..value)
+
+    local value = tostring(result.value)
+    log.info("[result]  "..value)
+
+    log.info("[args]")
+    for i, a in ipairs(args) do
+        local value = tostring(a.value)
+
+        -- If value is CInstance, print object name
+        local bool, val = pcall(function(val)
+            if val.object_index then val = gm.object_get_name(a.value.object_index) end
+            return val
+        end, a.value)
+        if bool then value = val end
+
+        log.info(value)
+
+        -- If value is Array, print all values
+        if gm.is_array(a.value) then
+            for j, val in ipairs(a.value) do
+                log.info("    ["..j.."]  "..tostring(val))
+            end
+        end
+
+        -- If value is Struct, print all variables
+        if gm.is_struct(a.value) then
+            local names = gm.struct_get_names(a.value)
+            for j, name in ipairs(names) do
+                log.info("    "..name.." = "..tostring(gm.variable_struct_get(a.value, name)))
+            end
+        end
+    end
+
+    log.info("----------")
+end
+
+
 Helper.chance = function(n)
     return gm.random_range(0, 1) <= n
 end
