@@ -50,8 +50,12 @@ Buff.apply = function(actor, buff, time, stack)
 end
 
 
-Buff.remove = function(actor, buff)
-    gm.remove_buff(actor, buff)
+Buff.remove = function(actor, buff, stack)
+    if gm.array_length(actor.buff_stack) <= buff then gm.array_resize(actor.buff_stack, buff + 1) end
+    local stack_count = Buff.get_stack_count(actor, buff)
+    if (not stack) or stack >= stack_count then gm.remove_buff(actor, buff)
+    else gm.array_set(actor.buff_stack, buff, stack_count - stack)
+    end
 end
 
 
