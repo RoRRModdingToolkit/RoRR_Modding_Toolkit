@@ -8,6 +8,24 @@ local callbacks = {}
 
 -- ========== General Functions ==========
 
+Buff.PROPERTY = {
+    show_icon               = 2,    -- Whether or not to show the buff icon. <br>`true` by default.
+    icon_sprite             = 3,    -- The GameMaker sprite_index. <br>add descriotinp
+    icon_subimage           = 4,    -- The image_index of the sprite to show. <br>`0` by default.
+    icon_frame_speed        = 5,    -- The speed at which to animate the icon. <br>`0` by default.
+    icon_stack_subimage     = 6,    -- Whether or not to increase the image_index per stack. <br>`true` by default.
+    draw_stack_number       = 7,    -- Whether or not to display the stack number on the icon.
+    stack_number_col        = 8,    -- description here (array) <br>`nil` by default
+    max_stack               = 9,    -- The maximum stack count. <br>`1` by default.
+    is_timed                = 13,   -- If `false`, the buff will persist until manually removed. <br>`true` by default.
+    is_debuff               = 14,   -- If `true`, the buff is considered a debuff. <br>`false` by default.
+    client_handles_removal  = 15    -- If `true`, the client handles removal instead of the server. <br>`false` by default.
+}
+
+
+
+-- ========== General Functions ==========
+
 Buff.find = function(namespace, identifier)
     local class_buff = gm.variable_global_get("class_buff")
 
@@ -32,6 +50,11 @@ Buff.apply = function(actor, buff, time, stack)
 end
 
 
+Buff.remove = function(actor, buff)
+    gm.remove_buff(actor, buff)
+end
+
+
 Buff.get_stack_count = function(actor, buff)
     return actor.buff_stack[buff + 1]
 end
@@ -53,9 +76,15 @@ Buff.create = function(namespace, identifier)
 end
 
 
-Buff.set_max_stack = function(buff, max)
+Buff.set_property = function(buff, property, value)
     local array = gm.variable_global_get("class_buff")[buff + 1]
-    gm.array_set(array, 9, math.max(max, 1))
+    gm.array_set(array, property, value)
+end
+
+
+Buff.get_property = function(buff, property, value)
+    local array = gm.variable_global_get("class_buff")[buff + 1]
+    return gm.array_get(array, property)
 end
 
 
