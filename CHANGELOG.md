@@ -10,3 +10,4 @@
 * Added Actor module
     * Actor.fire_bullet
     * Actor.damage
+    * Actor.heal

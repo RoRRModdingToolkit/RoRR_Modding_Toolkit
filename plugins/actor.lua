@@ -17,11 +17,22 @@ Actor.fire_explosion = function()
 end
 
 
-Actor.damage = function(target, source, damage, x, y, color, crit_sfx)
+Actor.damage = function(actor, source, damage, x, y, color, crit_sfx)
     if not crit_sfx then crit_sfx = false end
-    gm.damage_inflict(target, damage, 0.0, source, x, y, 0.0, 1.0, color or 16777215.0, crit_sfx)
+    gm.damage_inflict(actor, damage, 0.0, source, x, y, 0.0, 1.0, color or 16777215.0, crit_sfx)
 end
 
 
-Actor.heal = function()
+Actor.heal = function(actor, amount)
+    gm.actor_heal_networked(actor, amount, false)
+
+    -- Health bar flash (if this client's player is healed)
+    if actor == Player.get_client() then
+        local hud = Instance.find(gm.constants.oHUD)
+        if hud then
+            for i, v in ipairs(hud.player_hud_display_info) do
+                if gm.is_struct(v) then v.heal_flash = 0.5 end
+            end
+        end
+    end
 end
