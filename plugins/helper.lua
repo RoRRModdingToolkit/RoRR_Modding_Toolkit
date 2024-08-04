@@ -29,28 +29,26 @@ Helper.log_hook = function(self, other, result, args)
 
     log.info("")
     log.info("[result]")
-    for i, a in ipairs(args) do
-        local value = tostring(result.value)
+    local value = tostring(result.value)
 
-        -- If value is CInstance, print object name
-        local bool, val = pcall(obj_ind, result.value)
-        if bool then value = val end
+    -- If value is CInstance, print object name
+    local bool, val = pcall(obj_ind, result.value)
+    if bool then value = val end
 
-        log.info(value)
+    log.info(value)
 
-        -- If value is Array, print all values
-        if gm.is_array(result.value) then
-            for j, val in ipairs(result.value) do
-                log.info("    ["..j.."]  "..tostring(val))
-            end
+    -- If value is Array, print all values
+    if gm.is_array(result.value) then
+        for j, val in ipairs(result.value) do
+            log.info("    ["..j.."]  "..tostring(val))
         end
+    end
 
-        -- If value is Struct, print all variables
-        if gm.is_struct(result.value) then
-            local names = gm.struct_get_names(result.value)
-            for j, name in ipairs(names) do
-                log.info("    "..name.." = "..tostring(gm.variable_struct_get(result.value, name)))
-            end
+    -- If value is Struct, print all variables
+    if gm.is_struct(result.value) then
+        local names = gm.struct_get_names(result.value)
+        for j, name in ipairs(names) do
+            log.info("    "..name.." = "..tostring(gm.variable_struct_get(result.value, name)))
         end
     end
 
