@@ -4,6 +4,7 @@ log.info("Successfully loaded ".._ENV["!guid"]..".")
 
 RoRR_Modding_Toolkit = true
 
+require("./actor")
 require("./buff")
 require("./callback")
 require("./helper")
