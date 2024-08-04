@@ -30,7 +30,7 @@ Helper.log_hook = function(self, other, result, args)
     log.info("")
     log.info("[result]")
     for i, a in ipairs(args) do
-        local value = tostring(resule.value)
+        local value = tostring(result.value)
 
         -- If value is CInstance, print object name
         local bool, val = pcall(obj_ind, result.value)
