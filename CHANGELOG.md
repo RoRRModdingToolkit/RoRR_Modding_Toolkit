@@ -9,3 +9,4 @@
     * result now shows expanded arrays/structs.
 * Added Actor module
     * Actor.fire_bullet
+    * Actor.damage
