@@ -6,6 +6,8 @@ Actor = {}
 
 -- ========== Functions ==========
 
+-- TODO: Check if all of the below are net synced by the game already
+
 Actor.fire_bullet = function(actor, x, y, direction, range, damage, pierce_multiplier, hit_sprite)
     local damager = actor:fire_bullet(0, x, y, (pierce_multiplier and 1) or 0, damage, range, hit_sprite or -1, direction, 1.0, 1.0, -1.0)
     if pierce_multiplier then damager.damage_degrade = (1.0 - pierce_multiplier) end
@@ -35,4 +37,15 @@ Actor.heal = function(actor, amount)
             end
         end
     end
+end
+
+
+Actor.add_barrier = function(actor, amount)
+    gm.actor_heal_barrier(actor, amount)
+end
+
+
+Actor.set_barrier = function(actor, amount)
+    if actor.barrier <= 0 then Actor.add_barrier(actor, 1) end
+    actor.barrier = amount
 end
