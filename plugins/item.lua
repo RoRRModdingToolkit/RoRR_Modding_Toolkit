@@ -103,6 +103,12 @@ Item.get_stack_count = function(actor, item, type_)
 end
 
 
+Item.spawn_drop = function(item, x, y, target)
+    local obj = Item.get_data(item).object_id
+    if obj then return gm.item_drop_object(obj, x, y, target, false) end
+end
+
+
 
 -- ========== Custom Item Functions ==========
 
