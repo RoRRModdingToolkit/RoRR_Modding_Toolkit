@@ -134,3 +134,11 @@ Instance.spawn_crate = function(x, y, tier, items, depth)
 
     return c
 end
+
+
+
+-- ========== Initialize ==========
+
+Instance.__initialize = function()
+    Net.register("RMT.spawnCrate", Instance.spawn_crate)
+end
