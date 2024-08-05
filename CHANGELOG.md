@@ -13,5 +13,5 @@
     * Actor.heal
     * Actor.add_barrier
     * Actor.set_barrier
-* Item.set_tier : Now positions the log in the correct tier group when viewing in Logs and Unlockables.
+* Item.set_tier : Now positions the log at the end of the correct tier group when viewing in Logs and Unlockables.
 * Added Item.spawn_drop
