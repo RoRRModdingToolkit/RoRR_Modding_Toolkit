@@ -157,11 +157,13 @@ end
 
 Item.set_tier = function(item, tier)
     -- Set class_item tier
-    local array = gm.variable_global_get("class_item")[item + 1]
+    local class_item = gm.variable_global_get("class_item")
+    local array = class_item[item + 1]
     gm.array_set(array, 6, tier)
 
     local obj = array[9]
     local pools = gm.variable_global_get("treasure_loot_pools")
+
 
     -- Remove from all loot pools (if found)
     for _, p in ipairs(pools) do
@@ -174,6 +176,29 @@ Item.set_tier = function(item, tier)
     local pool = pools[tier + 1]
     local drops = pool.drop_pool
     gm.ds_list_add(drops, obj)
+
+
+    -- Remove previous item log position (if found)
+    local item_log_order = gm.variable_global_get("item_log_display_list")
+    local pos = gm.ds_list_find_index(item_log_order, array[10])
+    if pos >= 0 then gm.ds_list_delete(item_log_order, pos) end
+
+    -- Set item log position
+    local class_item_log = gm.variable_global_get("class_item_log")
+    local pos = 0
+    for i = 0, gm.ds_list_size(item_log_order) - 1 do
+        local log_id = gm.ds_list_find_value(item_log_order, i)
+        local log_ = class_item_log[log_id + 1]
+        local item_id = Item.find(log_[1], log_[2])
+        
+        local tier_ = Item.TIER.equipment
+        if item_id then tier_ = class_item[item_id + 1][7] end
+        if tier_ > tier then
+            pos = i
+            break
+        end
+    end
+    gm.ds_list_insert(item_log_order, pos, array[10])
 end
 
 

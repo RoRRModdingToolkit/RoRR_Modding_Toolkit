@@ -11,3 +11,6 @@
     * Actor.fire_bullet
     * Actor.damage
     * Actor.heal
+    * Actor.add_barrier
+    * Actor.set_barrier
+* Item.set_tier : Now positions the log in the correct tier group when viewing in Logs and Unlockables.
