@@ -15,7 +15,10 @@ Actor.fire_bullet = function(actor, x, y, direction, range, damage, pierce_multi
 end
 
 
-Actor.fire_explosion = function()
+Actor.fire_explosion = function(actor, x, y, x_radius, y_radius, damage, stun, hit_sprite)
+    local damager = actor:fire_explosion(0, x, y, damage, hit_sprite or -1, 2, -1, x_radius / 32.0, y_radius / 8.0)
+    if stun then damager.stun = stun end
+    return damager
 end
 
 
