@@ -20,3 +20,4 @@
 * Added Actor.fire_explosion
 * Added Buff onDraw callback
 * Buff.get_stack_count : Now returns "0" if it returned "nil" previously
+* Item.spawn_drop : Now returns the dropped instance
