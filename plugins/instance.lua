@@ -89,6 +89,24 @@ Instance.find_all = function(...)
 end
 
 
+Instance.number = function(index)
+    -- Vanilla objects
+    if index < Object.ID_encoding then return gm.instance_number(index)
+
+    -- RMT Custom objects
+    else
+        local number = 0
+        for n = 0, gm.instance_number(gm.constants.oCustomObject_pPickupItem) - 1 do
+            local inst = gm.instance_find(gm.constants.oCustomObject_pPickupItem, n)
+            if Instance.exists(inst) then
+                if inst.RMT_Object and inst.RMT_Object == index - Object.ID_encoding then number = number + 1 end
+            end
+        end
+        return number
+    end
+end
+
+
 Instance.spawn_crate = function(x, y, tier, items, depth)
     local lang_map = gm.variable_global_get("_language_map")
     local class_item = gm.variable_global_get("class_item")
