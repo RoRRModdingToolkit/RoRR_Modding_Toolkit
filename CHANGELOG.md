@@ -18,3 +18,5 @@
 
 ### v1.0.2 (unreleased and docs not updated)
 * Added Actor.fire_explosion
+* Added Buff onDraw callback
+* Buff.get_stack_count : Now returns "0" if it returned "nil" previously

@@ -263,7 +263,6 @@ function onAttack(self, other, result, args)
         end
     end
 end
-Callback.add("onAttackCreate", "RMT.onAttack", onAttack, true)
 
 
 function onPostAttack(self, other, result, args)
@@ -279,7 +278,6 @@ function onPostAttack(self, other, result, args)
         end
     end
 end
-Callback.add("onAttackHandleEnd", "RMT.onPostAttack", onPostAttack, true)
 
 
 function onHit(self, other, result, args)
@@ -295,7 +293,6 @@ function onHit(self, other, result, args)
         end
     end
 end
-Callback.add("onHitProc", "RMT.onHit", onHit, true)
 
 
 function onKill(self, other, result, args)
@@ -310,7 +307,6 @@ function onKill(self, other, result, args)
         end
     end
 end
-Callback.add("onKillProc", "RMT.onKill", onKill, true)
 
 
 function onDamaged(self, other, result, args)
@@ -325,7 +321,6 @@ function onDamaged(self, other, result, args)
         end
     end
 end
-Callback.add("onDamagedProc", "RMT.onDamaged", onDamaged, true)
 
 
 function onDamageBlocked(self, other, result, args)
@@ -340,7 +335,6 @@ function onDamageBlocked(self, other, result, args)
         end
     end
 end
-Callback.add("onDamageBlocked", "RMT.onDamageBlocked", onDamageBlocked, true)
 
 
 function onInteract(self, other, result, args)
@@ -355,7 +349,6 @@ function onInteract(self, other, result, args)
         end
     end
 end
-Callback.add("onInteractableActivate", "RMT.onInteract", onInteract, true)
 
 
 function onEquipmentUse(self, other, result, args)
@@ -370,7 +363,6 @@ function onEquipmentUse(self, other, result, args)
         end
     end
 end
-Callback.add("onEquipmentUse", "RMT.onEquipmentUse", onEquipmentUse, true)
 
 
 function onStep(self, other, result, args)
@@ -388,7 +380,6 @@ function onStep(self, other, result, args)
         end
     end
 end
-Callback.add("preStep", "RMT.onStep", onStep, true)
 
 
 function onDraw(self, other, result, args)
@@ -406,7 +397,6 @@ function onDraw(self, other, result, args)
         end
     end
 end
-Callback.add("onHUDDraw", "RMT.onDraw", onDraw, true)
 
 
 
@@ -431,3 +421,20 @@ gm.pre_script_hook(gm.constants.skill_util_update_heaven_cracker, function(self,
         end
     end
 end)
+
+
+
+-- ========== Initialize ==========
+
+Item.__initialize = function()
+    Callback.add("onAttackCreate", "RMT.item_onAttack", onAttack, true)
+    Callback.add("onAttackHandleEnd", "RMT.item_onPostAttack", onPostAttack, true)
+    Callback.add("onHitProc", "RMT.item_onHit", onHit, true)
+    Callback.add("onKillProc", "RMT.item_onKill", onKill, true)
+    Callback.add("onDamagedProc", "RMT.item_onDamaged", onDamaged, true)
+    Callback.add("onDamageBlocked", "RMT.item_onDamageBlocked", onDamageBlocked, true)
+    Callback.add("onInteractableActivate", "RMT.item_onInteract", onInteract, true)
+    Callback.add("onEquipmentUse", "RMT.item_onEquipmentUse", onEquipmentUse, true)
+    Callback.add("preStep", "RMT.item_onStep", onStep, true)
+    Callback.add("onHUDDraw", "RMT.item_onDraw", onDraw, true)
+end
