@@ -26,5 +26,5 @@
     * Object.create
     * Object.spawn
     * Object.add_callback
-* Item.find, Item.find_all : Now work with custom RMT Objects
+* Instance.find, Instance.find_all : Now work with custom RMT Objects
 * Added Instance.number
