@@ -42,7 +42,6 @@ end
 Object.spawn = function(object, x, y)
     local drop = Item.spawn_drop(object, x, y, -4)
     drop.RMT_Object = object
-    drop.y = drop.y + 40.0
 
     -- Run all Init callbacks on the object
     for _, fn in ipairs(callbacks["Init"][object]) do

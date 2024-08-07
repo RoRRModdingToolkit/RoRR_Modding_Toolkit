@@ -114,6 +114,7 @@ Item.spawn_drop = function(item, x, y, target)
     for _, d in ipairs(drops) do
         if math.abs(d.x - x) <= 1.0 and math.abs(d.y - (y - 40.0)) <= 1.0 then
             drop = d
+            d.y = d.y + 40.0
             break
         end
     end

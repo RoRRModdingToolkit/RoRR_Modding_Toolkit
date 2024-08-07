@@ -20,7 +20,7 @@
 * Added Actor.fire_explosion
 * Added Buff onDraw callback
 * Buff.get_stack_count : Now returns "0" if it returned "nil" previously
-* Item.spawn_drop : Now returns the dropped instance
+* Item.spawn_drop : Now returns the dropped instance, and spawns on the exact y position
 * Added Object module
     * Object.find
     * Object.create
