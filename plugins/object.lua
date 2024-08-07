@@ -29,6 +29,21 @@ Object.find = function(namespace, identifier)
 end
 
 
+Object.spawn = function(object, x, y)
+    local object = object - Object.ID_encoding
+
+    local drop = Item.spawn_drop(object, x, y, -4)
+    drop.RMT_Object = object
+
+    -- Run all Init callbacks on the object
+    for _, fn in ipairs(callbacks["Init"][object]) do
+        fn(drop)
+    end
+
+    return drop
+end
+
+
 
 -- ========== Custom Object Functions ==========
 
@@ -46,21 +61,6 @@ Object.create = function(namespace, identifier)
     -- Return object ID, with an encoding of +10000
     -- so that they remain separate from GM object_indexes
     return object + Object.ID_encoding
-end
-
-
-Object.spawn = function(object, x, y)
-    local object = object - Object.ID_encoding
-
-    local drop = Item.spawn_drop(object, x, y, -4)
-    drop.RMT_Object = object
-
-    -- Run all Init callbacks on the object
-    for _, fn in ipairs(callbacks["Init"][object]) do
-        fn(drop)
-    end
-
-    return drop
 end
 
 
