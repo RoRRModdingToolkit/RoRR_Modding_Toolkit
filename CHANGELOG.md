@@ -16,7 +16,7 @@
 * Item.set_tier : Now positions the log at the end of the correct tier group when viewing in Logs and Unlockables.
 * Added Item.spawn_drop
 
-### v1.0.2 (unreleased and docs not updated)
+### v1.0.2
 * Added Actor.fire_explosion
 * Added Buff onDraw callback
 * Buff.get_stack_count : Now returns "0" if it returned "nil" previously
