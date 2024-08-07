@@ -48,7 +48,7 @@ Instance.find = function(...)
             for i = 0, gm.instance_number(gm.constants.oCustomObject_pPickupItem) - 1 do
                 local inst = gm.instance_find(gm.constants.oCustomObject_pPickupItem, i)
                 if Instance.exists(inst) then
-                    if inst.RMT_Object and inst.RMT_Object == ind - Object.ID_encoding then return inst end
+                    if inst.RMT_Object and inst.RMT_Object == ind then return inst end
                 end
             end
 
@@ -78,7 +78,7 @@ Instance.find_all = function(...)
             for n = 0, gm.instance_number(gm.constants.oCustomObject_pPickupItem) - 1 do
                 local inst = gm.instance_find(gm.constants.oCustomObject_pPickupItem, n)
                 if Instance.exists(inst) then
-                    if inst.RMT_Object and inst.RMT_Object == ind - Object.ID_encoding then table.insert(insts, inst) end
+                    if inst.RMT_Object and inst.RMT_Object == ind then table.insert(insts, inst) end
                 end
             end
 

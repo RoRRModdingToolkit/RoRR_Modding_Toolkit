@@ -28,3 +28,9 @@
     * Object.add_callback
 * Instance.find, Instance.find_all : Now work with custom RMT Objects
 * Added Instance.number
+
+### v1.0.3
+* Custom objects will now have their collision masks move alongside properly
+* Added Object.set_hitbox
+* Added Object.get_collisions
+* Added Object.get_collision_box
