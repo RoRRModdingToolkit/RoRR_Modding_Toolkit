@@ -14,10 +14,18 @@ local callbacks = {
 
 
 
+-- ========== Internal ==========
+
+Object.ID_encoding = 10000
+
+
+
 -- ========== General Functions ==========
 
 Object.find = function(namespace, identifier)
-    return Item.find(namespace, PREFIX..identifier)
+    local id = Item.find(namespace, PREFIX..identifier)
+    if id then return id + Object.ID_encoding end
+    return nil
 end
 
 
@@ -35,11 +43,15 @@ Object.create = function(namespace, identifier)
     callbacks["Step"][object] = {}
     callbacks["Draw"][object] = {}
 
-    return object
+    -- Return object ID, with an encoding of +10000
+    -- so that they remain separate from GM object_indexes
+    return object + Object.ID_encoding
 end
 
 
 Object.spawn = function(object, x, y)
+    local object = object - Object.ID_encoding
+
     local drop = Item.spawn_drop(object, x, y, -4)
     drop.RMT_Object = object
 
@@ -53,6 +65,8 @@ end
 
 
 Object.add_callback = function(object, callback, func)
+    local object = object - Object.ID_encoding
+
     local array = gm.variable_global_get("class_item")[object + 1]
 
     if callback == "Init"
