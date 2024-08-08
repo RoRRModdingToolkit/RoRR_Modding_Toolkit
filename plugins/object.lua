@@ -43,6 +43,20 @@ Object.spawn = function(object, x, y)
 end
 
 
+Object.is_colliding = function(instance, other)
+    local bbox = callbacks["Hitbox"][instance.RMT_Object - Object.ID_encoding]
+
+    if Instance.exists(other) then
+        if not (other.bbox_left > instance.x + bbox.right or other.bbox_right < instance.x + bbox.left
+            or other.bbox_top > instance.y + bbox.bottom or other.bbox_bottom < instance.y + bbox.top) then
+            return true
+        end
+    end
+
+    return false
+end
+
+
 Object.get_collisions = function(instance, index)
     local cols = {}
     local bbox = callbacks["Hitbox"][instance.RMT_Object - Object.ID_encoding]

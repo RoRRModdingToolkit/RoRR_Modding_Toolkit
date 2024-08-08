@@ -31,6 +31,8 @@
 
 ### v1.0.3
 * Custom objects will now have their collision masks move alongside properly
-* Added Object.set_hitbox
-* Added Object.get_collisions
-* Added Object.get_collision_box
+* Added hitbox system for custom objects
+    * Object.set_hitbox
+    * Object.is_colliding
+    * Object.get_collisions
+    * Object.get_collision_box
