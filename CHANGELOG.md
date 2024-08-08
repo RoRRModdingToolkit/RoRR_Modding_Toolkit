@@ -30,7 +30,6 @@
 * Added Instance.number
 
 ### v1.0.3
-* Custom objects will now have their collision masks move alongside properly
 * Added hitbox system for custom objects
     * Object.set_hitbox
     * Object.is_colliding
