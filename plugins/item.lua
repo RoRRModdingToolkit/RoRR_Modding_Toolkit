@@ -269,7 +269,7 @@ function onAttack(self, other, result, args)
     if callbacks["onAttack"] then
         for _, c in ipairs(callbacks["onAttack"]) do
             local item = c[1]
-            local count = Item.get_stack_count(self, item)
+            local count = Item.get_stack_count(args[2].value.parent, item)
             if count > 0 then
                 local func = c[2]
                 func(self, args[2].value, count)    -- Actor, Damager attack_info, Stack count

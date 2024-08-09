@@ -19,14 +19,14 @@
 ### v1.0.2
 * Added Actor.fire_explosion
 * Added Buff onDraw callback
-* Buff.get_stack_count : Now returns "0" if it returned "nil" previously
-* Item.spawn_drop : Now returns the dropped instance, and spawns on the exact y position
+* Buff.get_stack_count : Now returns "0" if it returned "nil" previously.
+* Item.spawn_drop : Now returns the dropped instance, and spawns on the exact y position.
 * Added Object module
     * Object.find
     * Object.create
     * Object.spawn
     * Object.add_callback
-* Instance.find, Instance.find_all : Now work with custom RMT Objects
+* Instance.find, Instance.find_all : Now work with custom RMT Objects.
 * Added Instance.number
 
 ### v1.0.3
@@ -35,3 +35,7 @@
     * Object.is_colliding
     * Object.get_collisions
     * Object.get_collision_box
+
+### v1.0.4
+* Added Instance.projectiles table
+* Fixed Item onAttack callback throwing error sometimes.
