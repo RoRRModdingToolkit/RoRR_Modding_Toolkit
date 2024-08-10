@@ -60,6 +60,7 @@ end
 
 
 Buff.get_stack_count = function(actor, buff)
+    if gm.array_length(actor.buff_stack) <= buff then gm.array_resize(actor.buff_stack, buff + 1) end
     local count = actor.buff_stack[buff + 1]
     if count == nil then return 0 end
     return count
@@ -165,7 +166,9 @@ gm.pre_script_hook(gm.constants.actor_transform, function(self, other, result, a
     if callbacks["onChange"] then
         for _, fn in pairs(callbacks["onChange"]) do
             local stack = Buff.get_stack_count(args[1].value, fn[1])
-            fn[2](args[1].value, stack)   -- Actor, Buff stack
+            if stack > 0 then
+                fn[2](args[1].value, args[2].value, stack)   -- Actor, To, Buff stack
+            end
         end
     end
 end)
