@@ -47,4 +47,5 @@
 * Object.get_collisions : Now works with a custom RMT Object as "index".
 
 ### v1.0.6
-* Fixed apply_buff_internal error for custom buffs when an actor turned into another one via `instance_change` (e.g., Lemurian rider being dismounted).
+* Fixed apply_buff_internal error for custom buffs when an actor turned into another one (e.g., Lemurian rider being dismounted).
+* Added Buff onChange callback

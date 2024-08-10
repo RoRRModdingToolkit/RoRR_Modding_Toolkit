@@ -113,6 +113,7 @@ Buff.add_callback = function(buff, callback, func)
         table.insert(callbacks[array[13]], {buff, func})
 
     elseif callback == "onDraw"
+        or callback == "onChange"
         then
             if not callbacks[callback] then callbacks[callback] = {} end
             table.insert(callbacks[callback], {buff, func})
@@ -157,6 +158,16 @@ end)
 gm.pre_script_hook(gm.constants.apply_buff_internal, function(self, other, result, args)
     -- Extend buff_stack if necessary
     if gm.array_length(args[1].value.buff_stack) <= args[2].value then gm.array_resize(args[1].value.buff_stack, args[2].value + 1) end
+end)
+
+
+gm.pre_script_hook(gm.constants.actor_transform, function(self, other, result, args)
+    if callbacks["onChange"] then
+        for _, fn in pairs(callbacks["onChange"]) do
+            local stack = Buff.get_stack_count(args[1].value, fn[1])
+            fn[2](args[1].value, stack)   -- Actor, Buff stack
+        end
+    end
 end)
 
 
