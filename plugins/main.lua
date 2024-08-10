@@ -1,4 +1,4 @@
--- RoRR Modding Toolkit v1.0.5
+-- RoRR Modding Toolkit v1.0.6
 
 log.info("Successfully loaded ".._ENV["!guid"]..".")
 
