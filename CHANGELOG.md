@@ -43,3 +43,5 @@
 ### v1.0.5
 * Fixed Item onAttack callback error for real.
     * Item.get_stack_count will now return 0 if the actor is invalid or not a child of pActor.
+* Object.is_colliding : Now works with a custom RMT Object instance as "other".
+* Object.get_collisions : Now works with a custom RMT Object as "index".

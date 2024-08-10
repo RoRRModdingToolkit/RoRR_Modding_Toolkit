@@ -44,11 +44,19 @@ end
 
 
 Object.is_colliding = function(instance, other)
-    local bbox = callbacks["Hitbox"][instance.RMT_Object - Object.ID_encoding]
+    local bbox = Object.get_collision_box(instance)
 
     if Instance.exists(other) then
-        if not (other.bbox_left > instance.x + bbox.right or other.bbox_right < instance.x + bbox.left
-            or other.bbox_top > instance.y + bbox.bottom or other.bbox_bottom < instance.y + bbox.top) then
+        local other_bbox = {
+            left    = other.bbox_left,
+            top     = other.bbox_top,
+            right   = other.bbox_right,
+            bottom  = other.bbox_bottom
+        }
+        if other.RMT_Object then other_bbox = Object.get_collision_box(other) end
+
+        if not (other_bbox.left > bbox.right or other_bbox.right < bbox.left
+            or other_bbox.top > bbox.bottom or other_bbox.bottom < bbox.top) then
             return true
         end
     end
@@ -59,15 +67,22 @@ end
 
 Object.get_collisions = function(instance, index)
     local cols = {}
-    local bbox = callbacks["Hitbox"][instance.RMT_Object - Object.ID_encoding]
+    local bbox = Object.get_collision_box(instance)
 
-    for i = 0, gm.instance_number(index) - 1 do
-        local inst = gm.instance_find(index, i)
-        if Instance.exists(inst) then
-            if not (inst.bbox_left > instance.x + bbox.right or inst.bbox_right < instance.x + bbox.left
-                or inst.bbox_top > instance.y + bbox.bottom or inst.bbox_bottom < instance.y + bbox.top) then
-                table.insert(cols, inst)
-            end
+    local insts = Instance.find_all(index)
+    for _, inst in ipairs(insts) do
+        local other_bbox = {
+            left    = inst.bbox_left,
+            top     = inst.bbox_top,
+            right   = inst.bbox_right,
+            bottom  = inst.bbox_bottom
+        }
+        if inst.RMT_Object then other_bbox = Object.get_collision_box(inst) end
+
+        if not (instance == inst) and
+        not (other_bbox.left > bbox.right or other_bbox.right < bbox.left
+        or other_bbox.top > bbox.bottom or other_bbox.bottom < bbox.top) then
+            table.insert(cols, inst)
         end
     end
 
