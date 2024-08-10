@@ -27,12 +27,14 @@ Instance.teleporters = {
 
 Instance.projectiles = {
     gm.constants.oJellyMissile,
+    gm.constants.oWurmMissile,
+    gm.constants.oShamBMissile,
+    gm.constants.oTurtleMissile,
+    gm.constants.oEfMissileEnemy,
     gm.constants.oSpiderBulletNoSync, gm.constants.oSpiderBullet,
     gm.constants.oGuardBulletNoSync, gm.constants.oGuardBullet,
     gm.constants.oBugBulletNoSync, gm.constants.oBugBullet,
-    gm.constants.oWurmMissile,
-    gm.constants.oShamBMissile,
-    gm.constants.oTurtleMissile
+    gm.constants.oScavengerBulletNoSync, gm.constants.oScavengerBullet
 }
 
 
