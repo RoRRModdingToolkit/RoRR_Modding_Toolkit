@@ -39,3 +39,6 @@
 ### v1.0.4
 * Added Instance.projectiles table
 * Fixed Item onAttack callback throwing error sometimes.
+
+### v1.0.5
+* Fixed Item onAttack callback error for real.

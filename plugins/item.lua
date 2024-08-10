@@ -97,6 +97,9 @@ end
 
 
 Item.get_stack_count = function(actor, item, type_)
+    if not Instance.exists(actor) then return 0 end
+    if not gm.object_is_ancestor(actor.object_index, gm.constants.pActor) then return 0 end
+
     if type_ == Item.TYPE.real then return gm.item_count(actor, item, false) end
     if type_ == Item.TYPE.temporary then return gm.item_count(actor, item, true) end
     return gm.item_count(actor, item, false) + gm.item_count(actor, item, true)
