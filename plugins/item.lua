@@ -252,6 +252,8 @@ Item.add_callback = function(item, callback, func)
         or callback == "onKill"
         or callback == "onDamaged"
         or callback == "onDamageBlocked"
+        or callback == "onHeal"
+        or callback == "onShieldBreak"
         or callback == "onInteract"
         or callback == "onEquipmentUse"
         or callback == "onStep"
@@ -434,6 +436,34 @@ gm.pre_script_hook(gm.constants.skill_util_update_heaven_cracker, function(self,
             local count = Item.get_stack_count(args[1].value, fn[1])
             if count > 0 then
                 fn[2](args[1].value, count)   -- Actor, Stack count
+            end
+        end
+    end
+end)
+
+
+gm.pre_script_hook(gm.constants.actor_heal_networked, function(self, other, result, args)
+    if callbacks["onHeal"] then
+        for _, fn in pairs(callbacks["onHeal"]) do
+            local count = Item.get_stack_count(args[1].value, fn[1])
+            if count > 0 then
+                fn[2](args[1].value, args[2].value, count)   -- Actor, Heal amount, Stack count
+            end
+        end
+    end
+end)
+
+
+gm.pre_script_hook(gm.constants.step_actor, function(self, other, result, args)
+    if self.shield and self.shield > 0.0 then self.RMT_has_shield = true end
+    if self.RMT_has_shield and self.shield <= 0.0 then
+        self.RMT_has_shield = nil
+        if callbacks["onShieldBreak"] then
+            for _, fn in pairs(callbacks["onShieldBreak"]) do
+                local count = Item.get_stack_count(self, fn[1])
+                if count > 0 then
+                    fn[2](self, count)   -- Actor, Stack count
+                end
             end
         end
     end
