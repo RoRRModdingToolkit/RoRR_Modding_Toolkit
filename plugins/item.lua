@@ -430,12 +430,13 @@ gm.post_script_hook(gm.constants.callback_execute, function(self, other, result,
 end)
 
 
-gm.pre_script_hook(gm.constants.skill_util_update_heaven_cracker, function(self, other, result, args)
+gm.pre_script_hook(gm.constants.skill_activate, function(self, other, result, args)
+    if args[1].value ~= 0.0 or self.skills[1].active_skill.skill_id == 70.0 then return true end
     if callbacks["onBasicUse"] then
         for _, fn in pairs(callbacks["onBasicUse"]) do
-            local count = Item.get_stack_count(args[1].value, fn[1])
+            local count = Item.get_stack_count(self, fn[1])
             if count > 0 then
-                fn[2](args[1].value, count)   -- Actor, Stack count
+                fn[2](self, count)   -- Actor, Stack count
             end
         end
     end

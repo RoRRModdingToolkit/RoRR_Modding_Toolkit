@@ -54,3 +54,4 @@
 * Added Item callbacks
     * onHeal
     * onShieldBreak
+* Item onBasicUse callback now works with Sniper's Snipe properly.
