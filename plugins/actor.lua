@@ -56,21 +56,43 @@ Actor.set_barrier = function(actor, amount)
 end
 
 
-Actor.add_callback = function(callback, func)
-    if callback == "onBasicUse"
-    or callback == "onAttack"
-    or callback == "onPostAttack"
-    or callback == "onHit"
-    or callback == "onKill"
-    or callback == "onDamaged"
-    or callback == "onDamageBlocked"
-    or callback == "onHeal"
-    or callback == "onShieldBreak"
-    or callback == "onInteract"
-    or callback == "onEquipmentUse"
-    then
-        if not callbacks[callback] then callbacks[callback] = {} end
-        table.insert(callbacks[callback], func)
+Actor.find_skill_id = function(namespace, identifier)
+    local class_skill = gm.variable_global_get("class_skill")
+
+    if identifier then namespace = namespace.."-"..identifier end
+
+    for i, s in ipairs(class_skill) do
+        if namespace == s[1].."-"..s[2] then return i - 1 end
+    end
+
+    return nil
+end
+
+
+Actor.add_callback = function(callback, func, skill_id)
+    if callback == "onSkillUse" then
+        if not callbacks["onSkillUse"] then callbacks["onSkillUse"] = {} end
+        if not callbacks["onSkillUse"][skill_id] then callbacks["onSkillUse"][skill_id] = {} end
+        table.insert(callbacks["onSkillUse"][skill_id], func)
+
+    elseif callback == "onBasicUse"
+        or callback == "onAttack"
+        or callback == "onPostAttack"
+        or callback == "onHit"
+        or callback == "onKill"
+        or callback == "onDamaged"
+        or callback == "onDamageBlocked"
+        or callback == "onHeal"
+        or callback == "onShieldBreak"
+        or callback == "onInteract"
+        or callback == "onEquipmentUse"
+        or callback == "onPreStep"
+        or callback == "onPostStep"
+        or callback == "onDraw"
+        then
+            if not callbacks[callback] then callbacks[callback] = {} end
+            table.insert(callbacks[callback], func)
+
     end
 end
 
@@ -157,6 +179,16 @@ end
 -- ========== Hooks ==========
 
 gm.pre_script_hook(gm.constants.skill_activate, function(self, other, result, args)
+    if callbacks["onSkillUse"] then
+        for id, skill in pairs(callbacks["onSkillUse"]) do
+            if self.skills[args[1].value + 1].active_skill.skill_id == id then
+                for _, fn in pairs(skill) do
+                    fn(self)   -- Actor
+                end
+            end
+        end
+    end
+
     if args[1].value ~= 0.0 or self.skills[1].active_skill.skill_id == 70.0 then return true end
     if callbacks["onBasicUse"] then
         for _, fn in pairs(callbacks["onBasicUse"]) do
@@ -176,6 +208,12 @@ end)
 
 
 gm.pre_script_hook(gm.constants.step_actor, function(self, other, result, args)
+    if callbacks["onPreStep"] then
+        for _, fn in pairs(callbacks["onPreStep"]) do
+            fn(self)   -- Actor
+        end
+    end
+
     if self.shield and self.shield > 0.0 then self.RMT_has_shield = true end
     if self.RMT_has_shield and self.shield <= 0.0 then
         self.RMT_has_shield = nil
@@ -183,6 +221,24 @@ gm.pre_script_hook(gm.constants.step_actor, function(self, other, result, args)
             for _, fn in pairs(callbacks["onShieldBreak"]) do
                 fn(self)   -- Actor
             end
+        end
+    end
+end)
+
+
+gm.post_script_hook(gm.constants.step_actor, function(self, other, result, args)
+    if callbacks["onPostStep"] then
+        for _, fn in pairs(callbacks["onPostStep"]) do
+            fn(self)   -- Actor
+        end
+    end
+end)
+
+
+gm.post_script_hook(gm.constants.draw_actor, function(self, other, result, args)
+    if callbacks["onDraw"] then
+        for _, fn in pairs(callbacks["onDraw"]) do
+            fn(self)   -- Actor
         end
     end
 end)

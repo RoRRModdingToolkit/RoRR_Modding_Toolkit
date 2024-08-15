@@ -59,3 +59,4 @@
     * Item.add_achievement
     * Item.progress_achievement
 * Added Actor callback system
+* Added Actor.find_skill_id
