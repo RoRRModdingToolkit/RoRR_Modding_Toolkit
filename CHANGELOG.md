@@ -55,3 +55,7 @@
     * onHeal
     * onShieldBreak
 * Item onBasicUse callback now works with Sniper's Snipe properly.
+* Added achievement functions for Item
+    * Item.add_achievement
+    * Item.progress_achievement
+* Added Actor callback system

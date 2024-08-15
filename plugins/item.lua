@@ -234,6 +234,25 @@ Item.set_loot_tags = function(item, ...)
 end
 
 
+Item.add_achievement = function(item, progress_req)
+    local class_item = gm.variable_global_get("class_item")
+    local array = class_item[item + 1]
+
+    local ach = gm.achievement_create(array[1], array[2])
+    gm.achievement_set_unlock_item(ach, item)
+    gm.achievement_set_requirement(ach, progress_req or 1)
+end
+
+
+Item.progress_achievement = function(item, amount)
+    local class_item = gm.variable_global_get("class_item")
+    local array = class_item[item + 1]
+
+    if gm.achievement_is_unlocked(array[11]) then return end
+    gm.achievement_add_progress(array[11], amount or 1)
+end
+
+
 Item.add_callback = function(item, callback, func)
     local array = gm.variable_global_get("class_item")[item + 1]
 
