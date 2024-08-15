@@ -242,7 +242,11 @@ Item.add_achievement = function(item, progress_req, single_run)
     gm.achievement_set_unlock_item(ach, item)
     gm.achievement_set_requirement(ach, progress_req or 1)
 
-    if single_run then gm.array_set(array, 21, single_run) end
+    if single_run then
+        local class_achievement = gm.variable_global_get("class_achievement")
+        local ach_array = class_achievement[ach + 1]
+        gm.array_set(ach_array, 21, single_run)
+    end
 end
 
 
