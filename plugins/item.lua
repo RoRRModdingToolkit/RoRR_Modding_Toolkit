@@ -234,13 +234,15 @@ Item.set_loot_tags = function(item, ...)
 end
 
 
-Item.add_achievement = function(item, progress_req)
+Item.add_achievement = function(item, progress_req, single_run)
     local class_item = gm.variable_global_get("class_item")
     local array = class_item[item + 1]
 
     local ach = gm.achievement_create(array[1], array[2])
     gm.achievement_set_unlock_item(ach, item)
     gm.achievement_set_requirement(ach, progress_req or 1)
+
+    if single_run then gm.array_set(array, 21, single_run) end
 end
 
 
