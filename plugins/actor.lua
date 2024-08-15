@@ -214,9 +214,9 @@ gm.pre_script_hook(gm.constants.step_actor, function(self, other, result, args)
         end
     end
 
-    if self.shield and self.shield > 0.0 then self.RMT_has_shield = true end
-    if self.RMT_has_shield and self.shield <= 0.0 then
-        self.RMT_has_shield = nil
+    if self.shield and self.shield > 0.0 then self.RMT_has_shield_actor = true end
+    if self.RMT_has_shield_actor and self.shield <= 0.0 then
+        self.RMT_has_shield_actor = nil
         if callbacks["onShieldBreak"] then
             for _, fn in pairs(callbacks["onShieldBreak"]) do
                 fn(self)   -- Actor
