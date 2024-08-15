@@ -25,6 +25,7 @@ require("./survivor")
 -- ========== Initialize ==========
 
 function __initialize()
+    Actor.__initialize()
     Buff.__initialize()
     Instance.__initialize()
     Item.__initialize()

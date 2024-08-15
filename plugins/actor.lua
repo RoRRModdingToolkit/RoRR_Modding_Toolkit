@@ -2,6 +2,8 @@
 
 Actor = {}
 
+local callbacks = {}
+
 
 
 -- ========== Functions ==========
@@ -51,4 +53,151 @@ end
 Actor.set_barrier = function(actor, amount)
     if actor.barrier <= 0 then Actor.add_barrier(actor, 1) end
     actor.barrier = amount
+end
+
+
+Actor.add_callback = function(callback, func)
+    if callback == "onBasicUse"
+    or callback == "onAttack"
+    or callback == "onPostAttack"
+    or callback == "onHit"
+    or callback == "onKill"
+    or callback == "onDamaged"
+    or callback == "onDamageBlocked"
+    or callback == "onHeal"
+    or callback == "onShieldBreak"
+    or callback == "onInteract"
+    or callback == "onEquipmentUse"
+    then
+        if not callbacks[callback] then callbacks[callback] = {} end
+        table.insert(callbacks[callback], func)
+    end
+end
+
+
+
+-- ========== Internal ==========
+
+function actor_onAttack(self, other, result, args)
+    if not args[2].value.proc then return end
+    if callbacks["onAttack"] then
+        for _, fn in ipairs(callbacks["onAttack"]) do
+            fn(self, args[2].value)    -- Actor, Damager attack_info
+        end
+    end
+end
+
+
+function actor_onPostAttack(self, other, result, args)
+    if not args[2].value.proc or not args[2].value.parent then return end
+    if callbacks["onPostAttack"] then
+        for _, fn in ipairs(callbacks["onPostAttack"]) do
+            fn(args[2].value.parent, args[2].value)    -- Actor, Damager attack_info
+        end
+    end
+end
+
+
+function actor_onHit(self, other, result, args)
+    if not self.attack_info.proc then return end
+    if callbacks["onHit"] then
+        for _, fn in ipairs(callbacks["onHit"]) do
+            fn(args[2].value, args[3].value, self.attack_info) -- Attacker, Victim, Damager attack_info
+        end
+    end
+end
+
+
+function actor_onKill(self, other, result, args)
+    if callbacks["onKill"] then
+        for _, fn in ipairs(callbacks["onKill"]) do
+            fn(args[3].value, args[2].value)   -- Attacker, Victim
+        end
+    end
+end
+
+
+function actor_onDamaged(self, other, result, args)
+    if callbacks["onDamaged"] then
+        for _, fn in ipairs(callbacks["onDamaged"]) do
+            fn(args[2].value, args[3].value.attack_info)   -- Actor, Damager attack_info
+        end
+    end
+end
+
+
+function actor_onDamageBlocked(self, other, result, args)
+    if callbacks["onDamageBlocked"] then
+        for _, fn in ipairs(callbacks["onDamageBlocked"]) do
+            fn(self, other.attack_info)   -- Actor, Damager attack_info
+        end
+    end
+end
+
+
+function actor_onInteract(self, other, result, args)
+    if callbacks["onInteract"] then
+        for _, fn in ipairs(callbacks["onInteract"]) do
+            fn(args[3].value, args[2].value)   -- Actor, Interactable
+        end
+    end
+end
+
+
+function actor_onEquipmentUse(self, other, result, args)
+    if callbacks["onEquipmentUse"] then
+        for _, fn in ipairs(callbacks["onEquipmentUse"]) do
+            fn(args[2].value, args[3].value)   -- Actor, Equipment ID
+        end
+    end
+end
+
+
+
+-- ========== Hooks ==========
+
+gm.pre_script_hook(gm.constants.skill_activate, function(self, other, result, args)
+    if args[1].value ~= 0.0 or self.skills[1].active_skill.skill_id == 70.0 then return true end
+    if callbacks["onBasicUse"] then
+        for _, fn in pairs(callbacks["onBasicUse"]) do
+            fn(self)   -- Actor
+        end
+    end
+end)
+
+
+gm.pre_script_hook(gm.constants.actor_heal_networked, function(self, other, result, args)
+    if callbacks["onHeal"] then
+        for _, fn in pairs(callbacks["onHeal"]) do
+            fn(args[1].value, args[2].value)   -- Actor, Heal amount
+        end
+    end
+end)
+
+
+gm.pre_script_hook(gm.constants.step_actor, function(self, other, result, args)
+    if self.shield and self.shield > 0.0 then self.RMT_has_shield = true end
+    if self.RMT_has_shield and self.shield <= 0.0 then
+        self.RMT_has_shield = nil
+        if callbacks["onShieldBreak"] then
+            for _, fn in pairs(callbacks["onShieldBreak"]) do
+                fn(self)   -- Actor
+            end
+        end
+    end
+end)
+
+
+
+-- ========== Initialize ==========
+
+Actor.__initialize = function()
+    Callback.add("onAttackCreate", "RMT.actor_onAttack", actor_onAttack, true)
+    Callback.add("onAttackHandleEnd", "RMT.actor_onPostAttack", actor_onPostAttack, true)
+    Callback.add("onHitProc", "RMT.actor_onHit", actor_onHit, true)
+    Callback.add("onKillProc", "RMT.actor_onKill", actor_onKill, true)
+    Callback.add("onDamagedProc", "RMT.actor_onDamaged", actor_onDamaged, true)
+    Callback.add("onDamageBlocked", "RMT.actor_onDamageBlocked", actor_onDamageBlocked, true)
+    Callback.add("onInteractableActivate", "RMT.actor_onInteract", actor_onInteract, true)
+    Callback.add("onEquipmentUse", "RMT.actor_onEquipmentUse", actor_onEquipmentUse, true)
 end
