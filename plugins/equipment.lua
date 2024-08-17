@@ -75,6 +75,31 @@ Equipment.set_loot_tags = function(equipment, ...)
 end
 
 
+Equipment.add_achievement = function(equipment, progress_req, single_run)
+    local class_equipment = gm.variable_global_get("class_equipment")
+    local array = class_equipment[equipment + 1]
+
+    local ach = gm.achievement_create(array[1], array[2])
+    gm.achievement_set_unlock_equipment(ach, equipment)
+    gm.achievement_set_requirement(ach, progress_req or 1)
+
+    if single_run then
+        local class_achievement = gm.variable_global_get("class_achievement")
+        local ach_array = class_achievement[ach + 1]
+        gm.array_set(ach_array, 21, single_run)
+    end
+end
+
+
+Equipment.progress_achievement = function(equipment, amount)
+    local class_equipment = gm.variable_global_get("class_equipment")
+    local array = class_equipment[equipment + 1]
+
+    if gm.achievement_is_unlocked(array[11]) then return end
+    gm.achievement_add_progress(array[11], amount or 1)
+end
+
+
 Equipment.add_callback = function(equipment, callback, func)
     local array = gm.variable_global_get("class_equipment")[equipment + 1]
 

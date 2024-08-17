@@ -67,3 +67,8 @@
     * Equipment.set_cooldown
     * Equipment.set_loot_tags
     * Equipment.add_callback
+
+### v1.0.8
+* Added achievement functions for Equipment
+    * Equipment.add_achievement
+    * Equipment.progress_achievement
