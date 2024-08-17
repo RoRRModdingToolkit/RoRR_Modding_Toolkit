@@ -91,7 +91,6 @@ end
 
 gm.post_script_hook(gm.constants.callback_execute, function(self, other, result, args)
     if callbacks[args[1].value] then
-        Helper.log_hook(self, other, result, args)
         for _, fn in pairs(callbacks[args[1].value]) do
             fn(args[2].value)
         end
