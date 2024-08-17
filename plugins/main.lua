@@ -21,7 +21,7 @@ require("./survivor")
 -- Testing
 --require("./testing")
 
--- reminder: update README (check fully) before upload
+
 
 -- ========== Initialize ==========
 

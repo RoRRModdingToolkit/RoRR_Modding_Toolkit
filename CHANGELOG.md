@@ -50,7 +50,7 @@
 * Fixed apply_buff_internal error for custom buffs when an actor turned into another one (e.g., Lemurian rider being dismounted).
 * Added Buff onChange callback
 
-### v1.0.7 (unreleased)
+### v1.0.7
 * Added Item callbacks
     * onHeal
     * onShieldBreak
