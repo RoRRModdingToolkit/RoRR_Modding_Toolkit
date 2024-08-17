@@ -7,6 +7,7 @@ RoRR_Modding_Toolkit = true
 require("./actor")
 require("./buff")
 require("./callback")
+require("./equipment")
 require("./helper")
 require("./initialize")
 require("./instance")
@@ -20,7 +21,7 @@ require("./survivor")
 -- Testing
 --require("./testing")
 
-
+-- reminder: update README (check fully) before upload
 
 -- ========== Initialize ==========
 

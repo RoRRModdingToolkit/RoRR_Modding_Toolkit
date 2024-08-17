@@ -60,3 +60,10 @@
     * Item.progress_achievement
 * Added Actor callback system
 * Added Actor.find_skill_id
+* Added Equipment module
+    * Equipment.find
+    * Equipment.create
+    * Equipment.set_sprite
+    * Equipment.set_cooldown
+    * Equipment.set_loot_tags
+    * Equipment.add_callback
