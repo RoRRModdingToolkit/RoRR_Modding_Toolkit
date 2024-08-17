@@ -39,6 +39,24 @@ Equipment.create = function(namespace, identifier)
     -- Have to manually increase this variable for some reason (class_equipment array length)
     gm.variable_global_set("count_equipment", gm.variable_global_get("count_equipment") + 1.0)
 
+    -- Remove previous item log position (if found)
+    local class_equipment = gm.variable_global_get("class_equipment")
+    local array = class_equipment[equipment + 1]
+    local item_log_order = gm.variable_global_get("item_log_display_list")
+    local pos = gm.ds_list_find_index(item_log_order, array[10])
+    if pos >= 0 then gm.ds_list_delete(item_log_order, pos) end
+
+    -- Set item log position
+    local class_item_log = gm.variable_global_get("class_item_log")
+    local pos = 0
+    for i = 0, gm.ds_list_size(item_log_order) - 1 do
+        local log_id = gm.ds_list_find_value(item_log_order, i)
+        local log_ = class_item_log[log_id + 1]
+        local equip_id = Equipment.find(log_[1], log_[2])
+        if equip_id and class_equipment[equip_id + 1][7] == 3.0 then pos = i end
+    end
+    gm.ds_list_insert(item_log_order, pos + 1, array[10])
+
     return equipment
 end
 

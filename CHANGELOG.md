@@ -72,3 +72,4 @@
 * Added achievement functions for Equipment
     * Equipment.add_achievement
     * Equipment.progress_achievement
+* Custom Equipment item logs now appear after all the vanilla ones.
