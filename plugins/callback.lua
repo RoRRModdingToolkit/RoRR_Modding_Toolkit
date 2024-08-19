@@ -28,6 +28,11 @@ Callback.add = function(callback, id, func, replace)
 end
 
 
+Callback.remove = function(callback, id)
+    local callback_id = Callback.TYPE[callback]
+    callbacks[callback_id][id] = nil
+end
+
 
 -- ========== Hooks ==========
 

@@ -138,10 +138,6 @@ survivor_setup.Survivor = gm_array_class("class_survivor", {
     cape_offset         = {idx=33},
 })
 
-function survivor_setup:print_name ()
-    print(survivor_setup.Survivor.token_name)
-end
-
 -- == Section 
 
 local survivors = ... or {}
