@@ -13,19 +13,12 @@ require("./instance")
 require("./item")
 require("./net")
 require("./player")
-<<<<<<< Updated upstream
 require("./resources")
 require("./survivor")
+require("./alarm")
 
 -- Testing
 --require("./testing")
-
-
-=======
-require("./survivor")
-require("./resources")
-require("./alarm")
->>>>>>> Stashed changes
 
 -- ========== Initialize ==========
 
