@@ -25,6 +25,19 @@ Instance.teleporters = {
 }
 
 
+Instance.projectiles = {
+    gm.constants.oJellyMissile,
+    gm.constants.oWurmMissile,
+    gm.constants.oShamBMissile,
+    gm.constants.oTurtleMissile,
+    gm.constants.oEfMissileEnemy,
+    gm.constants.oSpiderBulletNoSync, gm.constants.oSpiderBullet,
+    gm.constants.oGuardBulletNoSync, gm.constants.oGuardBullet,
+    gm.constants.oBugBulletNoSync, gm.constants.oBugBullet,
+    gm.constants.oScavengerBulletNoSync, gm.constants.oScavengerBullet
+}
+
+
 
 -- ========== Functions ==========
 
@@ -38,8 +51,21 @@ Instance.find = function(...)
     if type(t[1]) == "table" then t = t[1] end
 
     for _, ind in ipairs(t) do
-        local inst = gm.instance_find(ind, 0)
-        if Instance.exists(inst) then return inst end
+        -- Vanilla objects
+        if ind < Object.ID_encoding then
+            local inst = gm.instance_find(ind, 0)
+            if Instance.exists(inst) then return inst end
+
+        -- RMT Custom objects
+        else
+            for i = 0, gm.instance_number(gm.constants.oCustomObject_pPickupItem) - 1 do
+                local inst = gm.instance_find(gm.constants.oCustomObject_pPickupItem, i)
+                if Instance.exists(inst) then
+                    if inst.RMT_Object and inst.RMT_Object == ind then return inst end
+                end
+            end
+
+        end
     end
 
     return nil
@@ -53,13 +79,44 @@ Instance.find_all = function(...)
     local insts = {}
 
     for _, ind in ipairs(t) do
-        for n = 0, gm.instance_number(ind) - 1 do
-            local inst = gm.instance_find(ind, n)
-            if Instance.exists(inst) then table.insert(insts, inst) end
+        -- Vanilla objects
+        if ind < Object.ID_encoding then
+            for n = 0, gm.instance_number(ind) - 1 do
+                local inst = gm.instance_find(ind, n)
+                if Instance.exists(inst) then table.insert(insts, inst) end
+            end
+
+        -- RMT Custom objects
+        else
+            for n = 0, gm.instance_number(gm.constants.oCustomObject_pPickupItem) - 1 do
+                local inst = gm.instance_find(gm.constants.oCustomObject_pPickupItem, n)
+                if Instance.exists(inst) then
+                    if inst.RMT_Object and inst.RMT_Object == ind then table.insert(insts, inst) end
+                end
+            end
+
         end
     end
 
     return insts, #insts > 0
+end
+
+
+Instance.number = function(index)
+    -- Vanilla objects
+    if index < Object.ID_encoding then return gm.instance_number(index)
+
+    -- RMT Custom objects
+    else
+        local number = 0
+        for n = 0, gm.instance_number(gm.constants.oCustomObject_pPickupItem) - 1 do
+            local inst = gm.instance_find(gm.constants.oCustomObject_pPickupItem, n)
+            if Instance.exists(inst) then
+                if inst.RMT_Object and inst.RMT_Object == index - Object.ID_encoding then number = number + 1 end
+            end
+        end
+        return number
+    end
 end
 
 

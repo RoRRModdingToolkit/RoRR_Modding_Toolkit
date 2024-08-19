@@ -60,7 +60,10 @@ end
 
 
 Buff.get_stack_count = function(actor, buff)
-    return actor.buff_stack[buff + 1]
+    if gm.array_length(actor.buff_stack) <= buff then gm.array_resize(actor.buff_stack, buff + 1) end
+    local count = actor.buff_stack[buff + 1]
+    if count == nil then return 0 end
+    return count
 end
 
 
@@ -110,6 +113,32 @@ Buff.add_callback = function(buff, callback, func)
         if not callbacks[array[13]] then callbacks[array[13]] = {} end
         table.insert(callbacks[array[13]], {buff, func})
 
+    elseif callback == "onDraw"
+        or callback == "onChange"
+        then
+            if not callbacks[callback] then callbacks[callback] = {} end
+            table.insert(callbacks[callback], {buff, func})
+
+    end
+end
+
+
+
+-- ========== Internal ==========
+
+function buff_onDraw(self, other, result, args)
+    if callbacks["onDraw"] then
+        for _, c in ipairs(callbacks["onDraw"]) do
+            local actors = Instance.find_all(gm.constants.pActor)
+            for _, a in ipairs(actors) do
+                local buff = c[1]
+                local count = Buff.get_stack_count(a, buff)
+                if count > 0 then
+                    local func = c[2]
+                    func(a, count)  -- Actor, Stack count
+                end
+            end
+        end
     end
 end
 
@@ -125,3 +154,29 @@ gm.post_script_hook(gm.constants.callback_execute, function(self, other, result,
         end
     end
 end)
+
+
+gm.pre_script_hook(gm.constants.apply_buff_internal, function(self, other, result, args)
+    -- Extend buff_stack if necessary
+    if gm.array_length(args[1].value.buff_stack) <= args[2].value then gm.array_resize(args[1].value.buff_stack, args[2].value + 1) end
+end)
+
+
+gm.pre_script_hook(gm.constants.actor_transform, function(self, other, result, args)
+    if callbacks["onChange"] then
+        for _, fn in pairs(callbacks["onChange"]) do
+            local stack = Buff.get_stack_count(args[1].value, fn[1])
+            if stack > 0 then
+                fn[2](args[1].value, args[2].value, stack)   -- Actor, To, Buff stack
+            end
+        end
+    end
+end)
+
+
+
+-- ========== Initialize ==========
+
+Buff.__initialize = function()
+    Callback.add("postHUDDraw", "RMT.buff_onDraw", buff_onDraw, true)
+end

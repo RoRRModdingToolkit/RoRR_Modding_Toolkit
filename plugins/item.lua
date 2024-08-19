@@ -97,6 +97,9 @@ end
 
 
 Item.get_stack_count = function(actor, item, type_)
+    if not Instance.exists(actor) then return 0 end
+    if not gm.object_is_ancestor(actor.object_index, gm.constants.pActor) then return 0 end
+
     if type_ == Item.TYPE.real then return gm.item_count(actor, item, false) end
     if type_ == Item.TYPE.temporary then return gm.item_count(actor, item, true) end
     return gm.item_count(actor, item, false) + gm.item_count(actor, item, true)
@@ -105,7 +108,21 @@ end
 
 Item.spawn_drop = function(item, x, y, target)
     local obj = Item.get_data(item).object_id
-    if obj then return gm.item_drop_object(obj, x, y, target, false) end
+    if obj then gm.item_drop_object(obj, x, y, target, false) end
+
+    -- Look for drop (because gm.item_drop_object does not actually return the instance for some reason)
+    -- The drop spawns 40 px above y parameter
+    local drop = nil
+    local drops = Instance.find_all(gm.constants.oCustomObject_pPickupItem)
+    for _, d in ipairs(drops) do
+        if math.abs(d.x - x) <= 1.0 and math.abs(d.y - (y - 40.0)) <= 1.0 then
+            drop = d
+            d.y = d.y + 40.0
+            break
+        end
+    end
+
+    return drop
 end
 
 
@@ -217,6 +234,31 @@ Item.set_loot_tags = function(item, ...)
 end
 
 
+Item.add_achievement = function(item, progress_req, single_run)
+    local class_item = gm.variable_global_get("class_item")
+    local array = class_item[item + 1]
+
+    local ach = gm.achievement_create(array[1], array[2])
+    gm.achievement_set_unlock_item(ach, item)
+    gm.achievement_set_requirement(ach, progress_req or 1)
+
+    if single_run then
+        local class_achievement = gm.variable_global_get("class_achievement")
+        local ach_array = class_achievement[ach + 1]
+        gm.array_set(ach_array, 21, single_run)
+    end
+end
+
+
+Item.progress_achievement = function(item, amount)
+    local class_item = gm.variable_global_get("class_item")
+    local array = class_item[item + 1]
+
+    if gm.achievement_is_unlocked(array[11]) then return end
+    gm.achievement_add_progress(array[11], amount or 1)
+end
+
+
 Item.add_callback = function(item, callback, func)
     local array = gm.variable_global_get("class_item")[item + 1]
 
@@ -235,6 +277,8 @@ Item.add_callback = function(item, callback, func)
         or callback == "onKill"
         or callback == "onDamaged"
         or callback == "onDamageBlocked"
+        or callback == "onHeal"
+        or callback == "onShieldBreak"
         or callback == "onInteract"
         or callback == "onEquipmentUse"
         or callback == "onStep"
@@ -255,7 +299,7 @@ function onAttack(self, other, result, args)
     if callbacks["onAttack"] then
         for _, c in ipairs(callbacks["onAttack"]) do
             local item = c[1]
-            local count = Item.get_stack_count(self, item)
+            local count = Item.get_stack_count(args[2].value.parent, item)
             if count > 0 then
                 local func = c[2]
                 func(self, args[2].value, count)    -- Actor, Damager attack_info, Stack count
@@ -263,7 +307,6 @@ function onAttack(self, other, result, args)
         end
     end
 end
-Callback.add("onAttackCreate", "RMT.onAttack", onAttack, true)
 
 
 function onPostAttack(self, other, result, args)
@@ -279,7 +322,6 @@ function onPostAttack(self, other, result, args)
         end
     end
 end
-Callback.add("onAttackHandleEnd", "RMT.onPostAttack", onPostAttack, true)
 
 
 function onHit(self, other, result, args)
@@ -295,7 +337,6 @@ function onHit(self, other, result, args)
         end
     end
 end
-Callback.add("onHitProc", "RMT.onHit", onHit, true)
 
 
 function onKill(self, other, result, args)
@@ -310,7 +351,6 @@ function onKill(self, other, result, args)
         end
     end
 end
-Callback.add("onKillProc", "RMT.onKill", onKill, true)
 
 
 function onDamaged(self, other, result, args)
@@ -325,7 +365,6 @@ function onDamaged(self, other, result, args)
         end
     end
 end
-Callback.add("onDamagedProc", "RMT.onDamaged", onDamaged, true)
 
 
 function onDamageBlocked(self, other, result, args)
@@ -340,7 +379,6 @@ function onDamageBlocked(self, other, result, args)
         end
     end
 end
-Callback.add("onDamageBlocked", "RMT.onDamageBlocked", onDamageBlocked, true)
 
 
 function onInteract(self, other, result, args)
@@ -355,7 +393,6 @@ function onInteract(self, other, result, args)
         end
     end
 end
-Callback.add("onInteractableActivate", "RMT.onInteract", onInteract, true)
 
 
 function onEquipmentUse(self, other, result, args)
@@ -370,7 +407,6 @@ function onEquipmentUse(self, other, result, args)
         end
     end
 end
-Callback.add("onEquipmentUse", "RMT.onEquipmentUse", onEquipmentUse, true)
 
 
 function onStep(self, other, result, args)
@@ -388,7 +424,6 @@ function onStep(self, other, result, args)
         end
     end
 end
-Callback.add("preStep", "RMT.onStep", onStep, true)
 
 
 function onDraw(self, other, result, args)
@@ -406,7 +441,6 @@ function onDraw(self, other, result, args)
         end
     end
 end
-Callback.add("onHUDDraw", "RMT.onDraw", onDraw, true)
 
 
 
@@ -421,13 +455,59 @@ gm.post_script_hook(gm.constants.callback_execute, function(self, other, result,
 end)
 
 
-gm.pre_script_hook(gm.constants.skill_util_update_heaven_cracker, function(self, other, result, args)
+gm.pre_script_hook(gm.constants.skill_activate, function(self, other, result, args)
+    if args[1].value ~= 0.0 or self.skills[1].active_skill.skill_id == 70.0 then return true end
     if callbacks["onBasicUse"] then
         for _, fn in pairs(callbacks["onBasicUse"]) do
-            local count = Item.get_stack_count(args[1].value, fn[1])
+            local count = Item.get_stack_count(self, fn[1])
             if count > 0 then
-                fn[2](args[1].value, count)   -- Actor, Stack count
+                fn[2](self, count)   -- Actor, Stack count
             end
         end
     end
 end)
+
+
+gm.pre_script_hook(gm.constants.actor_heal_networked, function(self, other, result, args)
+    if callbacks["onHeal"] then
+        for _, fn in pairs(callbacks["onHeal"]) do
+            local count = Item.get_stack_count(args[1].value, fn[1])
+            if count > 0 then
+                fn[2](args[1].value, args[2].value, count)   -- Actor, Heal amount, Stack count
+            end
+        end
+    end
+end)
+
+
+gm.pre_script_hook(gm.constants.step_actor, function(self, other, result, args)
+    if self.shield and self.shield > 0.0 then self.RMT_has_shield = true end
+    if self.RMT_has_shield and self.shield <= 0.0 then
+        self.RMT_has_shield = nil
+        if callbacks["onShieldBreak"] then
+            for _, fn in pairs(callbacks["onShieldBreak"]) do
+                local count = Item.get_stack_count(self, fn[1])
+                if count > 0 then
+                    fn[2](self, count)   -- Actor, Stack count
+                end
+            end
+        end
+    end
+end)
+
+
+
+-- ========== Initialize ==========
+
+Item.__initialize = function()
+    Callback.add("onAttackCreate", "RMT.item_onAttack", onAttack, true)
+    Callback.add("onAttackHandleEnd", "RMT.item_onPostAttack", onPostAttack, true)
+    Callback.add("onHitProc", "RMT.item_onHit", onHit, true)
+    Callback.add("onKillProc", "RMT.item_onKill", onKill, true)
+    Callback.add("onDamagedProc", "RMT.item_onDamaged", onDamaged, true)
+    Callback.add("onDamageBlocked", "RMT.item_onDamageBlocked", onDamageBlocked, true)
+    Callback.add("onInteractableActivate", "RMT.item_onInteract", onInteract, true)
+    Callback.add("onEquipmentUse", "RMT.item_onEquipmentUse", onEquipmentUse, true)
+    Callback.add("preStep", "RMT.item_onStep", onStep, true)
+    Callback.add("onHUDDraw", "RMT.item_onDraw", onDraw, true)
+end
