@@ -73,3 +73,7 @@
     * Equipment.add_achievement
     * Equipment.progress_achievement
 * Custom Equipment item logs now appear after all the vanilla ones.
+
+### set this to next version number when merged to main
+* Added alarm module
+   * Alarm.create
