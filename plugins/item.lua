@@ -409,38 +409,38 @@ function onEquipmentUse(self, other, result, args)
 end
 
 
-function onStep(self, other, result, args)
-    if callbacks["onStep"] then
-        for _, c in ipairs(callbacks["onStep"]) do
-            local actors = Instance.find_all(gm.constants.pActor)
-            for _, a in ipairs(actors) do
-                local item = c[1]
-                local count = Item.get_stack_count(a, item)
-                if count > 0 then
-                    local func = c[2]
-                    func(a, count)  -- Actor, Stack count
-                end
-            end
-        end
-    end
-end
+-- function onStep(self, other, result, args)
+--     if callbacks["onStep"] then
+--         for _, c in ipairs(callbacks["onStep"]) do
+--             local actors = Instance.find_all(gm.constants.pActor)
+--             for _, a in ipairs(actors) do
+--                 local item = c[1]
+--                 local count = Item.get_stack_count(a, item)
+--                 if count > 0 then
+--                     local func = c[2]
+--                     func(a, count)  -- Actor, Stack count
+--                 end
+--             end
+--         end
+--     end
+-- end
 
 
-function onDraw(self, other, result, args)
-    if callbacks["onDraw"] then
-        for _, c in ipairs(callbacks["onDraw"]) do
-            local actors = Instance.find_all(gm.constants.pActor)
-            for _, a in ipairs(actors) do
-                local item = c[1]
-                local count = Item.get_stack_count(a, item)
-                if count > 0 then
-                    local func = c[2]
-                    func(a, count)  -- Actor, Stack count
-                end
-            end
-        end
-    end
-end
+-- function onDraw(self, other, result, args)
+--     if callbacks["onDraw"] then
+--         for _, c in ipairs(callbacks["onDraw"]) do
+--             local actors = Instance.find_all(gm.constants.pActor)
+--             for _, a in ipairs(actors) do
+--                 local item = c[1]
+--                 local count = Item.get_stack_count(a, item)
+--                 if count > 0 then
+--                     local func = c[2]
+--                     func(a, count)  -- Actor, Stack count
+--                 end
+--             end
+--         end
+--     end
+-- end
 
 
 Item.get_callback_count = function()
@@ -490,6 +490,15 @@ end)
 
 
 gm.pre_script_hook(gm.constants.step_actor, function(self, other, result, args)
+    if callbacks["onStep"] then
+        for _, fn in ipairs(callbacks["onStep"]) do
+            local count = Item.get_stack_count(self, fn[1])
+            if count > 0 then
+                fn[2](self, count)  -- Actor, Stack count
+            end
+        end
+    end
+
     if self.shield and self.shield > 0.0 then self.RMT_has_shield = true end
     if self.RMT_has_shield and self.shield <= 0.0 then
         self.RMT_has_shield = nil
@@ -499,6 +508,18 @@ gm.pre_script_hook(gm.constants.step_actor, function(self, other, result, args)
                 if count > 0 then
                     fn[2](self, count)   -- Actor, Stack count
                 end
+            end
+        end
+    end
+end)
+
+
+gm.post_script_hook(gm.constants.draw_actor, function(self, other, result, args)
+    if callbacks["onDraw"] then
+        for _, fn in ipairs(callbacks["onDraw"]) do
+            local count = Item.get_stack_count(self, fn[1])
+            if count > 0 then
+                fn[2](self, count)  -- Actor, Stack count
             end
         end
     end
@@ -517,6 +538,6 @@ Item.__initialize = function()
     Callback.add("onDamageBlocked", "RMT.item_onDamageBlocked", onDamageBlocked, true)
     Callback.add("onInteractableActivate", "RMT.item_onInteract", onInteract, true)
     Callback.add("onEquipmentUse", "RMT.item_onEquipmentUse", onEquipmentUse, true)
-    Callback.add("preStep", "RMT.item_onStep", onStep, true)
-    Callback.add("onHUDDraw", "RMT.item_onDraw", onDraw, true)
+    -- Callback.add("preStep", "RMT.item_onStep", onStep, true)
+    -- Callback.add("onHUDDraw", "RMT.item_onDraw", onDraw, true)
 end
