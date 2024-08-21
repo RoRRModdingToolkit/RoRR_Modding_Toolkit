@@ -590,5 +590,5 @@ Item.__initialize = function()
     Callback.add("onInteractableActivate", "RMT.item_onInteract", onInteract, true)
     Callback.add("onEquipmentUse", "RMT.item_onEquipmentUse", onEquipmentUse, true)
     Callback.add("preStep", "RMT.item_onStep", onStep, true)
-    Callback.add("onHUDDraw", "RMT.item_onDraw", onDraw, true)
+    Callback.add("postHUDDraw", "RMT.item_onDraw", onDraw, true)
 end
