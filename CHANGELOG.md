@@ -76,3 +76,4 @@
 
 ### v1.0.9
 * Added Helper.log_toolkit_stats
+* Changed how Buff onDraw and Item onStep/onDraw work internally to reduce lag.
