@@ -445,6 +445,21 @@ function onStep(self, other, result, args)
         --     end
         -- end
     end
+
+    if callbacks["onShieldBreak"] then
+        for n, a in ipairs(has_custom_item) do
+            if a.shield and a.shield > 0.0 then a.RMT_has_shield = true end
+            if a.RMT_has_shield and a.shield <= 0.0 then
+                a.RMT_has_shield = nil
+                for _, c in pairs(callbacks["onShieldBreak"]) do
+                    local count = Item.get_stack_count(a, c[1])
+                    if count > 0 then
+                        c[2](a, count)  -- Actor, Stack count
+                    end
+                end
+            end
+        end
+    end
 end
 
 
