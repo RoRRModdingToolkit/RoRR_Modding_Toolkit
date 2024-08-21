@@ -77,3 +77,7 @@
 ### v1.0.9
 * Added Helper.log_toolkit_stats
 * Changed how onStep/onDraw callbacks work internally for several modules, heavily reducing lag.
+    * EDIT: Once again I prematurely release a patch.
+
+### v1.0.10
+* Fixed onStep/onDraw callback lag for real.

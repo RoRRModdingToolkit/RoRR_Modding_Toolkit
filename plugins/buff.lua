@@ -3,6 +3,7 @@
 Buff = {}
 
 local callbacks = {}
+local has_custom_buff = {}
 
 
 
@@ -82,6 +83,13 @@ Buff.create = function(namespace, identifier)
     -- Set default stack_number_col to pure white
     Buff.set_property(buff, Buff.PROPERTY.stack_number_col, gm.array_create(1, 16777215))
 
+    -- Add onApply callback to add actor to has_custom_buff table
+    Buff.add_callback(buff, "onApply", function(actor, stack)
+        if not Helper.table_has(has_custom_buff, actor) then
+            table.insert(has_custom_buff, actor)
+        end
+    end)
+
     return buff
 end
 
@@ -126,6 +134,25 @@ end
 
 -- ========== Internal ==========
 
+function buff_onDraw(self, other, result, args)
+    if gm.variable_global_get("pause") then return end
+    
+    if callbacks["onDraw"] then
+        for n, a in ipairs(has_custom_buff) do
+            if Instance.exists(a) then
+                for _, c in ipairs(callbacks["onDraw"]) do
+                    local count = Buff.get_stack_count(a, c[1])
+                    if count > 0 then
+                        c[2](a, count)  -- Actor, Stack count
+                    end
+                end
+            else table.remove(n)
+            end
+        end
+    end
+end
+
+
 Buff.get_callback_count = function()
     local count = 0
     for k, v in pairs(callbacks) do
@@ -166,13 +193,9 @@ gm.pre_script_hook(gm.constants.actor_transform, function(self, other, result, a
 end)
 
 
-gm.post_script_hook(gm.constants.draw_actor, function(self, other, result, args)
-    if callbacks["onDraw"] then
-        for _, fn in pairs(callbacks["onDraw"]) do
-            local stack = Buff.get_stack_count(self, fn[1])
-            if stack > 0 then
-                fn[2](self, stack)   -- Actor, Stack count
-            end
-        end
-    end
-end)
+
+-- ========== Initialize ==========
+
+Buff.__initialize = function()
+    Callback.add("postHUDDraw", "RMT.buff_onDraw", buff_onDraw, true)
+end
