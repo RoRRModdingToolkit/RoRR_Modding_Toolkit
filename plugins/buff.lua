@@ -126,23 +126,6 @@ end
 
 -- ========== Internal ==========
 
-function buff_onDraw(self, other, result, args)
-    if callbacks["onDraw"] then
-        for _, c in ipairs(callbacks["onDraw"]) do
-            local actors = Instance.find_all(gm.constants.pActor)
-            for _, a in ipairs(actors) do
-                local buff = c[1]
-                local count = Buff.get_stack_count(a, buff)
-                if count > 0 then
-                    local func = c[2]
-                    func(a, count)  -- Actor, Stack count
-                end
-            end
-        end
-    end
-end
-
-
 Buff.get_callback_count = function()
     local count = 0
     for k, v in pairs(callbacks) do
@@ -183,9 +166,13 @@ gm.pre_script_hook(gm.constants.actor_transform, function(self, other, result, a
 end)
 
 
-
--- ========== Initialize ==========
-
-Buff.__initialize = function()
-    Callback.add("postHUDDraw", "RMT.buff_onDraw", buff_onDraw, true)
-end
+gm.post_script_hook(gm.constants.draw_actor, function(self, other, result, args)
+    if callbacks["onDraw"] then
+        for _, fn in pairs(callbacks["onDraw"]) do
+            local stack = Buff.get_stack_count(self, fn[1])
+            if stack > 0 then
+                fn[2](self, stack)   -- Actor, Stack count
+            end
+        end
+    end
+end)
