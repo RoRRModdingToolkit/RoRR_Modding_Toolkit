@@ -30,6 +30,8 @@ Instance.projectiles = {
     gm.constants.oWurmMissile,
     gm.constants.oShamBMissile,
     gm.constants.oTurtleMissile,
+    gm.constants.oBrambleBullet,
+    gm.constants.oLizardRSpear,
     gm.constants.oEfMissileEnemy,
     gm.constants.oSpiderBulletNoSync, gm.constants.oSpiderBullet,
     gm.constants.oGuardBulletNoSync, gm.constants.oGuardBullet,

@@ -81,3 +81,4 @@
 
 ### v1.0.10
 * Fixed onStep/onDraw callback lag for real.
+* Added 2 more projectiles to the Instance.projectiles table.
