@@ -29,6 +29,20 @@ end
 
 
 
+-- ========== Internal ==========
+
+Callback.get_callback_count = function()
+    local count = 0
+    for k, v in pairs(callbacks) do
+        for _, c in pairs(callbacks) do
+            count = count + 1
+        end
+    end
+    return count
+end
+
+
+
 -- ========== Hooks ==========
 
 gm.post_script_hook(gm.constants.callback_execute, function(self, other, result, args)

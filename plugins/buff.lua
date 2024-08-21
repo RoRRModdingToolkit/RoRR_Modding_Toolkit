@@ -143,6 +143,15 @@ function buff_onDraw(self, other, result, args)
 end
 
 
+Buff.get_callback_count = function()
+    local count = 0
+    for k, v in pairs(callbacks) do
+        count = count + #v
+    end
+    return count
+end
+
+
 
 -- ========== Hooks ==========
 
