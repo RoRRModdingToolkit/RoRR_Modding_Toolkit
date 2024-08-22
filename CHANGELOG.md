@@ -82,3 +82,5 @@
 ### v1.0.10
 * Fixed onStep/onDraw callback lag for real.
 * Added 2 more projectiles to the Instance.projectiles table.
+* Fixed literal memory leak with Buff.find when calling it a lot.
+* RMT will now run its own __initialize before all other mods (not sure why this wasn't already the case).
