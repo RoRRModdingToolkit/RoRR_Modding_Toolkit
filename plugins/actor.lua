@@ -218,7 +218,7 @@ end)
 
 gm.pre_script_hook(gm.constants.step_actor, function(self, other, result, args)
     if callbacks["onPreStep"] then
-        for _, fn in pairs(callbacks["onPreStep"]) do
+        for _, fn in ipairs(callbacks["onPreStep"]) do
             fn(self)   -- Actor
         end
     end
@@ -227,7 +227,7 @@ gm.pre_script_hook(gm.constants.step_actor, function(self, other, result, args)
     if self.RMT_has_shield_actor and self.shield <= 0.0 then
         self.RMT_has_shield_actor = nil
         if callbacks["onShieldBreak"] then
-            for _, fn in pairs(callbacks["onShieldBreak"]) do
+            for _, fn in ipairs(callbacks["onShieldBreak"]) do
                 fn(self)   -- Actor
             end
         end
@@ -237,7 +237,7 @@ end)
 
 gm.post_script_hook(gm.constants.step_actor, function(self, other, result, args)
     if callbacks["onPostStep"] then
-        for _, fn in pairs(callbacks["onPostStep"]) do
+        for _, fn in ipairs(callbacks["onPostStep"]) do
             fn(self)   -- Actor
         end
     end

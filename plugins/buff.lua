@@ -199,13 +199,9 @@ end)
 -- ========== Initialize ==========
 
 Buff.__initialize = function()
-    -- Callback.add("postHUDDraw", "RMT.buff_onDraw", buff_onDraw, true)
+    Callback.add("postHUDDraw", "RMT.buff_onDraw", buff_onDraw, true)
 
     -- Populate buff_table
     local class_buff = gm.variable_global_get("class_buff")
     for i, b in ipairs(class_buff) do table.insert(buff_table, b[1].."-"..b[2]) end
-
-    for i, b in ipairs(buff_table) do
-        log.info(i.." : "..b)
-    end
 end

@@ -429,34 +429,25 @@ function onStep(self, other, result, args)
                         c[2](a, count)  -- Actor, Stack count
                     end
                 end
-            else table.remove(n)
+            else table.remove(has_custom_item, n)
             end
         end
-
-        -- for _, c in ipairs(callbacks["onStep"]) do
-        --     local actors = Instance.find_all(gm.constants.pActor)
-        --     for _, a in ipairs(actors) do
-        --         local item = c[1]
-        --         local count = Item.get_stack_count(a, item)
-        --         if count > 0 then
-        --             local func = c[2]
-        --             func(a, count)  -- Actor, Stack count
-        --         end
-        --     end
-        -- end
     end
 
     if callbacks["onShieldBreak"] then
         for n, a in ipairs(has_custom_item) do
-            if a.shield and a.shield > 0.0 then a.RMT_has_shield = true end
-            if a.RMT_has_shield and a.shield <= 0.0 then
-                a.RMT_has_shield = nil
-                for _, c in pairs(callbacks["onShieldBreak"]) do
-                    local count = Item.get_stack_count(a, c[1])
-                    if count > 0 then
-                        c[2](a, count)  -- Actor, Stack count
+            if Instance.exists(a) then
+                if a.shield and a.shield > 0.0 then a.RMT_has_shield = true end
+                if a.RMT_has_shield and a.shield <= 0.0 then
+                    a.RMT_has_shield = nil
+                    for _, c in ipairs(callbacks["onShieldBreak"]) do
+                        local count = Item.get_stack_count(a, c[1])
+                        if count > 0 then
+                            c[2](a, count)  -- Actor, Stack count
+                        end
                     end
                 end
+            else table.remove(has_custom_item, n)
             end
         end
     end
@@ -475,21 +466,9 @@ function onDraw(self, other, result, args)
                         c[2](a, count)  -- Actor, Stack count
                     end
                 end
-            else table.remove(n)
+            else table.remove(has_custom_item, n)
             end
         end
-
-        -- for _, c in ipairs(callbacks["onDraw"]) do
-        --     local actors = Instance.find_all(gm.constants.pActor)
-        --     for _, a in ipairs(actors) do
-        --         local item = c[1]
-        --         local count = Item.get_stack_count(a, item)
-        --         if count > 0 then
-        --             local func = c[2]
-        --             func(a, count)  -- Actor, Stack count
-        --         end
-        --     end
-        -- end
     end
 end
 
@@ -538,43 +517,6 @@ gm.pre_script_hook(gm.constants.actor_heal_networked, function(self, other, resu
         end
     end
 end)
-
-
--- gm.pre_script_hook(gm.constants.step_actor, function(self, other, result, args)
---     if callbacks["onStep"] then
---         for _, fn in ipairs(callbacks["onStep"]) do
---             local count = Item.get_stack_count(self, fn[1])
---             if count > 0 then
---                 fn[2](self, count)  -- Actor, Stack count
---             end
---         end
---     end
-
---     if self.shield and self.shield > 0.0 then self.RMT_has_shield = true end
---     if self.RMT_has_shield and self.shield <= 0.0 then
---         self.RMT_has_shield = nil
---         if callbacks["onShieldBreak"] then
---             for _, fn in pairs(callbacks["onShieldBreak"]) do
---                 local count = Item.get_stack_count(self, fn[1])
---                 if count > 0 then
---                     fn[2](self, count)   -- Actor, Stack count
---                 end
---             end
---         end
---     end
--- end)
-
-
--- gm.post_script_hook(gm.constants.draw_actor, function(self, other, result, args)
---     if callbacks["onDraw"] then
---         for _, fn in ipairs(callbacks["onDraw"]) do
---             local count = Item.get_stack_count(self, fn[1])
---             if count > 0 then
---                 fn[2](self, count)  -- Actor, Stack count
---             end
---         end
---     end
--- end)
 
 
 
