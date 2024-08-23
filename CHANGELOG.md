@@ -84,3 +84,6 @@
 * Added 2 more projectiles to the Instance.projectiles table.
 * Fixed literal memory leak with Buff.find when calling it a lot.
 * RMT will now run its own __initialize before all other mods (not sure why this wasn't already the case).
+
+### v1.0.11
+* Fixed callback tables not populating correctly in certain circumstances and crashing.

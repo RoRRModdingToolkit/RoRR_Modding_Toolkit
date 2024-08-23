@@ -1,4 +1,4 @@
--- RoRR Modding Toolkit v1.0.10
+-- RoRR Modding Toolkit v1.0.11
 
 log.info("Successfully loaded ".._ENV["!guid"]..".")
 
@@ -26,6 +26,10 @@ require("./survivor")
 -- ========== Initialize ==========
 
 function __initialize()
+    -- Initialize these first (callback population)
+    Callback.__initialize()
+    Survivor.__initialize()
+
     Actor.__initialize()
     Buff.__initialize()
     Instance.__initialize()

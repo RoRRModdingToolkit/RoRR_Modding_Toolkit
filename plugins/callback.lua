@@ -11,12 +11,6 @@ local callbacks = {}
 
 Callback.TYPE = {}
 
--- Populate Callback.TYPE
-local callback_names = gm.variable_global_get("callback_names")
-for i = 1, #callback_names do
-    Callback.TYPE[callback_names[i]] = i - 1
-end
-
 
 
 -- ========== Functions ==========
@@ -52,3 +46,15 @@ gm.post_script_hook(gm.constants.callback_execute, function(self, other, result,
         end
     end
 end)
+
+
+
+-- ========== Initialize ==========
+
+Callback.__initialize = function()
+    -- Populate Callback.TYPE
+    local callback_names = gm.variable_global_get("callback_names")
+    for i = 1, #callback_names do
+        Callback.TYPE[callback_names[i]] = i - 1
+    end
+end

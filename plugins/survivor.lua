@@ -337,13 +337,7 @@ end
 
 -- ========== Callbacks ==========
 
--- Init callbacks
-local callback_names = gm.variable_global_get("callback_names")
 callbacks = {}
-
-for i = 1, #callback_names do
-    callbacks[callback_names[i]] = i - 1
-end
 
 gm.post_script_hook(gm.constants.callback_execute, function(self, other, result, args)
     if not survivors[self.class] then return end
@@ -358,9 +352,23 @@ gm.post_script_hook(gm.constants.callback_execute, function(self, other, result,
     end
 end)
 
-return Survivor
-
 -- section possible additions : call_later
 
 -- local myMethod = gm.method(self.id, gm.constants.function_dummy)
 -- local _handle = gm.call_later(20, 1, myMethod, false)
+
+
+
+-- ========== Initialize ==========
+
+Survivor.__initialize = function()
+    -- Populate callbacks
+    local callback_names = gm.variable_global_get("callback_names")
+    for i = 1, #callback_names do
+        callbacks[callback_names[i]] = i - 1
+    end
+end
+
+
+
+return Survivor
