@@ -114,11 +114,12 @@ Item.spawn_drop = function(item, x, y, target)
     -- Look for drop (because gm.item_drop_object does not actually return the instance for some reason)
     -- The drop spawns 40 px above y parameter
     local drop = nil
-    local drops = Instance.find_all(gm.constants.oCustomObject_pPickupItem)
+    local drops = Instance.find_all(gm.constants.pPickupItem, gm.constants.oCustomObject_pPickupItem)
     for _, d in ipairs(drops) do
         if math.abs(d.x - x) <= 1.0 and math.abs(d.y - (y - 40.0)) <= 1.0 then
             drop = d
             d.y = d.y + 40.0
+            d.ystart = d.y
             break
         end
     end

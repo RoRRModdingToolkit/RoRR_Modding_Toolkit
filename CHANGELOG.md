@@ -87,3 +87,6 @@
 
 ### v1.0.11
 * Fixed callback tables not populating correctly in certain circumstances and crashing.
+
+### v1.0.12
+* Item.spawn_drop now works correctly with vanilla items.
