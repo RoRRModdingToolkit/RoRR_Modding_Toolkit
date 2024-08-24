@@ -7,6 +7,8 @@ local callbacks = {}
 local disabled_loot = {}
 local disabled_logs = {}
 
+local loot_toggled = {}     -- Loot pools that have been added to this frame
+
 
 
 -- ========== General Functions ==========
@@ -28,8 +30,11 @@ Equipment.toggle_loot = function(equipment, enabled)
     if enabled then
         if disabled_loot[equipment] then
             -- Add back to loot pools
-            for _, p in ipairs(disabled_loot[equipment]) do
-                gm.ds_list_insert(loot_pools[p[1]].drop_pool, p[2], obj)
+            for _, pool_id in ipairs(disabled_loot[equipment]) do
+                gm.ds_list_add(loot_pools[pool_id].drop_pool, obj)
+                if not Helper.table_has(loot_toggled, pool_id) then
+                    table.insert(loot_toggled, pool_id)
+                end
             end
 
             disabled_loot[equipment] = nil
@@ -38,7 +43,7 @@ Equipment.toggle_loot = function(equipment, enabled)
     else
         if not disabled_loot[equipment] then
             -- Remove from loot pools
-            -- and store the pool indexes and positions
+            -- and store the pool indexes
             local pools = {}
 
             for i, p in ipairs(loot_pools) do
@@ -46,7 +51,7 @@ Equipment.toggle_loot = function(equipment, enabled)
                 local pos = gm.ds_list_find_index(drops, obj)
                 if pos >= 0 then
                     gm.ds_list_delete(drops, pos)
-                    table.insert(pools, {i, pos})
+                    table.insert(pools, i)
                 end
             end
 
@@ -68,7 +73,9 @@ Equipment.toggle_log = function(equipment, enabled)
     if enabled then
         if disabled_logs[equipment] then
             -- Add back to log ds_list
-            gm.ds_list_insert(item_log_order, disabled_logs[equipment], log_id)
+            --gm.ds_list_insert(item_log_order, disabled_logs[equipment], log_id)
+            gm.ds_list_add(item_log_order, log_id)
+            gm.ds_list_sort(item_log_order, true)
             disabled_logs[equipment] = nil
         end
 
@@ -211,4 +218,32 @@ gm.post_script_hook(gm.constants.callback_execute, function(self, other, result,
             fn(args[2].value)
         end
     end
+end)
+
+
+gm.pre_script_hook(gm.constants.__input_system_tick, function()
+    -- Sort loot tables that have been added to
+    for _, pool_id in ipairs(loot_toggled) do
+        local class_equipment = gm.variable_global_get("class_equipment")
+        local loot_pools = gm.variable_global_get("treasure_loot_pools")
+
+        -- Get equipment IDs from objects and sort
+        local ids = gm.ds_list_create()
+        local pool = loot_pools[pool_id].drop_pool
+        local size = gm.ds_list_size(pool)
+        for i = 0, size - 1 do
+            local obj = gm.ds_list_find_value(pool, i)
+            gm.ds_list_add(ids, gm.object_to_equipment(obj))
+        end
+        gm.ds_list_sort(ids, true)
+
+        -- Add objects of sorted IDs back into loot pool
+        gm.ds_list_clear(pool)
+        for i = 0, size - 1 do
+            local id = gm.ds_list_find_value(ids, i)
+            gm.ds_list_add(pool, class_equipment[id + 1][9])
+        end
+        gm.ds_list_destroy(ids)
+    end
+    loot_toggled = {}
 end)

@@ -9,6 +9,9 @@ local has_custom_item = {}
 local disabled_loot = {}
 local disabled_logs = {}
 
+local loot_toggled = {}     -- Loot pools that have been added to this frame
+Item.logs_toggled = false
+
 
 
 -- ========== Enums ==========
@@ -142,8 +145,11 @@ Item.toggle_loot = function(item, enabled)
     if enabled then
         if disabled_loot[item] then
             -- Add back to loot pools
-            for _, p in ipairs(disabled_loot[item]) do
-                gm.ds_list_insert(loot_pools[p[1]].drop_pool, p[2], obj)
+            for _, pool_id in ipairs(disabled_loot[item]) do
+                gm.ds_list_add(loot_pools[pool_id].drop_pool, obj)
+                if not Helper.table_has(loot_toggled, pool_id) then
+                    table.insert(loot_toggled, pool_id)
+                end
             end
 
             disabled_loot[item] = nil
@@ -152,7 +158,7 @@ Item.toggle_loot = function(item, enabled)
     else
         if not disabled_loot[item] then
             -- Remove from loot pools
-            -- and store the pool indexes and positions
+            -- and store the pool indexes
             local pools = {}
 
             for i, p in ipairs(loot_pools) do
@@ -160,7 +166,7 @@ Item.toggle_loot = function(item, enabled)
                 local pos = gm.ds_list_find_index(drops, obj)
                 if pos >= 0 then
                     gm.ds_list_delete(drops, pos)
-                    table.insert(pools, {i, pos})
+                    table.insert(pools, i)
                 end
             end
 
@@ -182,7 +188,9 @@ Item.toggle_log = function(item, enabled)
     if enabled then
         if disabled_logs[item] then
             -- Add back to log ds_list
-            gm.ds_list_insert(item_log_order, disabled_logs[item], log_id)
+            --gm.ds_list_insert(item_log_order, disabled_logs[item], log_id)
+            gm.ds_list_add(item_log_order, log_id)
+            gm.ds_list_sort(item_log_order, true)
             disabled_logs[item] = nil
         end
 
@@ -590,6 +598,34 @@ gm.pre_script_hook(gm.constants.actor_heal_networked, function(self, other, resu
             end
         end
     end
+end)
+
+
+gm.pre_script_hook(gm.constants.__input_system_tick, function()
+    -- Sort loot tables that have been added to
+    for _, pool_id in ipairs(loot_toggled) do
+        local class_item = gm.variable_global_get("class_item")
+        local loot_pools = gm.variable_global_get("treasure_loot_pools")
+
+        -- Get item IDs from objects and sort
+        local ids = gm.ds_list_create()
+        local pool = loot_pools[pool_id].drop_pool
+        local size = gm.ds_list_size(pool)
+        for i = 0, size - 1 do
+            local obj = gm.ds_list_find_value(pool, i)
+            gm.ds_list_add(ids, gm.object_to_item(obj))
+        end
+        gm.ds_list_sort(ids, true)
+
+        -- Add objects of sorted IDs back into loot pool
+        gm.ds_list_clear(pool)
+        for i = 0, size - 1 do
+            local id = gm.ds_list_find_value(ids, i)
+            gm.ds_list_add(pool, class_item[id + 1][9])
+        end
+        gm.ds_list_destroy(ids)
+    end
+    loot_toggled = {}
 end)
 
 
