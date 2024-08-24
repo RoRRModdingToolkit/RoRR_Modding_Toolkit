@@ -93,6 +93,4 @@
 
 ### v1.0.13
 * Added Item.toggle_loot
-* Added Item.toggle_log
 * Added Equipment.toggle_loot
-* Added Equipment.toggle_log

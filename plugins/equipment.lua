@@ -5,8 +5,6 @@ Equipment = {}
 local callbacks = {}
 
 local disabled_loot = {}
-local disabled_logs = {}
-
 local loot_toggled = {}     -- Loot pools that have been added to this frame
 
 
@@ -56,38 +54,6 @@ Equipment.toggle_loot = function(equipment, enabled)
             end
 
             disabled_loot[equipment] = pools
-        end
-
-    end
-end
-
-
-Equipment.toggle_log = function(equipment, enabled)
-    if enabled == nil then return end
-
-    local class_equipment = gm.variable_global_get("class_equipment")
-    local item_log_order = gm.variable_global_get("item_log_display_list")
-
-    local log_id = class_equipment[equipment + 1][10]
-    
-    if enabled then
-        if disabled_logs[equipment] then
-            -- Add back to log ds_list
-            --gm.ds_list_insert(item_log_order, disabled_logs[equipment], log_id)
-            gm.ds_list_add(item_log_order, log_id)
-            gm.ds_list_sort(item_log_order, true)
-            disabled_logs[equipment] = nil
-        end
-
-    else
-        if not disabled_logs[equipment] then
-            -- Remove from log ds_list
-            -- and store position
-            local pos = gm.ds_list_find_index(item_log_order, log_id)
-            if pos >= 0 then
-                gm.ds_list_delete(item_log_order, pos)
-                disabled_logs[equipment] = pos
-            end
         end
 
     end
