@@ -5,6 +5,7 @@ Item = {}
 
 local callbacks = {}
 local has_custom_item = {}
+
 local disabled_loot = {}
 local disabled_logs = {}
 

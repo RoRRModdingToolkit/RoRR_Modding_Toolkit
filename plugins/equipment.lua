@@ -4,6 +4,9 @@ Equipment = {}
 
 local callbacks = {}
 
+local disabled_loot = {}
+local disabled_logs = {}
+
 
 
 -- ========== General Functions ==========
@@ -11,6 +14,76 @@ local callbacks = {}
 Equipment.find = function(namespace, identifier)
     if not identifier then return gm.equipment_find(namespace) end
     return gm.equipment_find(namespace.."-"..identifier)
+end
+
+
+Equipment.toggle_loot = function(equipment, enabled)
+    if enabled == nil then return end
+
+    local class_equipment = gm.variable_global_get("class_equipment")
+    local loot_pools = gm.variable_global_get("treasure_loot_pools")
+
+    local obj = class_equipment[equipment + 1][9]
+    
+    if enabled then
+        if disabled_loot[equipment] then
+            -- Add back to loot pools
+            for _, p in ipairs(disabled_loot[equipment]) do
+                gm.ds_list_insert(loot_pools[p[1]].drop_pool, p[2], obj)
+            end
+
+            disabled_loot[equipment] = nil
+        end
+
+    else
+        if not disabled_loot[equipment] then
+            -- Remove from loot pools
+            -- and store the pool indexes and positions
+            local pools = {}
+
+            for i, p in ipairs(loot_pools) do
+                local drops = p.drop_pool
+                local pos = gm.ds_list_find_index(drops, obj)
+                if pos >= 0 then
+                    gm.ds_list_delete(drops, pos)
+                    table.insert(pools, {i, pos})
+                end
+            end
+
+            disabled_loot[equipment] = pools
+        end
+
+    end
+end
+
+
+Equipment.toggle_log = function(equipment, enabled)
+    if enabled == nil then return end
+
+    local class_equipment = gm.variable_global_get("class_equipment")
+    local item_log_order = gm.variable_global_get("item_log_display_list")
+
+    local log_id = class_equipment[equipment + 1][10]
+    
+    if enabled then
+        if disabled_logs[equipment] then
+            -- Add back to log ds_list
+            gm.ds_list_insert(item_log_order, disabled_logs[equipment], log_id)
+            disabled_logs[equipment] = nil
+        end
+
+    else
+        if not disabled_logs[equipment] then
+            -- Remove from log ds_list
+            -- and store position
+            local pos = gm.ds_list_find_index(item_log_order, log_id)
+            if pos >= 0 then
+                gm.ds_list_delete(item_log_order, pos)
+                disabled_logs[equipment] = pos
+            end
+        end
+
+    end
 end
 
 
