@@ -5,6 +5,8 @@ Item = {}
 
 local callbacks = {}
 local has_custom_item = {}
+local disabled_loot = {}
+local disabled_logs = {}
 
 
 
@@ -125,6 +127,76 @@ Item.spawn_drop = function(item, x, y, target)
     end
 
     return drop
+end
+
+
+Item.toggle_loot = function(item, enabled)
+    if enabled == nil then return end
+
+    local class_item = gm.variable_global_get("class_item")
+    local loot_pools = gm.variable_global_get("treasure_loot_pools")
+
+    local obj = class_item[item + 1][9]
+    
+    if enabled then
+        if disabled_loot[item] then
+            -- Add back to loot pools
+            for _, p in ipairs(disabled_loot[item]) do
+                gm.ds_list_insert(loot_pools[p[1]].drop_pool, p[2], obj)
+            end
+
+            disabled_loot[item] = nil
+        end
+
+    else
+        if not disabled_loot[item] then
+            -- Remove from loot pools
+            -- and store the pool indexes and positions
+            local pools = {}
+
+            for i, p in ipairs(loot_pools) do
+                local drops = p.drop_pool
+                local pos = gm.ds_list_find_index(drops, obj)
+                if pos >= 0 then
+                    gm.ds_list_delete(drops, pos)
+                    table.insert(pools, {i, pos})
+                end
+            end
+
+            disabled_loot[item] = pools
+        end
+
+    end
+end
+
+
+Item.toggle_log = function(item, enabled)
+    if enabled == nil then return end
+
+    local class_item = gm.variable_global_get("class_item")
+    local item_log_order = gm.variable_global_get("item_log_display_list")
+
+    local log_id = class_item[item + 1][10]
+    
+    if enabled then
+        if disabled_logs[item] then
+            -- Add back to log ds_list
+            gm.ds_list_insert(item_log_order, disabled_logs[item], log_id)
+            disabled_logs[item] = nil
+        end
+
+    else
+        if not disabled_logs[item] then
+            -- Remove from log ds_list
+            -- and store position
+            local pos = gm.ds_list_find_index(item_log_order, log_id)
+            if pos >= 0 then
+                gm.ds_list_delete(item_log_order, pos)
+                disabled_logs[item] = pos
+            end
+        end
+
+    end
 end
 
 

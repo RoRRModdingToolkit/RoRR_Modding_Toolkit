@@ -90,3 +90,7 @@
 
 ### v1.0.12
 * Item.spawn_drop now works correctly with vanilla items.
+
+### v1.0.13
+* Added Item.toggle_loot
+* Added Item.toggle_log
