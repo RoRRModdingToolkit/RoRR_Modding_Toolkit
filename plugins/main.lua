@@ -17,6 +17,7 @@ require("./object")
 require("./player")
 require("./resources")
 require("./survivor")
+require("./alarm")
 
 -- Testing
 --require("./testing")
