@@ -94,3 +94,8 @@
 ### v1.0.13
 * Added Item.toggle_loot
 * Added Equipment.toggle_loot
+
+### v1.0.14
+* Added alarm module
+   * Added Alarm.create, in an early state
+* Fixed Survivor module
