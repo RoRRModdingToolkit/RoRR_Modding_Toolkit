@@ -363,7 +363,7 @@ end)
 
 Survivor.__initialize = function()
     -- Populate callbacks
-    local callback_names = gm.variable_global_get("callback_names")
+    callback_names = gm.variable_global_get("callback_names")
     for i = 1, #callback_names do
         callbacks[callback_names[i]] = i - 1
     end
