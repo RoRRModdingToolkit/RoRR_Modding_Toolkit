@@ -5,6 +5,7 @@ log.info("Successfully loaded ".._ENV["!guid"]..".")
 RoRR_Modding_Toolkit = true
 
 require("./actor")
+require("./alarm")
 require("./buff")
 require("./callback")
 require("./equipment")
@@ -17,7 +18,6 @@ require("./object")
 require("./player")
 require("./resources")
 require("./survivor")
-require("./alarm")
 
 -- Testing
 --require("./testing")
