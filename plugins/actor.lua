@@ -62,7 +62,7 @@ Actor.find_skill_id = function(namespace, identifier)
     if identifier then namespace = namespace.."-"..identifier end
 
     for i, s in ipairs(class_skill) do
-        if namespace == s[1].."-"..s[2] then return i - 1 end
+        if gm.is_array(s) and namespace == s[1].."-"..s[2] then return i - 1 end
     end
 
     return nil

@@ -99,3 +99,6 @@
 * Added Alarm module
    * Added Alarm.create, in an early state
 * Fixed Survivor module
+
+### v1.0.15
+* Fixed Actor.find_skill_id throwing an error at skill 186 when looping (which seems to be invalid).
