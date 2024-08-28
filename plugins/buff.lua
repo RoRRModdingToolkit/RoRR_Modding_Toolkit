@@ -50,7 +50,9 @@ Buff.apply = function(actor, buff, time, stack)
 
     -- Clamp to max stack or under
     -- Funny stuff happens if this is exceeded
-    local max_stack = gm.variable_global_get("class_buff")[buff + 1][10]
+    local class_buff = gm.variable_global_get("class_buff")
+    local buff_array = gm.array_get(class_buff, buff)
+    local max_stack = gm.array_get(buff_array, 9)
     gm.array_set(actor.buff_stack, buff, math.min(Buff.get_stack_count(actor, buff), max_stack))
 end
 
@@ -66,7 +68,7 @@ end
 
 Buff.get_stack_count = function(actor, buff)
     if gm.array_length(actor.buff_stack) <= buff then gm.array_resize(actor.buff_stack, buff + 1) end
-    local count = actor.buff_stack[buff + 1]
+    local count = gm.array_get(actor.buff_stack, buff)
     if count == nil then return 0 end
     return count
 end

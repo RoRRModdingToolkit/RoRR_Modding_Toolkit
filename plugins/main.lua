@@ -8,6 +8,7 @@ require("./actor")
 require("./alarm")
 require("./buff")
 require("./callback")
+require("./class")
 require("./equipment")
 require("./helper")
 require("./initialize")
@@ -27,6 +28,8 @@ require("./survivor")
 -- ========== Initialize ==========
 
 function __initialize()
+    Class.__initialize()
+    
     -- Initialize these first (callback population)
     Callback.__initialize()
     Survivor.__initialize()
