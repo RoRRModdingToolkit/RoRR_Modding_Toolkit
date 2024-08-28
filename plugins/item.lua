@@ -55,14 +55,13 @@ end
 
 
 Item.find_all = function(...)
-    local array = gm.variable_global_get("class_item")
     local tiers = {...}
     local items = {}
 
-    local size = gm.array_length(array)
+    local size = gm.array_length(Class.ITEM)
     for i = 0, size - 1 do
         for _, tier in ipairs(tiers) do
-            local item = gm.array_get(array, i)
+            local item = gm.array_get(Class.ITEM, i)
             if gm.array_get(item, 6) == tier then
                 table.insert(items, i)
                 break
@@ -75,25 +74,24 @@ end
 
 
 Item.get_data = function(item)
-    local array = gm.variable_global_get("class_item")
-    local item_arr = array[item + 1]
+    local item_arr = gm.array_get(Class.ITEM, item)
     return {
-        namespace       = item_arr[1],
-        identifier      = item_arr[2],
-        token_name      = item_arr[3],
-        token_text      = item_arr[4],
-        on_acquired     = item_arr[5],
-        on_removed      = item_arr[6],
-        tier            = item_arr[7],
-        sprite_id       = item_arr[8],
-        object_id       = item_arr[9],
-        item_log_id     = item_arr[10],
-        achievement_id  = item_arr[11],
-        is_hidden       = item_arr[12],
-        effect_display  = item_arr[13],
-        actor_component = item_arr[14],
-        loot_tags       = item_arr[15],
-        is_new_item     = item_arr[16]
+        namespace       = gm.array_get(item_arr, 0),
+        identifier      = gm.array_get(item_arr, 1),
+        token_name      = gm.array_get(item_arr, 2),
+        token_text      = gm.array_get(item_arr, 3),
+        on_acquired     = gm.array_get(item_arr, 4),
+        on_removed      = gm.array_get(item_arr, 5),
+        tier            = gm.array_get(item_arr, 6),
+        sprite_id       = gm.array_get(item_arr, 7),
+        object_id       = gm.array_get(item_arr, 8),
+        item_log_id     = gm.array_get(item_arr, 9),
+        achievement_id  = gm.array_get(item_arr, 10),
+        is_hidden       = gm.array_get(item_arr, 11),
+        effect_display  = gm.array_get(item_arr, 12),
+        actor_component = gm.array_get(item_arr, 13),
+        loot_tags       = gm.array_get(item_arr, 14),
+        is_new_item     = gm.array_get(item_arr, 15)
     }
 end
 
@@ -138,16 +136,16 @@ end
 Item.toggle_loot = function(item, enabled)
     if enabled == nil then return end
 
-    local class_item = gm.variable_global_get("class_item")
     local loot_pools = gm.variable_global_get("treasure_loot_pools")
 
-    local obj = class_item[item + 1][9]
+    local item_array = gm.array_get(Class.ITEM, item)
+    local obj = gm.array_get(item_array, 8)
     
     if enabled then
         if disabled_loot[item] then
             -- Add back to loot pools
             for _, pool_id in ipairs(disabled_loot[item]) do
-                gm.ds_list_add(loot_pools[pool_id].drop_pool, obj)
+                gm.ds_list_add(gm.array_get(loot_pools, pool_id).drop_pool, obj)
                 if not Helper.table_has(loot_toggled, pool_id) then
                     table.insert(loot_toggled, pool_id)
                 end
@@ -197,17 +195,17 @@ Item.create = function(namespace, identifier, no_log)
 
     if not no_log then
         -- Create item log
-        local array = gm.variable_global_get("class_item")[item + 1]
+        local item_array = gm.array_get(Class.ITEM, item)
         local log = gm.item_log_create(
             namespace,
             identifier,
             nil,
             nil,
-            array[9]
+            gm.array_get(item_array, 8)
         )
 
         -- Set item log ID into item array
-        gm.array_set(array, 9, log)
+        gm.array_set(item_array, 9, log)
     end
 
     -- Add onPickup callback to add actor to has_custom_item table
@@ -223,16 +221,16 @@ end
 
 Item.set_sprite = function(item, sprite)
     -- Set class_item sprite
-    local array = gm.variable_global_get("class_item")[item + 1]
+    local array = gm.array_get(Class.ITEM, item)
     gm.array_set(array, 7, sprite)
 
     -- Set item object sprite
-    local obj = array[9]
+    local obj = gm.array_get(array, 8)
     gm.object_set_sprite_w(obj, sprite)
 
     -- Set item log sprite
     if array[10] then
-        local log_array = gm.variable_global_get("class_item_log")[array[10] + 1]
+        local log_array = gm.array_get(Class.ITEM_LOG, gm.array_get(array, 9))
         gm.array_set(log_array, 9, sprite)
     end
 end
@@ -240,11 +238,10 @@ end
 
 Item.set_tier = function(item, tier)
     -- Set class_item tier
-    local class_item = gm.variable_global_get("class_item")
-    local array = class_item[item + 1]
+    local array = gm.array_get(Class.ITEM, item)
     gm.array_set(array, 6, tier)
 
-    local obj = array[9]
+    local obj = gm.array_get(array, 8)
     local pools = gm.variable_global_get("treasure_loot_pools")
 
 
@@ -268,15 +265,17 @@ Item.set_tier = function(item, tier)
     if pos >= 0 then gm.ds_list_delete(item_log_order, pos) end
 
     -- Set item log position
-    local class_item_log = gm.variable_global_get("class_item_log")
     local pos = 0
     for i = 0, gm.ds_list_size(item_log_order) - 1 do
         local log_id = gm.ds_list_find_value(item_log_order, i)
-        local log_ = class_item_log[log_id + 1]
+        local log_ = gm.array_get(Class.ITEM_LOG, log_id)
         local item_id = Item.find(log_[1], log_[2])
         
         local tier_ = Item.TIER.equipment
-        if item_id then tier_ = class_item[item_id + 1][7] end
+        if item_id then
+            local iter_item = gm.array_get(Class.ITEM, item_id)
+            tier_ = gm.array_get(iter_item, 6)
+        end
         if tier_ > tier then
             pos = i
             break
@@ -290,46 +289,49 @@ Item.set_loot_tags = function(item, ...)
     local tags = 0
     for _, t in ipairs{...} do tags = tags + t end
 
-    local array = gm.variable_global_get("class_item")[item + 1]
+    local array = gm.array_get(Class.ITEM, item)
     gm.array_set(array, 14, tags)
 end
 
 
 Item.add_achievement = function(item, progress_req, single_run)
-    local class_item = gm.variable_global_get("class_item")
-    local array = class_item[item + 1]
+    local array = gm.array_get(Class.ITEM, item)
 
-    local ach = gm.achievement_create(array[1], array[2])
+    local namespace = gm.array_get(array, 0)
+    local identifier = gm.array_get(array, 1)
+
+    local ach = gm.achievement_create(namespace, identifier)
     gm.achievement_set_unlock_item(ach, item)
     gm.achievement_set_requirement(ach, progress_req or 1)
 
     if single_run then
-        local class_achievement = gm.variable_global_get("class_achievement")
-        local ach_array = class_achievement[ach + 1]
+        local ach_array = gm.array_get(Class.ACHIEVEMENT, ach)
         gm.array_set(ach_array, 21, single_run)
     end
 end
 
 
 Item.progress_achievement = function(item, amount)
-    local class_item = gm.variable_global_get("class_item")
-    local array = class_item[item + 1]
+    local array = gm.array_get(Class.ITEM, item)
+    local ach_id = gm.array_get(array, 10)
 
-    if gm.achievement_is_unlocked(array[11]) then return end
-    gm.achievement_add_progress(array[11], amount or 1)
+    if gm.achievement_is_unlocked(ach_id) then return end
+    gm.achievement_add_progress(ach_id, amount or 1)
 end
 
 
 Item.add_callback = function(item, callback, func)
-    local array = gm.variable_global_get("class_item")[item + 1]
+    local array = gm.array_get(Class.ITEM, item)
 
     if callback == "onPickup" then
-        if not callbacks[array[5]] then callbacks[array[5]] = {} end
-        table.insert(callbacks[array[5]], func)
+        local callback_id = gm.array_get(array, 4)
+        if not callbacks[callback_id] then callbacks[callback_id] = {} end
+        table.insert(callbacks[callback_id], func)
 
     elseif callback == "onRemove" then
-        if not callbacks[array[6]] then callbacks[array[6]] = {} end
-        table.insert(callbacks[array[6]], func)
+        local callback_id = gm.array_get(array, 5)
+        if not callbacks[callback_id] then callbacks[callback_id] = {} end
+        table.insert(callbacks[callback_id], func)
 
     elseif callback == "onBasicUse"
         or callback == "onAttack"
@@ -575,12 +577,11 @@ end)
 gm.pre_script_hook(gm.constants.__input_system_tick, function()
     -- Sort loot tables that have been added to
     for _, pool_id in ipairs(loot_toggled) do
-        local class_item = gm.variable_global_get("class_item")
         local loot_pools = gm.variable_global_get("treasure_loot_pools")
 
         -- Get item IDs from objects and sort
         local ids = gm.ds_list_create()
-        local pool = loot_pools[pool_id].drop_pool
+        local pool = gm.array_get(loot_pools, pool_id).drop_pool
         local size = gm.ds_list_size(pool)
         for i = 0, size - 1 do
             local obj = gm.ds_list_find_value(pool, i)
@@ -592,7 +593,9 @@ gm.pre_script_hook(gm.constants.__input_system_tick, function()
         gm.ds_list_clear(pool)
         for i = 0, size - 1 do
             local id = gm.ds_list_find_value(ids, i)
-            gm.ds_list_add(pool, class_item[id + 1][9])
+            local _item = gm.array_get(Class.ITEM, id)
+            local obj = gm.array_get(_item, 8)
+            gm.ds_list_add(pool, obj)
         end
         gm.ds_list_destroy(ids)
     end
@@ -604,8 +607,6 @@ end)
 -- ========== Initialize ==========
 
 Item.__initialize = function()
-    -- Clone 
-
     Callback.add("onAttackCreate", "RMT.item_onAttack", onAttack, true)
     Callback.add("onAttackHandleEnd", "RMT.item_onPostAttack", onPostAttack, true)
     Callback.add("onHitProc", "RMT.item_onHit", onHit, true)
