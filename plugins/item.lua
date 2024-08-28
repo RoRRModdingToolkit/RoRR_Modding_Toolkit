@@ -550,7 +550,7 @@ end)
 
 
 gm.pre_script_hook(gm.constants.skill_activate, function(self, other, result, args)
-    if args[1].value ~= 0.0 or self.skills[1].active_skill.skill_id == 70.0 then return true end
+    if args[1].value ~= 0.0 or gm.array_get(self.skills, 0).active_skill.skill_id == 70.0 then return true end
     if callbacks["onBasicUse"] then
         for _, fn in pairs(callbacks["onBasicUse"]) do
             local count = Item.get_stack_count(self, fn[1])

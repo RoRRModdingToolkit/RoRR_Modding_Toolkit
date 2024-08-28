@@ -196,7 +196,7 @@ end
 gm.pre_script_hook(gm.constants.skill_activate, function(self, other, result, args)
     if callbacks["onSkillUse"] then
         for id, skill in pairs(callbacks["onSkillUse"]) do
-            if self.skills[args[1].value + 1].active_skill.skill_id == id then
+            if gm.array_get(self.skills, args[1].value).active_skill.skill_id == id then
                 for _, fn in pairs(skill) do
                     fn(self)   -- Actor
                 end
@@ -204,7 +204,7 @@ gm.pre_script_hook(gm.constants.skill_activate, function(self, other, result, ar
         end
     end
 
-    if args[1].value ~= 0.0 or self.skills[1].active_skill.skill_id == 70.0 then return true end
+    if args[1].value ~= 0.0 or gm.array_get(self.skills, 0).active_skill.skill_id == 70.0 then return true end
     if callbacks["onBasicUse"] then
         for _, fn in pairs(callbacks["onBasicUse"]) do
             fn(self)   -- Actor
