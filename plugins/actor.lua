@@ -60,9 +60,11 @@ Actor.find_skill_id = function(namespace, identifier)
     local class_skill = gm.variable_global_get("class_skill")
 
     if identifier then namespace = namespace.."-"..identifier end
-
-    for i, s in ipairs(class_skill) do
-        if gm.is_array(s) and namespace == s[1].."-"..s[2] then return i - 1 end
+    
+    local size = gm.array_length(class_skill)
+    for i = 0, size - 1 do
+        local skill = gm.array_get(class_skill, i)
+        if gm.is_array(skill) and namespace == skill[1].."-"..skill[2] then return i - 1 end
     end
 
     return nil

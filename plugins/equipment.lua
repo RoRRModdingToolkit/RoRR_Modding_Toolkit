@@ -44,8 +44,9 @@ Equipment.toggle_loot = function(equipment, enabled)
             -- and store the pool indexes
             local pools = {}
 
-            for i, p in ipairs(loot_pools) do
-                local drops = p.drop_pool
+            local size = gm.array_length(loot_pools)
+            for i = 0, size - 1 do
+                local drops = gm.array_get(loot_pools, i).drop_pool
                 local pos = gm.ds_list_find_index(drops, obj)
                 if pos >= 0 then
                     gm.ds_list_delete(drops, pos)

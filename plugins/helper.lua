@@ -51,8 +51,10 @@ Helper.log_hook = function(self, other, result, args)
 
     -- If value is Array, print all values
     if gm.is_array(result.value) then
-        for j, val in ipairs(result.value) do
-            log.info("    ["..j.."]  "..tostring(val))
+        local size = gm.array_length(result.value)
+        for i = 0, size - 1 do
+            local val = gm.array_get(result.value, i)
+            log.info("    ["..i.."]  "..tostring(val))
         end
     end
 
@@ -77,8 +79,10 @@ Helper.log_hook = function(self, other, result, args)
 
         -- If value is Array, print all values
         if gm.is_array(a.value) then
-            for j, val in ipairs(a.value) do
-                log.info("    ["..j.."]  "..tostring(val))
+            local size = gm.array_length(a.value)
+            for i = 0, size - 1 do
+                local val = gm.array_get(a.value, i)
+                log.info("    ["..i.."]  "..tostring(val))
             end
         end
 

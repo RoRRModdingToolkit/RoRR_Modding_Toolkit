@@ -58,14 +58,18 @@ Item.find_all = function(...)
     local array = gm.variable_global_get("class_item")
     local tiers = {...}
     local items = {}
-    for i = 1, gm.array_length(array) do
+
+    local size = gm.array_length(array)
+    for i = 0, size - 1 do
         for _, tier in ipairs(tiers) do
-            if array[i][7] == tier then
-                table.insert(items, i - 1)
+            local item = gm.array_get(array, i)
+            if gm.array_get(item, 6) == tier then
+                table.insert(items, i)
                 break
             end
         end
     end
+
     return items
 end
 
@@ -158,8 +162,9 @@ Item.toggle_loot = function(item, enabled)
             -- and store the pool indexes
             local pools = {}
 
-            for i, p in ipairs(loot_pools) do
-                local drops = p.drop_pool
+            local size = gm.array_length(loot_pools)
+            for i = 0, size - 1 do
+                local drops = gm.array_get(loot_pools, i).drop_pool
                 local pos = gm.ds_list_find_index(drops, obj)
                 if pos >= 0 then
                     gm.ds_list_delete(drops, pos)
@@ -244,8 +249,9 @@ Item.set_tier = function(item, tier)
 
 
     -- Remove from all loot pools (if found)
-    for _, p in ipairs(pools) do
-        local drops = p.drop_pool
+    local size = gm.array_length(pools)
+    for i = 0, size - 1 do
+        local drops = gm.array_get(pools, i).drop_pool
         local pos = gm.ds_list_find_index(drops, obj)
         if pos >= 0 then gm.ds_list_delete(drops, pos) end
     end

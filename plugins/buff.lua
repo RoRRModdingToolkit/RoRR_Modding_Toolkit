@@ -4,7 +4,7 @@ Buff = {}
 
 local callbacks = {}
 local has_custom_buff = {}
-local buff_table = {}
+--local buff_table = {}
 
 
 
@@ -29,10 +29,14 @@ Buff.PROPERTY = {
 -- ========== General Functions ==========
 
 Buff.find = function(namespace, identifier)
+    local class_buff = gm.variable_global_get("class_buff")
+
     if identifier then namespace = namespace.."-"..identifier end
 
-    for i, b in ipairs(buff_table) do
-        if namespace == b then return i - 1 end
+    local size = gm.array_length(class_buff)
+    for i = 0, size - 1 do
+        local buff = gm.array_get(class_buff, i)
+        if namespace == buff[1].."-"..buff[2] then return i - 1 end
     end
 
     return nil
@@ -80,7 +84,7 @@ Buff.create = function(namespace, identifier)
     )
 
     -- Insert buff namespace-identifier into buff_table
-    table.insert(buff_table, namespace.."-"..identifier)
+    --table.insert(buff_table, namespace.."-"..identifier)
 
     -- Set default stack_number_col to pure white
     Buff.set_property(buff, Buff.PROPERTY.stack_number_col, gm.array_create(1, 16777215))
@@ -202,6 +206,6 @@ Buff.__initialize = function()
     Callback.add("postHUDDraw", "RMT.buff_onDraw", buff_onDraw, true)
 
     -- Populate buff_table
-    local class_buff = gm.variable_global_get("class_buff")
-    for i, b in ipairs(class_buff) do table.insert(buff_table, b[1].."-"..b[2]) end
+    -- local class_buff = gm.variable_global_get("class_buff")
+    -- for i, b in ipairs(class_buff) do table.insert(buff_table, b[1].."-"..b[2]) end
 end
