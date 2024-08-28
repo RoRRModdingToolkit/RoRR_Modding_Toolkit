@@ -67,7 +67,7 @@ Actor.find_skill_id = function(namespace, identifier)
         if gm.is_array(skill) then
             local _namespace = gm.array_get(skill, 0)
             local _identifier = gm.array_get(skill, 1)
-            if namespace == _namespace.."-".._identifier then return i - 1 end
+            if namespace == _namespace.."-".._identifier then return i end
         end
     end
 

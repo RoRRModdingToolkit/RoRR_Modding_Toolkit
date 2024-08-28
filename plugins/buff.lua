@@ -37,7 +37,7 @@ Buff.find = function(namespace, identifier)
         local buff = gm.array_get(class_buff, i)
         local _namespace = gm.array_get(buff, 0)
         local _identifier = gm.array_get(buff, 1)
-        if namespace == _namespace.."-".._identifier then return i - 1 end
+        if namespace == _namespace.."-".._identifier then return i end
     end
 
     return nil
