@@ -20,16 +20,16 @@ end
 Equipment.toggle_loot = function(equipment, enabled)
     if enabled == nil then return end
 
-    local class_equipment = gm.variable_global_get("class_equipment")
     local loot_pools = gm.variable_global_get("treasure_loot_pools")
 
-    local obj = class_equipment[equipment + 1][9]
+    local equip_array = gm.array_get(Class.EQUIPMENT, equipment)
+    local obj = gm.array_get(equip_array, 8)
     
     if enabled then
         if disabled_loot[equipment] then
             -- Add back to loot pools
             for _, pool_id in ipairs(disabled_loot[equipment]) do
-                gm.ds_list_add(loot_pools[pool_id].drop_pool, obj)
+                gm.ds_list_add(gm.array_get(loot_pools, pool_id).drop_pool, obj)
                 if not Helper.table_has(loot_toggled, pool_id) then
                     table.insert(loot_toggled, pool_id)
                 end
@@ -71,7 +71,7 @@ Equipment.create = function(namespace, identifier)
     local equipment = gm.equipment_create(
         namespace,
         identifier,
-        gm.array_length(gm.variable_global_get("class_equipment")),   -- class_equipment index
+        gm.array_length(Class.EQUIPMENT),   -- class_equipment index
         3.0,    -- tier (3 is equipment)
         gm.object_add_w(namespace, identifier, gm.constants.pPickupEquipment),  -- pickup object
         0.0,    -- loot tags
@@ -86,21 +86,24 @@ Equipment.create = function(namespace, identifier)
     -- Have to manually increase this variable for some reason (class_equipment array length)
     gm.variable_global_set("count_equipment", gm.variable_global_get("count_equipment") + 1.0)
 
-    -- Remove previous item log position (if found)
-    local class_equipment = gm.variable_global_get("class_equipment")
-    local array = class_equipment[equipment + 1]
     local item_log_order = gm.variable_global_get("item_log_display_list")
-    local pos = gm.ds_list_find_index(item_log_order, array[10])
+
+    -- Remove previous item log position (if found)
+    local array = gm.array_get(Class.EQUIPMENT, equipment)
+    local pos = gm.ds_list_find_index(item_log_order, gm.array_get(array, 9))
     if pos >= 0 then gm.ds_list_delete(item_log_order, pos) end
 
     -- Set item log position
-    local class_item_log = gm.variable_global_get("class_item_log")
     local pos = 0
     for i = 0, gm.ds_list_size(item_log_order) - 1 do
         local log_id = gm.ds_list_find_value(item_log_order, i)
-        local log_ = class_item_log[log_id + 1]
-        local equip_id = Equipment.find(log_[1], log_[2])
-        if equip_id and class_equipment[equip_id + 1][7] == 3.0 then pos = i end
+        local log_ = gm.array_get(Class.ITEM_LOG, log_id)
+        local equip_id = Equipment.find(gm.array_get(log_, 0), gm.array_get(log_, 1))
+        if equip_id then
+            local equip_array = gm.array_get(Class.EQUIPMENT, equip_id)
+            local rarity = gm.array_get(equip_array, 6)
+            if rarity == 3.0 then pos = i end
+        end
     end
     gm.ds_list_insert(item_log_order, pos + 1, array[10])
 
@@ -110,23 +113,24 @@ end
 
 Equipment.set_sprite = function(equipment, sprite)
     -- Set class_equipment sprite
-    local array = gm.variable_global_get("class_equipment")[equipment + 1]
+    local array = gm.array_get(Class.EQUIPMENT, equipment)
     gm.array_set(array, 7, sprite)
 
     -- Set equipment object sprite
-    local obj = array[9]
+    local obj = gm.array_get(array, 8)
     gm.object_set_sprite_w(obj, sprite)
 
     -- Set equipment log sprite
-    if array[10] then
-        local log_array = gm.variable_global_get("class_item_log")[array[10] + 1]
+    local log_id = gm.array_get(array, 9)
+    if log_id then
+        local log_array = gm.array_get(Class.ITEM_LOG, log_id)
         gm.array_set(log_array, 9, sprite)
     end
 end
 
 
 Equipment.set_cooldown = function(equipment, cooldown)
-    local array = gm.variable_global_get("class_equipment")[equipment + 1]
+    local array = gm.array_get(Class.EQUIPMENT, equipment)
     gm.array_set(array, 5, cooldown * 60.0)
 end
 
@@ -135,30 +139,27 @@ Equipment.set_loot_tags = function(equipment, ...)
     local tags = 0
     for _, t in ipairs{...} do tags = tags + t end
 
-    local array = gm.variable_global_get("class_equipment")[equipment + 1]
+    local array = gm.array_get(Class.EQUIPMENT, equipment)
     gm.array_set(array, 12, tags)
 end
 
 
 Equipment.add_achievement = function(equipment, progress_req, single_run)
-    local class_equipment = gm.variable_global_get("class_equipment")
-    local array = class_equipment[equipment + 1]
+    local array = gm.array_get(Class.EQUIPMENT, equipment)
 
-    local ach = gm.achievement_create(array[1], array[2])
+    local ach = gm.achievement_create(gm.array_get(array, 0), gm.array_get(array, 1))
     gm.achievement_set_unlock_equipment(ach, equipment)
     gm.achievement_set_requirement(ach, progress_req or 1)
 
     if single_run then
-        local class_achievement = gm.variable_global_get("class_achievement")
-        local ach_array = class_achievement[ach + 1]
+        local ach_array = gm.array_get(Class.ACHIEVEMENT, ach)
         gm.array_set(ach_array, 21, single_run)
     end
 end
 
 
 Equipment.progress_achievement = function(equipment, amount)
-    local class_equipment = gm.variable_global_get("class_equipment")
-    local array = class_equipment[equipment + 1]
+    local array = gm.array_get(Class.EQUIPMENT, equipment)
 
     if gm.achievement_is_unlocked(array[11]) then return end
     gm.achievement_add_progress(array[11], amount or 1)
@@ -166,7 +167,7 @@ end
 
 
 Equipment.add_callback = function(equipment, callback, func)
-    local array = gm.variable_global_get("class_equipment")[equipment + 1]
+    local array = gm.array_get(Class.EQUIPMENT, equipment)
 
     if callback == "onUse" then
         if not callbacks[array[5]] then callbacks[array[5]] = {} end
@@ -191,12 +192,11 @@ end)
 gm.pre_script_hook(gm.constants.__input_system_tick, function()
     -- Sort loot tables that have been added to
     for _, pool_id in ipairs(loot_toggled) do
-        local class_equipment = gm.variable_global_get("class_equipment")
         local loot_pools = gm.variable_global_get("treasure_loot_pools")
 
         -- Get equipment IDs from objects and sort
         local ids = gm.ds_list_create()
-        local pool = loot_pools[pool_id].drop_pool
+        local pool = gm.array_get(loot_pools, pool_id).drop_pool
         local size = gm.ds_list_size(pool)
         for i = 0, size - 1 do
             local obj = gm.ds_list_find_value(pool, i)
@@ -208,7 +208,9 @@ gm.pre_script_hook(gm.constants.__input_system_tick, function()
         gm.ds_list_clear(pool)
         for i = 0, size - 1 do
             local id = gm.ds_list_find_value(ids, i)
-            gm.ds_list_add(pool, class_equipment[id + 1][9])
+            local _equip = gm.array_get(Class.EQUIPMENT, id)
+            local obj = gm.array_get(_equip, 8)
+            gm.ds_list_add(pool, obj)
         end
         gm.ds_list_destroy(ids)
     end

@@ -28,13 +28,11 @@ Buff.PROPERTY = {
 -- ========== General Functions ==========
 
 Buff.find = function(namespace, identifier)
-    local class_buff = gm.variable_global_get("class_buff")
-
     if identifier then namespace = namespace.."-"..identifier end
 
-    local size = gm.array_length(class_buff)
+    local size = gm.array_length(Class.BUFF)
     for i = 0, size - 1 do
-        local buff = gm.array_get(class_buff, i)
+        local buff = gm.array_get(Class.BUFF, i)
         local _namespace = gm.array_get(buff, 0)
         local _identifier = gm.array_get(buff, 1)
         if namespace == _namespace.."-".._identifier then return i end
@@ -50,8 +48,7 @@ Buff.apply = function(actor, buff, time, stack)
 
     -- Clamp to max stack or under
     -- Funny stuff happens if this is exceeded
-    local class_buff = gm.variable_global_get("class_buff")
-    local buff_array = gm.array_get(class_buff, buff)
+    local buff_array = gm.array_get(Class.BUFF, buff)
     local max_stack = gm.array_get(buff_array, 9)
     gm.array_set(actor.buff_stack, buff, math.min(Buff.get_stack_count(actor, buff), max_stack))
 end
@@ -101,31 +98,34 @@ end
 
 
 Buff.set_property = function(buff, property, value)
-    local array = gm.variable_global_get("class_buff")[buff + 1]
+    local array = gm.array_get(Class.BUFF, buff)
     gm.array_set(array, property, value)
 end
 
 
 Buff.get_property = function(buff, property, value)
-    local array = gm.variable_global_get("class_buff")[buff + 1]
+    local array = gm.array_get(Class.BUFF, buff)
     return gm.array_get(array, property)
 end
 
 
 Buff.add_callback = function(buff, callback, func)
-    local array = gm.variable_global_get("class_buff")[buff + 1]
+    local array = gm.array_get(Class.BUFF, buff)
 
     if callback == "onApply" then
-        if not callbacks[array[11]] then callbacks[array[11]] = {} end
-        table.insert(callbacks[array[11]], {buff, func})
+        local callback_id = gm.array_get(array, 10)
+        if not callbacks[callback_id] then callbacks[callback_id] = {} end
+        table.insert(callbacks[callback_id], {buff, func})
 
     elseif callback == "onRemove" then
-        if not callbacks[array[12]] then callbacks[array[12]] = {} end
-        table.insert(callbacks[array[12]], {buff, func})
+        local callback_id = gm.array_get(array, 11)
+        if not callbacks[callback_id] then callbacks[callback_id] = {} end
+        table.insert(callbacks[callback_id], {buff, func})
 
     elseif callback == "onStep" then
-        if not callbacks[array[13]] then callbacks[array[13]] = {} end
-        table.insert(callbacks[array[13]], {buff, func})
+        local callback_id = gm.array_get(array, 12)
+        if not callbacks[callback_id] then callbacks[callback_id] = {} end
+        table.insert(callbacks[callback_id], {buff, func})
 
     elseif callback == "onDraw"
         or callback == "onChange"
