@@ -102,5 +102,5 @@
 
 ### v1.0.15
 * Fixed Actor.find_skill_id throwing an error at skill 186 when looping (which seems to be invalid).
-* Fixed memory leaks in several places caused by iterating over GameMaker arrays with ipairs.
-    * For anyone reading this, get array sizes with gm.array_length and iterate with gm.array_get instead.
+* Fixed memory leaks in several places caused by iterating over GameMaker arrays with ipairs, as well as accessing them with lua syntax.
+    * For anyone reading this, get array sizes with gm.array_length and access elements with gm.array_get instead.
