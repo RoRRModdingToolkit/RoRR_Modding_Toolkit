@@ -26,7 +26,7 @@ end
 
 Actor.damage = function(actor, source, damage, x, y, color, crit_sfx)
     if not crit_sfx then crit_sfx = false end
-    gm.damage_inflict(actor, damage, 0.0, source, x, y, 0.0, 1.0, color or 16777215.0, crit_sfx)
+    gm.damage_inflict(actor, damage, 0.0, source, x, y, damage, 1.0, color or 16777215.0, crit_sfx)
 end
 
 

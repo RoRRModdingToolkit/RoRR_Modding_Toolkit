@@ -105,3 +105,6 @@
 * Fixed memory leaks in several places caused by iterating over GameMaker arrays with ipairs, as well as accessing them with lua syntax.
     * For anyone reading this, get array sizes with gm.array_length and access elements with gm.array_get instead.
 * Added Class module, containing references to the global class arrays.
+
+### v1.0.16
+* Fixed Actor.damage displaying "0" for damage number.
