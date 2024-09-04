@@ -15,11 +15,7 @@ Player.get_client = function(obj)
     -- Loop through players and return the one that "is_local"
     for _, p in ipairs(players) do
         if p.is_local then
-            local abstraction = {
-                value = p
-            }
-            setmetatable(abstraction, metatable_actor)
-            return abstraction
+            return Instance.make_instance(p)
         end
     end
 
@@ -33,11 +29,7 @@ Player.get_host = function()
     local players = Instance.find_all(gm.constants.oP)
     for _, p in ipairs(players) do
         if p.m_id == 1.0 then
-            local abstraction = {
-                value = p
-            }
-            setmetatable(abstraction, metatable_actor)
-            return abstraction
+            return Instance.make_instance(p)
         end
     end
 
@@ -50,11 +42,7 @@ Player.get_from_name = function(name)
     local players = Instance.find_all(gm.constants.oP)
     for _, p in ipairs(players) do
         if p.user_name == name then
-            local abstraction = {
-                value = p
-            }
-            setmetatable(abstraction, metatable_actor)
-            return abstraction
+            return Instance.make_instance(p)
         end
     end
 

@@ -2,6 +2,9 @@
 
 Item = {}
 
+local callbacks = {}
+local has_custom_item = {}
+
 
 
 -- ========== Enums ==========
@@ -110,11 +113,11 @@ Item.new = function(namespace, identifier, no_log)
     end
 
     -- Add onPickup callback to add actor to has_custom_item table
-    -- Item.add_callback(item, "onPickup", function(actor, stack)
-    --     if not Helper.table_has(has_custom_item, actor) then
-    --         table.insert(has_custom_item, actor)
-    --     end
-    -- end)
+    abstraction:add_callback("onPickup", function(actor, stack)
+        if not Helper.table_has(has_custom_item, actor.value) then
+            table.insert(has_custom_item, actor.value)
+        end
+    end)
 
     return abstraction
 end
@@ -125,8 +128,20 @@ end
 
 methods_item = {
 
-    add_callback = function(self, callback, fn)
+    add_callback = function(self, callback, func)
+        local array = gm.array_get(Class.ITEM, self.value)
 
+        if callback == "onPickup" then
+            local callback_id = self.on_acquired
+            if not callbacks[callback_id] then callbacks[callback_id] = {} end
+            table.insert(callbacks[callback_id], func)
+    
+        elseif callback == "onRemove" then
+            local callback_id = self.on_removed
+            if not callbacks[callback_id] then callbacks[callback_id] = {} end
+            table.insert(callbacks[callback_id], func)
+
+        end
     end,
 
 
@@ -149,9 +164,8 @@ methods_item = {
         self.tier = tier
 
 
-        local pools = gm.variable_global_get("treasure_loot_pools")
-
         -- Remove from all loot pools that the item is in
+        local pools = gm.variable_global_get("treasure_loot_pools")
         local size = gm.array_length(pools)
         for i = 0, size - 1 do
             local drops = gm.array_get(pools, i).drop_pool
@@ -200,7 +214,7 @@ methods_item = {
 
 
     add_achievement = function(self, progress_req, single_run)
-
+        
     end,
 
 
@@ -253,3 +267,16 @@ metatable_item = {
         metatable_item_gs.__newindex(table, key, value)
     end
 }
+
+
+
+-- ========== Hooks ==========
+
+gm.post_script_hook(gm.constants.callback_execute, function(self, other, result, args)
+    -- onPickup and onRemove
+    if callbacks[args[1].value] then
+        for _, fn in pairs(callbacks[args[1].value]) do
+            fn(Instance.make_instance(args[2].value), args[3].value)
+        end
+    end
+end)

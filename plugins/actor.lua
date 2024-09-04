@@ -67,18 +67,24 @@ methods_actor = {
     end,
 
 
-    item_give = function(self, item, count)
-
+    item_give = function(self, item, count, temp)
+        if type(item) == "table" then item = item.value end
+        if not temp then temp = false end
+        gm.item_give(self.value, item, count or 1, temp)
     end,
 
 
-    item_remove = function(self, item, count)
-        
+    item_remove = function(self, item, count, temp)
+        if type(item) == "table" then item = item.value end
+        if not temp then temp = false end
+        gm.item_take(self.value, item, count or 1, temp)
     end,
 
 
-    item_stack_count = function(self, item, type)
-        
+    item_stack = function(self, item, item_type)
+        if type_ == Item.TYPE.real then return gm.item_count(self.value, item, false) end
+        if type_ == Item.TYPE.temporary then return gm.item_count(self.value, item, true) end
+        return gm.item_count(self.value, item, false) + gm.item_count(self.value, item, true)
     end,
 
 
@@ -92,7 +98,7 @@ methods_actor = {
     end,
 
 
-    buff_stack_count = function(self, buff)
+    buff_stack = function(self, buff)
         
     end
 
