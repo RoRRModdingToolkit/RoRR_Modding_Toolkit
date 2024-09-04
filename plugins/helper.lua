@@ -1,5 +1,4 @@
 -- Helper
--- Originally in HelperFunctions by Klehrik
 
 Helper = {}
 
@@ -7,16 +6,16 @@ Helper = {}
 
 -- ========== Functions ==========
 
-Helper.log_toolkit_stats = function()
-    log.info("----------")
+-- Helper.log_toolkit_stats = function()
+--     log.info("----------")
 
-    log.info("Callback callbacks: "..Callback.get_callback_count())
-    log.info("Actor callbacks: "..Actor.get_callback_count())
-    log.info("Buff callbacks: "..Buff.get_callback_count())
-    log.info("Item callbacks: "..Item.get_callback_count())
+--     log.info("Callback callbacks: "..Callback.get_callback_count())
+--     log.info("Actor callbacks: "..Actor.get_callback_count())
+--     log.info("Buff callbacks: "..Buff.get_callback_count())
+--     log.info("Item callbacks: "..Item.get_callback_count())
 
-    log.info("----------")
-end
+--     log.info("----------")
+-- end
 
 
 Helper.log_hook = function(self, other, result, args)
