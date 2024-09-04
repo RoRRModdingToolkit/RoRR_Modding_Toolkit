@@ -1,4 +1,4 @@
-### v1.0.0
+## v1.0.0
 * Initial release
 
 ### v1.0.1
@@ -109,3 +109,6 @@
 ### v1.0.16
 * Fixed Actor.damage displaying "0" for damage number.
 * Fixed potential memory leak in Net module.
+
+## v1.1.0
+* Rewrote syntax to be similar to RoRML.
