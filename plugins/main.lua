@@ -1,32 +1,25 @@
--- RoRR Modding Toolkit v1.0.16
+-- RoRR Modding Toolkit v1.1.0
 
 log.info("Successfully loaded ".._ENV["!guid"]..".")
 
 RoRR_Modding_Toolkit = true
 
--- require("./metatables")
 require("./actor")
+require("./callback")
+require("./class")
+require("./helper")
+require("./initialize")
 require("./instance")
+require("./item")
+require("./net")
 require("./object")
 require("./player")
+require("./resources")
 
 -- require("./alarm")
 -- require("./buff")
-require("./callback")
-require("./class")
 -- require("./equipment")
-require("./helper")
-
-require("./initialize")
-
-require("./item")
--- require("./net")
--- require("./player")
-require("./resources")
 -- require("./survivor")
-
--- Testing
---require("./testing")
 
 
 
