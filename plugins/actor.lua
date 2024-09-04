@@ -22,14 +22,14 @@ methods_actor = {
     end,
 
 
-    damage = function(self, source, damage, x, y, color, crit_sfx)
+    damage = function(self, damage, source, x, y, color, crit_sfx)
         local source_inst = nil
         if source then
             if type(source) == "table" then source = source.value end
             source_inst = source
         end
         if not crit_sfx then crit_sfx = false end
-        gm.damage_inflict(self.value, damage, 0.0, source_inst, x, y, damage, 1.0, color or 16777215.0, crit_sfx)
+        gm.damage_inflict(self.value, damage, 0.0, source_inst, x or self.x, y or self.y - 28, damage, 1.0, color or 16777215.0, crit_sfx)
     end,
 
 
@@ -82,6 +82,7 @@ methods_actor = {
 
 
     item_stack = function(self, item, item_type)
+        if type(item) == "table" then item = item.value end
         if type_ == Item.TYPE.real then return gm.item_count(self.value, item, false) end
         if type_ == Item.TYPE.temporary then return gm.item_count(self.value, item, true) end
         return gm.item_count(self.value, item, false) + gm.item_count(self.value, item, true)

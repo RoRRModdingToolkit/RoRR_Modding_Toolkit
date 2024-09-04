@@ -33,10 +33,6 @@ require("./resources")
 -- ========== Initialize ==========
 
 function __initialize()
-    -- require("./instance")
-    -- require("./actor")
-    -- require("./object")
-
     Class.__initialize()
     
     -- -- Initialize these first (callback population)
@@ -46,7 +42,7 @@ function __initialize()
     -- Actor.__initialize()
     -- Buff.__initialize()
     -- Instance.__initialize()
-    -- Item.__initialize()
+    Item.__initialize()
 end
 
 

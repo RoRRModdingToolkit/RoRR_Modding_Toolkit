@@ -129,7 +129,6 @@ end
 methods_item = {
 
     add_callback = function(self, callback, func)
-        local array = gm.array_get(Class.ITEM, self.value)
 
         if callback == "onPickup" then
             local callback_id = self.on_acquired
@@ -140,6 +139,23 @@ methods_item = {
             local callback_id = self.on_removed
             if not callbacks[callback_id] then callbacks[callback_id] = {} end
             table.insert(callbacks[callback_id], func)
+
+        elseif callback == "onBasicUse"
+            or callback == "onAttack"
+            or callback == "onPostAttack"
+            or callback == "onHit"
+            or callback == "onKill"
+            or callback == "onDamaged"
+            or callback == "onDamageBlocked"
+            or callback == "onHeal"
+            or callback == "onShieldBreak"
+            or callback == "onInteract"
+            or callback == "onEquipmentUse"
+            or callback == "onStep"
+            or callback == "onDraw"
+            then
+                if not callbacks[callback] then callbacks[callback] = {} end
+                table.insert(callbacks[callback], {self.value, func})
 
         end
     end,
@@ -213,12 +229,30 @@ methods_item = {
     end,
 
 
+    is_unlocked = function(self)
+        return (not self.achievement_id) or gm.achievement_is_unlocked(self.achievement_id)
+    end,
+
+
     add_achievement = function(self, progress_req, single_run)
-        
+        local ach = gm.achievement_create(self.namespace, self.identifier)
+        gm.achievement_set_unlock_item(ach, self.value)
+        gm.achievement_set_requirement(ach, progress_req or 1)
+    
+        if single_run then
+            local ach_array = gm.array_get(Class.ACHIEVEMENT, ach)
+            gm.array_set(ach_array, 21, single_run)
+        end
     end,
 
 
     progress_achievement = function(self, amount)
+        if self:is_unlocked() then return end
+        gm.achievement_add_progress(self.achievement_id, amount or 1)
+    end,
+
+
+    toggle_loot = function(self, enabled)
 
     end
 
@@ -280,3 +314,233 @@ gm.post_script_hook(gm.constants.callback_execute, function(self, other, result,
         end
     end
 end)
+
+
+gm.pre_script_hook(gm.constants.skill_activate, function(self, other, result, args)
+    if args[1].value ~= 0.0 or gm.array_get(self.skills, 0).active_skill.skill_id == 70.0 then return true end
+    if callbacks["onBasicUse"] then
+        for _, fn in pairs(callbacks["onBasicUse"]) do
+            local actor = Instance.make_instance(self)
+            local count = actor:item_stack(fn[1])
+            if count > 0 then
+                fn[2](actor, count)   -- Actor, Stack count
+            end
+        end
+    end
+end)
+
+
+gm.pre_script_hook(gm.constants.actor_heal_networked, function(self, other, result, args)
+    if callbacks["onHeal"] then
+        for _, fn in pairs(callbacks["onHeal"]) do
+            local actor = Instance.make_instance(args[1].value)
+            local count = actor:item_stack(fn[1])
+            if count > 0 then
+                fn[2](actor, args[2].value, count)   -- Actor, Heal amount, Stack count
+            end
+        end
+    end
+end)
+
+
+
+-- ========== Callbacks ==========
+
+local function item_onAttack(self, other, result, args)
+    if not args[2].value.proc then return end
+    if callbacks["onAttack"] then
+        for _, c in ipairs(callbacks["onAttack"]) do
+            local item = c[1]
+            local actor = Instance.make_instance(args[2].value.parent)
+            local count = actor:item_stack(item)
+            if count > 0 then
+                local func = c[2]
+                func(actor, args[2].value, count)    -- Actor, Damager attack_info, Stack count
+            end
+        end
+    end
+end
+
+
+local function item_onPostAttack(self, other, result, args)
+    if not args[2].value.proc or not args[2].value.parent then return end
+    if callbacks["onPostAttack"] then
+        for _, c in ipairs(callbacks["onPostAttack"]) do
+            local item = c[1]
+            local actor = Instance.make_instance(args[2].value.parent)
+            local count = actor:item_stack(item)
+            if count > 0 then
+                local func = c[2]
+                func(actor, args[2].value, count)    -- Actor, Damager attack_info, Stack count
+            end
+        end
+    end
+end
+
+
+local function item_onHit(self, other, result, args)
+    if not self.attack_info.proc then return end
+    if callbacks["onHit"] then
+        for _, c in ipairs(callbacks["onHit"]) do
+            local item = c[1]
+            local actor = Instance.make_instance(args[2].value)
+            local count = actor:item_stack(item)
+            if count > 0 then
+                local func = c[2]
+                func(actor, Instance.make_instance(args[3].value), self.attack_info, count) -- Attacker, Victim, Damager attack_info, Stack count
+            end
+        end
+    end
+end
+
+
+local function item_onKill(self, other, result, args)
+    if callbacks["onKill"] then
+        for _, c in ipairs(callbacks["onKill"]) do
+            local item = c[1]
+            local actor = Instance.make_instance(args[3].value)
+            local count = actor:item_stack(item)
+            if count > 0 then
+                local func = c[2]
+                func(actor, Instance.make_instance(args[2].value), count)   -- Attacker, Victim, Stack count
+            end
+        end
+    end
+end
+
+
+local function item_onDamaged(self, other, result, args)
+    if callbacks["onDamaged"] then
+        for _, c in ipairs(callbacks["onDamaged"]) do
+            local item = c[1]
+            local actor = Instance.make_instance(args[2].value)
+            local count = actor:item_stack(item)
+            if count > 0 then
+                local func = c[2]
+                func(actor, args[3].value.attack_info, count)   -- Actor, Damager attack_info, Stack count
+            end
+        end
+    end
+end
+
+
+local function item_onDamageBlocked(self, other, result, args)
+    if callbacks["onDamageBlocked"] then
+        for _, c in ipairs(callbacks["onDamageBlocked"]) do
+            local item = c[1]
+            local actor = Instance.make_instance(self)
+            local count = actor:item_stack(item)
+            if count > 0 then
+                local func = c[2]
+                func(actor, other.attack_info, count)   -- Actor, Damager attack_info, Stack count
+            end
+        end
+    end
+end
+
+
+local function item_onInteract(self, other, result, args)
+    if callbacks["onInteract"] then
+        for _, c in ipairs(callbacks["onInteract"]) do
+            local item = c[1]
+            local actor = Instance.make_instance(args[3].value)
+            local count = actor:item_stack(item)
+            if count > 0 then
+                local func = c[2]
+                func(actor, Instance.make_instance(args[2].value), count)   -- Actor, Interactable, Stack count
+            end
+        end
+    end
+end
+
+
+local function item_onEquipmentUse(self, other, result, args)
+    if callbacks["onEquipmentUse"] then
+        for _, c in ipairs(callbacks["onEquipmentUse"]) do
+            local item = c[1]
+            local actor = Instance.make_instance(args[2].value)
+            local count = actor:item_stack(item)
+            if count > 0 then
+                local func = c[2]
+                func(actor, args[3].value, count)   -- Actor, Equipment ID, Stack count
+                -- TODO: Pass in equipment abstraction
+            end
+        end
+    end
+end
+
+
+local function item_onStep(self, other, result, args)
+    if gm.variable_global_get("pause") then return end
+    
+    if callbacks["onStep"] then
+        for n, a in ipairs(has_custom_item) do
+            if gm.instance_exists(a) == 1.0 then
+                for _, c in ipairs(callbacks["onStep"]) do
+                    local actor = Instance.make_instance(a)
+                    local count = actor:item_stack(c[1])
+                    if count > 0 then
+                        c[2](actor, count)  -- Actor, Stack count
+                    end
+                end
+            else table.remove(has_custom_item, n)
+            end
+        end
+    end
+
+    if callbacks["onShieldBreak"] then
+        for n, a in ipairs(has_custom_item) do
+            if gm.instance_exists(a) == 1.0 then
+                if a.shield and a.shield > 0.0 then a.RMT_has_shield = true end
+                if a.RMT_has_shield and a.shield <= 0.0 then
+                    a.RMT_has_shield = nil
+                    for _, c in ipairs(callbacks["onShieldBreak"]) do
+                        local actor = Instance.make_instance(a)
+                        local count = actor:item_stack(c[1])
+                        if count > 0 then
+                            c[2](actor, count)  -- Actor, Stack count
+                        end
+                    end
+                end
+            else table.remove(has_custom_item, n)
+            end
+        end
+    end
+end
+
+
+local function item_onDraw(self, other, result, args)
+    if gm.variable_global_get("pause") then return end
+
+    if callbacks["onDraw"] then
+        for n, a in ipairs(has_custom_item) do
+            if Instance.exists(a) then
+                for _, c in ipairs(callbacks["onDraw"]) do
+                    local actor = Instance.make_instance(a)
+                    local count = actor:item_stack(c[1])
+                    if count > 0 then
+                        c[2](actor, count)  -- Actor, Stack count
+                    end
+                end
+            else table.remove(has_custom_item, n)
+            end
+        end
+    end
+end
+
+
+
+-- ========== Initialize ==========
+
+Item.__initialize = function()
+    Callback.add("onAttackCreate", "RMT.item_onAttack", item_onAttack, true)
+    Callback.add("onAttackHandleEnd", "RMT.item_onPostAttack", item_onPostAttack, true)
+    Callback.add("onHitProc", "RMT.item_onHit", item_onHit, true)
+    Callback.add("onKillProc", "RMT.item_onKill", item_onKill, true)
+    Callback.add("onDamagedProc", "RMT.item_onDamaged", item_onDamaged, true)
+    Callback.add("onDamageBlocked", "RMT.item_onDamageBlocked", item_onDamageBlocked, true)
+    Callback.add("onInteractableActivate", "RMT.item_onInteract", item_onInteract, true)
+    Callback.add("onEquipmentUse", "RMT.item_onEquipmentUse", item_onEquipmentUse, true)
+    Callback.add("preStep", "RMT.item_onStep", item_onStep, true)
+    Callback.add("postHUDDraw", "RMT.item_onDraw", item_onDraw, true)
+end
