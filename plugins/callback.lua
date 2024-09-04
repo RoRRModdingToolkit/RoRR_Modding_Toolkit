@@ -1,5 +1,4 @@
 -- Callback
--- Original system written by SmoothSpatula
 
 Callback = {}
 
@@ -54,7 +53,8 @@ end)
 Callback.__initialize = function()
     -- Populate Callback.TYPE
     local callback_names = gm.variable_global_get("callback_names")
-    for i = 1, #callback_names do
-        Callback.TYPE[callback_names[i]] = i - 1
+    local size = gm.array_length(callback_names)
+    for i = 0, size - 1 do
+        Callback.TYPE[gm.array_get(callback_names, i)] = i
     end
 end

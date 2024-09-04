@@ -1,4 +1,5 @@
 -- Helper
+-- Originally in HelperFunctions by Klehrik
 
 Helper = {}
 

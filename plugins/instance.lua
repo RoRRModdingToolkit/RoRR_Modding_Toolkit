@@ -11,79 +11,64 @@ Instance.exists = function(inst)
 end
 
 
-Instance.find = function(obj)
-    if type(obj) == "table" then obj = obj.value end
+Instance.find = function(...)
+    local t = {...}
+    if type(t[1]) == "table" and (not t[1].value) then t = t[1] end
 
-    local inst = gm.instance_find(obj, 0)
-    if obj >= 800.0 then
-        local count = Object.count(gm.constants.oCustomObject)
-        for i = 0, count - 1 do
-            local ins = gm.instance_find(gm.constants.oCustomObject, i)
-            if ins.__object_index == obj then
-                inst = ins
-                break
+    for _, obj in ipairs(t) do
+        if type(obj) == "table" then obj = obj.value end
+
+        local inst = gm.instance_find(obj, 0)
+        if obj >= 800.0 then
+            local count = Object.count(gm.constants.oCustomObject)
+            for i = 0, count - 1 do
+                local ins = gm.instance_find(gm.constants.oCustomObject, i)
+                if ins.__object_index == obj then
+                    inst = ins
+                    break
+                end
             end
+        end
+
+        if inst ~= nil and inst ~= -4.0 then
+            return Instance.make_instance(inst)
         end
     end
 
     -- None
-    if inst == nil or inst == -4.0 then
-        return Instance.make_invalid()
-    end
-
-    -- Instance
-    return Instance.make_instance(inst)
+    return Instance.make_invalid()
 end
 
 
-Instance.find_all = function(obj)
-    if type(obj) == "table" then obj = obj.value end
+Instance.find_all = function(...)
+    local t = {...}
+    if type(t[1]) == "table" and (not t[1].value) then t = t[1] end
 
     local insts = {}
 
-    local is_actor = false
-    if gm.object_is_ancestor(obj, gm.constants.pActor) then is_actor = true end
+    for _, obj in ipairs(t) do
+        if type(obj) == "table" then obj = obj.value end
 
-    if obj < 800.0 then
-        local count = Object.count(obj)
-        for n = 0, count - 1 do
-            local inst = gm.instance_find(obj, n)
-            local abstraction = {
-                value = inst
-            }
-            if is_actor then setmetatable(abstraction, Actor.make_metatable(inst))
-            else setmetatable(abstraction, Instance.make_metatable(inst))
+        if obj < 800.0 then
+            local count = Object.count(obj)
+            for n = 0, count - 1 do
+                local inst = gm.instance_find(obj, n)
+                table.insert(insts, Instance.make_instance(inst))
             end
-            table.insert(insts, abstraction)
-        end
 
-    else
-        local count = Object.count(gm.constants.oCustomObject)
-        for n = 0, count - 1 do
-            local inst = gm.instance_find(gm.constants.oCustomObject, n)
-            if inst.__object_index == obj then
-                local abstraction = {
-                    value = inst
-                }
-                if is_actor then setmetatable(abstraction, Actor.make_metatable(inst))
-                else setmetatable(abstraction, Instance.make_metatable(inst))
+        else
+            local count = Object.count(gm.constants.oCustomObject)
+            for n = 0, count - 1 do
+                local inst = gm.instance_find(gm.constants.oCustomObject, n)
+                if inst.__object_index == obj then
+                    table.insert(insts, Instance.make_instance(inst))
                 end
-                table.insert(insts, abstraction)
             end
-        end
 
+        end
     end
 
     return insts, #insts > 0
-end
-
-
-Instance.make_invalid = function()
-    local abstraction = {
-        value = nil
-    }
-    setmetatable(abstraction, Instance.make_metatable(nil))
-    return abstraction
 end
 
 
@@ -95,6 +80,15 @@ Instance.make_instance = function(inst)
         setmetatable(abstraction, Actor.make_metatable(inst))
     else setmetatable(abstraction, Instance.make_metatable(inst))
     end
+    return abstraction
+end
+
+
+Instance.make_invalid = function()
+    local abstraction = {
+        value = nil
+    }
+    setmetatable(abstraction, Instance.make_metatable(nil))
     return abstraction
 end
 
