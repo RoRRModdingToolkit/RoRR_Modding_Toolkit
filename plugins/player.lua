@@ -18,7 +18,7 @@ Player.get_client = function(obj)
             local abstraction = {
                 value = p
             }
-            setmetatable(abstraction, Actor.make_metatable(p))
+            setmetatable(abstraction, metatable_actor)
             return abstraction
         end
     end
@@ -36,7 +36,7 @@ Player.get_host = function()
             local abstraction = {
                 value = p
             }
-            setmetatable(abstraction, Actor.make_metatable(p))
+            setmetatable(abstraction, metatable_actor)
             return abstraction
         end
     end
@@ -53,7 +53,7 @@ Player.get_from_name = function(name)
             local abstraction = {
                 value = p
             }
-            setmetatable(abstraction, Actor.make_metatable(p))
+            setmetatable(abstraction, metatable_actor)
             return abstraction
         end
     end

@@ -77,8 +77,8 @@ Instance.make_instance = function(inst)
         value = inst
     }
     if gm.object_is_ancestor(inst.object_index, gm.constants.pActor) == 1.0 then
-        setmetatable(abstraction, Actor.make_metatable(inst))
-    else setmetatable(abstraction, Instance.make_metatable(inst))
+        setmetatable(abstraction, metatable_actor)
+    else setmetatable(abstraction, metatable_instance)
     end
     return abstraction
 end
@@ -88,7 +88,7 @@ Instance.make_invalid = function()
     local abstraction = {
         value = nil
     }
-    setmetatable(abstraction, Instance.make_metatable(nil))
+    setmetatable(abstraction, metatable_instance)
     return abstraction
 end
 
@@ -96,66 +96,57 @@ end
 
 -- ========== Instance Methods ==========
 
-Instance.make_metatable = function(inst)
-    return {
-        __index = setmetatable({
+methods_instance = {
 
-            value = inst,
-
-
-            -- Return true if instance exists
-            exists = function(self)
-                return gm.instance_exists(self.value) == 1.0
-            end,
+    -- Return true if instance exists
+    exists = function(self)
+        return gm.instance_exists(self.value) == 1.0
+    end,
 
 
-            -- Return true if the other instance is the same one
-            same = function(self, other)
-                if not self:exists() then return false end
-                if type(other) == "table" then other = other.value end
-                return self.value == other
-            end
+    -- Return true if the other instance is the same one
+    same = function(self, other)
+        if not self:exists() then return false end
+        if type(other) == "table" then other = other.value end
+        return self.value == other
+    end
 
-        },
-        {
-            -- Getter
-            __index = function(table, key)
-                local var = rawget(table, "value")
-                if var then return gm.variable_instance_get(var, key) end
-                return nil
-            end
-        }),
+}
 
 
-        -- Setter
-        __newindex = function(table, key, value)
-            local var = rawget(table, "value")
-            if var then gm.variable_instance_set(var, key, value) end
+
+-- ========== Metatables ==========
+
+metatable_instance_gs = {
+    -- Getter
+    __index = function(table, key)
+        local var = rawget(table, "value")
+        if var then return gm.variable_instance_get(var, key) end
+        return nil
+    end,
+
+
+    -- Setter
+    __newindex = function(table, key, value)
+        local var = rawget(table, "value")
+        if var then gm.variable_instance_set(var, key, value) end
+    end
+}
+
+
+metatable_instance = {
+    __index = function(table, key)
+        -- Methods
+        if methods_instance[key] then
+            return methods_instance[key]
         end
-    }
-end
+
+        -- Pass to next metatable
+        return metatable_instance_gs.__index(table, key)
+    end,
 
 
--- metatable_instance = {
---     __index = setmetatable({
-
---         -- Return true if instance exists
---         exists = function(self)
---             return gm.instance_exists(self.value) == 1.0
---         end
-
---     },
---     {
---         -- Getter
---         __index = function(table, key)
---             return rawget(table, "value")
---             --return gm.variable_instance_get(rawget(table, "value"), key)
---         end,
-
-
---         -- Setter
---         __newindex = function(table, key, value)
---             --return gm.variable_instance_set(rawget(table, "value"), key, value)
---         end
---     })
--- }
+    __newindex = function(table, key, value)
+        metatable_instance_gs.__newindex(table, key, value)
+    end
+}

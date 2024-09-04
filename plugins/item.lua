@@ -69,7 +69,7 @@ Item.find = function(namespace, identifier)
         local abstraction = {
             value = item
         }
-        setmetatable(abstraction, Item.make_metatable(item))
+        setmetatable(abstraction, metatable_item)
         return abstraction
     end
 
@@ -94,7 +94,7 @@ Item.new = function(namespace, identifier, no_log)
     local abstraction = {
         value = item
     }
-    setmetatable(abstraction, Item.make_metatable(item))
+    setmetatable(abstraction, metatable_item)
 
     -- Create item log
     if not no_log then
@@ -123,113 +123,98 @@ end
 
 -- ========== Instance Methods ==========
 
-Item.make_metatable = function(item)
-    return {
-        __index = setmetatable({
+methods_item = {
 
-            value = item,
+    add_callback = function(self, callback, fn)
 
-
-            add_callback = function(self, callback, fn)
-
-            end,
+    end,
 
 
-            set_sprite = function(self, sprite)
-                -- Set class_item sprite
-                self.sprite_id = sprite
+    set_sprite = function(self, sprite)
+        -- Set class_item sprite
+        self.sprite_id = sprite
 
-                -- Set item object sprite
-                gm.object_set_sprite_w(self.object_id, sprite)
+        -- Set item object sprite
+        gm.object_set_sprite_w(self.object_id, sprite)
 
-                -- Set item log sprite
-                if self.item_log_id then
-                    local log_array = gm.array_get(Class.ITEM_LOG, self.item_log_id)
-                    gm.array_set(log_array, 9, sprite)
-                end
-            end,
-
-
-            set_tier = function(self, tier)
-                self.tier = tier
+        -- Set item log sprite
+        if self.item_log_id then
+            local log_array = gm.array_get(Class.ITEM_LOG, self.item_log_id)
+            gm.array_set(log_array, 9, sprite)
+        end
+    end,
 
 
-                local pools = gm.variable_global_get("treasure_loot_pools")
-
-                -- Remove from all loot pools that the item is in
-                local size = gm.array_length(pools)
-                for i = 0, size - 1 do
-                    local drops = gm.array_get(pools, i).drop_pool
-                    local pos = gm.ds_list_find_index(drops, self.object_id)
-                    if pos >= 0 then gm.ds_list_delete(drops, pos) end
-                end
-
-                -- Add to new loot pool
-                local pool = gm.array_get(pools, tier).drop_pool
-                gm.ds_list_add(pool, self.object_id)
-                
-
-                -- Remove previous item log position (if found)
-                local item_log_order = gm.variable_global_get("item_log_display_list")
-                local pos = gm.ds_list_find_index(item_log_order, self.item_log_id)
-                if pos >= 0 then gm.ds_list_delete(item_log_order, pos) end
-
-                -- Set new item log position
-                local pos = 0
-                local size = gm.ds_list_size(item_log_order)
-                for i = 0, size - 1 do
-                    local log_id = gm.ds_list_find_value(item_log_order, i)
-                    local log_ = gm.array_get(Class.ITEM_LOG, log_id)
-                    local item_id = Item.find(gm.array_get(log_, 0), gm.array_get(log_, 1))
-                    
-                    local tier_ = Item.TIER.equipment
-                    if item_id then
-                        local iter_item = gm.array_get(Class.ITEM, item_id.value)
-                        tier_ = gm.array_get(iter_item, 6)
-                    end
-                    if tier_ > tier then
-                        pos = i
-                        break
-                    end
-                end
-                gm.ds_list_insert(item_log_order, pos, self.item_log_id)
-            end,
+    set_tier = function(self, tier)
+        self.tier = tier
 
 
-            set_loot_tags = function(self, ...)
-                local tags = 0
-                for _, t in ipairs{...} do tags = tags + t end
+        local pools = gm.variable_global_get("treasure_loot_pools")
 
-                self.loot_tags = tags
-            end,
+        -- Remove from all loot pools that the item is in
+        local size = gm.array_length(pools)
+        for i = 0, size - 1 do
+            local drops = gm.array_get(pools, i).drop_pool
+            local pos = gm.ds_list_find_index(drops, self.object_id)
+            if pos >= 0 then gm.ds_list_delete(drops, pos) end
+        end
 
+        -- Add to new loot pool
+        local pool = gm.array_get(pools, tier).drop_pool
+        gm.ds_list_add(pool, self.object_id)
+        
 
-            add_achievement = function(self, progress_req, single_run)
+        -- Remove previous item log position (if found)
+        local item_log_order = gm.variable_global_get("item_log_display_list")
+        local pos = gm.ds_list_find_index(item_log_order, self.item_log_id)
+        if pos >= 0 then gm.ds_list_delete(item_log_order, pos) end
 
-            end,
-
-
-            progress_achievement = function(self, amount)
-
+        -- Set new item log position
+        local pos = 0
+        local size = gm.ds_list_size(item_log_order)
+        for i = 0, size - 1 do
+            local log_id = gm.ds_list_find_value(item_log_order, i)
+            local log_ = gm.array_get(Class.ITEM_LOG, log_id)
+            local item_id = Item.find(gm.array_get(log_, 0), gm.array_get(log_, 1))
+            
+            local tier_ = Item.TIER.equipment
+            if item_id then
+                local iter_item = gm.array_get(Class.ITEM, item_id.value)
+                tier_ = gm.array_get(iter_item, 6)
             end
-
-        },
-        metatable_item_fields),
-
-
-        -- Setter
-        __newindex = function(table, key, value)
-            local index = Item.ARRAY[key]
-            if index then
-                local item_array = gm.array_get(Class.ITEM, table.value)
-                gm.array_set(item_array, index, value)
+            if tier_ > tier then
+                pos = i
+                break
             end
         end
-    }
-end
+        gm.ds_list_insert(item_log_order, pos, self.item_log_id)
+    end,
 
 
-metatable_item_fields = {
+    set_loot_tags = function(self, ...)
+        local tags = 0
+        for _, t in ipairs{...} do tags = tags + t end
+
+        self.loot_tags = tags
+    end,
+
+
+    add_achievement = function(self, progress_req, single_run)
+
+    end,
+
+
+    progress_achievement = function(self, amount)
+
+    end
+
+}
+
+
+
+-- ========== Metatables ==========
+
+metatable_item_gs = {
     -- Getter
     __index = function(table, key)
         local index = Item.ARRAY[key]
@@ -238,5 +223,33 @@ metatable_item_fields = {
             return gm.array_get(item_array, index)
         end
         return nil
+    end,
+
+
+    -- Setter
+    __newindex = function(table, key, value)
+        local index = Item.ARRAY[key]
+        if index then
+            local item_array = gm.array_get(Class.ITEM, table.value)
+            gm.array_set(item_array, index, value)
+        end
+    end
+}
+
+
+metatable_item = {
+    __index = function(table, key)
+        -- Methods
+        if methods_item[key] then
+            return methods_item[key]
+        end
+
+        -- Pass to next metatable
+        return metatable_item_gs.__index(table, key)
+    end,
+    
+
+    __newindex = function(table, key, value)
+        metatable_item_gs.__newindex(table, key, value)
     end
 }
