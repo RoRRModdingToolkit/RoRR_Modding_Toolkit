@@ -39,6 +39,56 @@ Equipment.find = function(namespace, identifier)
 end
 
 
+Equipment.new = function(namespace, identifier)
+    if Equipment.find(namespace, identifier) then return nil end
+
+    -- Create equipment
+    local equipment = gm.equipment_create(
+        namespace,
+        identifier,
+        gm.array_length(Class.EQUIPMENT),   -- class_equipment index
+        3.0,    -- tier (3 is equipment)
+        gm.object_add_w(namespace, identifier, gm.constants.pPickupEquipment),  -- pickup object
+        0.0,    -- loot tags
+        nil,    -- not sure; might be an anon function call
+        45.0,   -- cooldown
+        true,   -- ? (most have this)
+        6.0,    -- ? (most have this)
+        nil,    -- ? (most have this)
+        nil     -- ? (most have this)
+    )
+
+    -- Make equipment abstraction
+    local abstraction = Equipment.make_instance(equipment)
+
+    -- Have to manually increase this variable for some reason (class_equipment array length)
+    gm.variable_global_set("count_equipment", gm.variable_global_get("count_equipment") + 1.0)
+
+
+    -- Remove previous item log position (if found)
+    local item_log_order = gm.variable_global_get("item_log_display_list")
+    local pos = gm.ds_list_find_index(item_log_order, abstraction.item_log_id)
+    if pos >= 0 then gm.ds_list_delete(item_log_order, pos) end
+
+    -- Set item log position
+    local pos = 0
+    local size = gm.ds_list_size(item_log_order)
+    for i = 0, size - 1 do
+        local log_id = gm.ds_list_find_value(item_log_order, i)
+        local log_ = gm.array_get(Class.ITEM_LOG, log_id)
+        local iter_item = Equipment.find(gm.array_get(log_, 0), gm.array_get(log_, 1))
+        
+        if iter_item then
+            if iter_item.tier == 3.0 then pos = i end
+        end
+    end
+    gm.ds_list_insert(item_log_order, pos + 1, abstraction.item_log_id)
+
+    
+    return abstraction
+end
+
+
 Equipment.make_instance = function(equipment_id)
     local abstraction = {
         value = equipment_id

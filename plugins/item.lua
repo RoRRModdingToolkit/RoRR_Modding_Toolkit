@@ -214,12 +214,11 @@ methods_item = {
         for i = 0, size - 1 do
             local log_id = gm.ds_list_find_value(item_log_order, i)
             local log_ = gm.array_get(Class.ITEM_LOG, log_id)
-            local item_id = Item.find(gm.array_get(log_, 0), gm.array_get(log_, 1))
+            local iter_item = Item.find(gm.array_get(log_, 0), gm.array_get(log_, 1))
             
             local tier_ = Item.TIER.equipment
-            if item_id then
-                local iter_item = gm.array_get(Class.ITEM, item_id.value)
-                tier_ = gm.array_get(iter_item, 6)
+            if iter_item then
+                tier_ = iter_item.tier
             end
             if tier_ > tier then
                 pos = i
