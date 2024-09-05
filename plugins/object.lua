@@ -112,7 +112,8 @@ methods_object = {
 
 
     get_depth = function(self)
-        return gm.object_get_depth(self.value)
+        local depths = gm.variable_global_get("object_depths")
+        return gm.array_get(depths, self.value)
     end,
 
 
