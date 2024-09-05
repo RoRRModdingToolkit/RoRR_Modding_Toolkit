@@ -56,7 +56,7 @@ methods_actor = {
     end,
 
 
-    damage = function(self, damage, source, x, y, color, crit_sfx)
+    take_damage = function(self, damage, source, x, y, color, crit_sfx)
         local source_inst = nil
         if source then
             if type(source) == "table" then source = source.value end
@@ -96,11 +96,6 @@ methods_actor = {
     end,
 
 
-    activate_equipment = function(self)
-
-    end,
-
-
     item_give = function(self, item, count, temp)
         if type(item) == "table" then item = item.value end
         if not temp then temp = false end
@@ -115,10 +110,10 @@ methods_actor = {
     end,
 
 
-    item_stack = function(self, item, item_type)
+    item_stack_count = function(self, item, item_type)
         if type(item) == "table" then item = item.value end
-        if type_ == Item.TYPE.real then return gm.item_count(self.value, item, false) end
-        if type_ == Item.TYPE.temporary then return gm.item_count(self.value, item, true) end
+        if item_type == Item.TYPE.real then return gm.item_count(self.value, item, false) end
+        if item_type == Item.TYPE.temporary then return gm.item_count(self.value, item, true) end
         return gm.item_count(self.value, item, false) + gm.item_count(self.value, item, true)
     end,
 
@@ -133,7 +128,7 @@ methods_actor = {
         -- Funny stuff happens if this is exceeded
         local buff_array = gm.array_get(Class.BUFF, buff)
         local max_stack = gm.array_get(buff_array, 9)
-        gm.array_set(self.buff_stack, buff, math.min(self:buff_stack(buff), max_stack))
+        gm.array_set(self.buff_stack, buff, math.min(self:buff_stack_count(buff), max_stack))
     end,
 
 
@@ -141,14 +136,14 @@ methods_actor = {
         if type(buff) == "table" then buff = buff.value end
         if gm.array_length(self.buff_stack) <= buff then gm.array_resize(self.buff_stack, buff + 1) end
 
-        local stack_count = self:buff_stack(buff)
+        local stack_count = self:buff_stack_count(buff)
         if (not count) or count >= stack_count then gm.remove_buff(self.value, buff)
         else gm.array_set(self.buff_stack, buff, stack_count - count)
         end
     end,
 
 
-    buff_stack = function(self, buff)
+    buff_stack_count = function(self, buff)
         if type(buff) == "table" then buff = buff.value end
         if gm.array_length(self.buff_stack) <= buff then gm.array_resize(self.buff_stack, buff + 1) end
 

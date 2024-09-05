@@ -106,7 +106,7 @@ Item.new = function(namespace, identifier, no_log)
             identifier,
             nil,
             nil,
-            abstraction.sprite_id
+            abstraction.object_id
         )
 
         abstraction.item_log_id = log
@@ -269,7 +269,7 @@ methods_item = {
     create = function(self, x, y, target)
         if not self.object_id then return nil end
 
-        gm.item_drop_object(self.object_id, x, y, target, false) end
+        gm.item_drop_object(self.object_id, x, y, target, false)
 
         -- Look for drop (because gm.item_drop_object does not actually return the instance for some reason)
         -- The drop spawns 40 px above y parameter
@@ -352,7 +352,7 @@ gm.pre_script_hook(gm.constants.skill_activate, function(self, other, result, ar
     if callbacks["onBasicUse"] then
         for _, fn in pairs(callbacks["onBasicUse"]) do
             local actor = Instance.make_instance(self)
-            local count = actor:item_stack(fn[1])
+            local count = actor:item_stack_count(fn[1])
             if count > 0 then
                 fn[2](actor, count)   -- Actor, Stack count
             end
@@ -365,7 +365,7 @@ gm.pre_script_hook(gm.constants.actor_heal_networked, function(self, other, resu
     if callbacks["onHeal"] then
         for _, fn in pairs(callbacks["onHeal"]) do
             local actor = Instance.make_instance(args[1].value)
-            local count = actor:item_stack(fn[1])
+            local count = actor:item_stack_count(fn[1])
             if count > 0 then
                 fn[2](actor, args[2].value, count)   -- Actor, Heal amount, Stack count
             end
@@ -383,7 +383,7 @@ local function item_onAttack(self, other, result, args)
         for _, c in ipairs(callbacks["onAttack"]) do
             local item = c[1]
             local actor = Instance.make_instance(args[2].value.parent)
-            local count = actor:item_stack(item)
+            local count = actor:item_stack_count(item)
             if count > 0 then
                 local func = c[2]
                 func(actor, args[2].value, count)    -- Actor, Damager attack_info, Stack count
@@ -399,7 +399,7 @@ local function item_onPostAttack(self, other, result, args)
         for _, c in ipairs(callbacks["onPostAttack"]) do
             local item = c[1]
             local actor = Instance.make_instance(args[2].value.parent)
-            local count = actor:item_stack(item)
+            local count = actor:item_stack_count(item)
             if count > 0 then
                 local func = c[2]
                 func(actor, args[2].value, count)    -- Actor, Damager attack_info, Stack count
@@ -415,7 +415,7 @@ local function item_onHit(self, other, result, args)
         for _, c in ipairs(callbacks["onHit"]) do
             local item = c[1]
             local actor = Instance.make_instance(args[2].value)
-            local count = actor:item_stack(item)
+            local count = actor:item_stack_count(item)
             if count > 0 then
                 local func = c[2]
                 func(actor, Instance.make_instance(args[3].value), self.attack_info, count) -- Attacker, Victim, Damager attack_info, Stack count
@@ -430,7 +430,7 @@ local function item_onKill(self, other, result, args)
         for _, c in ipairs(callbacks["onKill"]) do
             local item = c[1]
             local actor = Instance.make_instance(args[3].value)
-            local count = actor:item_stack(item)
+            local count = actor:item_stack_count(item)
             if count > 0 then
                 local func = c[2]
                 func(actor, Instance.make_instance(args[2].value), count)   -- Attacker, Victim, Stack count
@@ -445,7 +445,7 @@ local function item_onDamaged(self, other, result, args)
         for _, c in ipairs(callbacks["onDamaged"]) do
             local item = c[1]
             local actor = Instance.make_instance(args[2].value)
-            local count = actor:item_stack(item)
+            local count = actor:item_stack_count(item)
             if count > 0 then
                 local func = c[2]
                 func(actor, args[3].value.attack_info, count)   -- Actor, Damager attack_info, Stack count
@@ -460,7 +460,7 @@ local function item_onDamageBlocked(self, other, result, args)
         for _, c in ipairs(callbacks["onDamageBlocked"]) do
             local item = c[1]
             local actor = Instance.make_instance(self)
-            local count = actor:item_stack(item)
+            local count = actor:item_stack_count(item)
             if count > 0 then
                 local func = c[2]
                 func(actor, other.attack_info, count)   -- Actor, Damager attack_info, Stack count
@@ -475,7 +475,7 @@ local function item_onInteract(self, other, result, args)
         for _, c in ipairs(callbacks["onInteract"]) do
             local item = c[1]
             local actor = Instance.make_instance(args[3].value)
-            local count = actor:item_stack(item)
+            local count = actor:item_stack_count(item)
             if count > 0 then
                 local func = c[2]
                 func(actor, Instance.make_instance(args[2].value), count)   -- Actor, Interactable, Stack count
@@ -490,7 +490,7 @@ local function item_onEquipmentUse(self, other, result, args)
         for _, c in ipairs(callbacks["onEquipmentUse"]) do
             local item = c[1]
             local actor = Instance.make_instance(args[2].value)
-            local count = actor:item_stack(item)
+            local count = actor:item_stack_count(item)
             if count > 0 then
                 local func = c[2]
                 func(actor, args[3].value, count)   -- Actor, Equipment ID, Stack count
@@ -506,10 +506,10 @@ local function item_onStep(self, other, result, args)
     
     if callbacks["onStep"] then
         for n, a in ipairs(has_custom_item) do
-            if gm.instance_exists(a) == 1.0 then
+            if Instance.exists(a) then
                 for _, c in ipairs(callbacks["onStep"]) do
                     local actor = Instance.make_instance(a)
-                    local count = actor:item_stack(c[1])
+                    local count = actor:item_stack_count(c[1])
                     if count > 0 then
                         c[2](actor, count)  -- Actor, Stack count
                     end
@@ -521,13 +521,13 @@ local function item_onStep(self, other, result, args)
 
     if callbacks["onShieldBreak"] then
         for n, a in ipairs(has_custom_item) do
-            if gm.instance_exists(a) == 1.0 then
+            if Instance.exists(a) then
                 if a.shield and a.shield > 0.0 then a.RMT_has_shield = true end
                 if a.RMT_has_shield and a.shield <= 0.0 then
                     a.RMT_has_shield = nil
                     for _, c in ipairs(callbacks["onShieldBreak"]) do
                         local actor = Instance.make_instance(a)
-                        local count = actor:item_stack(c[1])
+                        local count = actor:item_stack_count(c[1])
                         if count > 0 then
                             c[2](actor, count)  -- Actor, Stack count
                         end
@@ -545,10 +545,10 @@ local function item_onDraw(self, other, result, args)
 
     if callbacks["onDraw"] then
         for n, a in ipairs(has_custom_item) do
-            if gm.instance_exists(a) == 1.0 then
+            if Instance.exists(a) then
                 for _, c in ipairs(callbacks["onDraw"]) do
                     local actor = Instance.make_instance(a)
-                    local count = actor:item_stack(c[1])
+                    local count = actor:item_stack_count(c[1])
                     if count > 0 then
                         c[2](actor, count)  -- Actor, Stack count
                     end

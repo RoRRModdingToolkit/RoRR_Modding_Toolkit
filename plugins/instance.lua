@@ -76,7 +76,9 @@ Instance.make_instance = function(inst)
     local abstraction = {
         value = inst
     }
-    if gm.object_is_ancestor(inst.object_index, gm.constants.pActor) == 1.0 then
+    if inst.object_index == gm.constants.oP then
+        setmetatable(abstraction, metatable_player)
+    elseif gm.object_is_ancestor(inst.object_index, gm.constants.pActor) == 1.0 then
         setmetatable(abstraction, metatable_actor)
     else setmetatable(abstraction, metatable_instance)
     end

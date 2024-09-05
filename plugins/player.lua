@@ -49,3 +49,41 @@ Player.get_from_name = function(name)
     -- None
     return Instance.make_invalid()
 end
+
+
+
+-- ========== Instance Methods ==========
+
+methods_player = {
+
+    get_equipment_cooldown = function(self)
+        return gm.player_get_equipment_cooldown(self.value)
+    end,
+
+
+    reduce_equipment_cooldown = function(self, amount)
+        gm.player_grant_equipment_cooldown_reduction(self.value, amount)
+    end
+
+}
+
+
+
+-- ========== Metatables ==========
+
+metatable_player = {
+    __index = function(table, key)
+        -- Methods
+        if methods_player[key] then
+            return methods_player[key]
+        end
+
+        -- Pass to next metatable
+        return metatable_actor.__index(table, key)
+    end,
+    
+
+    __newindex = function(table, key, value)
+        metatable_instance_gs.__newindex(table, key, value)
+    end
+}

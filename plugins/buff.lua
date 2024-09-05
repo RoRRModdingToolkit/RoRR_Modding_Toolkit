@@ -45,7 +45,7 @@ Buff.find = function(namespace, identifier)
             local abstraction = {
                 value = i
             }
-            setmetatable(abstraction, metatable_item)
+            setmetatable(abstraction, metatable_buff)
             return abstraction
         end
     end
@@ -177,7 +177,9 @@ gm.post_script_hook(gm.constants.callback_execute, function(self, other, result,
     -- onApply and onRemove
     if callbacks[args[1].value] then
         for _, fn in pairs(callbacks[args[1].value]) do
-            fn(Instance.make_instance(args[2].value), args[3].value)
+            local actor = Instance.make_instance(args[2].value)
+            local stack = actor:buff_stack_count(fn[1])
+            fn[2](actor, stack)     -- Actor, Buff stack
         end
     end
 end)
@@ -193,7 +195,7 @@ gm.pre_script_hook(gm.constants.actor_transform, function(self, other, result, a
     if callbacks["onChange"] then
         for _, fn in pairs(callbacks["onChange"]) do
             local actor = Instance.make_instance(args[1].value)
-            local count = actor:buff_stack(fn[1])
+            local count = actor:buff_stack_count(fn[1])
             if count > 0 then
                 fn[2](actor, Instance.make_instance(args[2].value), stack)   -- Actor, To, Buff stack
             end
@@ -210,10 +212,10 @@ local function buff_onDraw(self, other, result, args)
 
     if callbacks["onDraw"] then
         for n, a in ipairs(has_custom_buff) do
-            if gm.instance_exists(a) == 1.0 then
+            if Instance.exists(a) then
                 for _, c in ipairs(callbacks["onDraw"]) do
                     local actor = Instance.make_instance(a)
-                    local count = actor:buff_stack(c[1])
+                    local count = actor:buff_stack_count(c[1])
                     if count > 0 then
                         c[2](actor, count)  -- Actor, Stack count
                     end

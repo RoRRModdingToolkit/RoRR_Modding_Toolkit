@@ -10,6 +10,7 @@ require("./buff")
 require("./callback")
 require("./class")
 require("./color")
+require("./equipment")
 require("./helper")
 require("./initialize")
 require("./instance")
@@ -20,8 +21,6 @@ require("./player")
 require("./resources")
 require("./skill")
 require("./survivor")
-
--- require("./equipment")
 
 
 

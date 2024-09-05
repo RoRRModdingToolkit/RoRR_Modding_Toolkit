@@ -1,0 +1,5 @@
+- Add Equipment class
+    - Modify Actor and Item onEquipmentUse callbacks
+- Add ability for specific (single-instance) Actor callbacks
+- Add Item and Equipment toggle_loot
+- Add new custom Object support (based on info from sarn)
