@@ -131,7 +131,7 @@ end
 
 Instance.wrap_invalid = function()
     local abstraction = {
-        value = nil
+        value = -4
     }
     setmetatable(abstraction, metatable_instance)
     return abstraction
@@ -153,6 +153,8 @@ methods_instance = {
 
 
     destroy = function(self)
+        if not self:exists() then return end
+
         gm.instance_destroy(self.value)
     end,
 
@@ -160,18 +162,23 @@ methods_instance = {
     -- Return true if the other instance is the same one
     same = function(self, other)
         if not self:exists() then return false end
+
         if type(other) == "table" then other = other.value end
         return self.value == other
     end,
 
 
     is_colliding = function(self, obj, x, y)
+        if not self:exists() then return false end
+
         if type(obj) == "table" then obj = obj.value end
         return self.value:place_meeting(x or self.x, y or self.y, obj) == 1.0
     end,
 
 
     get_collisions = function(self, obj)
+        if not self:exists() then return {}, 0 end
+
         if type(obj) == "table" then obj = obj.value end
 
         local list = gm.ds_list_create()
@@ -189,6 +196,8 @@ methods_instance = {
 
 
     draw_collision = function(self)
+        if not self:exists() then return end
+
         local c = Color.WHITE
         gm.draw_rectangle_color(self.bbox_left, self.bbox_top, self.bbox_right, self.bbox_bottom, c, c, c, c, true)
     end
@@ -205,7 +214,9 @@ metatable_instance_gs = {
         local var = rawget(table, "value")
         if var then
             local v = gm.variable_instance_get(var, key)
-            if gm.instance_exists(v) == 1.0 and gm.object_exists(v) == 0.0 then
+            if gm.typeof(v) == "struct"
+            and gm.instance_exists(v) == 1.0
+            and gm.object_exists(v) == 0.0 then
                 return Instance.wrap(v)
             end
             return v
