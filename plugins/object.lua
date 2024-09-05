@@ -30,7 +30,7 @@ Object.CUSTOM_START = 800
 Object.find = function(namespace, identifier)
     -- Vanilla object_index
     if type(namespace) == "number" then
-        return Object.make_instance(namespace)
+        return Object.wrap(namespace)
     end
 
     if identifier then namespace = namespace.."-"..identifier end
@@ -39,7 +39,7 @@ Object.find = function(namespace, identifier)
     if string.sub(namespace, 1, 3) == "ror" then
         local obj = gm.constants["o"..string.upper(string.sub(namespace, 5, 5))..string.sub(namespace, 6, #namespace)]
         if obj then
-            return Object.make_instance(obj)
+            return Object.wrap(obj)
         end
         return nil
     end
@@ -47,7 +47,7 @@ Object.find = function(namespace, identifier)
     -- Custom objects
     local ind = gm.object_find(namespace)
     if ind then
-        return Object.make_instance(ind)
+        return Object.wrap(ind)
     end
 
     return nil
@@ -56,7 +56,7 @@ end
 
 Object.new = function(namespace, identifier, parent)
     local obj = gm.object_add_w(namespace, identifier, parent)
-    return Object.make_instance(obj)
+    return Object.wrap(obj)
 end
 
 
@@ -65,7 +65,7 @@ Object.count = function(obj)
 end
 
 
-Object.make_instance = function(object_id)
+Object.wrap = function(object_id)
     local abstraction = {
         value = object_id
     }
@@ -81,7 +81,7 @@ methods_object = {
 
     create = function(self, x, y)
         local inst = gm.instance_create(x, y, self.value)
-        return Instance.make_instance(inst)
+        return Instance.wrap(inst)
     end,
 
 
@@ -179,7 +179,7 @@ gm.post_script_hook(gm.constants.callback_execute, function(self, other, result,
     -- Custom object callbacks
     if callbacks[args[1].value] then
         for _, fn in pairs(callbacks[args[1].value]) do
-            fn(Instance.make_instance(args[2].value))   -- Instance
+            fn(Instance.wrap(args[2].value))   -- Instance
         end
     end
 end)

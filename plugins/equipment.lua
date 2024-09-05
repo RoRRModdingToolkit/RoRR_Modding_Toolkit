@@ -32,7 +32,7 @@ Equipment.find = function(namespace, identifier)
     local equip = gm.equipment_find(namespace)
 
     if equip then
-        return Equipment.make_instance(equip)
+        return Equipment.wrap(equip)
     end
 
     return nil
@@ -59,7 +59,7 @@ Equipment.new = function(namespace, identifier)
     )
 
     -- Make equipment abstraction
-    local abstraction = Equipment.make_instance(equipment)
+    local abstraction = Equipment.wrap(equipment)
 
     -- Have to manually increase this variable for some reason (class_equipment array length)
     gm.variable_global_set("count_equipment", gm.variable_global_get("count_equipment") + 1.0)
@@ -89,7 +89,7 @@ Equipment.new = function(namespace, identifier)
 end
 
 
-Equipment.make_instance = function(equipment_id)
+Equipment.wrap = function(equipment_id)
     local abstraction = {
         value = equipment_id
     }
@@ -121,7 +121,7 @@ methods_equipment = {
             end
         end
 
-        return Instance.make_instance(drop)
+        return Instance.wrap(drop)
     end,
     
 
@@ -245,7 +245,7 @@ gm.post_script_hook(gm.constants.callback_execute, function(self, other, result,
     -- onUse
     if callbacks[args[1].value] then
         for _, fn in pairs(callbacks[args[1].value]) do
-            fn(Instance.make_instance(args[2].value))   -- Actor
+            fn(Instance.wrap(args[2].value))   -- Actor
         end
     end
 end)

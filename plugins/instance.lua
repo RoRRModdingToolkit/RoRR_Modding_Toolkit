@@ -74,12 +74,12 @@ Instance.find = function(...)
         end
 
         if inst ~= nil and inst ~= -4.0 then
-            return Instance.make_instance(inst)
+            return Instance.wrap(inst)
         end
     end
 
     -- None
-    return Instance.make_invalid()
+    return Instance.wrap_invalid()
 end
 
 
@@ -96,7 +96,7 @@ Instance.find_all = function(...)
             local count = Object.count(obj)
             for n = 0, count - 1 do
                 local inst = gm.instance_find(obj, n)
-                table.insert(insts, Instance.make_instance(inst))
+                table.insert(insts, Instance.wrap(inst))
             end
 
         else
@@ -104,7 +104,7 @@ Instance.find_all = function(...)
             for n = 0, count - 1 do
                 local inst = gm.instance_find(gm.constants.oCustomObject, n)
                 if inst.__object_index == obj then
-                    table.insert(insts, Instance.make_instance(inst))
+                    table.insert(insts, Instance.wrap(inst))
                 end
             end
 
@@ -115,7 +115,7 @@ Instance.find_all = function(...)
 end
 
 
-Instance.make_instance = function(inst)
+Instance.wrap = function(inst)
     local abstraction = {
         value = inst
     }
@@ -129,7 +129,7 @@ Instance.make_instance = function(inst)
 end
 
 
-Instance.make_invalid = function()
+Instance.wrap_invalid = function()
     local abstraction = {
         value = nil
     }
@@ -177,7 +177,7 @@ methods_instance = {
         local insts = {}
         local size = gm.ds_list_size(list)
         for i = 0, size - 1 do
-            table.insert(insts, Instance.make_instance(gm.ds_list_find_value(list, i)))
+            table.insert(insts, Instance.wrap(gm.ds_list_find_value(list, i)))
         end
         gm.ds_list_destroy(list)
 

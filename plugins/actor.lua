@@ -189,7 +189,7 @@ metatable_actor = {
 -- ========== Hooks ==========
 
 gm.pre_script_hook(gm.constants.skill_activate, function(self, other, result, args)
-    local actor = Instance.make_instance(self)
+    local actor = Instance.wrap(self)
 
     if callbacks["onSkillUse"] then
         for id, skill in pairs(callbacks["onSkillUse"]) do
@@ -213,7 +213,7 @@ end)
 gm.pre_script_hook(gm.constants.actor_heal_networked, function(self, other, result, args)
     if callbacks["onHeal"] then
         for _, fn in pairs(callbacks["onHeal"]) do
-            fn(Instance.make_instance(args[1].value), args[2].value)   -- Actor, Heal amount
+            fn(Instance.wrap(args[1].value), args[2].value)   -- Actor, Heal amount
         end
     end
 end)
@@ -222,7 +222,7 @@ end)
 gm.pre_script_hook(gm.constants.step_actor, function(self, other, result, args)
     if callbacks["onPreStep"] then
         for _, fn in ipairs(callbacks["onPreStep"]) do
-            fn(Instance.make_instance(self))   -- Actor
+            fn(Instance.wrap(self))   -- Actor
         end
     end
 
@@ -231,7 +231,7 @@ gm.pre_script_hook(gm.constants.step_actor, function(self, other, result, args)
         self.RMT_has_shield_actor = nil
         if callbacks["onShieldBreak"] then
             for _, fn in ipairs(callbacks["onShieldBreak"]) do
-                fn(Instance.make_instance(self))   -- Actor
+                fn(Instance.wrap(self))   -- Actor
             end
         end
     end
@@ -241,7 +241,7 @@ end)
 gm.post_script_hook(gm.constants.step_actor, function(self, other, result, args)
     if callbacks["onPostStep"] then
         for _, fn in ipairs(callbacks["onPostStep"]) do
-            fn(Instance.make_instance(self))   -- Actor
+            fn(Instance.wrap(self))   -- Actor
         end
     end
 end)
@@ -250,7 +250,7 @@ end)
 gm.post_script_hook(gm.constants.draw_actor, function(self, other, result, args)
     if callbacks["onDraw"] then
         for _, fn in pairs(callbacks["onDraw"]) do
-            fn(Instance.make_instance(self))   -- Actor
+            fn(Instance.wrap(self))   -- Actor
         end
     end
 end)
@@ -263,7 +263,7 @@ local function actor_onAttack(self, other, result, args)
     if not args[2].value.proc then return end
     if callbacks["onAttack"] then
         for _, fn in ipairs(callbacks["onAttack"]) do
-            fn(Instance.make_instance(self), args[2].value)    -- Actor, Damager attack_info
+            fn(Instance.wrap(self), args[2].value)    -- Actor, Damager attack_info
         end
     end
 end
@@ -273,7 +273,7 @@ local function actor_onPostAttack(self, other, result, args)
     if not args[2].value.proc or not args[2].value.parent then return end
     if callbacks["onPostAttack"] then
         for _, fn in ipairs(callbacks["onPostAttack"]) do
-            fn(Instance.make_instance(args[2].value.parent), args[2].value)    -- Actor, Damager attack_info
+            fn(Instance.wrap(args[2].value.parent), args[2].value)    -- Actor, Damager attack_info
         end
     end
 end
@@ -283,7 +283,7 @@ local function actor_onHit(self, other, result, args)
     if not self.attack_info.proc then return end
     if callbacks["onHit"] then
         for _, fn in ipairs(callbacks["onHit"]) do
-            fn(Instance.make_instance(args[2].value), Instance.make_instance(args[3].value), self.attack_info) -- Attacker, Victim, Damager attack_info
+            fn(Instance.wrap(args[2].value), Instance.wrap(args[3].value), self.attack_info) -- Attacker, Victim, Damager attack_info
         end
     end
 end
@@ -292,7 +292,7 @@ end
 local function actor_onKill(self, other, result, args)
     if callbacks["onKill"] then
         for _, fn in ipairs(callbacks["onKill"]) do
-            fn(Instance.make_instance(args[3].value), Instance.make_instance(args[2].value))   -- Attacker, Victim
+            fn(Instance.wrap(args[3].value), Instance.wrap(args[2].value))   -- Attacker, Victim
         end
     end
 end
@@ -301,7 +301,7 @@ end
 local function actor_onDamaged(self, other, result, args)
     if callbacks["onDamaged"] then
         for _, fn in ipairs(callbacks["onDamaged"]) do
-            fn(Instance.make_instance(args[2].value), args[3].value.attack_info)   -- Actor, Damager attack_info
+            fn(Instance.wrap(args[2].value), args[3].value.attack_info)   -- Actor, Damager attack_info
         end
     end
 end
@@ -310,7 +310,7 @@ end
 local function actor_onDamageBlocked(self, other, result, args)
     if callbacks["onDamageBlocked"] then
         for _, fn in ipairs(callbacks["onDamageBlocked"]) do
-            fn(Instance.make_instance(self), other.attack_info)   -- Actor, Damager attack_info
+            fn(Instance.wrap(self), other.attack_info)   -- Actor, Damager attack_info
         end
     end
 end
@@ -319,7 +319,7 @@ end
 local function actor_onInteract(self, other, result, args)
     if callbacks["onInteract"] then
         for _, fn in ipairs(callbacks["onInteract"]) do
-            fn(Instance.make_instance(args[3].value), Instance.make_instance(args[2].value))   -- Actor, Interactable
+            fn(Instance.wrap(args[3].value), Instance.wrap(args[2].value))   -- Actor, Interactable
         end
     end
 end
@@ -328,7 +328,7 @@ end
 local function actor_onEquipmentUse(self, other, result, args)
     if callbacks["onEquipmentUse"] then
         for _, fn in ipairs(callbacks["onEquipmentUse"]) do
-            fn(Instance.make_instance(args[2].value), Equipment.make_instance(args[3].value))   -- Actor, Equipment ID
+            fn(Instance.wrap(args[2].value), Equipment.wrap(args[3].value))   -- Actor, Equipment ID
         end
     end
 end
