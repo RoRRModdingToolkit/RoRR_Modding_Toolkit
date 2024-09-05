@@ -123,6 +123,15 @@ Item.new = function(namespace, identifier, no_log)
 end
 
 
+Item.get_callback_count = function()
+    local count = 0
+    for k, v in pairs(callbacks) do
+        count = count + #v
+    end
+    return count
+end
+
+
 
 -- ========== Instance Methods ==========
 

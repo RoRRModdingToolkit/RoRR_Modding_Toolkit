@@ -5,6 +5,7 @@ log.info("Successfully loaded ".._ENV["!guid"]..".")
 RoRR_Modding_Toolkit = true
 
 require("./actor")
+require("./alarm")
 require("./callback")
 require("./class")
 require("./color")
@@ -16,11 +17,11 @@ require("./net")
 require("./object")
 require("./player")
 require("./resources")
+require("./skill")
+require("./survivor")
 
--- require("./alarm")
 -- require("./buff")
 -- require("./equipment")
--- require("./survivor")
 
 
 
@@ -29,9 +30,9 @@ require("./resources")
 function __initialize()
     Class.__initialize()
     
-    -- -- Initialize these first (callback population)
+    -- Initialize these first (callback population)
     Callback.__initialize()
-    -- Survivor.__initialize()
+    Survivor.__initialize()
 
     -- Actor.__initialize()
     -- Buff.__initialize()
@@ -43,7 +44,7 @@ end
 
 -- ========== Hooks ==========
 
--- Write "Modded" under version number in top-left corner
+-- Write "Modded" under version number at top-left corner
 gm.post_code_execute(function(self, other, code, result, flags)
     if code.name:match("oStartMenu_Draw_0") then
         gm.draw_set_alpha(0.5)

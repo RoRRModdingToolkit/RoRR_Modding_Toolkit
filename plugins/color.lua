@@ -12,6 +12,8 @@ Color = {
     TEXT_BLUE       = 13802033,
     TEXT_GREEN      = 8828542,
     TEXT_RED        = 6710991,
-    TEXT_LTGRAY     = 12632256,
-    TEXT_DKGRAY     = 8421504
+    TEXT_LT_GRAY    = 12632256,
+    TEXT_LT_GREY    = 12632256,
+    TEXT_DK_GRAY    = 8421504
+    TEXT_DK_GREY    = 8421504
 }
