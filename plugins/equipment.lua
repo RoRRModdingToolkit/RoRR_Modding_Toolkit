@@ -84,7 +84,7 @@ Equipment.new = function(namespace, identifier)
     end
     gm.ds_list_insert(item_log_order, pos + 1, abstraction.item_log_id)
 
-    
+
     return abstraction
 end
 
@@ -178,7 +178,7 @@ methods_equipment = {
         -- Look for drop (because gm.item_drop_object does not actually return the instance for some reason)
         -- The drop spawns 40 px above y parameter
         local drop = nil
-        local drops = Instance.find_all(gm.constants.pPickupItem, gm.constants.oCustomObject_pPickupItem)
+        local drops = Instance.find_all(gm.constants.pPickupEquipment, gm.constants.oCustomObject_pPickupEquipment)
         for _, d in ipairs(drops) do
             if math.abs(d.x - x) <= 1.0 and math.abs(d.y - (y - 40.0)) <= 1.0 then
                 drop = d
