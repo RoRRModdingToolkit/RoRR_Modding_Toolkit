@@ -4,10 +4,51 @@ Instance = {}
 
 
 
+-- ========== Tables ==========
+
+Instance.chests = {
+    gm.constants.oChest1, gm.constants.oChest2, gm.constants.oChest5,
+    gm.constants.oChestHealing1, gm.constants.oChestDamage1, gm.constants.oChestUtility1,
+    gm.constants.oChestHealing2, gm.constants.oChestDamage2, gm.constants.oChestUtility2,
+    gm.constants.oGunchest
+}
+
+
+Instance.shops = {
+    gm.constants.oShop1, gm.constants.oShop2
+}
+
+
+Instance.teleporters = {
+    gm.constants.oTeleporter, gm.constants.oTeleporterEpic
+}
+
+
+Instance.projectiles = {
+    gm.constants.oJellyMissile,
+    gm.constants.oWurmMissile,
+    gm.constants.oShamBMissile,
+    gm.constants.oTurtleMissile,
+    gm.constants.oBrambleBullet,
+    gm.constants.oLizardRSpear,
+    gm.constants.oEfMissileEnemy,
+    gm.constants.oSpiderBulletNoSync, gm.constants.oSpiderBullet,
+    gm.constants.oGuardBulletNoSync, gm.constants.oGuardBullet,
+    gm.constants.oBugBulletNoSync, gm.constants.oBugBullet,
+    gm.constants.oScavengerBulletNoSync, gm.constants.oScavengerBullet
+}
+
+
+
 -- ========== Static Methods ==========
 
 Instance.exists = function(inst)
     return gm.instance_exists(inst) == 1.0
+end
+
+
+Instance.destroy = function(inst)
+    gm.instance_destroy(inst)
 end
 
 
@@ -106,6 +147,11 @@ methods_instance = {
     end,
 
 
+    destroy = function(self)
+        gm.instance_destroy(self.value)
+    end,
+
+
     -- Return true if the other instance is the same one
     same = function(self, other)
         if not self:exists() then return false end
@@ -116,7 +162,7 @@ methods_instance = {
 
     is_colliding = function(self, obj, x, y)
         if type(obj) == "table" then obj = obj.value end
-        return gm.place_meeting(x or self.x, y or self.y, obj)
+        return self.value:place_meeting(x or self.x, y or self.y, obj)
     end,
 
 
@@ -124,12 +170,12 @@ methods_instance = {
         if type(obj) == "table" then obj = obj.value end
 
         local list = gm.ds_list_create()
-        gm.collision_rectangle_list(self.bbox_left, self.bbox_top, self.bbox_right, self.bbox_bottom, obj, false, true, list, false)
+        self.value:collision_rectangle_list(self.bbox_left, self.bbox_top, self.bbox_right, self.bbox_bottom, obj, false, true, list, false)
 
         local insts = {}
         local size = gm.ds_list_size(list)
         for i = 0, size - 1 do
-            table.insert(insts, gm.ds_list_find_value(list, i))
+            table.insert(insts, Instance.make_instance(gm.ds_list_find_value(list, i)))
         end
         gm.ds_list_destroy(list)
 
