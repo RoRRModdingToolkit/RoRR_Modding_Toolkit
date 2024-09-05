@@ -120,16 +120,17 @@ methods_object = {
 
     set_sprite = function(self, sprite)
         gm.object_set_sprite_w(self.value, sprite)
-    end,
-
-
-    set_collision = function(self, left, top, right, bottom)
-        -- Collision masks are linked to sprites, not objects
-        local spr = self:get_sprite()
-        local orig_x = gm.sprite_get_xoffset(spr)
-        local orig_y = gm.sprite_get_yoffset(spr)
-        gm.sprite_collision_mask(spr, false, 2, left + orig_x, top + orig_y, right + orig_x, bottom + orig_y, 0, 0)
     end
+
+
+    -- Since collisions are linked to sprites, moved to Resources class
+    -- set_collision = function(self, left, top, right, bottom)
+    --     -- Collision masks are linked to sprites, not objects
+    --     local spr = self:get_sprite()
+    --     local orig_x = gm.sprite_get_xoffset(spr)
+    --     local orig_y = gm.sprite_get_yoffset(spr)
+    --     gm.sprite_collision_mask(spr, false, 2, left + orig_x, top + orig_y, right + orig_x, bottom + orig_y, 0, 0)
+    -- end
 
 }
 

@@ -116,3 +116,4 @@
 * Added Skill class
     * Skill.find
 * Added Difficulty class
+* Resources.sprite_load can now set the rectangular collision mask of the sprite relative to its origin.
