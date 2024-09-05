@@ -143,6 +143,9 @@ end
 
 methods_instance = {
 
+    is_instance_wrapper = true,
+
+
     -- Return true if instance exists
     exists = function(self)
         return gm.instance_exists(self.value) == 1.0
@@ -200,7 +203,13 @@ metatable_instance_gs = {
     -- Getter
     __index = function(table, key)
         local var = rawget(table, "value")
-        if var then return gm.variable_instance_get(var, key) end
+        if var then
+            local v = gm.variable_instance_get(var, key)
+            if gm.instance_exists(v) == 1.0 and gm.object_exists(v) == 0.0 then
+                return Instance.wrap(v)
+            end
+            return v
+        end
         return nil
     end,
 
@@ -208,7 +217,12 @@ metatable_instance_gs = {
     -- Setter
     __newindex = function(table, key, value)
         local var = rawget(table, "value")
-        if var then gm.variable_instance_set(var, key, value) end
+        if var then
+            if type(value) == "table" and value.is_instance_wrapper then
+                value = value.value
+            end
+            gm.variable_instance_set(var, key, value)
+        end
     end
 }
 
