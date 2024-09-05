@@ -29,7 +29,7 @@ methods_actor = {
             source_inst = source
         end
         if not crit_sfx then crit_sfx = false end
-        gm.damage_inflict(self.value, damage, 0.0, source_inst, x or self.x, y or self.y - 28, damage, 1.0, color or 16777215.0, crit_sfx)
+        gm.damage_inflict(self.value, damage, 0.0, source_inst, x or self.x, y or self.y - 28, damage, 1.0, color or Color.WHITE, crit_sfx)
     end,
 
 

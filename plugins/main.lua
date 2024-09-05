@@ -7,6 +7,7 @@ RoRR_Modding_Toolkit = true
 require("./actor")
 require("./callback")
 require("./class")
+require("./color")
 require("./helper")
 require("./initialize")
 require("./instance")
