@@ -103,6 +103,28 @@ end
 
 methods_equipment = {
 
+    create = function(self, x, y, target)
+        if not self.object_id then return nil end
+
+        gm.item_drop_object(self.object_id, x, y, target, false)
+
+        -- Look for drop (because gm.item_drop_object does not actually return the instance for some reason)
+        -- The drop spawns 40 px above y parameter
+        local drop = nil
+        local drops = Instance.find_all(gm.constants.pPickupEquipment, gm.constants.oCustomObject_pPickupEquipment)
+        for _, d in ipairs(drops) do
+            if math.abs(d.x - x) <= 1.0 and math.abs(d.y - (y - 40.0)) <= 1.0 then
+                drop = d
+                d.y = d.y + 40.0
+                d.ystart = d.y
+                break
+            end
+        end
+
+        return Instance.make_instance(drop)
+    end,
+    
+
     add_callback = function(self, callback, func)
 
         if callback == "onUse" then
@@ -167,28 +189,6 @@ methods_equipment = {
 
     toggle_loot = function(self, enabled)
         
-    end,
-
-
-    create = function(self, x, y, target)
-        if not self.object_id then return nil end
-
-        gm.item_drop_object(self.object_id, x, y, target, false)
-
-        -- Look for drop (because gm.item_drop_object does not actually return the instance for some reason)
-        -- The drop spawns 40 px above y parameter
-        local drop = nil
-        local drops = Instance.find_all(gm.constants.pPickupEquipment, gm.constants.oCustomObject_pPickupEquipment)
-        for _, d in ipairs(drops) do
-            if math.abs(d.x - x) <= 1.0 and math.abs(d.y - (y - 40.0)) <= 1.0 then
-                drop = d
-                d.y = d.y + 40.0
-                d.ystart = d.y
-                break
-            end
-        end
-
-        return Instance.make_instance(drop)
     end
 
 }
