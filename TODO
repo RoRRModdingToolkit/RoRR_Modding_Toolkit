@@ -4,3 +4,4 @@ v Add Equipment class
 - Add Item and Equipment toggle_loot
 - Add new custom Object support (based on info from sarn)
 - Add Difficulty class
+- Apply Instance wrapper everywhere (on gm.array_get, etc.)

@@ -162,7 +162,7 @@ methods_instance = {
 
     is_colliding = function(self, obj, x, y)
         if type(obj) == "table" then obj = obj.value end
-        return self.value:place_meeting(x or self.x, y or self.y, obj)
+        return self.value:place_meeting(x or self.x, y or self.y, obj) == 1.0
     end,
 
 
