@@ -43,11 +43,13 @@ Instance.projectiles = {
 -- ========== Static Methods ==========
 
 Instance.exists = function(inst)
+    if type(inst) == "table" then inst = inst.value end
     return gm.instance_exists(inst) == 1.0
 end
 
 
 Instance.destroy = function(inst)
+    if type(inst) == "table" then inst = inst.value end
     gm.instance_destroy(inst)
 end
 
