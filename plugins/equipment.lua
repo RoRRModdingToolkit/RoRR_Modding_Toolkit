@@ -47,7 +47,7 @@ Equipment.new = function(namespace, identifier)
         namespace,
         identifier,
         gm.array_length(Class.EQUIPMENT),   -- class_equipment index
-        3.0,    -- tier (3 is equipment)
+        Item.TIER.equipment,    -- tier
         gm.object_add_w(namespace, identifier, gm.constants.pPickupEquipment),  -- pickup object
         0.0,    -- loot tags
         nil,    -- not sure; might be an anon function call
