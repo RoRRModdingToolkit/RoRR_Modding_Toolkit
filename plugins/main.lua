@@ -34,7 +34,7 @@ function __initialize()
     Callback.__initialize()
     Survivor.__initialize()
 
-    -- Actor.__initialize()
+    Actor.__initialize()
     Buff.__initialize()
     -- Instance.__initialize()
     Item.__initialize()
