@@ -114,6 +114,29 @@ methods_instance = {
     end,
 
 
+    is_colliding = function(self, obj, x, y)
+        if type(obj) == "table" then obj = obj.value end
+        return gm.place_meeting(x or self.x, y or self.y, obj)
+    end,
+
+
+    get_collisions = function(self, obj)
+        if type(obj) == "table" then obj = obj.value end
+
+        local list = gm.ds_list_create()
+        gm.collision_rectangle_list(self.bbox_left, self.bbox_top, self.bbox_right, self.bbox_bottom, obj, false, true, list, false)
+
+        local insts = {}
+        local size = gm.ds_list_size(list)
+        for i = 0, size - 1 do
+            table.insert(insts, gm.ds_list_find_value(list, i))
+        end
+        gm.ds_list_destroy(list)
+
+        return insts, #insts
+    end,
+
+
     draw_collision = function(self)
         local c = Color.WHITE
         gm.draw_rectangle_color(self.bbox_left, self.bbox_top, self.bbox_right, self.bbox_bottom, c, c, c, c, true)
