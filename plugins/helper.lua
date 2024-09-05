@@ -12,7 +12,7 @@ Helper.log_toolkit_stats = function()
 
     log.info("Callback callbacks: "..Callback.get_callback_count())
     -- log.info("Actor callbacks: "..Actor.get_callback_count())
-    -- log.info("Buff callbacks: "..Buff.get_callback_count())
+    log.info("Buff callbacks: "..Buff.get_callback_count())
     log.info("Item callbacks: "..Item.get_callback_count())
 
     log.info("----------")

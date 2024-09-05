@@ -6,6 +6,7 @@ RoRR_Modding_Toolkit = true
 
 require("./actor")
 require("./alarm")
+require("./buff")
 require("./callback")
 require("./class")
 require("./color")
@@ -20,7 +21,6 @@ require("./resources")
 require("./skill")
 require("./survivor")
 
--- require("./buff")
 -- require("./equipment")
 
 
@@ -35,7 +35,7 @@ function __initialize()
     Survivor.__initialize()
 
     -- Actor.__initialize()
-    -- Buff.__initialize()
+    Buff.__initialize()
     -- Instance.__initialize()
     Item.__initialize()
 end

@@ -114,3 +114,4 @@
 * Rewrote syntax to be similar to RoRML.
 * Now displays "Modded" under the version number at top-left corner.
 * Added Skill module
+    * Skill.find

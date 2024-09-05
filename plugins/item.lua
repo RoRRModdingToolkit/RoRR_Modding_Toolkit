@@ -523,7 +523,7 @@ local function item_onDraw(self, other, result, args)
 
     if callbacks["onDraw"] then
         for n, a in ipairs(has_custom_item) do
-            if Instance.exists(a) then
+            if gm.instance_exists(a) == 1.0 then
                 for _, c in ipairs(callbacks["onDraw"]) do
                     local actor = Instance.make_instance(a)
                     local count = actor:item_stack(c[1])

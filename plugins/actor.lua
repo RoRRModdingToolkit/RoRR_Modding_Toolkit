@@ -90,17 +90,46 @@ methods_actor = {
 
 
     buff_apply = function(self, buff, duration, count)
+        if type(buff) == "table" then buff = buff.value end
+        if gm.array_length(self.buff_stack) <= buff then gm.array_resize(self.buff_stack, buff + 1) end
 
+        gm.apply_buff(self.value, buff, duration, count or 1)
+
+        -- Clamp to max stack or under
+        -- Funny stuff happens if this is exceeded
+        local buff_array = gm.array_get(Class.BUFF, buff)
+        local max_stack = gm.array_get(buff_array, 9)
+        gm.array_set(self.buff_stack, buff, math.min(self:buff_stack(buff), max_stack))
     end,
 
 
     buff_remove = function(self, buff, count)
-        
+        if type(buff) == "table" then buff = buff.value end
+        if gm.array_length(self.buff_stack) <= buff then gm.array_resize(self.buff_stack, buff + 1) end
+
+        local stack_count = self:buff_stack(buff)
+        if (not count) or count >= stack_count then gm.remove_buff(self.value, buff)
+        else gm.array_set(self.buff_stack, buff, stack_count - count)
+        end
     end,
 
 
     buff_stack = function(self, buff)
-        
+        if type(buff) == "table" then buff = buff.value end
+        if gm.array_length(self.buff_stack) <= buff then gm.array_resize(self.buff_stack, buff + 1) end
+
+        local count = gm.array_get(self.buff_stack, buff)
+        if count == nil then return 0 end
+        return count
+    end,
+
+
+    get_skill = function(self, slot)
+        local abstraction = {
+            value = gm.array_get(self.skills, slot).active_skill.skill_id
+        }
+        setmetatable(abstraction, metatable_skill)
+        return abstraction
     end
 
 }
