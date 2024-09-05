@@ -88,7 +88,7 @@ methods_equipment = {
 
 
     set_cooldown = function(self, cooldown)
-        
+        self.cooldown = cooldown * 60.0
     end,
 
 
