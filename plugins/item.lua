@@ -493,8 +493,7 @@ local function item_onEquipmentUse(self, other, result, args)
             local count = actor:item_stack_count(item)
             if count > 0 then
                 local func = c[2]
-                func(actor, args[3].value, count)   -- Actor, Equipment ID, Stack count
-                -- TODO: Pass in equipment abstraction
+                func(actor, Equipment.make_instance(args[3].value), count)   -- Actor, Equipment ID, Stack count
             end
         end
     end

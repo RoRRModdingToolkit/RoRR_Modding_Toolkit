@@ -328,8 +328,7 @@ end
 local function actor_onEquipmentUse(self, other, result, args)
     if callbacks["onEquipmentUse"] then
         for _, fn in ipairs(callbacks["onEquipmentUse"]) do
-            fn(Instance.make_instance(args[2].value), args[3].value)   -- Actor, Equipment ID
-            -- TODO: Pass in equipment abstraction
+            fn(Instance.make_instance(args[2].value), Equipment.make_instance(args[3].value))   -- Actor, Equipment ID
         end
     end
 end
