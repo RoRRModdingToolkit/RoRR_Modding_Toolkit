@@ -56,7 +56,6 @@ end
 
 Object.new = function(namespace, identifier, parent)
     local obj = gm.object_add_w(namespace, identifier, parent)
-
     return Object.make_instance(obj)
 end
 
@@ -99,6 +98,37 @@ methods_object = {
             table.insert(callbacks[callback_id], func)
 
         end
+    end,
+
+
+    get_depth = function(self)
+        return gm.object_get_depth(self.value)
+    end,
+
+
+    set_depth = function(self, depth)
+        -- Does not apply retroactively to existing instances
+        local depths = gm.variable_global_get("object_depths")
+        gm.array_set(depths, self.value, depth)
+    end,
+
+
+    get_sprite = function(self)
+        return gm.object_get_sprite_w(self.value)
+    end,
+
+
+    set_sprite = function(self, sprite)
+        gm.object_set_sprite_w(self.value, sprite)
+    end,
+
+
+    set_collision = function(self, left, top, right, bottom)
+        -- Collision masks are linked to sprites, not objects
+        local spr = self:get_sprite()
+        local orig_x = gm.sprite_get_xoffset(spr)
+        local orig_y = gm.sprite_get_yoffset(spr)
+        gm.sprite_collision_mask(spr, false, 2, left + orig_x, top + orig_y, right + orig_x, bottom + orig_y, 0, 0)
     end
 
 }

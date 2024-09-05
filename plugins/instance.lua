@@ -111,6 +111,12 @@ methods_instance = {
         if not self:exists() then return false end
         if type(other) == "table" then other = other.value end
         return self.value == other
+    end,
+
+
+    draw_collision = function(self)
+        local c = Color.WHITE
+        gm.draw_rectangle_color(self.bbox_left, self.bbox_top, self.bbox_right, self.bbox_bottom, c, c, c, c, true)
     end
 
 }
