@@ -6,16 +6,17 @@ RoRR_Modding_Toolkit = true
 
 require("./actor")
 require("./alarm")
+require("./array")
 require("./buff")
 require("./callback")
 require("./class")
 require("./color")
-require("./difficulty")
 require("./equipment")
 require("./helper")
 require("./initialize")
 require("./instance")
 require("./item")
+require("./list")
 require("./net")
 require("./object")
 require("./player")
@@ -23,6 +24,7 @@ require("./resources")
 require("./skill")
 require("./state")
 require("./survivor")
+require("./wrap")
 
 
 

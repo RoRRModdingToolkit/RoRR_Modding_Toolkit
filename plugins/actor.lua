@@ -42,6 +42,11 @@ end
 
 methods_actor = {
 
+    is_grounded = function(self)
+        return self.value:place_meeting(self.x, self.y + 1, gm.constants.oB) == 1.0 and self.activity_type ~= 2.0
+    end,
+
+
     fire_bullet = function(self, x, y, direction, range, damage, pierce_multiplier, hit_sprite)
         local damager = self.value:fire_bullet(0, x, y, (pierce_multiplier and 1) or 0, damage, range, hit_sprite or -1, direction, 1.0, 1.0, -1.0)
         if pierce_multiplier then damager.damage_degrade = (1.0 - pierce_multiplier) end
@@ -74,7 +79,7 @@ methods_actor = {
         if self:same(Player.get_client()) then
             local hud = Instance.find(gm.constants.oHUD)
             if hud:exists() then
-                gm.array_get(hud.player_hud_display_info, 0).heal_flash = 0.5
+                hud.player_hud_display_info:get(0).heal_flash = 0.5
             end
         end
     end,
@@ -91,27 +96,44 @@ methods_actor = {
     end,
 
 
+    is_immune = function(self)
+        if actor.invincible == false then actor.invincible = 0 end
+        return actor.invincible > 0
+    end,
+
+
+    set_immune = function(self, amount)
+        if actor.invincible == false then actor.invincible = 0 end
+        self.invincible = math.max(self.invincible, amount)
+    end,
+
+
+    remove_immune = function(self)
+        self.invincible = 0
+    end,
+
+
     kill = function(self)
         if self.hp then self.hp = -1000000.0 end
     end,
 
 
     item_give = function(self, item, count, temp)
-        if type(item) == "table" then item = item.value end
+        if type(item) == "table" and item.RMT_wrapper then item = item.value end
         if not temp then temp = false end
         gm.item_give(self.value, item, count or 1, temp)
     end,
 
 
     item_remove = function(self, item, count, temp)
-        if type(item) == "table" then item = item.value end
+        if type(item) == "table" and item.RMT_wrapper then item = item.value end
         if not temp then temp = false end
         gm.item_take(self.value, item, count or 1, temp)
     end,
 
 
     item_stack_count = function(self, item, item_type)
-        if type(item) == "table" then item = item.value end
+        if type(item) == "table" and item.RMT_wrapper then item = item.value end
         if item_type == Item.TYPE.real then return gm.item_count(self.value, item, false) end
         if item_type == Item.TYPE.temporary then return gm.item_count(self.value, item, true) end
         return gm.item_count(self.value, item, false) + gm.item_count(self.value, item, true)
@@ -119,46 +141,41 @@ methods_actor = {
 
 
     buff_apply = function(self, buff, duration, count)
-        if type(buff) == "table" then buff = buff.value end
-        if gm.array_length(self.buff_stack) <= buff then gm.array_resize(self.buff_stack, buff + 1) end
+        if type(buff) == "table" and buff.RMT_wrapper then buff = buff.value end
+        if self.buff_stack:size() <= buff then self.buff_stack:resize(buff + 1) end
 
         gm.apply_buff(self.value, buff, duration, count or 1)
 
         -- Clamp to max stack or under
         -- Funny stuff happens if this is exceeded
-        local buff_array = gm.array_get(Class.BUFF, buff)
-        local max_stack = gm.array_get(buff_array, 9)
-        gm.array_set(self.buff_stack, buff, math.min(self:buff_stack_count(buff), max_stack))
+        local buff_array = Buff.wrap(buff)
+        self.buff_stack:set(buff, math.min(self:buff_stack_count(buff), buff_array.max_stack))
     end,
 
 
     buff_remove = function(self, buff, count)
-        if type(buff) == "table" then buff = buff.value end
-        if gm.array_length(self.buff_stack) <= buff then gm.array_resize(self.buff_stack, buff + 1) end
+        if type(buff) == "table" and buff.RMT_wrapper then buff = buff.value end
+        if self.buff_stack:size() <= buff then self.buff_stack:resize(buff + 1) end
 
         local stack_count = self:buff_stack_count(buff)
         if (not count) or count >= stack_count then gm.remove_buff(self.value, buff)
-        else gm.array_set(self.buff_stack, buff, stack_count - count)
+        else self.buff_stack:set(buff, stack_count - count)
         end
     end,
 
 
     buff_stack_count = function(self, buff)
-        if type(buff) == "table" then buff = buff.value end
-        if gm.array_length(self.buff_stack) <= buff then gm.array_resize(self.buff_stack, buff + 1) end
+        if type(buff) == "table" and buff.RMT_wrapper then buff = buff.value end
+        if self.buff_stack:size() <= buff then self.buff_stack:resize(buff + 1) end
 
-        local count = gm.array_get(self.buff_stack, buff)
+        local count = self.buff_stack:get(buff)
         if count == nil then return 0 end
         return count
     end,
 
 
     get_skill = function(self, slot)
-        local abstraction = {
-            value = gm.array_get(self.skills, slot).active_skill.skill_id
-        }
-        setmetatable(abstraction, metatable_skill)
-        return abstraction
+        return Skill.wrap(self.skills:get(slot).active_skill.skill_id)
     end
 
 }
@@ -189,7 +206,7 @@ metatable_actor = {
 -- ========== Hooks ==========
 
 gm.pre_script_hook(gm.constants.skill_activate, function(self, other, result, args)
-    local actor = Instance.make_instance(self)
+    local actor = Instance.wrap(self)
 
     if callbacks["onSkillUse"] then
         for id, skill in pairs(callbacks["onSkillUse"]) do
@@ -213,7 +230,7 @@ end)
 gm.pre_script_hook(gm.constants.actor_heal_networked, function(self, other, result, args)
     if callbacks["onHeal"] then
         for _, fn in pairs(callbacks["onHeal"]) do
-            fn(Instance.make_instance(args[1].value), args[2].value)   -- Actor, Heal amount
+            fn(Instance.wrap(args[1].value), args[2].value)   -- Actor, Heal amount
         end
     end
 end)
@@ -222,7 +239,7 @@ end)
 gm.pre_script_hook(gm.constants.step_actor, function(self, other, result, args)
     if callbacks["onPreStep"] then
         for _, fn in ipairs(callbacks["onPreStep"]) do
-            fn(Instance.make_instance(self))   -- Actor
+            fn(Instance.wrap(self))   -- Actor
         end
     end
 
@@ -231,7 +248,7 @@ gm.pre_script_hook(gm.constants.step_actor, function(self, other, result, args)
         self.RMT_has_shield_actor = nil
         if callbacks["onShieldBreak"] then
             for _, fn in ipairs(callbacks["onShieldBreak"]) do
-                fn(Instance.make_instance(self))   -- Actor
+                fn(Instance.wrap(self))   -- Actor
             end
         end
     end
@@ -241,7 +258,7 @@ end)
 gm.post_script_hook(gm.constants.step_actor, function(self, other, result, args)
     if callbacks["onPostStep"] then
         for _, fn in ipairs(callbacks["onPostStep"]) do
-            fn(Instance.make_instance(self))   -- Actor
+            fn(Instance.wrap(self))   -- Actor
         end
     end
 end)
@@ -250,7 +267,7 @@ end)
 gm.post_script_hook(gm.constants.draw_actor, function(self, other, result, args)
     if callbacks["onDraw"] then
         for _, fn in pairs(callbacks["onDraw"]) do
-            fn(Instance.make_instance(self))   -- Actor
+            fn(Instance.wrap(self))   -- Actor
         end
     end
 end)
@@ -263,7 +280,7 @@ local function actor_onAttack(self, other, result, args)
     if not args[2].value.proc then return end
     if callbacks["onAttack"] then
         for _, fn in ipairs(callbacks["onAttack"]) do
-            fn(Instance.make_instance(self), args[2].value)    -- Actor, Damager attack_info
+            fn(Instance.wrap(self), args[2].value)    -- Actor, Damager attack_info
         end
     end
 end
@@ -273,7 +290,7 @@ local function actor_onPostAttack(self, other, result, args)
     if not args[2].value.proc or not args[2].value.parent then return end
     if callbacks["onPostAttack"] then
         for _, fn in ipairs(callbacks["onPostAttack"]) do
-            fn(Instance.make_instance(args[2].value.parent), args[2].value)    -- Actor, Damager attack_info
+            fn(Instance.wrap(args[2].value.parent), args[2].value)    -- Actor, Damager attack_info
         end
     end
 end
@@ -283,7 +300,7 @@ local function actor_onHit(self, other, result, args)
     if not self.attack_info.proc then return end
     if callbacks["onHit"] then
         for _, fn in ipairs(callbacks["onHit"]) do
-            fn(Instance.make_instance(args[2].value), Instance.make_instance(args[3].value), self.attack_info) -- Attacker, Victim, Damager attack_info
+            fn(Instance.wrap(args[2].value), Instance.wrap(args[3].value), self.attack_info) -- Attacker, Victim, Damager attack_info
         end
     end
 end
@@ -292,7 +309,7 @@ end
 local function actor_onKill(self, other, result, args)
     if callbacks["onKill"] then
         for _, fn in ipairs(callbacks["onKill"]) do
-            fn(Instance.make_instance(args[3].value), Instance.make_instance(args[2].value))   -- Attacker, Victim
+            fn(Instance.wrap(args[3].value), Instance.wrap(args[2].value))   -- Attacker, Victim
         end
     end
 end
@@ -301,7 +318,7 @@ end
 local function actor_onDamaged(self, other, result, args)
     if callbacks["onDamaged"] then
         for _, fn in ipairs(callbacks["onDamaged"]) do
-            fn(Instance.make_instance(args[2].value), args[3].value.attack_info)   -- Actor, Damager attack_info
+            fn(Instance.wrap(args[2].value), args[3].value.attack_info)   -- Actor, Damager attack_info
         end
     end
 end
@@ -310,7 +327,7 @@ end
 local function actor_onDamageBlocked(self, other, result, args)
     if callbacks["onDamageBlocked"] then
         for _, fn in ipairs(callbacks["onDamageBlocked"]) do
-            fn(Instance.make_instance(self), other.attack_info)   -- Actor, Damager attack_info
+            fn(Instance.wrap(self), other.attack_info)   -- Actor, Damager attack_info
         end
     end
 end
@@ -319,7 +336,7 @@ end
 local function actor_onInteract(self, other, result, args)
     if callbacks["onInteract"] then
         for _, fn in ipairs(callbacks["onInteract"]) do
-            fn(Instance.make_instance(args[3].value), Instance.make_instance(args[2].value))   -- Actor, Interactable
+            fn(Instance.wrap(args[3].value), Instance.wrap(args[2].value))   -- Actor, Interactable
         end
     end
 end
@@ -328,8 +345,7 @@ end
 local function actor_onEquipmentUse(self, other, result, args)
     if callbacks["onEquipmentUse"] then
         for _, fn in ipairs(callbacks["onEquipmentUse"]) do
-            fn(Instance.make_instance(args[2].value), args[3].value)   -- Actor, Equipment ID
-            -- TODO: Pass in equipment abstraction
+            fn(Instance.wrap(args[2].value), Equipment.wrap(args[3].value))   -- Actor, Equipment ID
         end
     end
 end

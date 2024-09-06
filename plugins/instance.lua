@@ -4,16 +4,59 @@ Instance = {}
 
 
 
+-- ========== Tables ==========
+
+Instance.chests = {
+    gm.constants.oChest1, gm.constants.oChest2, gm.constants.oChest5,
+    gm.constants.oChestHealing1, gm.constants.oChestDamage1, gm.constants.oChestUtility1,
+    gm.constants.oChestHealing2, gm.constants.oChestDamage2, gm.constants.oChestUtility2,
+    gm.constants.oGunchest
+}
+
+
+Instance.shops = {
+    gm.constants.oShop1, gm.constants.oShop2
+}
+
+
+Instance.teleporters = {
+    gm.constants.oTeleporter, gm.constants.oTeleporterEpic
+}
+
+
+Instance.projectiles = {
+    gm.constants.oJellyMissile,
+    gm.constants.oWurmMissile,
+    gm.constants.oShamBMissile,
+    gm.constants.oTurtleMissile,
+    gm.constants.oBrambleBullet,
+    gm.constants.oLizardRSpear,
+    gm.constants.oEfMissileEnemy,
+    gm.constants.oSpiderBulletNoSync, gm.constants.oSpiderBullet,
+    gm.constants.oGuardBulletNoSync, gm.constants.oGuardBullet,
+    gm.constants.oBugBulletNoSync, gm.constants.oBugBullet,
+    gm.constants.oScavengerBulletNoSync, gm.constants.oScavengerBullet
+}
+
+
+
 -- ========== Static Methods ==========
 
 Instance.exists = function(inst)
+    if type(inst) == "table" and inst.RMT_wrapper then inst = inst.value end
     return gm.instance_exists(inst) == 1.0
+end
+
+
+Instance.destroy = function(inst)
+    if type(inst) == "table" and inst.RMT_wrapper then inst = inst.value end
+    gm.instance_destroy(inst)
 end
 
 
 Instance.find = function(...)
     local t = {...}
-    if type(t[1]) == "table" and (not t[1].value) then t = t[1] end
+    if type(t[1]) == "table" and (not t[1].RMT_wrapper) then t = t[1] end
 
     for _, obj in ipairs(t) do
         if type(obj) == "table" then obj = obj.value end
@@ -31,18 +74,18 @@ Instance.find = function(...)
         end
 
         if inst ~= nil and inst ~= -4.0 then
-            return Instance.make_instance(inst)
+            return Instance.wrap(inst)
         end
     end
 
     -- None
-    return Instance.make_invalid()
+    return Instance.wrap_invalid()
 end
 
 
 Instance.find_all = function(...)
     local t = {...}
-    if type(t[1]) == "table" and (not t[1].value) then t = t[1] end
+    if type(t[1]) == "table" and (not t[1].RMT_wrapper) then t = t[1] end
 
     local insts = {}
 
@@ -53,7 +96,7 @@ Instance.find_all = function(...)
             local count = Object.count(obj)
             for n = 0, count - 1 do
                 local inst = gm.instance_find(obj, n)
-                table.insert(insts, Instance.make_instance(inst))
+                table.insert(insts, Instance.wrap(inst))
             end
 
         else
@@ -61,7 +104,7 @@ Instance.find_all = function(...)
             for n = 0, count - 1 do
                 local inst = gm.instance_find(gm.constants.oCustomObject, n)
                 if inst.__object_index == obj then
-                    table.insert(insts, Instance.make_instance(inst))
+                    table.insert(insts, Instance.wrap(inst))
                 end
             end
 
@@ -72,23 +115,26 @@ Instance.find_all = function(...)
 end
 
 
-Instance.make_instance = function(inst)
+Instance.wrap = function(inst)
     local abstraction = {
+        RMT_wrapper = "Instance",
         value = inst
     }
     if inst.object_index == gm.constants.oP then
         setmetatable(abstraction, metatable_player)
+        abstraction.RMT_wrapper = "Player"
     elseif gm.object_is_ancestor(inst.object_index, gm.constants.pActor) == 1.0 then
         setmetatable(abstraction, metatable_actor)
+        abstraction.RMT_wrapper = "Actor"
     else setmetatable(abstraction, metatable_instance)
     end
     return abstraction
 end
 
 
-Instance.make_invalid = function()
+Instance.wrap_invalid = function()
     local abstraction = {
-        value = nil
+        value = -4
     }
     setmetatable(abstraction, metatable_instance)
     return abstraction
@@ -100,17 +146,63 @@ end
 
 methods_instance = {
 
+    is_instance_wrapper = true,
+
+
     -- Return true if instance exists
     exists = function(self)
         return gm.instance_exists(self.value) == 1.0
     end,
 
 
+    destroy = function(self)
+        if not self:exists() then return end
+
+        gm.instance_destroy(self.value)
+        self.value = -4
+    end,
+
+
     -- Return true if the other instance is the same one
     same = function(self, other)
         if not self:exists() then return false end
-        if type(other) == "table" then other = other.value end
+
+        if type(other) == "table" and other.RMT_wrapper then other = other.value end
         return self.value == other
+    end,
+
+
+    is_colliding = function(self, obj, x, y)
+        if not self:exists() then return false end
+
+        if type(obj) == "table" and obj.RMT_wrapper then obj = obj.value end
+        return self.value:place_meeting(x or self.x, y or self.y, obj) == 1.0
+    end,
+
+
+    get_collisions = function(self, obj)
+        if not self:exists() then return {}, 0 end
+
+        if type(obj) == "table" and obj.RMT_wrapper then obj = obj.value end
+
+        local list = List.new()
+        self.value:collision_rectangle_list(self.bbox_left, self.bbox_top, self.bbox_right, self.bbox_bottom, obj, false, true, list.value, false)
+
+        local insts = {}
+        for _, inst in ipairs(list) do
+            table.insert(insts, Instance.wrap(inst))
+        end
+        list:destroy()
+
+        return insts, #insts
+    end,
+
+
+    draw_collision = function(self)
+        if not self:exists() then return end
+
+        local c = Color.WHITE
+        gm.draw_rectangle_color(self.bbox_left, self.bbox_top, self.bbox_right, self.bbox_bottom, c, c, c, c, true)
     end
 
 }
@@ -123,7 +215,10 @@ metatable_instance_gs = {
     -- Getter
     __index = function(table, key)
         local var = rawget(table, "value")
-        if var then return gm.variable_instance_get(var, key) end
+        if var then
+            local v = gm.variable_instance_get(var, key)
+            return Wrap.wrap(v)
+        end
         return nil
     end,
 
@@ -131,7 +226,9 @@ metatable_instance_gs = {
     -- Setter
     __newindex = function(table, key, value)
         local var = rawget(table, "value")
-        if var then gm.variable_instance_set(var, key, value) end
+        if var then
+            gm.variable_instance_set(var, key, Wrap.unwrap(value))
+        end
     end
 }
 

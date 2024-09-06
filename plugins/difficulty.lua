@@ -1,3 +1,0 @@
--- Difficulty
-
-Difficulty = {}

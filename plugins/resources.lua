@@ -5,7 +5,7 @@ Resources = {}
 
 -- == Section Sprites == --
 
-Resources.sprite_load = function(path, img_num, remove_back, smoooth, x_orig, y_orig, speed)
+Resources.sprite_load = function(path, img_num, remove_back, smoooth, x_orig, y_orig, speed, bbox_left, bbox_top, bbox_right, bbox_bottom)
     local sprite = gm.sprite_add(
         path, 
         (img_num ~= nil and {img_num} or {1})[1], 
@@ -23,6 +23,11 @@ Resources.sprite_load = function(path, img_num, remove_back, smoooth, x_orig, y_
     if speed then
         gm.sprite_set_speed(sprite, speed, 1) -- always set in framespergameframe since framerate is constant
     end
+
+    if bbox_left then
+        gm.sprite_collision_mask(sprite, false, 2, bbox_left + x_orig, bbox_top + y_orig, bbox_right + x_orig, bbox_bottom + y_orig, 0, 0)
+    end
+
     return sprite
 end
 

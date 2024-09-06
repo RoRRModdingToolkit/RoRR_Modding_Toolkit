@@ -35,18 +35,12 @@ Buff.ARRAY = {
 
 Buff.find = function(namespace, identifier)
     if identifier then namespace = namespace.."-"..identifier end
-    
-    local size = gm.array_length(Class.BUFF)
-    for i = 0, size - 1 do
-        local buff = gm.array_get(Class.BUFF, i)
-        local _namespace = gm.array_get(buff, 0)
-        local _identifier = gm.array_get(buff, 1)
+
+    for i, buff in Class.BUFF do
+        local _namespace = buff:get(0)
+        local _identifier = buff:get(1)
         if namespace == _namespace.."-".._identifier then
-            local abstraction = {
-                value = i
-            }
-            setmetatable(abstraction, metatable_buff)
-            return abstraction
+            return Buff.wrap(i)
         end
     end
 
@@ -64,13 +58,10 @@ Buff.new = function(namespace, identifier)
     )
 
     -- Make buff abstraction
-    local abstraction = {
-        value = buff
-    }
-    setmetatable(abstraction, metatable_buff)
+    local abstraction = Buff.wrap(buff)
 
     -- Set default stack_number_col to pure white
-    abstraction.stack_number_col = gm.array_create(1, Color.WHITE)
+    abstraction.stack_number_col = Array.new(1, Color.WHITE)
 
     -- Add onApply callback to add actor to has_custom_buff table
     abstraction:add_callback("onApply", function(actor, stack)
@@ -79,6 +70,16 @@ Buff.new = function(namespace, identifier)
         end
     end)
 
+    return abstraction
+end
+
+
+Buff.wrap = function(buff_id)
+    local abstraction = {
+        RMT_wrapper = "Buff",
+        value = buff_id
+    }
+    setmetatable(abstraction, metatable_buff)
     return abstraction
 end
 
@@ -134,8 +135,8 @@ metatable_buff_gs = {
     __index = function(table, key)
         local index = Buff.ARRAY[key]
         if index then
-            local buff_array = gm.array_get(Class.BUFF, table.value)
-            return gm.array_get(buff_array, index)
+            local buff_array = Class.BUFF:get(table.value)
+            return buff_array:get(index)
         end
         return nil
     end,
@@ -145,8 +146,8 @@ metatable_buff_gs = {
     __newindex = function(table, key, value)
         local index = Buff.ARRAY[key]
         if index then
-            local buff_array = gm.array_get(Class.BUFF, table.value)
-            gm.array_set(buff_array, index, value)
+            local buff_array = Class.BUFF:get(table.value)
+            buff_array:set(index, value)
         end
     end
 }
@@ -177,7 +178,7 @@ gm.post_script_hook(gm.constants.callback_execute, function(self, other, result,
     -- onApply and onRemove
     if callbacks[args[1].value] then
         for _, fn in pairs(callbacks[args[1].value]) do
-            local actor = Instance.make_instance(args[2].value)
+            local actor = Instance.wrap(args[2].value)
             local stack = actor:buff_stack_count(fn[1])
             fn[2](actor, stack)     -- Actor, Buff stack
         end
@@ -194,10 +195,10 @@ end)
 gm.pre_script_hook(gm.constants.actor_transform, function(self, other, result, args)
     if callbacks["onChange"] then
         for _, fn in pairs(callbacks["onChange"]) do
-            local actor = Instance.make_instance(args[1].value)
+            local actor = Instance.wrap(args[1].value)
             local count = actor:buff_stack_count(fn[1])
             if count > 0 then
-                fn[2](actor, Instance.make_instance(args[2].value), stack)   -- Actor, To, Buff stack
+                fn[2](actor, Instance.wrap(args[2].value), stack)   -- Actor, To, Buff stack
             end
         end
     end
@@ -214,7 +215,7 @@ local function buff_onDraw(self, other, result, args)
         for n, a in ipairs(has_custom_buff) do
             if Instance.exists(a) then
                 for _, c in ipairs(callbacks["onDraw"]) do
-                    local actor = Instance.make_instance(a)
+                    local actor = Instance.wrap(a)
                     local count = actor:buff_stack_count(c[1])
                     if count > 0 then
                         c[2](actor, count)  -- Actor, Stack count
