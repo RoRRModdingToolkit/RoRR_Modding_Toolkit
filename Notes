@@ -6,7 +6,7 @@ Things that autowrap (via Wrap.wrap):
         * Instance (and by extension Actor and Player)
         * Array
 
-    Source:
+    Sources:
         * Get/set to wrapped instances' variables
         * Get/set to wrapped arrays
         * Get/set to wrapped ds_lists
