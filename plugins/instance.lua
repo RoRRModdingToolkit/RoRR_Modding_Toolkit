@@ -190,7 +190,7 @@ methods_instance = {
 
         local insts = {}
         for _, inst in ipairs(list) do
-            table.insert(insts, Instance.wrap(inst))
+            table.insert(insts, inst)
         end
         list:destroy()
 
