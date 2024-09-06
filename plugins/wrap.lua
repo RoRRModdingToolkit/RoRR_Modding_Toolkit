@@ -3,6 +3,9 @@
 -- This class contains static methods for wrapping and
 -- unwrapping GameMaker values with the class wrappers.
 
+Wrap = {}
+
+
 Wrap.wrap = function(value)
     -- Array
     if gm.is_array(value) then
