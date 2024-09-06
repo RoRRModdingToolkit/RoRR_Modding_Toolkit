@@ -39,7 +39,7 @@ methods_array = {
 
     pop = function(self)
         return gm.array_pop(self.value)
-    end
+    end,
 
 
     insert = function(self, index, value)
