@@ -38,12 +38,12 @@ methods_list = {
 
 
     get = function(self, index)
-        return Wrap.wrap(gm.ds_list_find_value(table.value, index))
+        return Wrap.wrap(gm.ds_list_find_value(self.value, index))
     end,
 
 
     set = function(self, index, value)
-        gm.ds_list_set(table.value, index, Wrap.unwrap(value))
+        gm.ds_list_set(self.value, index, Wrap.unwrap(value))
     end,
 
 

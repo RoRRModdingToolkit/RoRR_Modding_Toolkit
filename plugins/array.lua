@@ -32,7 +32,7 @@ methods_array = {
 
 
     set = function(self, index, value)
-        gm.array_set(table.value, index, Wrap.unwrap(value))
+        gm.array_set(self.value, index, Wrap.unwrap(value))
     end,
 
 
