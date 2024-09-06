@@ -119,5 +119,10 @@ metatable_array = {
 
     __newindex = function(table, key, value)
         metatable_array_gs.__newindex(table, key, value)
-    end
+    end,
+
+
+    __len = function(table)
+		return gm.array_length(table.value)
+	end
 }
