@@ -35,9 +35,8 @@ Buff.ARRAY = {
 
 Buff.find = function(namespace, identifier)
     if identifier then namespace = namespace.."-"..identifier end
-    
-    for i = 0, Class.BUFF:size() - 1 do
-        local buff = Class.BUFF:get(i)
+
+    for i, buff in Class.BUFF do
         local _namespace = buff:get(0)
         local _identifier = buff:get(1)
         if namespace == _namespace.."-".._identifier then

@@ -66,23 +66,18 @@ Equipment.new = function(namespace, identifier)
 
 
     -- Remove previous item log position (if found)
-    local item_log_order = gm.variable_global_get("item_log_display_list")
-    local pos = gm.ds_list_find_index(item_log_order, abstraction.item_log_id)
-    if pos >= 0 then gm.ds_list_delete(item_log_order, pos) end
+    local item_log_order = List.wrap(gm.variable_global_get("item_log_display_list"))
+    local pos = item_log_order:find(abstraction.item_log_id)
+    if pos >= 0 then item_log_order:delete(pos) end
 
     -- Set item log position
     local pos = 0
-    local size = gm.ds_list_size(item_log_order)
-    for i = 0, size - 1 do
-        local log_id = gm.ds_list_find_value(item_log_order, i)
-        local log_ = gm.array_get(Class.ITEM_LOG, log_id)
-        local iter_item = Equipment.find(gm.array_get(log_, 0), gm.array_get(log_, 1))
-        
-        if iter_item then
-            if iter_item.tier == 3.0 then pos = i end
-        end
+    for _, log_id in ipairs(item_log_order) do
+        local log = Class.ITEM_LOG:get(log_id)
+        local iter_item = Equipment.find(log:get(0), log:get(1))
+        if iter_item and iter_item.tier == 3.0 then pos = i end
     end
-    gm.ds_list_insert(item_log_order, pos + 1, abstraction.item_log_id)
+    item_log_order:insert(pos + 1, abstraction.item_log_id)
 
 
     return abstraction
@@ -146,8 +141,8 @@ methods_equipment = {
 
         -- Set equipment log sprite
         if self.item_log_id then
-            local log_array = gm.array_get(Class.ITEM_LOG, self.item_log_id)
-            gm.array_set(log_array, 9, sprite)
+            local log_array = Class.ITEM_LOG:get(self.item_log_id)
+            log_array:set(9, sprite)
         end
     end,
 
@@ -176,8 +171,8 @@ methods_equipment = {
         gm.achievement_set_requirement(ach, progress_req or 1)
     
         if single_run then
-            local ach_array = gm.array_get(Class.ACHIEVEMENT, ach)
-            gm.array_set(ach_array, 21, single_run)
+            local ach_array = Class.ACHIEVEMENT:get(ach)
+            ach_array:set(21, single_run)
         end
     end,
 

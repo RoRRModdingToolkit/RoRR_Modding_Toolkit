@@ -43,20 +43,20 @@ Instance.projectiles = {
 -- ========== Static Methods ==========
 
 Instance.exists = function(inst)
-    if type(inst) == "table" then inst = inst.value end
+    if type(inst) == "table" and inst.RMT_wrapper then inst = inst.value end
     return gm.instance_exists(inst) == 1.0
 end
 
 
 Instance.destroy = function(inst)
-    if type(inst) == "table" then inst = inst.value end
+    if type(inst) == "table" and inst.RMT_wrapper then inst = inst.value end
     gm.instance_destroy(inst)
 end
 
 
 Instance.find = function(...)
     local t = {...}
-    if type(t[1]) == "table" and (not t[1].value) then t = t[1] end
+    if type(t[1]) == "table" and (not t[1].RMT_wrapper) then t = t[1] end
 
     for _, obj in ipairs(t) do
         if type(obj) == "table" then obj = obj.value end
@@ -85,7 +85,7 @@ end
 
 Instance.find_all = function(...)
     local t = {...}
-    if type(t[1]) == "table" and (not t[1].value) then t = t[1] end
+    if type(t[1]) == "table" and (not t[1].RMT_wrapper) then t = t[1] end
 
     local insts = {}
 
@@ -159,6 +159,7 @@ methods_instance = {
         if not self:exists() then return end
 
         gm.instance_destroy(self.value)
+        self.value = -4
     end,
 
 
@@ -166,7 +167,7 @@ methods_instance = {
     same = function(self, other)
         if not self:exists() then return false end
 
-        if type(other) == "table" then other = other.value end
+        if type(other) == "table" and other.RMT_wrapper then other = other.value end
         return self.value == other
     end,
 
@@ -174,7 +175,7 @@ methods_instance = {
     is_colliding = function(self, obj, x, y)
         if not self:exists() then return false end
 
-        if type(obj) == "table" then obj = obj.value end
+        if type(obj) == "table" and obj.RMT_wrapper then obj = obj.value end
         return self.value:place_meeting(x or self.x, y or self.y, obj) == 1.0
     end,
 
@@ -182,17 +183,16 @@ methods_instance = {
     get_collisions = function(self, obj)
         if not self:exists() then return {}, 0 end
 
-        if type(obj) == "table" then obj = obj.value end
+        if type(obj) == "table" and obj.RMT_wrapper then obj = obj.value end
 
-        local list = gm.ds_list_create()
-        self.value:collision_rectangle_list(self.bbox_left, self.bbox_top, self.bbox_right, self.bbox_bottom, obj, false, true, list, false)
+        local list = List.new()
+        self.value:collision_rectangle_list(self.bbox_left, self.bbox_top, self.bbox_right, self.bbox_bottom, obj, false, true, list.value, false)
 
         local insts = {}
-        local size = gm.ds_list_size(list)
-        for i = 0, size - 1 do
-            table.insert(insts, Instance.wrap(gm.ds_list_find_value(list, i)))
+        for _, inst in ipairs(list) do
+            table.insert(insts, Instance.wrap(inst))
         end
-        gm.ds_list_destroy(list)
+        list:destroy()
 
         return insts, #insts
     end,

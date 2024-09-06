@@ -54,12 +54,10 @@ Skill.SLOT = {
 Skill.find = function(namespace, identifier)
     if identifier then namespace = namespace.."-"..identifier end
     
-    local size = gm.array_length(Class.SKILL)
-    for i = 0, size - 1 do
-        local skill = gm.array_get(Class.SKILL, i)
-        if gm.is_array(skill) then
-            local _namespace = gm.array_get(skill, 0)
-            local _identifier = gm.array_get(skill, 1)
+    for i, skill in Class.SKILL do
+        if gm.is_array(skill.value) then    -- There is a random nil(?) value at 186(?) for some reason
+            local _namespace = skill:get(0)
+            local _identifier = skill:get(1)
             if namespace == _namespace.."-".._identifier then
                 return Skill.wrap(i)
             end

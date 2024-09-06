@@ -113,15 +113,15 @@ methods_object = {
 
 
     get_depth = function(self)
-        local depths = gm.variable_global_get("object_depths")
-        return gm.array_get(depths, self.value)
+        local depths = Array.wrap(gm.variable_global_get("object_depths"))
+        return depths:get(self.value)
     end,
 
 
     set_depth = function(self, depth)
         -- Does not apply retroactively to existing instances
-        local depths = gm.variable_global_get("object_depths")
-        gm.array_set(depths, self.value, depth)
+        local depths = Array.wrap(gm.variable_global_get("object_depths"))
+        depths:set(self.value, depth)
     end
 
 }
