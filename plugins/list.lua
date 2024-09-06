@@ -94,7 +94,7 @@ metatable_list_gs = {
     -- Getter
     __index = function(table, key)
         key = tonumber(key)
-        if key then
+        if key and key >= 1 and key <= table:size() then
             return Wrap.wrap(gm.ds_list_find_value(table.value, key - 1))
         end
         return nil
