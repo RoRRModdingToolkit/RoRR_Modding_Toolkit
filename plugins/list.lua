@@ -21,8 +21,41 @@ end
 
 methods_list = {
 
-    a = function(self)
-        
+    size = function(self)
+        return gm.ds_list_size(self.value)
+    end,
+
+
+    add = function(self, ...)
+        local values = {...}
+        gm.ds_list_add(self.value, table.unpack(values))
+    end,
+
+
+    insert = function(self, index, value)
+        gm.ds_list_insert(self.value, index, value)
+    end,
+    
+
+    delete = function(self, index)
+        gm.ds_list_delete(self.value, index)
+    end,
+
+
+    contains = function(self, value)
+        return gm.ds_list_find_index(self.value, value) >= 0
+    end,
+
+
+    find = function(self)
+        local pos = gm.ds_list_find_index(self.value, value)
+        if pos < 0 then return nil end
+        return pos
+    end,
+
+
+    sort = function(self, descending)
+        gm.ds_list_sort(self.value, not descending)
     end
 
 }
@@ -34,10 +67,9 @@ methods_list = {
 metatable_list_gs = {
     -- Getter
     __index = function(table, key)
-        local index = Item.ARRAY[key]
-        if index then
-            local item_array = gm.array_get(Class.ITEM, table.value)
-            return gm.array_get(item_array, index)
+        key = tonumber(key)
+        if key then
+            return Wrap.wrap(gm.ds_list_find_value(table.value, key))
         end
         return nil
     end,
@@ -45,10 +77,9 @@ metatable_list_gs = {
 
     -- Setter
     __newindex = function(table, key, value)
-        local index = Item.ARRAY[key]
-        if index then
-            local item_array = gm.array_get(Class.ITEM, table.value)
-            gm.array_set(item_array, index, value)
+        key = tonumber(key)
+        if key then
+            gm.ds_list_set(table.value, key, Wrap.unwrap(value))
         end
     end
 }
