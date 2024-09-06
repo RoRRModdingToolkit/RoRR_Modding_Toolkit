@@ -13,6 +13,7 @@ end
 
 Array.wrap = function(array)
     local abstraction = {
+        RMT_wrapper = true,
         value = array
     }
     setmetatable(abstraction, metatable_array)
@@ -71,7 +72,7 @@ metatable_array_gs = {
     __index = function(table, key)
         key = tonumber(key)
         if key then
-            return gm.array_get(table.value, key)
+            return Wrap.wrap(gm.array_get(table.value, key))
         end
         return nil
     end,
@@ -81,7 +82,7 @@ metatable_array_gs = {
     __newindex = function(table, key, value)
         key = tonumber(key)
         if key then
-            gm.array_set(table.value, key, value)
+            gm.array_set(table.value, key, Wrap.unwrap(value))
         end
     end
 }

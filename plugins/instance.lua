@@ -117,6 +117,7 @@ end
 
 Instance.wrap = function(inst)
     local abstraction = {
+        RMT_wrapper = true,
         value = inst
     }
     if inst.object_index == gm.constants.oP then
@@ -214,12 +215,7 @@ metatable_instance_gs = {
         local var = rawget(table, "value")
         if var then
             local v = gm.variable_instance_get(var, key)
-            if gm.typeof(v) == "struct"
-            and gm.instance_exists(v) == 1.0
-            and gm.object_exists(v) == 0.0 then
-                return Instance.wrap(v)
-            end
-            return v
+            return Wrap.wrap(v)
         end
         return nil
     end,
@@ -229,10 +225,7 @@ metatable_instance_gs = {
     __newindex = function(table, key, value)
         local var = rawget(table, "value")
         if var then
-            if type(value) == "table" and value.is_instance_wrapper then
-                value = value.value
-            end
-            gm.variable_instance_set(var, key, value)
+            gm.variable_instance_set(var, key, Wrap.unwrap(value))
         end
     end
 }

@@ -8,6 +8,7 @@ List = {}
 
 List.wrap = function(list)
     local abstraction = {
+        RMT_wrapper = true,
         value = list
     }
     setmetatable(abstraction, metatable_list)

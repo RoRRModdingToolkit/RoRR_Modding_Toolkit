@@ -176,11 +176,7 @@ methods_actor = {
 
 
     get_skill = function(self, slot)
-        local abstraction = {
-            value = gm.array_get(self.skills, slot).active_skill.skill_id
-        }
-        setmetatable(abstraction, metatable_skill)
-        return abstraction
+        return Skill.wrap(gm.array_get(self.skills, slot).active_skill.skill_id)
     end
 
 }

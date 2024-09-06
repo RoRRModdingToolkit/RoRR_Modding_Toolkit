@@ -91,6 +91,7 @@ end
 
 Equipment.wrap = function(equipment_id)
     local abstraction = {
+        RMT_wrapper = true,
         value = equipment_id
     }
     setmetatable(abstraction, metatable_equipment)

@@ -69,11 +69,7 @@ Item.find = function(namespace, identifier)
     local item = gm.item_find(namespace)
 
     if item then
-        local abstraction = {
-            value = item
-        }
-        setmetatable(abstraction, metatable_item)
-        return abstraction
+        return Item.wrap(item)
     end
 
     return nil
@@ -94,10 +90,7 @@ Item.new = function(namespace, identifier, no_log)
     )
 
     -- Make item abstraction
-    local abstraction = {
-        value = item
-    }
-    setmetatable(abstraction, metatable_item)
+    local abstraction = Item.wrap(item)
 
     -- Create item log
     if not no_log then
@@ -119,6 +112,16 @@ Item.new = function(namespace, identifier, no_log)
         end
     end)
 
+    return abstraction
+end
+
+
+Item.wrap = function(item_id)
+    local abstraction = {
+        RMT_wrapper = true,
+        value = item_id
+    }
+    setmetatable(abstraction, metatable_item)
     return abstraction
 end
 

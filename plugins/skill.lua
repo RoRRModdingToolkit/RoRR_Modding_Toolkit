@@ -61,16 +61,22 @@ Skill.find = function(namespace, identifier)
             local _namespace = gm.array_get(skill, 0)
             local _identifier = gm.array_get(skill, 1)
             if namespace == _namespace.."-".._identifier then
-                local abstraction = {
-                    value = i
-                }
-                setmetatable(abstraction, metatable_skill)
-                return abstraction
+                return Skill.wrap(i)
             end
         end
     end
 
     return nil
+end
+
+
+Skill.wrap = function(skill_id)
+    local abstraction = {
+        RMT_wrapper = true,
+        value = skill_id
+    }
+    setmetatable(abstraction, metatable_skill)
+    return abstraction
 end
 
 

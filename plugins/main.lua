@@ -24,6 +24,7 @@ require("./player")
 require("./resources")
 require("./skill")
 require("./survivor")
+require("./wrap")
 
 
 

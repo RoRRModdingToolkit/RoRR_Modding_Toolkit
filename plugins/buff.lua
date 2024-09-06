@@ -42,11 +42,7 @@ Buff.find = function(namespace, identifier)
         local _namespace = gm.array_get(buff, 0)
         local _identifier = gm.array_get(buff, 1)
         if namespace == _namespace.."-".._identifier then
-            local abstraction = {
-                value = i
-            }
-            setmetatable(abstraction, metatable_buff)
-            return abstraction
+            return Buff.wrap(i)
         end
     end
 
@@ -64,10 +60,7 @@ Buff.new = function(namespace, identifier)
     )
 
     -- Make buff abstraction
-    local abstraction = {
-        value = buff
-    }
-    setmetatable(abstraction, metatable_buff)
+    local abstraction = Buff.wrap(buff)
 
     -- Set default stack_number_col to pure white
     abstraction.stack_number_col = gm.array_create(1, Color.WHITE)
@@ -79,6 +72,16 @@ Buff.new = function(namespace, identifier)
         end
     end)
 
+    return abstraction
+end
+
+
+Buff.wrap = function(buff_id)
+    local abstraction = {
+        RMT_wrapper = true,
+        value = buff_id
+    }
+    setmetatable(abstraction, metatable_buff)
     return abstraction
 end
 
