@@ -27,7 +27,7 @@ end
 methods_list = {
 
     exists = function(self)
-        return gm.ds_exists(self.value, 1) == 1.0
+        return gm.ds_exists(self.value, 2) == 1.0
     end,
 
 
@@ -85,7 +85,7 @@ metatable_list_gs = {
     __index = function(table, key)
         key = tonumber(key)
         if key then
-            return Wrap.wrap(gm.ds_list_find_value(table.value, key))
+            return Wrap.wrap(gm.ds_list_find_value(table.value, key - 1))
         end
         return nil
     end,
@@ -95,7 +95,7 @@ metatable_list_gs = {
     __newindex = function(table, key, value)
         key = tonumber(key)
         if key then
-            gm.ds_list_set(table.value, key, Wrap.unwrap(value))
+            gm.ds_list_set(table.value, key - 1, Wrap.unwrap(value))
         end
     end
 }
