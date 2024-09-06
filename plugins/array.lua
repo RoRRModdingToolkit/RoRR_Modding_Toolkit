@@ -31,6 +31,11 @@ methods_array = {
     end,
 
 
+    resize = function(self, size)
+        gm.array_resize(self.value, size)
+    end,
+
+
     push = function(self, ...)
         local values = {...}
         gm.array_push(self.value, table.unpack(values))
