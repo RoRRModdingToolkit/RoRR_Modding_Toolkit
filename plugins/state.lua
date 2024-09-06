@@ -28,12 +28,10 @@ State.ARRAY = {
 State.find = function(namespace, identifier)
     if identifier then namespace = namespace.."-"..identifier end
     
-    local size = gm.array_length(Class.ACTOR_STATE)
-    for i = 0, size - 1 do
-        local state = gm.array_get(Class.ACTOR_STATE, i)
-        if gm.is_array(state) then
-            local _namespace = gm.array_get(state, 0)
-            local _identifier = gm.array_get(state, 1)
+    for i, state in Class.ACTOR_STATE do
+        if gm.is_array(state.value) then
+            local _namespace = state:get(0)
+            local _identifier = state:get(1)
             if namespace == _namespace.."-".._identifier then
                 return State.wrap(i)
             end
@@ -46,7 +44,7 @@ end
 
 State.wrap = function(state_id)
     local abstraction = {
-        RMT_wrapper = true,
+        RMT_wrapper = "State",
         value = state_id
     }
     setmetatable(abstraction, metatable_state)
@@ -116,7 +114,7 @@ metatable_state_gs = {
         local index = State.ARRAY[key]
         if index then
             local state_array = gm.array_get(Class.ACTOR_STATE, table.value)
-            return gm.array_get(state_array, index)
+            return state_array:get(index)
         end
         return nil
     end,
@@ -126,8 +124,8 @@ metatable_state_gs = {
     __newindex = function(table, key, value)
         local index = State.ARRAY[key]
         if index then
-            local state_array = gm.array_get(Class.ACTOR_STATE, table.value)
-            gm.array_set(state_array, index, value)
+            local state_array = Class.ACTOR_STATE:get(table.value)
+            state_array:set(index, value)
         end
     end
 }
