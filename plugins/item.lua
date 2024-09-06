@@ -215,30 +215,28 @@ methods_item = {
 
 
         -- Remove from all loot pools that the item is in
-        local pools = gm.variable_global_get("treasure_loot_pools")
-        local size = gm.array_length(pools)
-        for i = 0, size - 1 do
-            local drops = gm.array_get(pools, i).drop_pool
-            local pos = gm.ds_list_find_index(drops, self.object_id)
-            if pos >= 0 then gm.ds_list_delete(drops, pos) end
+        local pools = Array.wrap(gm.variable_global_get("treasure_loot_pools"))
+        for _, drop in ipairs(pools) do
+            local drop_pool = List.wrap(drop.drop_pool)
+            local pos = drop_pool:find(self.object_id)
+            if pos then drop_pool:delete(pos) end
         end
 
         -- Add to new loot pool
-        local pool = gm.array_get(pools, tier).drop_pool
-        gm.ds_list_add(pool, self.object_id)
+        local pool = List.wrap(pools:get(tier).drop_pool)
+        pool:add(self.object_id)
         
 
         -- Remove previous item log position (if found)
         local item_log_order = List.wrap(gm.variable_global_get("item_log_display_list"))
         local pos = item_log_order:find(self.item_log_id)
-        if pos >= 0 then item_log_order:delete(pos) end
+        if pos then item_log_order:delete(pos) end
 
         -- Set new item log position
         local pos = 0
-        local size = gm.ds_list_size(item_log_order)
-        for _, log_id in ipairs(item_log_order) do
-            local log = Class.ITEM_LOG:get(log_id)
-            local iter_item = Item.find(log:get(0), log:get(1))
+        for i, log_id in ipairs(item_log_order) do
+            local log_ = Class.ITEM_LOG:get(log_id)
+            local iter_item = Item.find(log_:get(0), log_:get(1))
             
             local tier_ = Item.TIER.equipment
             if iter_item then tier_ = iter_item.tier end
@@ -247,7 +245,7 @@ methods_item = {
                 break
             end
         end
-        item_log_order:insert(pos, self.item_log_id)
+        item_log_order:insert(pos - 1, self.item_log_id)
     end,
 
 
