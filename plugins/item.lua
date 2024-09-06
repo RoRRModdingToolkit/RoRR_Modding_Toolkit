@@ -300,8 +300,8 @@ metatable_item_gs = {
     __index = function(table, key)
         local index = Item.ARRAY[key]
         if index then
-            local item_array = gm.array_get(Class.ITEM, table.value)
-            return gm.array_get(item_array, index)
+            local item_array = Class.ITEM:get(table.value)
+            return item_array:get(index)
         end
         return nil
     end,
@@ -311,8 +311,8 @@ metatable_item_gs = {
     __newindex = function(table, key, value)
         local index = Item.ARRAY[key]
         if index then
-            local item_array = gm.array_get(Class.ITEM, table.value)
-            gm.array_set(item_array, index, value)
+            local item_array = Class.ITEM:get(table.value)
+            item_array:set(index, value)
         end
     end
 }

@@ -135,9 +135,9 @@ metatable_object_gs = {
     __index = function(table, key)
         local index = Object.ARRAY[key]
         if index and table.value >= Object.CUSTOM_START then
-            local custom_object = gm.variable_global_get("custom_object")
-            local obj_array = gm.array_get(custom_object, table.value - Object.CUSTOM_START)
-            return gm.array_get(obj_array, index)
+            local custom_object = Array.wrap(gm.variable_global_get("custom_object"))
+            local obj_array = custom_object:get(table.value - Object.CUSTOM_START)
+            return obj_array:get(index)
         end
         return nil
     end,
@@ -147,9 +147,9 @@ metatable_object_gs = {
     __newindex = function(table, key, value)
         local index = Object.ARRAY[key]
         if index and table.value >= Object.CUSTOM_START then
-            local custom_object = gm.variable_global_get("custom_object")
-            local item_array = gm.array_get(custom_object, table.value - Object.CUSTOM_START)
-            gm.array_set(obj_array, index, value)
+            local custom_object = Array.wrap(gm.variable_global_get("custom_object"))
+            local obj_array = custom_object:get(table.value - Object.CUSTOM_START)
+            obj_array:set(index, value)
         end
     end
 }

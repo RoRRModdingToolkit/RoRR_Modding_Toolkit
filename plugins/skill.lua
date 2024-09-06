@@ -88,8 +88,8 @@ metatable_skill_gs = {
     __index = function(table, key)
         local index = Skill.ARRAY[key]
         if index then
-            local skill_array = gm.array_get(Class.SKILL, table.value)
-            return gm.array_get(skill_array, index)
+            local skill_array = Class.SKILL:get(table.value)
+            return skill_array:get(index)
         end
         return nil
     end,
@@ -99,8 +99,8 @@ metatable_skill_gs = {
     __newindex = function(table, key, value)
         local index = Skill.ARRAY[key]
         if index then
-            local skill_array = gm.array_get(Class.SKILL, table.value)
-            gm.array_set(skill_array, index, value)
+            local skill_array = Class.SKILL:get(table.value)
+            skill_array:set(index, value)
         end
     end
 }

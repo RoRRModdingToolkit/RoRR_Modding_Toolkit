@@ -203,8 +203,8 @@ metatable_equipment_gs = {
     __index = function(table, key)
         local index = Equipment.ARRAY[key]
         if index then
-            local equipment_array = gm.array_get(Class.EQUIPMENT, table.value)
-            return gm.array_get(equipment_array, index)
+            local equipment_array = Class.EQUIPMENT:get(table.value)
+            return equipment_array:get(index)
         end
         return nil
     end,
@@ -214,8 +214,8 @@ metatable_equipment_gs = {
     __newindex = function(table, key, value)
         local index = Equipment.ARRAY[key]
         if index then
-            local equipment_array = gm.array_get(Class.EQUIPMENT, table.value)
-            gm.array_set(equipment_array, index, value)
+            local equipment_array = Class.EQUIPMENT:get(table.value)
+            equipment_array:set(index, value)
         end
     end
 }

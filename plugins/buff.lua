@@ -62,7 +62,7 @@ Buff.new = function(namespace, identifier)
     local abstraction = Buff.wrap(buff)
 
     -- Set default stack_number_col to pure white
-    abstraction.stack_number_col = gm.array_create(1, Color.WHITE)
+    abstraction.stack_number_col = Array.new(1, Color.WHITE)
 
     -- Add onApply callback to add actor to has_custom_buff table
     abstraction:add_callback("onApply", function(actor, stack)
@@ -136,8 +136,8 @@ metatable_buff_gs = {
     __index = function(table, key)
         local index = Buff.ARRAY[key]
         if index then
-            local buff_array = gm.array_get(Class.BUFF, table.value)
-            return gm.array_get(buff_array, index)
+            local buff_array = Class.BUFF:get(table.value)
+            return buff_array:get(index)
         end
         return nil
     end,
@@ -147,8 +147,8 @@ metatable_buff_gs = {
     __newindex = function(table, key, value)
         local index = Buff.ARRAY[key]
         if index then
-            local buff_array = gm.array_get(Class.BUFF, table.value)
-            gm.array_set(buff_array, index, value)
+            local buff_array = Class.BUFF:get(table.value)
+            buff_array:set(index, value)
         end
     end
 }
