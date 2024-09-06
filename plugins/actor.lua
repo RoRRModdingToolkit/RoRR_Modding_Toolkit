@@ -97,13 +97,13 @@ methods_actor = {
 
 
     is_immune = function(self)
-        if actor.invincible == false then actor.invincible = 0 end
-        return actor.invincible > 0
+        if self.invincible == false then self.invincible = 0 end
+        return self.invincible > 0
     end,
 
 
     set_immune = function(self, amount)
-        if actor.invincible == false then actor.invincible = 0 end
+        if self.invincible == false then self.invincible = 0 end
         self.invincible = math.max(self.invincible, amount)
     end,
 

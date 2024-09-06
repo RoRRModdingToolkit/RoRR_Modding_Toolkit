@@ -2,6 +2,8 @@
 
 Equipment = {}
 
+local callbacks = {}
+
 
 
 -- ========== Enums ==========
@@ -46,7 +48,7 @@ Equipment.new = function(namespace, identifier)
     local equipment = gm.equipment_create(
         namespace,
         identifier,
-        gm.array_length(Class.EQUIPMENT),   -- class_equipment index
+        Class.EQUIPMENT:size(),   -- class_equipment index
         Item.TIER.equipment,    -- tier
         gm.object_add_w(namespace, identifier, gm.constants.pPickupEquipment),  -- pickup object
         0.0,    -- loot tags
