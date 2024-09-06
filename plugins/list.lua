@@ -6,6 +6,11 @@ List = {}
 
 -- ========== Static Methods ==========
 
+List.new = function()
+    return List.wrap(gm.ds_list_create())
+end
+
+
 List.wrap = function(list)
     local abstraction = {
         RMT_wrapper = true,
