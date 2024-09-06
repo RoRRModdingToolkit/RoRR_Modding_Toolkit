@@ -26,6 +26,17 @@ end
 
 methods_list = {
 
+    exists = function(self)
+        return gm.ds_exists(self.value, 1) == 1.0
+    end,
+
+
+    destroy = function(self)
+        gm.ds_list_destroy(self.value)
+        self.value = -1
+    end,
+
+
     size = function(self)
         return gm.ds_list_size(self.value)
     end,
