@@ -26,6 +26,16 @@ end
 
 methods_array = {
 
+    get = function(self, index)
+        return Wrap.wrap(gm.array_get(self.value, index))
+    end,
+
+
+    set = function(self, index, value)
+        gm.array_set(table.value, index, Wrap.unwrap(value))
+    end,
+
+
     size = function(self)
         return gm.array_length(self.value)
     end,

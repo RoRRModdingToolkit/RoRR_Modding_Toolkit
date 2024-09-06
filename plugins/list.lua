@@ -37,6 +37,16 @@ methods_list = {
     end,
 
 
+    get = function(self, index)
+        return Wrap.wrap(gm.ds_list_find_value(table.value, index))
+    end,
+
+
+    set = function(self, index, value)
+        gm.ds_list_set(table.value, index, Wrap.unwrap(value))
+    end,
+
+
     size = function(self)
         return gm.ds_list_size(self.value)
     end,
