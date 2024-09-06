@@ -56,7 +56,7 @@ Skill.find = function(namespace, identifier)
     if identifier then namespace = namespace.."-"..identifier end
     
     for i, skill in ipairs(Class.SKILL) do
-        if gm.is_array(skill.value) then    -- There is a random nil(?) value at 186(?) for some reason
+        if skill ~= 0 then    -- There is a random nil(?) value at 186(?) for some reason
             local _namespace = skill:get(0)
             local _identifier = skill:get(1)
             if namespace == _namespace.."-".._identifier then
@@ -143,27 +143,27 @@ methods_skill = {
 
     add_callback = function(self, callback, func)
 
-        if callback == "OnCanActivate" then 
+        if callback == "onCanActivate" then 
             local callback_id = self.on_can_activate
             if not callbacks[callback_id] then callbacks[callback_id] = {} end
             table.insert(callbacks[callback_id], func)
         end
-        if callback == "OnActivate" then 
+        if callback == "onActivate" then 
             local callback_id = self.on_activate
             if not callbacks[callback_id] then callbacks[callback_id] = {} end
             table.insert(callbacks[callback_id], func)
         end
-        if callback == "OnStep" then
+        if callback == "onStep" then
             local callback_id = self.on_step
             if not callbacks[callback_id] then callbacks[callback_id] = {} end
             table.insert(callbacks[callback_id], func)
         end
-        if callback == "OnEquipped" then
+        if callback == "onEquipped" then
             local callback_id = self.on_equipped
             if not callbacks[callback_id] then callbacks[callback_id] = {} end
             table.insert(callbacks[callback_id], func)
         end
-        if callback == "OnUnequipped" then
+        if callback == "onUnequipped" then
             local callback_id = self.on_unequipped
             if not callbacks[callback_id] then callbacks[callback_id] = {} end
             table.insert(callbacks[callback_id], func)
@@ -210,7 +210,7 @@ methods_skill = {
         self.animation = animation
     end,
 
-    set_skill_settings = function(self, allow_buffered_input, use_delay, animation, required_interrupt_priority, hold_facing_direction, override_strafe_direction, ignore_aim_direction, disable_aim_stall, does_change_activity_state)
+    set_skill_settings = function(self, allow_buffered_input, use_delay, required_interrupt_priority, hold_facing_direction, override_strafe_direction, ignore_aim_direction, disable_aim_stall, does_change_activity_state)
         self.allow_buffered_input = allow_buffered_input
         self.use_delay = use_delay
         self.required_interrupt_priority = required_interrupt_priority

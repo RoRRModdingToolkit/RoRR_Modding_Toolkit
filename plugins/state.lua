@@ -28,12 +28,12 @@ State.ARRAY = {
 State.find = function(namespace, identifier)
     if identifier then namespace = namespace.."-"..identifier end
     
-    for i, state in Class.ACTOR_STATE do
+    for i, state in ipairs(Class.ACTOR_STATE) do
         if gm.is_array(state.value) then
             local _namespace = state:get(0)
             local _identifier = state:get(1)
             if namespace == _namespace.."-".._identifier then
-                return State.wrap(i)
+                return State.wrap(i - 1)
             end
         end
     end
@@ -82,22 +82,22 @@ methods_state = {
 
     add_callback = function(self, callback, func)
 
-        if callback == "OnEnter" then 
+        if callback == "onEnter" then 
             local callback_id = self.on_enter
             if not callbacks[callback_id] then callbacks[callback_id] = {} end
             table.insert(callbacks[callback_id], func)
         end
-        if callback == "OnExit" then 
+        if callback == "onExit" then 
             local callback_id = self.on_exit
             if not callbacks[callback_id] then callbacks[callback_id] = {} end
             table.insert(callbacks[callback_id], func)
         end
-        if callback == "OnStep" then
+        if callback == "onStep" then
             local callback_id = self.on_step
             if not callbacks[callback_id] then callbacks[callback_id] = {} end
             table.insert(callbacks[callback_id], func)
         end
-        if callback == "OnGetInterruptPriority" then
+        if callback == "onGetInterruptPriority" then
             local callback_id = self.on_get_interrupt_priority
             if not callbacks[callback_id] then callbacks[callback_id] = {} end
             table.insert(callbacks[callback_id], func)
