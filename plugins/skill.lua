@@ -72,7 +72,7 @@ end
 
 Skill.wrap = function(skill_id)
     local abstraction = {
-        RMT_wrapper = true,
+        RMT_wrapper = "Skill",
         value = skill_id
     }
     setmetatable(abstraction, metatable_skill)

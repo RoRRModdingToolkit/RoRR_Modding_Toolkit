@@ -13,7 +13,7 @@ end
 
 List.wrap = function(list)
     local abstraction = {
-        RMT_wrapper = true,
+        RMT_wrapper = "List",
         value = list
     }
     setmetatable(abstraction, metatable_list)

@@ -13,7 +13,7 @@ end
 
 Array.wrap = function(array)
     local abstraction = {
-        RMT_wrapper = true,
+        RMT_wrapper = "Array",
         value = array
     }
     setmetatable(abstraction, metatable_array)

@@ -79,7 +79,7 @@ methods_actor = {
         if self:same(Player.get_client()) then
             local hud = Instance.find(gm.constants.oHUD)
             if hud:exists() then
-                gm.array_get(hud.player_hud_display_info, 0).heal_flash = 0.5
+                hud.player_hud_display_info:get(0).heal_flash = 0.5
             end
         end
     end,
@@ -142,41 +142,40 @@ methods_actor = {
 
     buff_apply = function(self, buff, duration, count)
         if type(buff) == "table" then buff = buff.value end
-        if gm.array_length(self.buff_stack) <= buff then gm.array_resize(self.buff_stack, buff + 1) end
+        if self.buff_stack:size() <= buff then self.buff_stack:resize(buff + 1) end
 
         gm.apply_buff(self.value, buff, duration, count or 1)
 
         -- Clamp to max stack or under
         -- Funny stuff happens if this is exceeded
-        local buff_array = gm.array_get(Class.BUFF, buff)
-        local max_stack = gm.array_get(buff_array, 9)
-        gm.array_set(self.buff_stack, buff, math.min(self:buff_stack_count(buff), max_stack))
+        local buff_array = Buff.wrap(buff)
+        self.buff_stack:set(buff, math.min(self:buff_stack_count(buff), buff_array.max_stack))
     end,
 
 
     buff_remove = function(self, buff, count)
         if type(buff) == "table" then buff = buff.value end
-        if gm.array_length(self.buff_stack) <= buff then gm.array_resize(self.buff_stack, buff + 1) end
+        if self.buff_stack:size() <= buff then self.buff_stack:resize(buff + 1) end
 
         local stack_count = self:buff_stack_count(buff)
         if (not count) or count >= stack_count then gm.remove_buff(self.value, buff)
-        else gm.array_set(self.buff_stack, buff, stack_count - count)
+        else self.buff_stack:set(buff, stack_count - count)
         end
     end,
 
 
     buff_stack_count = function(self, buff)
         if type(buff) == "table" then buff = buff.value end
-        if gm.array_length(self.buff_stack) <= buff then gm.array_resize(self.buff_stack, buff + 1) end
+        if self.buff_stack:size() <= buff then self.buff_stack:resize(buff + 1) end
 
-        local count = gm.array_get(self.buff_stack, buff)
+        local count = self.buff_stack:get(buff)
         if count == nil then return 0 end
         return count
     end,
 
 
     get_skill = function(self, slot)
-        return Skill.wrap(gm.array_get(self.skills, slot).active_skill.skill_id)
+        return Skill.wrap(self.skills:get(slot).active_skill.skill_id)
     end
 
 }

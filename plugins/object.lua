@@ -67,7 +67,7 @@ end
 
 Object.wrap = function(object_id)
     local abstraction = {
-        RMT_wrapper = true,
+        RMT_wrapper = "Object",
         value = object_id
     }
     setmetatable(abstraction, metatable_object)

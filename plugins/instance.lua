@@ -117,13 +117,15 @@ end
 
 Instance.wrap = function(inst)
     local abstraction = {
-        RMT_wrapper = true,
+        RMT_wrapper = "Instance",
         value = inst
     }
     if inst.object_index == gm.constants.oP then
         setmetatable(abstraction, metatable_player)
+        abstraction.RMT_wrapper = "Player"
     elseif gm.object_is_ancestor(inst.object_index, gm.constants.pActor) == 1.0 then
         setmetatable(abstraction, metatable_actor)
+        abstraction.RMT_wrapper = "Actor"
     else setmetatable(abstraction, metatable_instance)
     end
     return abstraction

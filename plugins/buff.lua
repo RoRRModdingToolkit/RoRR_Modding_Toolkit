@@ -36,11 +36,10 @@ Buff.ARRAY = {
 Buff.find = function(namespace, identifier)
     if identifier then namespace = namespace.."-"..identifier end
     
-    local size = gm.array_length(Class.BUFF)
-    for i = 0, size - 1 do
-        local buff = gm.array_get(Class.BUFF, i)
-        local _namespace = gm.array_get(buff, 0)
-        local _identifier = gm.array_get(buff, 1)
+    for i = 0, Class.BUFF:size() - 1 do
+        local buff = Class.BUFF:get(i)
+        local _namespace = buff:get(0)
+        local _identifier = buff:get(1)
         if namespace == _namespace.."-".._identifier then
             return Buff.wrap(i)
         end
@@ -78,7 +77,7 @@ end
 
 Buff.wrap = function(buff_id)
     local abstraction = {
-        RMT_wrapper = true,
+        RMT_wrapper = "Buff",
         value = buff_id
     }
     setmetatable(abstraction, metatable_buff)
