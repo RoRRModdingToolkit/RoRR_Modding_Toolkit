@@ -99,6 +99,14 @@ Helper.log_hook = function(self, other, result, args)
 end
 
 
+Helper.log_struct = function(struct)
+    local names = gm.struct_get_names(struct)
+    for _, name in ipairs(names) do
+        log.info(name.." = "..tostring(gm.variable_struct_get(struct, name)))
+    end
+end
+
+
 Helper.chance = function(n)
     return gm.random_range(0, 1) <= n
 end

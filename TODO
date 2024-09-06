@@ -6,3 +6,4 @@ v Add Equipment class
 - Add Difficulty class
 o Apply Instance wrapper everywhere (on gm.array_get, etc.)
     : Support on GM instance variable get/set; having only this is probably fine
+- Fix actor:fire_explosion not stunning without proc being active, which makes no sense

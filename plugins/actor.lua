@@ -42,6 +42,11 @@ end
 
 methods_actor = {
 
+    is_grounded = function(self)
+        return self.value:place_meeting(self.x, self.y + 1, gm.constants.oB) == 1.0 and self.activity_type ~= 2.0
+    end,
+
+
     fire_bullet = function(self, x, y, direction, range, damage, pierce_multiplier, hit_sprite)
         local damager = self.value:fire_bullet(0, x, y, (pierce_multiplier and 1) or 0, damage, range, hit_sprite or -1, direction, 1.0, 1.0, -1.0)
         if pierce_multiplier then damager.damage_degrade = (1.0 - pierce_multiplier) end
@@ -88,6 +93,23 @@ methods_actor = {
     set_barrier = function(self, amount)
         if self.barrier <= 0 then self:add_barrier(1) end
         self.barrier = amount
+    end,
+
+
+    is_immune = function(self)
+        if actor.invincible == false then actor.invincible = 0 end
+        return actor.invincible > 0
+    end,
+
+
+    set_immune = function(self, amount)
+        if actor.invincible == false then actor.invincible = 0 end
+        self.invincible = math.max(self.invincible, amount)
+    end,
+
+
+    remove_immune = function(self)
+        self.invincible = 0
     end,
 
 
