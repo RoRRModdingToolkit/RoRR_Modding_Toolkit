@@ -115,5 +115,5 @@
 * Now displays "Modded" under the version number at top-left corner.
 * Added Skill class
     * Skill.find
-* Added Difficulty class
-* Resources.sprite_load can now set the rectangular collision mask of the sprite relative to its origin.
+* Added Array and List classes.
+* Resources.sprite_load can now set the rectangular collision mask of the sprite (relative to its origin).
