@@ -35,6 +35,12 @@ Object.find = function(namespace, identifier)
 
     if identifier then namespace = namespace.."-"..identifier end
 
+    -- Custom objects
+    local ind = gm.object_find(namespace)
+    if ind then
+        return Object.wrap(ind)
+    end
+
     -- Vanilla namespaced objects
     if string.sub(namespace, 1, 3) == "ror" then
         local obj = gm.constants["o"..string.upper(string.sub(namespace, 5, 5))..string.sub(namespace, 6, #namespace)]
@@ -42,12 +48,6 @@ Object.find = function(namespace, identifier)
             return Object.wrap(obj)
         end
         return nil
-    end
-
-    -- Custom objects
-    local ind = gm.object_find(namespace)
-    if ind then
-        return Object.wrap(ind)
     end
 
     return nil
