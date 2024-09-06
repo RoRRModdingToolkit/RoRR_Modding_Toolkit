@@ -2,6 +2,8 @@
 
 Equipment = {}
 
+local callbacks = {}
+
 
 
 -- ========== Enums ==========
@@ -46,7 +48,7 @@ Equipment.new = function(namespace, identifier)
     local equipment = gm.equipment_create(
         namespace,
         identifier,
-        gm.array_length(Class.EQUIPMENT),   -- class_equipment index
+        Class.EQUIPMENT:size(),   -- class_equipment index
         Item.TIER.equipment,    -- tier
         gm.object_add_w(namespace, identifier, gm.constants.pPickupEquipment),  -- pickup object
         0.0,    -- loot tags
@@ -68,16 +70,16 @@ Equipment.new = function(namespace, identifier)
     -- Remove previous item log position (if found)
     local item_log_order = List.wrap(gm.variable_global_get("item_log_display_list"))
     local pos = item_log_order:find(abstraction.item_log_id)
-    if pos >= 0 then item_log_order:delete(pos) end
+    if pos then item_log_order:delete(pos) end
 
     -- Set item log position
     local pos = 0
-    for _, log_id in ipairs(item_log_order) do
-        local log = Class.ITEM_LOG:get(log_id)
-        local iter_item = Equipment.find(log:get(0), log:get(1))
+    for i, log_id in ipairs(item_log_order) do
+        local log_ = Class.ITEM_LOG:get(log_id)
+        local iter_item = Equipment.find(log_:get(0), log_:get(1))
         if iter_item and iter_item.tier == 3.0 then pos = i end
     end
-    item_log_order:insert(pos + 1, abstraction.item_log_id)
+    item_log_order:insert(pos, abstraction.item_log_id)
 
 
     return abstraction

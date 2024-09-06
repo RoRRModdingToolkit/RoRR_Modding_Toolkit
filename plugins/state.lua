@@ -113,7 +113,7 @@ metatable_state_gs = {
     __index = function(table, key)
         local index = State.ARRAY[key]
         if index then
-            local state_array = gm.array_get(Class.ACTOR_STATE, table.value)
+            local state_array = Class.ACTOR_STATE:get(table.value)
             return state_array:get(index)
         end
         return nil

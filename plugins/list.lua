@@ -69,6 +69,11 @@ methods_list = {
         gm.ds_list_delete(self.value, index)
     end,
 
+    
+    clear = function(self)
+        gm.ds_list_clear(self.value)
+    end,
+
 
     contains = function(self, value)
         return gm.ds_list_find_index(self.value, Wrap.unwrap(value)) >= 0

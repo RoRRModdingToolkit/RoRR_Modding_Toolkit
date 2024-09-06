@@ -36,11 +36,11 @@ Buff.ARRAY = {
 Buff.find = function(namespace, identifier)
     if identifier then namespace = namespace.."-"..identifier end
 
-    for i, buff in Class.BUFF do
+    for i, buff in ipairs(Class.BUFF) do
         local _namespace = buff:get(0)
         local _identifier = buff:get(1)
         if namespace == _namespace.."-".._identifier then
-            return Buff.wrap(i)
+            return Buff.wrap(i - 1)
         end
     end
 
