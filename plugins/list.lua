@@ -54,12 +54,14 @@ methods_list = {
 
     add = function(self, ...)
         local values = {...}
-        gm.ds_list_add(self.value, table.unpack(values))
+        for _, v in ipairs(values) do
+            gm.ds_list_add(self.value, Wrap.unwrap(v))
+        end
     end,
 
 
     insert = function(self, index, value)
-        gm.ds_list_insert(self.value, index, value)
+        gm.ds_list_insert(self.value, index, Wrap.unwrap(value))
     end,
     
 
@@ -69,12 +71,12 @@ methods_list = {
 
 
     contains = function(self, value)
-        return gm.ds_list_find_index(self.value, value) >= 0
+        return gm.ds_list_find_index(self.value, Wrap.unwrap(value)) >= 0
     end,
 
 
-    find = function(self)
-        local pos = gm.ds_list_find_index(self.value, value)
+    find = function(self, value)
+        local pos = gm.ds_list_find_index(self.value, Wrap.unwrap(value))
         if pos < 0 then return nil end
         return pos
     end,

@@ -48,7 +48,9 @@ methods_array = {
 
     push = function(self, ...)
         local values = {...}
-        gm.array_push(self.value, table.unpack(values))
+        for _, v in ipairs(values) do
+            gm.array_push(self.value, Wrap.unwrap(v))
+        end
     end,
 
 
@@ -58,7 +60,7 @@ methods_array = {
 
 
     insert = function(self, index, value)
-        gm.array_insert(self.value, index, value)
+        gm.array_insert(self.value, index, Wrap.unwrap(value))
     end,
     
 
@@ -68,7 +70,7 @@ methods_array = {
 
 
     contains = function(self, value, offset, length)
-        return gm.array_contains(self.value, value, offset, length)
+        return gm.array_contains(self.value, Wrap.unwrap(value), offset, length)
     end,
 
 
