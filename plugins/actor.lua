@@ -16,6 +16,7 @@ Actor.add_callback = function(callback, func, skill)
         table.insert(callbacks["onSkillUse"][skill], func)
 
     elseif callback == "onStatRecalc"
+        or callback == "onPostStatRecalc"
         or callback == "onBasicUse"
         or callback == "onAttack"
         or callback == "onPostAttack"
@@ -190,6 +191,7 @@ methods_actor = {
 methods_actor_callbacks = {
     
     onStatRecalc        = function(self, func) Actor.add_callback("onStatRecalc", func) end,
+    onPostStatRecalc    = function(self, func) Actor.add_callback("onPostStatRecalc", func) end,
     onSkillUse          = function(self, func, skill) Actor.add_callback("onSkillUse", func, skill) end,
     onBasicUse          = function(self, func) Actor.add_callback("onBasicUse", func) end,
     onAttack            = function(self, func) Actor.add_callback("onAttack", func) end,
@@ -247,6 +249,12 @@ setmetatable(Actor, metatable_actor_callbacks)
 gm.post_script_hook(gm.constants.recalculate_stats, function(self, other, result, args)
     if callbacks["onStatRecalc"] then
         for _, fn in ipairs(callbacks["onStatRecalc"]) do
+            fn(Instance.wrap(self))   -- Actor
+        end
+    end
+
+    if callbacks["onPostStatRecalc"] then
+        for _, fn in ipairs(callbacks["onPostStatRecalc"]) do
             fn(Instance.wrap(self))   -- Actor
         end
     end

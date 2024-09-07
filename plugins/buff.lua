@@ -116,6 +116,7 @@ methods_buff = {
             table.insert(callbacks[callback_id], {self.value, func})
 
         elseif callback == "onStatRecalc"
+            or callback == "onPostStatRecalc"
             or callback == "onDraw"
             or callback == "onChange"
             then
@@ -132,12 +133,13 @@ methods_buff = {
 
 methods_buff_callbacks = {
 
-    onApply         = function(self, func) self:add_callback("onApply", func) end,
-    onRemove        = function(self, func) self:add_callback("onRemove", func) end,
-    onStatRecalc    = function(self, func) self:add_callback("onStatRecalc", func) end,
-    onStep          = function(self, func) self:add_callback("onStep", func) end,
-    onDraw          = function(self, func) self:add_callback("onDraw", func) end,
-    onChange        = function(self, func) self:add_callback("onChange", func) end
+    onApply             = function(self, func) self:add_callback("onApply", func) end,
+    onRemove            = function(self, func) self:add_callback("onRemove", func) end,
+    onStatRecalc        = function(self, func) self:add_callback("onStatRecalc", func) end,
+    onPostStatRecalc    = function(self, func) self:add_callback("onPostStatRecalc", func) end,
+    onStep              = function(self, func) self:add_callback("onStep", func) end,
+    onDraw              = function(self, func) self:add_callback("onDraw", func) end,
+    onChange            = function(self, func) self:add_callback("onChange", func) end
 
 }
 
@@ -228,6 +230,16 @@ end)
 gm.post_script_hook(gm.constants.recalculate_stats, function(self, other, result, args)
     if callbacks["onStatRecalc"] then
         for _, fn in ipairs(callbacks["onStatRecalc"]) do
+            local actor = Instance.wrap(self)
+            local count = actor:buff_stack_count(fn[1])
+            if count > 0 then
+                fn[2](actor, count)   -- Actor, Stack count
+            end
+        end
+    end
+
+    if callbacks["onPostStatRecalc"] then
+        for _, fn in ipairs(callbacks["onPostStatRecalc"]) do
             local actor = Instance.wrap(self)
             local count = actor:buff_stack_count(fn[1])
             if count > 0 then

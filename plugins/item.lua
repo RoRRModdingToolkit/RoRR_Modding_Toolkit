@@ -175,6 +175,7 @@ methods_item = {
             table.insert(callbacks[callback_id], func)
 
         elseif callback == "onStatRecalc"
+            or callback == "onPostStatRecalc"
             or callback == "onBasicUse"
             or callback == "onAttack"
             or callback == "onPostAttack"
@@ -295,6 +296,7 @@ methods_item_callbacks = {
     onPickup            = function(self, func) self:add_callback("onPickup", func) end,
     onRemove            = function(self, func) self:add_callback("onRemove", func) end,
     onStatRecalc        = function(self, func) self:add_callback("onStatRecalc", func) end,
+    onPostStatRecalc    = function(self, func) self:add_callback("onPostStatRecalc", func) end,
     onBasicUse          = function(self, func) self:add_callback("onBasicUse", func) end,
     onAttack            = function(self, func) self:add_callback("onAttack", func) end,
     onPostAttack        = function(self, func) self:add_callback("onPostAttack", func) end,
@@ -385,6 +387,16 @@ end)
 gm.post_script_hook(gm.constants.recalculate_stats, function(self, other, result, args)
     if callbacks["onStatRecalc"] then
         for _, fn in ipairs(callbacks["onStatRecalc"]) do
+            local actor = Instance.wrap(self)
+            local count = actor:item_stack_count(fn[1])
+            if count > 0 then
+                fn[2](actor, count)   -- Actor, Stack count
+            end
+        end
+    end
+
+    if callbacks["onPostStatRecalc"] then
+        for _, fn in ipairs(callbacks["onPostStatRecalc"]) do
             local actor = Instance.wrap(self)
             local count = actor:item_stack_count(fn[1])
             if count > 0 then

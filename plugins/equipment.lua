@@ -132,6 +132,7 @@ methods_equipment = {
 
         elseif callback == "onPickup"
             or callback == "onStatRecalc"
+            or callback == "onPostStatRecalc"
             or callback == "onStep"
             or callback == "onDraw"
             then
@@ -204,11 +205,12 @@ methods_equipment = {
 
 methods_equipment_callbacks = {
 
-    onPickup        = function(self, func) self:add_callback("onPickup", func) end,
-    onUse           = function(self, func) self:add_callback("onUse", func) end,
-    onStatRecalc    = function(self, func) self:add_callback("onStatRecalc", func) end,
-    onStep          = function(self, func) self:add_callback("onStep", func) end,
-    onDraw          = function(self, func) self:add_callback("onDraw", func) end
+    onPickup            = function(self, func) self:add_callback("onPickup", func) end,
+    onUse               = function(self, func) self:add_callback("onUse", func) end,
+    onStatRecalc        = function(self, func) self:add_callback("onStatRecalc", func) end,
+    onPostStatRecalc    = function(self, func) self:add_callback("onPostStatRecalc", func) end,
+    onStep              = function(self, func) self:add_callback("onStep", func) end,
+    onDraw              = function(self, func) self:add_callback("onDraw", func) end
 
 }
 
@@ -291,6 +293,18 @@ end)
 gm.post_script_hook(gm.constants.recalculate_stats, function(self, other, result, args)
     if callbacks["onStatRecalc"] then
         for _, fn in ipairs(callbacks["onStatRecalc"]) do
+            local actor = Instance.wrap(self)
+            if actor.RMT_wrapper == "Player" then
+                local equip = actor:get_equipment()
+                if equip and equip.value == fn[1] then
+                    fn[2](actor)  -- Player
+                end
+            end
+        end
+    end
+
+    if callbacks["onPostStatRecalc"] then
+        for _, fn in ipairs(callbacks["onPostStatRecalc"]) do
             local actor = Instance.wrap(self)
             if actor.RMT_wrapper == "Player" then
                 local equip = actor:get_equipment()
