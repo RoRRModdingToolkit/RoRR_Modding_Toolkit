@@ -127,6 +127,16 @@ methods_object = {
 }
 
 
+methods_object_callbacks = {
+
+    onCreate        = function(self, func) self:add_callback("onCreate", func) end,
+    onDestroy       = function(self, func) self:add_callback("onDestroy", func) end,
+    onStep          = function(self, func) self:add_callback("onStep", func) end,
+    onDraw          = function(self, func) self:add_callback("onDraw", func) end
+
+}
+
+
 
 -- ========== Metatables ==========
 
@@ -155,6 +165,24 @@ metatable_object_gs = {
 }
 
 
+metatable_object_callbacks = {
+    __index = function(table, key)
+        -- Methods
+        if methods_object_callbacks[key] then
+            return methods_object_callbacks[key]
+        end
+
+        -- Pass to next metatable
+        return metatable_object_gs.__index(table, key)
+    end,
+    
+
+    __newindex = function(table, key, value)
+        metatable_object_gs.__newindex(table, key, value)
+    end
+}
+
+
 metatable_object = {
     __index = function(table, key)
         -- Methods
@@ -163,7 +191,7 @@ metatable_object = {
         end
 
         -- Pass to next metatable
-        return metatable_object_gs.__index(table, key)
+        return metatable_object_callbacks.__index(table, key)
     end,
     
 
