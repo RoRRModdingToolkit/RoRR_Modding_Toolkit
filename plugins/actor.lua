@@ -15,7 +15,8 @@ Actor.add_callback = function(callback, func, skill)
         if not callbacks["onSkillUse"][skill] then callbacks["onSkillUse"][skill] = {} end
         table.insert(callbacks["onSkillUse"][skill], func)
 
-    elseif callback == "onBasicUse"
+    elseif callback == "onStatRecalc"
+        or callback == "onBasicUse"
         or callback == "onAttack"
         or callback == "onPostAttack"
         or callback == "onHit"
@@ -186,6 +187,28 @@ methods_actor = {
 }
 
 
+methods_actor_callbacks = {
+    
+    onStatRecalc        = function(self, func) Actor.add_callback("onStatRecalc", func) end,
+    onSkillUse          = function(self, func, skill) Actor.add_callback("onSkillUse", func, skill) end,
+    onBasicUse          = function(self, func) Actor.add_callback("onBasicUse", func) end,
+    onAttack            = function(self, func) Actor.add_callback("onAttack", func) end,
+    onPostAttack        = function(self, func) Actor.add_callback("onPostAttack", func) end,
+    onHit               = function(self, func) Actor.add_callback("onHit", func) end,
+    onKill              = function(self, func) Actor.add_callback("onKill", func) end,
+    onDamaged           = function(self, func) Actor.add_callback("onDamaged", func) end,
+    onDamageBlocked     = function(self, func) Actor.add_callback("onDamageBlocked", func) end,
+    onHeal              = function(self, func) Actor.add_callback("onHeal", func) end,
+    onShieldBreak       = function(self, func) Actor.add_callback("onShieldBreak", func) end,
+    onInteract          = function(self, func) Actor.add_callback("onInteract", func) end,
+    onEquipmentUse      = function(self, func) Actor.add_callback("onEquipmentUse", func) end,
+    onPreStep           = function(self, func) Actor.add_callback("onPreStep", func) end,
+    onPostStep          = function(self, func) Actor.add_callback("onPostStep", func) end,
+    onDraw              = function(self, func) Actor.add_callback("onDraw", func) end
+
+}
+
+
 
 -- ========== Metatables ==========
 
@@ -207,8 +230,28 @@ metatable_actor = {
 }
 
 
+metatable_actor_callbacks = {
+    __index = function(table, key)
+        -- Methods
+        if methods_actor_callbacks[key] then
+            return methods_actor_callbacks[key]
+        end
+    end
+}
+setmetatable(Actor, metatable_actor_callbacks)
+
+
 
 -- ========== Hooks ==========
+
+gm.post_script_hook(gm.constants.recalculate_stats, function(self, other, result, args)
+    if callbacks["onStatRecalc"] then
+        for _, fn in ipairs(callbacks["onStatRecalc"]) do
+            fn(Instance.wrap(self))   -- Actor
+        end
+    end
+end)
+
 
 gm.pre_script_hook(gm.constants.skill_activate, function(self, other, result, args)
     local actor = Instance.wrap(self)
