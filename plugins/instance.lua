@@ -146,9 +146,6 @@ end
 
 methods_instance = {
 
-    is_instance_wrapper = true,
-
-
     -- Return true if instance exists
     exists = function(self)
         return gm.instance_exists(self.value) == 1.0
