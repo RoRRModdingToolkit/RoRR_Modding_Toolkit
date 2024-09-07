@@ -27,6 +27,7 @@ end
 methods_array = {
 
     get = function(self, index)
+        if index < 0 or index >= self:size() then return nil end
         return Wrap.wrap(gm.array_get(self.value, index))
     end,
 
