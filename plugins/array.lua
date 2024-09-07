@@ -69,6 +69,14 @@ methods_array = {
     end,
 
 
+    clear = function(self)
+        local size = self:size()
+        for i = 1, size do
+            gm.array_delete(self.value, 0)
+        end
+    end,
+
+
     contains = function(self, value, offset, length)
         return gm.array_contains(self.value, Wrap.unwrap(value), offset, length)
     end,
