@@ -226,6 +226,14 @@ methods_skill = {
     end,
 }
 
+methods_skill_callbacks = {
+    onCanActivate   = function(self, func) self:add_callback("onCanActivate", func) end,
+    onActivate      = function(self, func) self:add_callback("onActivate", func) end,
+    onStep          = function(self, func) self:add_callback("onStep", func) end,
+    onEquipped      = function(self, func) self:add_callback("onEquipped", func) end,
+    onUnequipped    = function(self, func) self:add_callback("onUnequipped", func) end
+}
+
 -- ========== Metatables ==========
 
 metatable_skill_gs = {
@@ -250,6 +258,17 @@ metatable_skill_gs = {
     end
 }
 
+metatable_skill_callbacks = {
+    __index = function(table, key)
+        -- Methods
+        if methods_skill_callbacks[key] then
+            return methods_skill_callbacks[key]
+        end
+
+        -- Pass to next metatable
+        return metatable_skill_gs.__index(table, key)
+    end
+}
 
 metatable_skill = {
     __index = function(table, key)
@@ -259,7 +278,7 @@ metatable_skill = {
         end
 
         -- Pass to next metatable
-        return metatable_skill_gs.__index(table, key)
+        return metatable_skill_callbacks.__index(table, key)
     end,
     
 

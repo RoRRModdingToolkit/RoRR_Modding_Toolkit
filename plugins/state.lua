@@ -106,6 +106,13 @@ methods_state = {
 
 }
 
+methods_state_callbacks = {
+    onEnter                     = function(self, func) self:add_callback("onEnter", func) end,
+    onExit                      = function(self, func) self:add_callback("onExit", func) end,
+    onStep                      = function(self, func) self:add_callback("onStep", func) end,
+    on_get_interrupt_priority   = function(self, func) self:add_callback("onGetInterruptPriority", func) end
+}
+
 -- ========== Metatables ==========
 
 metatable_state_gs = {
@@ -130,6 +137,18 @@ metatable_state_gs = {
     end
 }
 
+metatable_state_callbacks = {
+    __index = function(table, key)
+        -- Methods
+        if methods_state_callbacks[key] then
+            return methods_state_callbacks[key]
+        end
+
+        -- Pass to next metatable
+        return metatable_state_gs.__index(table, key)
+    end
+}
+
 
 metatable_state = {
     __index = function(table, key)
@@ -139,7 +158,7 @@ metatable_state = {
         end
 
         -- Pass to next metatable
-        return metatable_state_gs.__index(table, key)
+        return metatable_state_callbacks.__index(table, key)
     end,
     
 
