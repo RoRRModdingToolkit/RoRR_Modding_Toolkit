@@ -174,7 +174,8 @@ methods_item = {
             if not callbacks[callback_id] then callbacks[callback_id] = {} end
             table.insert(callbacks[callback_id], func)
 
-        elseif callback == "onBasicUse"
+        elseif callback == "onStatRecalc"
+            or callback == "onBasicUse"
             or callback == "onAttack"
             or callback == "onPostAttack"
             or callback == "onHit"
@@ -291,21 +292,22 @@ methods_item = {
 
 methods_item_callbacks = {
 
-    onPickup        = function(self, func) self:add_callback("onPickup", func) end,
-    onRemove        = function(self, func) self:add_callback("onRemove", func) end,
-    onBasicUse      = function(self, func) self:add_callback("onBasicUse", func) end,
-    onAttack        = function(self, func) self:add_callback("onAttack", func) end,
-    onPostAttack    = function(self, func) self:add_callback("onPostAttack", func) end,
-    onHit           = function(self, func) self:add_callback("onHit", func) end,
-    onKill          = function(self, func) self:add_callback("onKill", func) end,
-    onDamaged       = function(self, func) self:add_callback("onDamaged", func) end,
-    onDamageBlocked = function(self, func) self:add_callback("onDamageBlocked", func) end,
-    onHeal          = function(self, func) self:add_callback("onHeal", func) end,
-    onShieldBreak   = function(self, func) self:add_callback("onShieldBreak", func) end,
-    onInteract      = function(self, func) self:add_callback("onInteract", func) end,
-    onEquipmentUse  = function(self, func) self:add_callback("onEquipmentUse", func) end,
-    onStep          = function(self, func) self:add_callback("onStep", func) end,
-    onDraw          = function(self, func) self:add_callback("onDraw", func) end
+    onPickup            = function(self, func) self:add_callback("onPickup", func) end,
+    onRemove            = function(self, func) self:add_callback("onRemove", func) end,
+    onStatRecalc        = function(self, func) self:add_callback("onStatRecalc", func) end,
+    onBasicUse          = function(self, func) self:add_callback("onBasicUse", func) end,
+    onAttack            = function(self, func) self:add_callback("onAttack", func) end,
+    onPostAttack        = function(self, func) self:add_callback("onPostAttack", func) end,
+    onHit               = function(self, func) self:add_callback("onHit", func) end,
+    onKill              = function(self, func) self:add_callback("onKill", func) end,
+    onDamaged           = function(self, func) self:add_callback("onDamaged", func) end,
+    onDamageBlocked     = function(self, func) self:add_callback("onDamageBlocked", func) end,
+    onHeal              = function(self, func) self:add_callback("onHeal", func) end,
+    onShieldBreak       = function(self, func) self:add_callback("onShieldBreak", func) end,
+    onInteract          = function(self, func) self:add_callback("onInteract", func) end,
+    onEquipmentUse      = function(self, func) self:add_callback("onEquipmentUse", func) end,
+    onStep              = function(self, func) self:add_callback("onStep", func) end,
+    onDraw              = function(self, func) self:add_callback("onDraw", func) end
 
 }
 
@@ -375,6 +377,19 @@ gm.post_script_hook(gm.constants.callback_execute, function(self, other, result,
     if callbacks[args[1].value] then
         for _, fn in ipairs(callbacks[args[1].value]) do
             fn(Instance.wrap(args[2].value), args[3].value)
+        end
+    end
+end)
+
+
+gm.post_script_hook(gm.constants.recalculate_stats, function(self, other, result, args)
+    if callbacks["onStatRecalc"] then
+        for _, fn in ipairs(callbacks["onStatRecalc"]) do
+            local actor = Instance.wrap(self)
+            local count = actor:item_stack_count(fn[1])
+            if count > 0 then
+                fn[2](actor, count)   -- Actor, Stack count
+            end
         end
     end
 end)

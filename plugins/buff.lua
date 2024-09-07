@@ -115,7 +115,8 @@ methods_buff = {
             if not callbacks[callback_id] then callbacks[callback_id] = {} end
             table.insert(callbacks[callback_id], {self.value, func})
 
-        elseif callback == "onDraw"
+        elseif callback == "onStatRecalc"
+            or callback == "onDraw"
             or callback == "onChange"
             then
                 if not callbacks[callback] then callbacks[callback] = {} end
@@ -131,11 +132,12 @@ methods_buff = {
 
 methods_buff_callbacks = {
 
-    onApply     = function(self, func) self:add_callback("onApply", func) end,
-    onRemove    = function(self, func) self:add_callback("onRemove", func) end,
-    onStep      = function(self, func) self:add_callback("onStep", func) end,
-    onDraw      = function(self, func) self:add_callback("onDraw", func) end,
-    onChange    = function(self, func) self:add_callback("onChange", func) end
+    onApply         = function(self, func) self:add_callback("onApply", func) end,
+    onRemove        = function(self, func) self:add_callback("onRemove", func) end,
+    onStatRecalc    = function(self, func) self:add_callback("onStatRecalc", func) end,
+    onStep          = function(self, func) self:add_callback("onStep", func) end,
+    onDraw          = function(self, func) self:add_callback("onDraw", func) end,
+    onChange        = function(self, func) self:add_callback("onChange", func) end
 
 }
 
@@ -223,13 +225,26 @@ gm.pre_script_hook(gm.constants.apply_buff_internal, function(self, other, resul
 end)
 
 
+gm.post_script_hook(gm.constants.recalculate_stats, function(self, other, result, args)
+    if callbacks["onStatRecalc"] then
+        for _, fn in ipairs(callbacks["onStatRecalc"]) do
+            local actor = Instance.wrap(self)
+            local count = actor:buff_stack_count(fn[1])
+            if count > 0 then
+                fn[2](actor, count)   -- Actor, Stack count
+            end
+        end
+    end
+end)
+
+
 gm.pre_script_hook(gm.constants.actor_transform, function(self, other, result, args)
     if callbacks["onChange"] then
         for _, fn in pairs(callbacks["onChange"]) do
             local actor = Instance.wrap(args[1].value)
             local count = actor:buff_stack_count(fn[1])
             if count > 0 then
-                fn[2](actor, Instance.wrap(args[2].value), stack)   -- Actor, To, Buff stack
+                fn[2](actor, Instance.wrap(args[2].value), count)   -- Actor, To, Buff stack
             end
         end
     end

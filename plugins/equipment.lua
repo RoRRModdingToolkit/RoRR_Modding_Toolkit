@@ -131,6 +131,7 @@ methods_equipment = {
             table.insert(callbacks[callback_id], func)
 
         elseif callback == "onPickup"
+            or callback == "onStatRecalc"
             or callback == "onStep"
             or callback == "onDraw"
             then
@@ -203,10 +204,11 @@ methods_equipment = {
 
 methods_equipment_callbacks = {
 
-    onUse       = function(self, func) self:add_callback("onUse", func) end,
-    onPickup    = function(self, func) self:add_callback("onPickup", func) end,
-    onStep      = function(self, func) self:add_callback("onStep", func) end,
-    onDraw      = function(self, func) self:add_callback("onDraw", func) end
+    onPickup        = function(self, func) self:add_callback("onPickup", func) end,
+    onUse           = function(self, func) self:add_callback("onUse", func) end,
+    onStatRecalc    = function(self, func) self:add_callback("onStatRecalc", func) end,
+    onStep          = function(self, func) self:add_callback("onStep", func) end,
+    onDraw          = function(self, func) self:add_callback("onDraw", func) end
 
 }
 
@@ -281,6 +283,21 @@ gm.post_script_hook(gm.constants.callback_execute, function(self, other, result,
     if callbacks[args[1].value] then
         for _, fn in ipairs(callbacks[args[1].value]) do
             fn(Instance.wrap(args[2].value))   -- Actor
+        end
+    end
+end)
+
+
+gm.post_script_hook(gm.constants.recalculate_stats, function(self, other, result, args)
+    if callbacks["onStatRecalc"] then
+        for _, fn in ipairs(callbacks["onStatRecalc"]) do
+            local actor = Instance.wrap(self)
+            if actor.RMT_wrapper == "Player" then
+                local equip = actor:get_equipment()
+                if equip and equip.value == fn[1] then
+                    fn[2](actor)  -- Player
+                end
+            end
         end
     end
 end)
