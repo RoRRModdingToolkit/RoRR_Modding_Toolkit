@@ -72,7 +72,7 @@ methods_array = {
     clear = function(self)
         local size = self:size()
         for i = 1, size do
-            gm.array_delete(self.value, 0)
+            gm.array_delete(self.value, 0, 1)
         end
     end,
 
