@@ -127,6 +127,17 @@ methods_buff = {
 }
 
 
+methods_buff_callbacks = {
+
+    onApply     = function(self, func) self:add_callback("onApply", func) end,
+    onRemove    = function(self, func) self:add_callback("onRemove", func) end,
+    onStep      = function(self, func) self:add_callback("onStep", func) end,
+    onDraw      = function(self, func) self:add_callback("onDraw", func) end,
+    onChange    = function(self, func) self:add_callback("onChange", func) end
+
+}
+
+
 
 -- ========== Metatables ==========
 
@@ -153,6 +164,24 @@ metatable_buff_gs = {
 }
 
 
+metatable_buff_callbacks = {
+    __index = function(table, key)
+        -- Methods
+        if methods_buff_callbacks[key] then
+            return methods_buff_callbacks[key]
+        end
+
+        -- Pass to next metatable
+        return metatable_buff_gs.__index(table, key)
+    end,
+    
+
+    __newindex = function(table, key, value)
+        metatable_buff_gs.__newindex(table, key, value)
+    end
+}
+
+
 metatable_buff = {
     __index = function(table, key)
         -- Methods
@@ -161,7 +190,7 @@ metatable_buff = {
         end
 
         -- Pass to next metatable
-        return metatable_buff_gs.__index(table, key)
+        return metatable_buff_callbacks.__index(table, key)
     end,
     
 
