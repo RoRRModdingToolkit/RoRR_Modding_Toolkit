@@ -121,6 +121,9 @@ methods_buff = {
                 if not callbacks[callback] then callbacks[callback] = {} end
                 table.insert(callbacks[callback], {self.value, func})
 
+        else
+            log.info("Invalid callback name!")
+
         end
     end
 
