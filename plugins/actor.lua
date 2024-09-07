@@ -47,6 +47,11 @@ methods_actor = {
     end,
 
 
+    recalculate_stats = function(self)
+        self.value:recalculate_stats()
+    end,
+
+
     fire_bullet = function(self, x, y, direction, range, damage, pierce_multiplier, hit_sprite)
         local damager = self.value:fire_bullet(0, x, y, (pierce_multiplier and 1) or 0, damage, range, hit_sprite or -1, direction, 1.0, 1.0, -1.0)
         if pierce_multiplier then damager.damage_degrade = (1.0 - pierce_multiplier) end
