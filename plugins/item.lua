@@ -191,8 +191,7 @@ methods_item = {
                 if not callbacks[callback] then callbacks[callback] = {} end
                 table.insert(callbacks[callback], {self.value, func})
 
-        else
-            log.info("Invalid callback name!")
+        else error("invalid callback name", 2)
 
         end
     end,

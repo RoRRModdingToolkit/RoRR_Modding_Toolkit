@@ -98,8 +98,7 @@ methods_object = {
             if not callbacks[callback_id] then callbacks[callback_id] = {} end
             table.insert(callbacks[callback_id], func)
 
-        else
-            log.info("Invalid callback name!")
+        else error("invalid callback name", 2)
 
         end
     end,
