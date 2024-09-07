@@ -7,7 +7,7 @@ Array = {}
 -- ========== Static Methods ==========
 
 Array.new = function(size, value)
-    return Array.wrap(gm.array_create(size, value or 0))
+    return Array.wrap(gm.array_create(size or 0, value or 0))
 end
 
 
