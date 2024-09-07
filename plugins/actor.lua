@@ -209,7 +209,7 @@ gm.pre_script_hook(gm.constants.skill_activate, function(self, other, result, ar
     local actor = Instance.wrap(self)
 
     if callbacks["onSkillUse"] then
-        for id, skill in pairs(callbacks["onSkillUse"]) do
+        for id, skill in ipairs(callbacks["onSkillUse"]) do
             if gm.array_get(self.skills, args[1].value).active_skill.skill_id == id then
                 for _, fn in pairs(skill) do
                     fn(actor)   -- Actor
@@ -220,7 +220,7 @@ gm.pre_script_hook(gm.constants.skill_activate, function(self, other, result, ar
 
     if args[1].value ~= 0.0 or gm.array_get(self.skills, 0).active_skill.skill_id == 70.0 then return true end
     if callbacks["onBasicUse"] then
-        for _, fn in pairs(callbacks["onBasicUse"]) do
+        for _, fn in ipairs(callbacks["onBasicUse"]) do
             fn(actor)   -- Actor
         end
     end
@@ -229,7 +229,7 @@ end)
 
 gm.pre_script_hook(gm.constants.actor_heal_networked, function(self, other, result, args)
     if callbacks["onHeal"] then
-        for _, fn in pairs(callbacks["onHeal"]) do
+        for _, fn in ipairs(callbacks["onHeal"]) do
             fn(Instance.wrap(args[1].value), args[2].value)   -- Actor, Heal amount
         end
     end
@@ -266,7 +266,7 @@ end)
 
 gm.post_script_hook(gm.constants.draw_actor, function(self, other, result, args)
     if callbacks["onDraw"] then
-        for _, fn in pairs(callbacks["onDraw"]) do
+        for _, fn in ipairs(callbacks["onDraw"]) do
             fn(Instance.wrap(self))   -- Actor
         end
     end

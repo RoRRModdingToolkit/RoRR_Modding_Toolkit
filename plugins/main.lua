@@ -38,6 +38,7 @@ function __initialize()
 
     Actor.__initialize()
     Buff.__initialize()
+    Equipment.__initialize()
     -- Instance.__initialize()
     Item.__initialize()
 end

@@ -373,7 +373,7 @@ metatable_item = {
 gm.post_script_hook(gm.constants.callback_execute, function(self, other, result, args)
     -- onPickup and onRemove
     if callbacks[args[1].value] then
-        for _, fn in pairs(callbacks[args[1].value]) do
+        for _, fn in ipairs(callbacks[args[1].value]) do
             fn(Instance.wrap(args[2].value), args[3].value)
         end
     end
@@ -383,7 +383,7 @@ end)
 gm.pre_script_hook(gm.constants.skill_activate, function(self, other, result, args)
     if args[1].value ~= 0.0 or gm.array_get(self.skills, 0).active_skill.skill_id == 70.0 then return true end
     if callbacks["onBasicUse"] then
-        for _, fn in pairs(callbacks["onBasicUse"]) do
+        for _, fn in ipairs(callbacks["onBasicUse"]) do
             local actor = Instance.wrap(self)
             local count = actor:item_stack_count(fn[1])
             if count > 0 then
@@ -396,7 +396,7 @@ end)
 
 gm.pre_script_hook(gm.constants.actor_heal_networked, function(self, other, result, args)
     if callbacks["onHeal"] then
-        for _, fn in pairs(callbacks["onHeal"]) do
+        for _, fn in ipairs(callbacks["onHeal"]) do
             local actor = Instance.wrap(args[1].value)
             local count = actor:item_stack_count(fn[1])
             if count > 0 then

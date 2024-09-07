@@ -130,6 +130,13 @@ methods_equipment = {
             if not callbacks[callback_id] then callbacks[callback_id] = {} end
             table.insert(callbacks[callback_id], func)
 
+        elseif callback == "onPickup"
+            or callback == "onStep"
+            or callback == "onDraw"
+            then
+                if not callbacks[callback] then callbacks[callback] = {} end
+                table.insert(callbacks[callback], {self.value, func})
+
         else error("invalid callback name", 2)
 
         end
@@ -196,7 +203,10 @@ methods_equipment = {
 
 methods_equipment_callbacks = {
 
-    onUse   = function(self, func) self:add_callback("onUse", func) end
+    onUse       = function(self, func) self:add_callback("onUse", func) end,
+    onPickup    = function(self, func) self:add_callback("onPickup", func) end,
+    onStep      = function(self, func) self:add_callback("onStep", func) end,
+    onDraw      = function(self, func) self:add_callback("onDraw", func) end
 
 }
 
@@ -269,8 +279,63 @@ metatable_equipment = {
 gm.post_script_hook(gm.constants.callback_execute, function(self, other, result, args)
     -- onUse
     if callbacks[args[1].value] then
-        for _, fn in pairs(callbacks[args[1].value]) do
+        for _, fn in ipairs(callbacks[args[1].value]) do
             fn(Instance.wrap(args[2].value))   -- Actor
         end
     end
 end)
+
+
+gm.post_script_hook(gm.constants.equipment_set, function(self, other, result, args)
+    if callbacks["onPickup"] then
+        for _, fn in ipairs(callbacks["onPickup"]) do
+            fn[2](Instance.wrap(args[1].value))   -- Actor
+        end
+    end
+end)
+
+
+
+-- ========== Callbacks ==========
+
+local function equipment_onStep(self, other, result, args)
+    if gm.variable_global_get("pause") then return end
+    
+    if callbacks["onStep"] then
+        local players = Instance.find_all(gm.constants.oP)
+        for n, player in ipairs(players) do
+            for _, c in ipairs(callbacks["onStep"]) do
+                local equip = player:get_equipment()
+                if equip and equip.value == c[1] then
+                    c[2](player)  -- Player
+                end
+            end
+        end
+    end
+end
+
+
+local function equipment_onDraw(self, other, result, args)
+    if gm.variable_global_get("pause") then return end
+
+    if callbacks["onDraw"] then
+        local players = Instance.find_all(gm.constants.oP)
+        for n, player in ipairs(players) do
+            for _, c in ipairs(callbacks["onDraw"]) do
+                local equip = player:get_equipment()
+                if equip and equip.value == c[1] then
+                    c[2](player)  -- Player
+                end
+            end
+        end
+    end
+end
+
+
+
+-- ========== Initialize ==========
+
+Equipment.__initialize = function()
+    Callback.add("preStep", "RMT.equipment_onStep", equipment_onStep, true)
+    Callback.add("postHUDDraw", "RMT.equipment_onDraw", equipment_onDraw, true)
+end

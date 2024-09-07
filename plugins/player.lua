@@ -56,6 +56,15 @@ end
 
 methods_player = {
 
+    get_equipment = function(self)
+        local equip = gm.equipment_get(self.value)
+        if equip >= 0 then
+            return Equipment.wrap(equip)
+        end
+        return nil
+    end,
+
+
     get_equipment_cooldown = function(self)
         return gm.player_get_equipment_cooldown(self.value)
     end,
