@@ -49,11 +49,10 @@ Survivor.find = function(namespace, identifier)
     if identifier then namespace = namespace.."-"..identifier end
     
     for i, survivor in ipairs(Class.SURVIVOR) do
-            local _namespace = survivor:get(0)
-            local _identifier = survivor:get(1)
-            if namespace == _namespace.."-".._identifier then
-                return Survivor.wrap(i - 1)
-            end
+        local _namespace = survivor:get(0)
+        local _identifier = survivor:get(1)
+        if namespace == _namespace.."-".._identifier then
+            return Survivor.wrap(i - 1)
         end
     end
 
@@ -71,13 +70,20 @@ Survivor.wrap = function(survivor_id)
 end
 
 Survivor.new = function(namespace, identifier)
-    if Survivor.find(namespace, identifier) then return nil end
+    -- Check if survivor already exist
+    local survivor = Survivor.find(namespace, identifier)
+    if survivor then return survivor end
 
     -- Create survivor
-    local survivor = gm.survivor_create(namespace, identifier)
+    survivor = gm.survivor_create(namespace, identifier)
 
     -- Make survivor abstraction
     local abstraction = Survivor.wrap(survivor)
+
+    -- Create callbacks for on_init and on_step
+    -- abstraction.on_init = gm.callback_create()
+    abstraction.on_init = 77
+    abstraction.on_step = gm.callback_create()
 
     return abstraction
 end
@@ -112,6 +118,68 @@ methods_survivor = {
             if not callbacks[callback_id] then callbacks[callback_id] = {} end
             table.insert(callbacks[callback_id], func)
         end
+    end,
+
+    add_skill = function(self, skill, skill_family, achievement)
+        if not achievement then achievement = -1 end
+
+        local survivor_loadout_unlockables = gm.variable_global_get("survivor_loadout_unlockables")
+        
+        local survivor_loadout = gm.struct_create()
+
+        gm.static_set(survivor_loadout, gm.static_get(skill_family[1]))
+
+        survivor_loadout.skill_id = skill.value
+        survivor_loadout.achievement_id = achievement -- TODO make it compatible with the achievement module
+        survivor_loadout.save_flag_viewed = nil
+        survivor_loadout.index = gm.array_length(survivor_loadout_unlockables)
+
+        gm.array_push(survivor_loadout_unlockables, survivor_loadout)
+        gm.array_push(skill_family, survivor_loadout)
+    end,
+
+    add_primary = function(self, skill, achievement)
+        self:add_skill(skill, self.skill_family_z.elements, achievement)
+    end,
+    
+    add_secondary = function(self, skill, achievement)
+        self:add_skill(skill, self.skill_family_x.elements, achievement)
+    end,
+    
+    add_utility = function(self, skill, achievement)
+        self:add_skill(skill, self.skill_family_c.elements, achievement)
+    end,
+    
+    add_special = function(self, skill, achievement)
+        self:add_skill(skill, self.skill_family_v.elements, achievement)
+    end,
+
+    get_skill = function(self, skill_family, family_index)
+        if family_index > #skill_family or family_index < 1 then 
+            log.error("Family index is out of bound!")
+            return nil
+        end
+        return Skill.wrap(skill_family[family_index].skill_id)
+    end,
+    
+    get_primary = function(self, family_index)
+        local elements = self.skill_family_z.elements
+        return self:get_skill(elements, family_index)
+    end,
+
+    get_secondary = function(self, family_index)
+        local elements = self.skill_family_x.elements
+        return self:get_skill(elements, family_index)
+    end,
+
+    get_utility = function(self, family_index)
+        local elements = self.skill_family_c.elements
+        return self:get_skill(elements, family_index)
+    end,
+
+    get_special = function(self, family_index)
+        local elements = self.skill_family_v.elements
+        return self:get_skill(elements, family_index)
     end,
 }
 

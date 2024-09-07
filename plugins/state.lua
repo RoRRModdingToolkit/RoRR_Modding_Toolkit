@@ -52,10 +52,12 @@ State.wrap = function(state_id)
 end
 
 State.new = function(namespace, identifier)
-    if State.find(namespace, identifier) then return nil end
+    -- Check if state already exist
+    local state = State.find(namespace, identifier)
+    if state then return state end
 
     -- Create state
-    local state = gm.actor_state_create(
+    state = gm.actor_state_create(
         namespace,      -- Namespace
         identifier      -- Identifier
     )
