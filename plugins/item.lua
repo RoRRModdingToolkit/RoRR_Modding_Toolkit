@@ -191,6 +191,8 @@ methods_item = {
                 if not callbacks[callback] then callbacks[callback] = {} end
                 table.insert(callbacks[callback], {self.value, func})
 
+        else error("invalid callback name", 2)
+
         end
     end,
 
@@ -287,6 +289,27 @@ methods_item = {
 }
 
 
+methods_item_callbacks = {
+
+    onPickup        = function(self, func) self:add_callback("onPickup", func) end,
+    onRemove        = function(self, func) self:add_callback("onRemove", func) end,
+    onBasicUse      = function(self, func) self:add_callback("onBasicUse", func) end,
+    onAttack        = function(self, func) self:add_callback("onAttack", func) end,
+    onPostAttack    = function(self, func) self:add_callback("onPostAttack", func) end,
+    onHit           = function(self, func) self:add_callback("onHit", func) end,
+    onKill          = function(self, func) self:add_callback("onKill", func) end,
+    onDamaged       = function(self, func) self:add_callback("onDamaged", func) end,
+    onDamageBlocked = function(self, func) self:add_callback("onDamageBlocked", func) end,
+    onHeal          = function(self, func) self:add_callback("onHeal", func) end,
+    onShieldBreak   = function(self, func) self:add_callback("onShieldBreak", func) end,
+    onInteract      = function(self, func) self:add_callback("onInteract", func) end,
+    onEquipmentUse  = function(self, func) self:add_callback("onEquipmentUse", func) end,
+    onStep          = function(self, func) self:add_callback("onStep", func) end,
+    onDraw          = function(self, func) self:add_callback("onDraw", func) end
+
+}
+
+
 
 -- ========== Metatables ==========
 
@@ -313,6 +336,19 @@ metatable_item_gs = {
 }
 
 
+metatable_item_callbacks = {
+    __index = function(table, key)
+        -- Methods
+        if methods_item_callbacks[key] then
+            return methods_item_callbacks[key]
+        end
+
+        -- Pass to next metatable
+        return metatable_item_gs.__index(table, key)
+    end
+}
+
+
 metatable_item = {
     __index = function(table, key)
         -- Methods
@@ -321,7 +357,7 @@ metatable_item = {
         end
 
         -- Pass to next metatable
-        return metatable_item_gs.__index(table, key)
+        return metatable_item_callbacks.__index(table, key)
     end,
     
 

@@ -35,6 +35,12 @@ Object.find = function(namespace, identifier)
 
     if identifier then namespace = namespace.."-"..identifier end
 
+    -- Custom objects
+    local ind = gm.object_find(namespace)
+    if ind then
+        return Object.wrap(ind)
+    end
+
     -- Vanilla namespaced objects
     if string.sub(namespace, 1, 3) == "ror" then
         local obj = gm.constants["o"..string.upper(string.sub(namespace, 5, 5))..string.sub(namespace, 6, #namespace)]
@@ -42,12 +48,6 @@ Object.find = function(namespace, identifier)
             return Object.wrap(obj)
         end
         return nil
-    end
-
-    -- Custom objects
-    local ind = gm.object_find(namespace)
-    if ind then
-        return Object.wrap(ind)
     end
 
     return nil
@@ -98,6 +98,8 @@ methods_object = {
             if not callbacks[callback_id] then callbacks[callback_id] = {} end
             table.insert(callbacks[callback_id], func)
 
+        else error("invalid callback name", 2)
+
         end
     end,
 
@@ -123,6 +125,16 @@ methods_object = {
         local depths = Array.wrap(gm.variable_global_get("object_depths"))
         depths:set(self.value, depth)
     end
+
+}
+
+
+methods_object_callbacks = {
+
+    onCreate        = function(self, func) self:add_callback("onCreate", func) end,
+    onDestroy       = function(self, func) self:add_callback("onDestroy", func) end,
+    onStep          = function(self, func) self:add_callback("onStep", func) end,
+    onDraw          = function(self, func) self:add_callback("onDraw", func) end
 
 }
 
@@ -155,6 +167,24 @@ metatable_object_gs = {
 }
 
 
+metatable_object_callbacks = {
+    __index = function(table, key)
+        -- Methods
+        if methods_object_callbacks[key] then
+            return methods_object_callbacks[key]
+        end
+
+        -- Pass to next metatable
+        return metatable_object_gs.__index(table, key)
+    end,
+    
+
+    __newindex = function(table, key, value)
+        metatable_object_gs.__newindex(table, key, value)
+    end
+}
+
+
 metatable_object = {
     __index = function(table, key)
         -- Methods
@@ -163,7 +193,7 @@ metatable_object = {
         end
 
         -- Pass to next metatable
-        return metatable_object_gs.__index(table, key)
+        return metatable_object_callbacks.__index(table, key)
     end,
     
 

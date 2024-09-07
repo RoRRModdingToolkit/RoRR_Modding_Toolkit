@@ -16,6 +16,10 @@ Callback.TYPE = {}
 
 Callback.add = function(callback, id, func, replace)
     local callback_id = Callback.TYPE[callback]
+    if not callback_id then
+        error("invalid callback name", 2)
+        return
+    end
     if not callbacks[callback_id] then callbacks[callback_id] = {} end
     if replace or not callbacks[callback_id][id] then callbacks[callback_id][id] = func end
 end

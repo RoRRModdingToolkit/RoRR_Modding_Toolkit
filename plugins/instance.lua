@@ -43,13 +43,13 @@ Instance.projectiles = {
 -- ========== Static Methods ==========
 
 Instance.exists = function(inst)
-    if type(inst) == "table" and inst.RMT_wrapper then inst = inst.value end
+    inst = Wrap.unwrap(inst)
     return gm.instance_exists(inst) == 1.0
 end
 
 
 Instance.destroy = function(inst)
-    if type(inst) == "table" and inst.RMT_wrapper then inst = inst.value end
+    inst = Wrap.unwrap(inst)
     gm.instance_destroy(inst)
 end
 
@@ -146,9 +146,6 @@ end
 
 methods_instance = {
 
-    is_instance_wrapper = true,
-
-
     -- Return true if instance exists
     exists = function(self)
         return gm.instance_exists(self.value) == 1.0
@@ -167,7 +164,7 @@ methods_instance = {
     same = function(self, other)
         if not self:exists() then return false end
 
-        if type(other) == "table" and other.RMT_wrapper then other = other.value end
+        other = Wrap.unwrap(other)
         return self.value == other
     end,
 
@@ -175,7 +172,7 @@ methods_instance = {
     is_colliding = function(self, obj, x, y)
         if not self:exists() then return false end
 
-        if type(obj) == "table" and obj.RMT_wrapper then obj = obj.value end
+        obj = Wrap.unwrap(obj)
         return self.value:place_meeting(x or self.x, y or self.y, obj) == 1.0
     end,
 
@@ -183,14 +180,14 @@ methods_instance = {
     get_collisions = function(self, obj)
         if not self:exists() then return {}, 0 end
 
-        if type(obj) == "table" and obj.RMT_wrapper then obj = obj.value end
+        obj = Wrap.unwrap(obj)
 
         local list = List.new()
         self.value:collision_rectangle_list(self.bbox_left, self.bbox_top, self.bbox_right, self.bbox_bottom, obj, false, true, list.value, false)
 
         local insts = {}
         for _, inst in ipairs(list) do
-            table.insert(insts, Instance.wrap(inst))
+            table.insert(insts, inst)
         end
         list:destroy()
 

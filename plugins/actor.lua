@@ -119,21 +119,21 @@ methods_actor = {
 
 
     item_give = function(self, item, count, temp)
-        if type(item) == "table" and item.RMT_wrapper then item = item.value end
+        item = Wrap.unwrap(item)
         if not temp then temp = false end
         gm.item_give(self.value, item, count or 1, temp)
     end,
 
 
     item_remove = function(self, item, count, temp)
-        if type(item) == "table" and item.RMT_wrapper then item = item.value end
+        item = Wrap.unwrap(item)
         if not temp then temp = false end
         gm.item_take(self.value, item, count or 1, temp)
     end,
 
 
     item_stack_count = function(self, item, item_type)
-        if type(item) == "table" and item.RMT_wrapper then item = item.value end
+        item = Wrap.unwrap(item)
         if item_type == Item.TYPE.real then return gm.item_count(self.value, item, false) end
         if item_type == Item.TYPE.temporary then return gm.item_count(self.value, item, true) end
         return gm.item_count(self.value, item, false) + gm.item_count(self.value, item, true)
@@ -141,7 +141,7 @@ methods_actor = {
 
 
     buff_apply = function(self, buff, duration, count)
-        if type(buff) == "table" and buff.RMT_wrapper then buff = buff.value end
+        buff = Wrap.unwrap(buff)
         if self.buff_stack:size() <= buff then self.buff_stack:resize(buff + 1) end
 
         gm.apply_buff(self.value, buff, duration, count or 1)
@@ -154,7 +154,7 @@ methods_actor = {
 
 
     buff_remove = function(self, buff, count)
-        if type(buff) == "table" and buff.RMT_wrapper then buff = buff.value end
+        buff = Wrap.unwrap(buff)
         if self.buff_stack:size() <= buff then self.buff_stack:resize(buff + 1) end
 
         local stack_count = self:buff_stack_count(buff)
@@ -165,7 +165,7 @@ methods_actor = {
 
 
     buff_stack_count = function(self, buff)
-        if type(buff) == "table" and buff.RMT_wrapper then buff = buff.value end
+        buff = Wrap.unwrap(buff)
         if self.buff_stack:size() <= buff then self.buff_stack:resize(buff + 1) end
 
         local count = self.buff_stack:get(buff)

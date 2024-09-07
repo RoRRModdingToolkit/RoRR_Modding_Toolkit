@@ -130,6 +130,8 @@ methods_equipment = {
             if not callbacks[callback_id] then callbacks[callback_id] = {} end
             table.insert(callbacks[callback_id], func)
 
+        else error("invalid callback name", 2)
+
         end
     end,
 
@@ -192,6 +194,13 @@ methods_equipment = {
 }
 
 
+methods_equipment_callbacks = {
+
+    onUse   = function(self, func) self:add_callback("onUse", func) end
+
+}
+
+
 
 -- ========== Metatables ==========
 
@@ -218,6 +227,24 @@ metatable_equipment_gs = {
 }
 
 
+metatable_equipment_callbacks = {
+    __index = function(table, key)
+        -- Methods
+        if methods_equipment_callbacks[key] then
+            return methods_equipment_callbacks[key]
+        end
+
+        -- Pass to next metatable
+        return metatable_equipment_gs.__index(table, key)
+    end,
+    
+
+    __newindex = function(table, key, value)
+        metatable_equipment_gs.__newindex(table, key, value)
+    end
+}
+
+
 metatable_equipment = {
     __index = function(table, key)
         -- Methods
@@ -226,7 +253,7 @@ metatable_equipment = {
         end
 
         -- Pass to next metatable
-        return metatable_equipment_gs.__index(table, key)
+        return metatable_equipment_callbacks.__index(table, key)
     end,
     
 

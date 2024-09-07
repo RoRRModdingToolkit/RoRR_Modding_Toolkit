@@ -7,7 +7,7 @@ Array = {}
 -- ========== Static Methods ==========
 
 Array.new = function(size, value)
-    return Array.wrap(gm.array_create(size, value or 0))
+    return Array.wrap(gm.array_create(size or 0, value or 0))
 end
 
 
@@ -27,6 +27,7 @@ end
 methods_array = {
 
     get = function(self, index)
+        if index < 0 or index >= self:size() then return nil end
         return Wrap.wrap(gm.array_get(self.value, index))
     end,
 
@@ -66,6 +67,11 @@ methods_array = {
 
     delete = function(self, index, number)
         gm.array_delete(self.value, index, number or 1)
+    end,
+
+
+    clear = function(self)
+        gm.array_delete(self.value, 0, self:size())
     end,
 
 
@@ -119,5 +125,10 @@ metatable_array = {
 
     __newindex = function(table, key, value)
         metatable_array_gs.__newindex(table, key, value)
-    end
+    end,
+
+
+    __len = function(table)
+		return gm.array_length(table.value)
+	end
 }
