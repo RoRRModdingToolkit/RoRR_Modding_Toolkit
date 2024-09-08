@@ -145,27 +145,33 @@ methods_object_callbacks = {
 metatable_object_gs = {
     -- Getter
     __index = function(table, key)
-        local index = Object.ARRAY[key]
-        if index and table.value >= Object.CUSTOM_START then
-            local custom_object = Array.wrap(gm.variable_global_get("custom_object"))
-            local obj_array = custom_object:get(table.value - Object.CUSTOM_START)
-            return obj_array:get(index)
+        if table.value >= Object.CUSTOM_START then
+            local index = Object.ARRAY[key]
+            if index then
+                local custom_object = Array.wrap(gm.variable_global_get("custom_object"))
+                local obj_array = custom_object:get(table.value - Object.CUSTOM_START)
+                return obj_array:get(index)
+            end
+            log.error("Non-existent object property", 2)
         end
-        log.error("Non-existent object property", 2)
+        log.error("No object properties for vanilla objects", 2)
         return nil
     end,
 
 
     -- Setter
     __newindex = function(table, key, value)
-        local index = Object.ARRAY[key]
-        if index and table.value >= Object.CUSTOM_START then
-            local custom_object = Array.wrap(gm.variable_global_get("custom_object"))
-            local obj_array = custom_object:get(table.value - Object.CUSTOM_START)
-            obj_array:set(index, value)
-            return
+        if table.value >= Object.CUSTOM_START then
+            local index = Object.ARRAY[key]
+            if index then
+                local custom_object = Array.wrap(gm.variable_global_get("custom_object"))
+                local obj_array = custom_object:get(table.value - Object.CUSTOM_START)
+                obj_array:set(index, value)
+                return
+            end
+            log.error("Non-existent object property", 2)
         end
-        log.error("Non-existent object property", 2)
+        log.error("No object properties for vanilla objects", 2)
     end
 }
 
