@@ -151,6 +151,7 @@ metatable_object_gs = {
             local obj_array = custom_object:get(table.value - Object.CUSTOM_START)
             return obj_array:get(index)
         end
+        log.error("Non-existent object property", 2)
         return nil
     end,
 
