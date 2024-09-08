@@ -50,6 +50,16 @@ local abstraction_color = {
 
 -- ========== Static Functions ==========
 
+Color.make_rgb = function(red, green, blue)
+    return gm.make_colour_rgb(red, green, blue)
+end
+
+
+Color.make_hsv = function(hue, saturation, value)
+    return gm.make_colour_hsv(hue, sat, val)
+end
+
+
 Color.make_hex = function(hex)
     if type(hex) ~= "string" or #hex ~= 6 then
         log.error("Not a valid color hex code", 2)
@@ -60,16 +70,6 @@ Color.make_hex = function(hex)
     local g = gm.real(gm.ptr( string.sub(hex, 3, 4) ))
     local b = gm.real(gm.ptr( string.sub(hex, 5, 6) ))
     return Color.make_rgb(r, g, b)
-end
-
-
-Color.make_rgb = function(red, green, blue)
-    return gm.make_colour_rgb(red, green, blue)
-end
-
-
-Color.make_hsv = function(hue, saturation, value)
-    return gm.make_colour_hsv(hue, sat, val)
 end
 
 
