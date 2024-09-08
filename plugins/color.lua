@@ -50,6 +50,19 @@ local abstraction_color = {
 
 -- ========== Static Functions ==========
 
+Color.make_hex = function(hex)
+    if type(hex) ~= "string" or #hex ~= 6 then
+        log.error("Not a valid color hex code", 2)
+        return nil
+    end
+
+    local r = gm.real(gm.ptr( string.sub(hex, 1, 2) ))
+    local g = gm.real(gm.ptr( string.sub(hex, 3, 4) ))
+    local b = gm.real(gm.ptr( string.sub(hex, 5, 6) ))
+    return Color.make_rgb(r, g, b)
+end
+
+
 Color.make_rgb = function(red, green, blue)
     return gm.make_colour_rgb(red, green, blue)
 end
@@ -66,15 +79,7 @@ end
 metatable_color = {
     -- Create color by calling Color(hex_string)
     __call = function(table, hex)
-        if type(hex) ~= "string" or #hex ~= 6 then
-            log.error("Not a valid color hex code", 2)
-            return nil
-        end
-
-        local r = gm.real(gm.ptr( string.sub(hex, 1, 2) ))
-        local g = gm.real(gm.ptr( string.sub(hex, 3, 4) ))
-        local b = gm.real(gm.ptr( string.sub(hex, 5, 6) ))
-        return Color.make_rgb(r, g, b)
+        return Color.make_hex(hex)
     end,
 
 
