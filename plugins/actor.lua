@@ -35,6 +35,8 @@ Actor.add_callback = function(callback, func, skill)
             if not callbacks[callback] then callbacks[callback] = {} end
             table.insert(callbacks[callback], func)
 
+    else log.error("Invalid callback name", 2)
+
     end
 end
 

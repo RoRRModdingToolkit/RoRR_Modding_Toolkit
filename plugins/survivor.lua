@@ -49,11 +49,10 @@ Survivor.find = function(namespace, identifier)
     if identifier then namespace = namespace.."-"..identifier end
     
     for i, survivor in ipairs(Class.SURVIVOR) do
-            local _namespace = survivor:get(0)
-            local _identifier = survivor:get(1)
-            if namespace == _namespace.."-".._identifier then
-                return Survivor.wrap(i - 1)
-            end
+        local _namespace = survivor:get(0)
+        local _identifier = survivor:get(1)
+        if namespace == _namespace.."-".._identifier then
+            return Survivor.wrap(i - 1)
         end
     end
 

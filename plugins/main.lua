@@ -35,7 +35,7 @@ function __initialize()
     
     -- Initialize these first (callback population)
     Callback.__initialize()
-    Survivor.__initialize()
+    -- Survivor.__initialize()
 
     Actor.__initialize()
     Buff.__initialize()
