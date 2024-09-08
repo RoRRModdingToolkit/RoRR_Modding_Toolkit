@@ -153,6 +153,7 @@ metatable_object_gs = {
                 return obj_array:get(index)
             end
             log.error("Non-existent object property", 2)
+            return nil
         end
         log.error("No object properties for vanilla objects", 2)
         return nil
@@ -170,6 +171,7 @@ metatable_object_gs = {
                 return
             end
             log.error("Non-existent object property", 2)
+            return
         end
         log.error("No object properties for vanilla objects", 2)
     end
