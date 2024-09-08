@@ -176,9 +176,9 @@ methods_instance = {
 
     get_data = function(self, name)
         if not name then name = "main" end
-        if not instance_data[name] then instance_data[name] = {} end
-        if not instance_data[name][self.value.id] then instance_data[name][self.value.id] = {} end
-        return instance_data[name][self.value.id]
+        if not instance_data[self.value.id] then instance_data[self.value.id] = {} end
+        if not instance_data[self.value.id][name] then instance_data[self.value.id][name] = {} end
+        return instance_data[self.value.id][name]
     end,
 
 
@@ -276,10 +276,8 @@ metatable_instance = {
 -- because this is running every frame
 gm.post_script_hook(gm.constants.__input_system_tick, function(self, other, result, args)
     for k, v in pairs(instance_data) do
-        for k2, v2 in pairs(v) do
-            if not Instance.exists(k2) then
-                instance_data[k2] = nil
-            end
+        if not Instance.exists(k) then
+            instance_data[k] = nil
         end
     end
 end)
