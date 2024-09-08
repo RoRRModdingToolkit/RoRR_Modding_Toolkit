@@ -211,21 +211,18 @@ methods_instance = {
 metatable_instance_gs = {
     -- Getter
     __index = function(table, key)
-        local var = rawget(table, "value")
-        if var then
-            local v = gm.variable_instance_get(var, key)
-            return Wrap.wrap(v)
-        end
-        return nil
+        return Wrap.wrap(gm.variable_instance_get(table.value, key))
     end,
 
 
     -- Setter
     __newindex = function(table, key, value)
-        local var = rawget(table, "value")
-        if var then
-            gm.variable_instance_set(var, key, Wrap.unwrap(value))
+        if key == "value" or key == "RMT_wrapper" then
+            log.error("Cannot change wrapper value", 2)
+            return
         end
+
+        gm.variable_instance_set(table.value, key, Wrap.unwrap(value))
     end
 }
 

@@ -155,6 +155,7 @@ metatable_buff_gs = {
             local buff_array = Class.BUFF:get(table.value)
             return buff_array:get(index)
         end
+        log.error("Non-existent buff property", 2)
         return nil
     end,
 
@@ -165,7 +166,9 @@ metatable_buff_gs = {
         if index then
             local buff_array = Class.BUFF:get(table.value)
             buff_array:set(index, value)
+            return
         end
+        log.error("Non-existent buff property", 2)
     end
 }
 

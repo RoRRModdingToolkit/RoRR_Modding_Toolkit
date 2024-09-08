@@ -325,6 +325,7 @@ metatable_item_gs = {
             local item_array = Class.ITEM:get(table.value)
             return item_array:get(index)
         end
+        log.error("Non-existent item property", 2)
         return nil
     end,
 
@@ -335,7 +336,9 @@ metatable_item_gs = {
         if index then
             local item_array = Class.ITEM:get(table.value)
             item_array:set(index, value)
+            return
         end
+        log.error("Non-existent item property", 2)
     end
 }
 

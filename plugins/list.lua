@@ -110,6 +110,11 @@ metatable_list_gs = {
 
     -- Setter
     __newindex = function(table, key, value)
+        if key == "value" or key == "RMT_wrapper" then
+            log.error("Cannot change wrapper value", 2)
+            return
+        end
+        
         key = tonumber(key)
         if key then
             gm.ds_list_set(table.value, key - 1, Wrap.unwrap(value))

@@ -226,6 +226,7 @@ metatable_equipment_gs = {
             local equipment_array = Class.EQUIPMENT:get(table.value)
             return equipment_array:get(index)
         end
+        log.error("Non-existent equipment property", 2)
         return nil
     end,
 
@@ -236,7 +237,9 @@ metatable_equipment_gs = {
         if index then
             local equipment_array = Class.EQUIPMENT:get(table.value)
             equipment_array:set(index, value)
+            return
         end
+        log.error("Non-existent equipment property", 2)
     end
 }
 
