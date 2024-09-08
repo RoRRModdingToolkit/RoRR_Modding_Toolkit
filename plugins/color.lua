@@ -87,7 +87,7 @@ metatable_color = {
 
 
     __newindex = function(table, key, value)
-        log.error("Cannot modify Color constants", 2)
+        log.error("Cannot modify Color constant", 2)
     end
 }
 setmetatable(Color, metatable_color)
