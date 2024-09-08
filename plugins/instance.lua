@@ -156,7 +156,6 @@ methods_instance = {
         if not self:exists() then return end
 
         gm.instance_destroy(self.value)
-        self.value = -4
     end,
 
 

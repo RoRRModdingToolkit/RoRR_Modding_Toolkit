@@ -110,7 +110,7 @@ metatable_list_gs = {
 
     -- Setter
     __newindex = function(table, key, value)
-        if key == "value" or key == "RMT_wrapper" then
+        if (key == "value" and value ~= -1) or key == "RMT_wrapper" then
             log.error("Cannot change wrapper value", 2)
             return
         end
