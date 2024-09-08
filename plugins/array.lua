@@ -2,6 +2,8 @@
 
 Array = {}
 
+local abstraction_data = setmetatable({}, {__mode = "k"})
+
 
 
 -- ========== Static Methods ==========
@@ -12,7 +14,8 @@ end
 
 
 Array.wrap = function(array)
-    local abstraction = {
+    local abstraction = {}
+    abstraction_data[abstraction] = {
         RMT_wrapper = "Array",
         value = array
     }
@@ -113,6 +116,10 @@ metatable_array_gs = {
 
 metatable_array = {
     __index = function(table, key)
+        -- Allow getting but not setting these
+        if key == "value" then return abstraction_data[table].value end
+        if key == "RMT_wrapper" then return abstraction_data[table].RMT_wrapper end
+
         -- Methods
         if methods_array[key] then
             return methods_array[key]
