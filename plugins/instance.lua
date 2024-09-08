@@ -4,6 +4,8 @@ Instance = {}
 
 local abstraction_data = setmetatable({}, {__mode = "k"})
 
+local instance_data = {}
+
 
 
 -- ========== Tables ==========
@@ -151,7 +153,6 @@ end
 
 methods_instance = {
 
-    -- Return true if instance exists
     exists = function(self)
         return gm.instance_exists(self.value) == 1.0
     end,
@@ -165,12 +166,17 @@ methods_instance = {
     end,
 
 
-    -- Return true if the other instance is the same one
     same = function(self, other)
         if not self:exists() then return false end
 
         other = Wrap.unwrap(other)
         return self.value == other
+    end,
+
+
+    get_data = function(self)
+        if not instance_data[self.value.id] then instance_data[self.value.id] = {} end
+        return instance_data[self.value.id]
     end,
 
 
@@ -252,3 +258,24 @@ metatable_instance = {
         metatable_instance_gs.__newindex(table, key, value)
     end
 }
+
+
+
+-- ========== Hooks ==========
+
+-- Doesn't work??
+-- gm.post_script_hook(gm.constants.instance_destroy, function(self, other, result, args)
+--     Helper.log_hook(self, other, result, args)
+--     -- instance_data[self.value] = nil
+-- end)
+
+
+-- Find out what is called when an instance is destroyed and hook that instead
+-- because this is running every frame
+gm.post_script_hook(gm.constants.__input_system_tick, function(self, other, result, args)
+    for k, v in pairs(instance_data) do
+        if not Instance.exists(k) then
+            instance_data[k] = nil
+        end
+    end
+end)
