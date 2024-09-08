@@ -181,6 +181,31 @@ methods_survivor = {
         local elements = self.skill_family_v.elements
         return self:get_skill(elements, family_index)
     end,
+
+    set_animations = function(self, sprites)
+        self:onInit(function(actor)
+            actor.sprite_idle       = sprites.idle
+            actor.sprite_walk       = sprites.walk
+            actor.sprite_jump       = sprites.jump
+            actor.sprite_jump_peak  = sprites.jump_peak
+            actor.sprite_fall       = sprites.fall
+            actor.sprite_climb      = sprites.climb
+            actor.sprite_death      = sprites.death
+            actor.sprite_decoy      = sprites.decoy
+            actor.sprite_climb_hurt = sprites.climb_hurt
+        end)
+    end,
+
+    set_primary_color = function(self, R, G, B)
+        self.primary_color = gm.make_colour_rgb(R, G, B)
+    end,
+
+    set_text = function(self, name, description, end_quote)
+        self.token_name = name
+        self.token_name_upper = string.upper(name)
+        self.token_description = description
+        self.token_end_quote = end_quote
+    end,
 }
 
 methods_survivor_callbacks = {
@@ -258,7 +283,7 @@ metatable_survivor = {
 gm.post_script_hook(gm.constants.callback_execute, function(self, other, result, args)
     if callbacks[args[1].value] then
         for _, fn in pairs(callbacks[args[1].value]) do
-            fn(args[2].value, args[3].value) --(actor, ??)
+            fn(args[2].value) --(actor, initial_set)
         end
     end
 end)
