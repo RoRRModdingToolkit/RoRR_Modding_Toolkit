@@ -34,12 +34,14 @@ Survivor.ARRAY = {
     select_sound_id             = 23,
     log_id                      = 24,
     achievement_id              = 25,
-    _SURVIVOR_MILESTONE_FIELDS  = 26,
-    on_init                     = 27,
-    on_step                     = 28,
-    on_remove                   = 29,
-    is_secret                   = 30,
-    cape_offset                 = 31
+    milestone_kills_1           = 26,
+    milestone_items_1           = 27,
+    milestone_stages_1          = 28,
+    on_init                     = 29,
+    on_step                     = 30,
+    on_remove                   = 31,
+    is_secret                   = 32,
+    cape_offset                 = 33
 }
 
 
@@ -82,8 +84,8 @@ Survivor.new = function(namespace, identifier)
 
     -- Create callbacks for on_init and on_step
     -- abstraction.on_init = gm.callback_create()
-    abstraction.on_init = 77
-    abstraction.on_step = gm.callback_create()
+    -- abstraction.on_init = 77
+    -- abstraction.on_step = gm.callback_create()
 
     return abstraction
 end
