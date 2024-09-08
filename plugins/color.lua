@@ -148,7 +148,7 @@ Color.rgb_to_hsv = function(r, g, b)
     s = Delta/Cmax
   end
   -- Return h, s, v
-  return h, s*100, Cmax*100
+  return math.floor(h), math.floor(s*100), math.floor(Cmax*100)
 end
 
 Color.from_hsv = function(h, s, v)
