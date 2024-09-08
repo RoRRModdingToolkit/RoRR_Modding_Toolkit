@@ -1,6 +1,8 @@
 -- Color
 
-Color = {
+Color = {}
+
+local abstraction_color = {
     -- Constants from GML manual
     -- https://manual.gamemaker.io/monthly/en/GameMaker_Language/GML_Reference/Drawing/Colour_And_Alpha/Colour_And_Alpha.htm
     AQUA            = 16776960,
@@ -73,6 +75,14 @@ metatable_color = {
         local g = gm.real(gm.ptr( string.sub(hex, 3, 4) ))
         local b = gm.real(gm.ptr( string.sub(hex, 5, 6) ))
         return Color.make_rgb(r, g, b)
+    end,
+
+
+    __index = function(table, key, value)
+        local col = abstraction_color[key]
+        if col then return col end
+        log.error("Non-existent Color constant", 2)
+        return nil
     end,
 
 
