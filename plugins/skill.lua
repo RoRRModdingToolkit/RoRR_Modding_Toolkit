@@ -80,10 +80,12 @@ Skill.wrap = function(skill_id)
 end
 
 Skill.new = function(namespace, identifier, cooldown, damage, sprite_id, sprite_subimage, animation, is_primary, is_utility)
-    if Skill.find(namespace, identifier) then return nil end
+    -- Check if skill already exist
+    local skill = Skill.find(namespace, identifier)
+    if skill then return skill end
 
     -- Create skill
-    local skill = gm.skill_create(
+    skill = gm.skill_create(
         namespace,                      -- Namespace
         identifier,                     -- Identifier
         nil,                            -- Skill ID
@@ -103,7 +105,9 @@ Skill.new = function(namespace, identifier, cooldown, damage, sprite_id, sprite_
 end
 
 Skill.newEmpty = function(namespace, identifier)
-    if Skill.find(namespace, identifier) then return nil end
+    -- Check if skill already exist
+    local skill = Skill.find(namespace, identifier)
+    if skill then return skill end
 
     -- Create skill
     local skill = gm.skill_create(
