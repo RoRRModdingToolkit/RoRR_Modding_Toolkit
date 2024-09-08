@@ -156,6 +156,7 @@ methods_instance = {
         if not self:exists() then return end
 
         gm.instance_destroy(self.value)
+        self.value = -4
     end,
 
 
@@ -216,11 +217,6 @@ metatable_instance_gs = {
 
     -- Setter
     __newindex = function(table, key, value)
-        if key == "value" or key == "RMT_wrapper" then
-            log.error("Cannot change wrapper value", 2)
-            return
-        end
-
         gm.variable_instance_set(table.value, key, Wrap.unwrap(value))
     end
 }

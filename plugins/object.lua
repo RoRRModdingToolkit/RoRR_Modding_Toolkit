@@ -157,11 +157,6 @@ metatable_object_gs = {
 
     -- Setter
     __newindex = function(table, key, value)
-        if key == "value" or key == "RMT_wrapper" then
-            log.error("Cannot change wrapper value", 2)
-            return
-        end
-
         local index = Object.ARRAY[key]
         if index and table.value >= Object.CUSTOM_START then
             local custom_object = Array.wrap(gm.variable_global_get("custom_object"))
