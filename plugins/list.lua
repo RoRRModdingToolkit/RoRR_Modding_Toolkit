@@ -133,9 +133,9 @@ metatable_list = {
     __newindex = function(table, key, value)
         metatable_list_gs.__newindex(table, key, value)
     end,
-
-
+    
+    
     __len = function(table)
-		return gm.ds_list_size(table.value)
-	end
+        return gm.ds_list_size(table.value)
+    end
 }
