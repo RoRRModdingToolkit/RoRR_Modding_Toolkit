@@ -24,11 +24,15 @@ Color = {
     TEAL            = 8421376,
     WHITE           = 16777215,
     YELLOW          = 65535,
-    
+
+    ITEM_WHITE      = 16777215,
     ITEM_GREEN      = 5813365,
     ITEM_RED        = 4007881,
     ITEM_YELLOW     = 4312538,
     ITEM_ORANGE     = 3499737,
+    ITEM_PURPLE     = 13068971,
+    ITEM_GRAY       = 5592405,
+    ITEM_GREY       = 5592405,
 
     TEXT_YELLOW     = 8114927,
     TEXT_BLUE       = 13802033,
@@ -42,10 +46,32 @@ Color = {
 
 
 
+-- ========== Static Functions ==========
+
+Color.make_rgb = function(red, green, blue)
+    return gm.make_colour_rgb(red, green, blue)
+end
+
+
+Color.make_hsv = function(hue, saturation, value)
+    return gm.make_colour_hsv(hue, sat, val)
+end
+
+
+
 -- ========== Metatables ==========
 
 metatable_color = {
-    __newindex = function()
+    -- Create color by calling Color(hex_string)
+    __call = function(table, hex)
+        local r = gm.real(gm.ptr( string.sub(hex, 1, 2) ))
+        local g = gm.real(gm.ptr( string.sub(hex, 3, 4) ))
+        local b = gm.real(gm.ptr( string.sub(hex, 5, 6) ))
+        return Color.make_rgb(r, g, b)
+    end,
+
+
+    __newindex = function(table, key, value)
         log.error("Cannot modify Color constants", 2)
     end
 }
