@@ -2,6 +2,8 @@
 
 State = {}
 
+local abstraction_data = setmetatable({}, {__mode = "k"})
+
 local callbacks = {}
 
 
@@ -43,11 +45,13 @@ end
 
 
 State.wrap = function(state_id)
-    local abstraction = {
+    local abstraction = {}
+    abstraction_data[abstraction] = {
         RMT_wrapper = "State",
         value = state_id
     }
     setmetatable(abstraction, metatable_state)
+
     return abstraction
 end
 
@@ -154,6 +158,10 @@ metatable_state_callbacks = {
 
 metatable_state = {
     __index = function(table, key)
+        -- Allow getting but not setting these
+        if key == "value" then return abstraction_data[table].value end
+        if key == "RMT_wrapper" then return abstraction_data[table].RMT_wrapper end
+
         -- Methods
         if methods_state[key] then
             return methods_state[key]
@@ -165,6 +173,11 @@ metatable_state = {
     
 
     __newindex = function(table, key, value)
+        if key == "value" or key == "RMT_wrapper" then
+            log.error("Cannot modify wrapper values", 2)
+            return
+        end
+        
         metatable_state_gs.__newindex(table, key, value)
     end
 }

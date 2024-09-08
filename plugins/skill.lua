@@ -2,6 +2,8 @@
 
 Skill = {}
 
+local abstraction_data = setmetatable({}, {__mode = "k"})
+
 local callbacks = {}
 
 
@@ -70,7 +72,8 @@ end
 
 
 Skill.wrap = function(skill_id)
-    local abstraction = {
+    local abstraction = {}
+    abstraction_data[abstraction] = {
         RMT_wrapper = "Skill",
         value = skill_id
     }
@@ -276,6 +279,10 @@ metatable_skill_callbacks = {
 
 metatable_skill = {
     __index = function(table, key)
+        -- Allow getting but not setting these
+        if key == "value" then return abstraction_data[table].value end
+        if key == "RMT_wrapper" then return abstraction_data[table].RMT_wrapper end
+        
         -- Methods
         if methods_skill[key] then
             return methods_skill[key]
@@ -287,6 +294,11 @@ metatable_skill = {
     
 
     __newindex = function(table, key, value)
+        if key == "value" or key == "RMT_wrapper" then
+            log.error("Cannot modify wrapper values", 2)
+            return
+        end
+        
         metatable_skill_gs.__newindex(table, key, value)
     end
 }

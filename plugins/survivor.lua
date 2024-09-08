@@ -2,6 +2,8 @@
 
 Survivor = {}
 
+local abstraction_data = setmetatable({}, {__mode = "k"})
+
 local callbacks = {}
 
 
@@ -62,7 +64,8 @@ Survivor.find = function(namespace, identifier)
 end
 
 Survivor.wrap = function(survivor_id)
-    local abstraction = {
+    local abstraction = {}
+    abstraction_data[abstraction] = {
         RMT_wrapper = "Survivor",
         value = survivor_id
     }
@@ -81,11 +84,6 @@ Survivor.new = function(namespace, identifier)
 
     -- Make survivor abstraction
     local abstraction = Survivor.wrap(survivor)
-
-    -- Create callbacks for on_init and on_step
-    -- abstraction.on_init = gm.callback_create()
-    -- abstraction.on_init = 77
-    -- abstraction.on_step = gm.callback_create()
 
     return abstraction
 end
@@ -230,6 +228,10 @@ metatable_survivor_callbacks = {
 
 metatable_survivor = {
     __index = function(table, key)
+        -- Allow getting but not setting these
+        if key == "value" then return abstraction_data[table].value end
+        if key == "RMT_wrapper" then return abstraction_data[table].RMT_wrapper end
+
         -- Methods
         if methods_survivor[key] then
             return methods_survivor[key]
@@ -241,6 +243,11 @@ metatable_survivor = {
     
 
     __newindex = function(table, key, value)
+        if key == "value" or key == "RMT_wrapper" then
+            log.error("Cannot modify wrapper values", 2)
+            return
+        end
+
         metatable_survivor_gs.__newindex(table, key, value)
     end
 }
