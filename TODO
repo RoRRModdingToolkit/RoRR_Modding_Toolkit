@@ -11,3 +11,4 @@ o Apply Instance wrapper everywhere (on gm.array_get, etc.)
 - Add Instance.spawn_crate back
 
 - Add actor:reduce_cooldown(slot)
+- Also think of better way to do cooldown reduction on a slot (I think Hardlight Afterburner already does this)
