@@ -9,3 +9,5 @@ o Apply Instance wrapper everywhere (on gm.array_get, etc.)
     ! EDIT: See Notes.txt
 - Fix actor:fire_explosion not stunning without proc being active, which makes no sense
 - Add Instance.spawn_crate back
+
+- Add actor:reduce_cooldown(slot)
