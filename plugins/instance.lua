@@ -2,6 +2,8 @@
 
 Instance = {}
 
+local abstraction_data = setmetatable({}, {__mode = "k"})
+
 
 
 -- ========== Tables ==========
@@ -116,16 +118,17 @@ end
 
 
 Instance.wrap = function(inst)
-    local abstraction = {
+    local abstraction = {}
+    abstraction_data[abstraction] = {
         RMT_wrapper = "Instance",
         value = inst
     }
     if inst.object_index == gm.constants.oP then
         setmetatable(abstraction, metatable_player)
-        abstraction.RMT_wrapper = "Player"
+        abstraction_data[abstraction].RMT_wrapper = "Player"
     elseif gm.object_is_ancestor(inst.object_index, gm.constants.pActor) == 1.0 then
         setmetatable(abstraction, metatable_actor)
-        abstraction.RMT_wrapper = "Actor"
+        abstraction_data[abstraction].RMT_wrapper = "Actor"
     else setmetatable(abstraction, metatable_instance)
     end
     return abstraction
@@ -133,7 +136,9 @@ end
 
 
 Instance.wrap_invalid = function()
-    local abstraction = {
+    local abstraction = {}
+    abstraction_data[abstraction] = {
+        RMT_wrapper = "Instance",
         value = -4
     }
     setmetatable(abstraction, metatable_instance)
@@ -156,7 +161,7 @@ methods_instance = {
         if not self:exists() then return end
 
         gm.instance_destroy(self.value)
-        self.value = -4
+        abstraction_data[self].value = -4
     end,
 
 
@@ -224,6 +229,10 @@ metatable_instance_gs = {
 
 metatable_instance = {
     __index = function(table, key)
+        -- Allow getting but not setting these
+        if key == "value" then return abstraction_data[table].value end
+        if key == "RMT_wrapper" then return abstraction_data[table].RMT_wrapper end
+
         -- Methods
         if methods_instance[key] then
             return methods_instance[key]
@@ -235,6 +244,11 @@ metatable_instance = {
 
 
     __newindex = function(table, key, value)
+        if key == "value" or key == "RMT_wrapper" then
+            log.error("Cannot modify wrapper values", 2)
+            return
+        end
+        
         metatable_instance_gs.__newindex(table, key, value)
     end
 }

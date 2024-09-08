@@ -2,6 +2,8 @@
 
 Item = {}
 
+local abstraction_data = setmetatable({}, {__mode = "k"})
+
 local callbacks = {}
 local has_custom_item = {}
 
@@ -117,7 +119,8 @@ end
 
 
 Item.wrap = function(item_id)
-    local abstraction = {
+    local abstraction = {}
+    abstraction_data[abstraction] = {
         RMT_wrapper = "Item",
         value = item_id
     }
@@ -358,6 +361,10 @@ metatable_item_callbacks = {
 
 metatable_item = {
     __index = function(table, key)
+        -- Allow getting but not setting these
+        if key == "value" then return abstraction_data[table].value end
+        if key == "RMT_wrapper" then return abstraction_data[table].RMT_wrapper end
+
         -- Methods
         if methods_item[key] then
             return methods_item[key]
@@ -369,6 +376,11 @@ metatable_item = {
     
 
     __newindex = function(table, key, value)
+        if key == "value" or key == "RMT_wrapper" then
+            log.error("Cannot modify wrapper values", 2)
+            return
+        end
+        
         metatable_item_gs.__newindex(table, key, value)
     end
 }

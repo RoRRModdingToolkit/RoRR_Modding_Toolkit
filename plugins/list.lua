@@ -2,6 +2,8 @@
 
 List = {}
 
+local abstraction_data = setmetatable({}, {__mode = "k"})
+
 
 
 -- ========== Static Methods ==========
@@ -12,7 +14,8 @@ end
 
 
 List.wrap = function(list)
-    local abstraction = {
+    local abstraction = {}
+    abstraction_data[abstraction] = {
         RMT_wrapper = "List",
         value = list
     }
@@ -33,7 +36,7 @@ methods_list = {
 
     destroy = function(self)
         gm.ds_list_destroy(self.value)
-        self.value = -1
+        abstraction_data[self].value = -1
     end,
 
 
@@ -120,6 +123,10 @@ metatable_list_gs = {
 
 metatable_list = {
     __index = function(table, key)
+        -- Allow getting but not setting these
+        if key == "value" then return abstraction_data[table].value end
+        if key == "RMT_wrapper" then return abstraction_data[table].RMT_wrapper end
+
         -- Methods
         if methods_list[key] then
             return methods_list[key]
@@ -131,6 +138,11 @@ metatable_list = {
     
 
     __newindex = function(table, key, value)
+        if key == "value" or key == "RMT_wrapper" then
+            log.error("Cannot modify wrapper values", 2)
+            return
+        end
+        
         metatable_list_gs.__newindex(table, key, value)
     end,
     

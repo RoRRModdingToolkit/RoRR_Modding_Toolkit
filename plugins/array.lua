@@ -131,6 +131,11 @@ metatable_array = {
     
 
     __newindex = function(table, key, value)
+        if key == "value" or key == "RMT_wrapper" then
+            log.error("Cannot modify wrapper values", 2)
+            return
+        end
+
         metatable_array_gs.__newindex(table, key, value)
     end,
     

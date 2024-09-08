@@ -2,6 +2,8 @@
 
 Buff = {}
 
+local abstraction_data = setmetatable({}, {__mode = "k"})
+
 local callbacks = {}
 local has_custom_buff = {}
 
@@ -75,7 +77,8 @@ end
 
 
 Buff.wrap = function(buff_id)
-    local abstraction = {
+    local abstraction = {}
+    abstraction_data[abstraction] = {
         RMT_wrapper = "Buff",
         value = buff_id
     }
@@ -193,6 +196,10 @@ metatable_buff_callbacks = {
 
 metatable_buff = {
     __index = function(table, key)
+        -- Allow getting but not setting these
+        if key == "value" then return abstraction_data[table].value end
+        if key == "RMT_wrapper" then return abstraction_data[table].RMT_wrapper end
+
         -- Methods
         if methods_buff[key] then
             return methods_buff[key]
@@ -204,6 +211,11 @@ metatable_buff = {
     
 
     __newindex = function(table, key, value)
+        if key == "value" or key == "RMT_wrapper" then
+            log.error("Cannot modify wrapper values", 2)
+            return
+        end
+        
         metatable_buff_gs.__newindex(table, key, value)
     end
 }
