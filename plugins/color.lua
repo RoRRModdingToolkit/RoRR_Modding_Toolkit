@@ -64,6 +64,11 @@ end
 metatable_color = {
     -- Create color by calling Color(hex_string)
     __call = function(table, hex)
+        if type(hex) ~= "string" or #hex ~= 6 then
+            log.error("Not a valid color hex code", 2)
+            return nil
+        end
+
         local r = gm.real(gm.ptr( string.sub(hex, 1, 2) ))
         local g = gm.real(gm.ptr( string.sub(hex, 3, 4) ))
         local b = gm.real(gm.ptr( string.sub(hex, 5, 6) ))
