@@ -176,6 +176,7 @@ methods_instance = {
 
     get_data = function(self, name)
         if not name then name = "main" end
+        if not instance_data[name] then instance_data[name] = {} end
         if not instance_data[name][self.value.id] then instance_data[name][self.value.id] = {} end
         return instance_data[name][self.value.id]
     end,
