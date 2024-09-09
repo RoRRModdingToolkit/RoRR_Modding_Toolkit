@@ -6,6 +6,10 @@ local abstraction_data = setmetatable({}, {__mode = "k"})
 
 local callbacks = {}
 
+-- TODO maybe find a better way to do this?
+local survivors = {}
+
+
 
 -- ========== Enums ==========
 
@@ -46,7 +50,6 @@ Survivor.ARRAY = {
     cape_offset                 = 33
 }
 
-
 -- ========== Static Methods ==========
 
 Survivor.find = function(namespace, identifier)
@@ -59,7 +62,7 @@ Survivor.find = function(namespace, identifier)
             return Survivor.wrap(i - 1)
         end
     end
-
+    
     return nil
 end
 
@@ -70,7 +73,7 @@ Survivor.wrap = function(survivor_id)
         value = survivor_id
     }
     setmetatable(abstraction, metatable_survivor)
-
+    
     return abstraction
 end
 
@@ -78,12 +81,99 @@ Survivor.new = function(namespace, identifier)
     -- Check if survivor already exist
     local survivor = Survivor.find(namespace, identifier)
     if survivor then return survivor end
-
+    
     -- Create survivor
     survivor = gm.survivor_create(namespace, identifier)
+    
+    -- TODO maybe find a better way to do this?
+    -- Create default variable for the survivor
+    survivors[survivor] = {
+        -- Default Scale
+        xscale                  = 1.0,
+        yscale                  = 1.0,
+
+        -- Default Sprites
+        idle                    = gm.constants.sCommandoIdle,
+        walk                    = gm.constants.sCommandoWalk,
+        walk_last               = gm.constants.sCommandoWalk,
+        jump                    = gm.constants.sCommandoJump,
+        jump_peak               = gm.constants.sCommandoJumpPeak,
+        fall                    = gm.constants.sCommandoFall,
+        climb                   = gm.constants.sCommandoClimb,
+        death                   = gm.constants.sCommandoDeath,
+        decoy                   = gm.constants.sDronePlayerCommandoIdle,
+        drone_idle              = gm.constants.sDronePlayerCommandoShoot,
+        drone_shoot             = gm.constants.sCommandoDecoy,
+        climb_hurt              = -1,
+        
+        -- Default Stats Base
+        maxhp_base              = 110.0,
+        damage_base             = 12.0,
+        regen_base              = 0.01,
+        attack_speed_base       = 1.0,
+        critical_chance_base    = 1.0,
+        armor_base              = 0.0,
+        maxshield_base          = 0.0,
+        pHmax_base              = 2.8,
+        pVmax_base              = 6.0,
+        pGravity1_base          = 0.52,
+        pGravity2_base          = 0.36,
+        pAccel_base             = 0.15,
+    
+        -- Default Stats Level
+        maxhp_level             = 32.0,
+        damage_level            = 2.0,
+        regen_level             = 0.002,
+        attack_speed_level      = 0.0,
+        critical_chance_level   = 0.0,
+        armor_level             = 2.0
+    }
 
     -- Make survivor abstraction
     local abstraction = Survivor.wrap(survivor)
+
+    abstraction:onInit(function(actor)
+
+        -- Survivor scale
+        actor.image_xscale          = survivors[actor.class].xscale
+        actor.image_yscale          = survivors[actor.class].yscale
+
+        -- Set sprites
+        actor.sprite_idle           = survivors[actor.class].idle
+        actor.sprite_walk           = survivors[actor.class].walk
+        actor.sprite_walk_last      = survivors[actor.class].walk_last
+        actor.sprite_jump           = survivors[actor.class].jump
+        actor.sprite_jump_peak      = survivors[actor.class].jump_peak
+        actor.sprite_fall           = survivors[actor.class].fall
+        actor.sprite_climb          = survivors[actor.class].climb
+        actor.sprite_death          = survivors[actor.class].death
+        actor.sprite_decoy          = survivors[actor.class].decoy
+        actor.sprite_drone_idle     = survivors[actor.class].drone_idle
+        actor.sprite_drone_shoot    = survivors[actor.class].drone_shoot
+        actor.sprite_climb_hurt     = survivors[actor.class].climb_hurt    
+
+        -- Set base stats
+        actor.maxhp_base            = survivors[actor.class].maxhp_base
+        actor.damage_base           = survivors[actor.class].damage_base
+        actor.hp_regen_base         = survivors[actor.class].regen_base
+        actor.attack_speed_base     = survivors[actor.class].attack_speed_base
+        actor.critical_chance_base  = survivors[actor.class].critical_chance_base
+        actor.armor_base            = survivors[actor.class].armor_base
+        actor.maxshield_base        = survivors[actor.class].maxshield_base
+        actor.pHmax_base            = survivors[actor.class].pHmax_base
+        actor.pVmax_base            = survivors[actor.class].pVmax_base
+        actor.pGravity1_base        = survivors[actor.class].pGravity1_base
+        actor.pGravity2_base        = survivors[actor.class].pGravity2_base
+        actor.pAccel_base           = survivors[actor.class].pAccel_base
+
+        -- Set level stats
+        actor.maxhp_level           = survivors[actor.class].maxhp_level
+        actor.damage_level          = survivors[actor.class].damage_level
+        actor.hp_regen_level        = survivors[actor.class].regen_level
+        actor.attack_speed_level    = survivors[actor.class].attack_speed_level
+        actor.critical_chance_level = survivors[actor.class].critical_chance_level
+        actor.armor_level           = survivors[actor.class].armor_level
+    end)
 
     return abstraction
 end
@@ -155,6 +245,7 @@ methods_survivor = {
     end,
 
     get_skill = function(self, skill_family, family_index)
+        family_index = family_index or 1
         if family_index > #skill_family or family_index < 1 then 
             log.error("Family index is out of bound!")
             return nil
@@ -183,17 +274,18 @@ methods_survivor = {
     end,
 
     set_animations = function(self, sprites)
-        self:onInit(function(actor)
-            actor.sprite_idle       = sprites.idle
-            actor.sprite_walk       = sprites.walk
-            actor.sprite_jump       = sprites.jump
-            actor.sprite_jump_peak  = sprites.jump_peak
-            actor.sprite_fall       = sprites.fall
-            actor.sprite_climb      = sprites.climb
-            actor.sprite_death      = sprites.death
-            actor.sprite_decoy      = sprites.decoy
-            actor.sprite_climb_hurt = sprites.climb_hurt
-        end)
+        survivors[self.value].idle          = sprites.idle or survivors[self.value].idle
+        survivors[self.value].walk          = sprites.walk or survivors[self.value].walk
+        survivors[self.value].walk_last     = sprites.walk_last or (sprites.walk or survivors[self.value].walk)
+        survivors[self.value].jump          = sprites.jump or survivors[self.value].jump
+        survivors[self.value].jump_peak     = sprites.jump_peak or (sprites.jump or survivors[self.value].jump_peak)
+        survivors[self.value].fall          = sprites.fall or (sprites.jump or survivors[self.value].fall)
+        survivors[self.value].climb         = sprites.climb or survivors[self.value].climb
+        survivors[self.value].death         = sprites.death or survivors[self.value].death
+        survivors[self.value].decoy         = sprites.decoy or survivors[self.value].decoy
+        survivors[self.value].drone_idle    = sprites.drone_idle or survivors[self.value].drone_idle
+        survivors[self.value].drone_shoot   = sprites.drone_shoot or survivors[self.value].drone_shoot
+        survivors[self.value].climb_hurt    = sprites.climb_hurt or survivors[self.value].climb_hurt
     end,
 
     set_primary_color = function(self, R, G, B)
@@ -205,6 +297,62 @@ methods_survivor = {
         self.token_name_upper = string.upper(name)
         self.token_description = description
         self.token_end_quote = end_quote
+    end,
+
+    set_stats_base = function(self, maxhp, damage, regen, attack_speed, critical_chance, armor, maxshield)
+        if type(maxhp) ~= "number" and type(maxhp) ~= "nil" then log.error("Max HP base should be a number, got a "..type(maxhp), 2) return end
+        if type(damage) ~= "number" and type(damage) ~= "nil" then log.error("Damage base should be a number, got a "..type(damage), 2) return end
+        if type(regen) ~= "number" and type(regen) ~= "nil" then log.error("Regen base should be a number, got a "..type(regen), 2) return end
+        if type(attack_speed) ~= "number" and type(attack_speed) ~= "nil" then log.error("Attack Speed base should be a number, got a "..type(attack_speed), 2) return end
+        if type(critical_chance) ~= "number" and type(critical_chance) ~= "nil" then log.error("Critical Chance base should be a number, got a "..type(critical_chance), 2) return end
+        if type(armor) ~= "number" and type(armor) ~= "nil" then log.error("Armor base should be a number, got a "..type(armor), 2) return end
+        if type(maxshield) ~= "number" and type(maxshield) ~= "nil" then log.error("Max Shield base should be a number, got a "..type(maxshield), 2) return end
+
+        survivors[self.value].maxhp_base = maxhp or survivors[self.value].maxhp_base
+        survivors[self.value].damage_base = damage or survivors[self.value].damage_base
+        survivors[self.value].regen_base = regen or survivors[self.value].regen_base
+        survivors[self.value].attack_speed_base = attack_speed or survivors[self.value].attack_speed_base
+        survivors[self.value].critical_chance_base = critical_chance or survivors[self.value].critical_chance_base
+        survivors[self.value].armor_base = armor or survivors[self.value].armor_base
+        survivors[self.value].maxshield_base = maxshield or survivors[self.value].maxshield_base
+    end,
+    
+    set_physic_base = function(self, hmax, vmax, gravity1, gravity2, accel)
+        if type(hmax) ~= "number" and type(hmax) ~= "nil" then log.error("Hmax base should be a number, got a "..type(hmax), 2) return end
+        if type(vmax) ~= "number" and type(vmax) ~= "nil" then log.error("Vmax base should be a number, got a "..type(vmax), 2) return end
+        if type(gravity1) ~= "number" and type(gravity1) ~= "nil" then log.error("Gravity1 base should be a number, got a "..type(gravity1), 2) return end
+        if type(gravity2) ~= "number" and type(gravity2) ~= "nil" then log.error("Gravity2 base should be a number, got a "..type(gravity2), 2) return end
+        if type(accel) ~= "number" and type(accel) ~= "nil" then log.error("Acceleration base should be a number, got a "..type(accel), 2) return end
+
+        survivors[self.value].pHmax_base = hmax or survivors[self.value].pHmax_base
+        survivors[self.value].pVmax_base = vmax or survivors[self.value].pVmax_base
+        survivors[self.value].pGravity1_base = gravity1 or survivors[self.value].pGravity1_base
+        survivors[self.value].pGravity2_base = gravity2 or survivors[self.value].pGravity2_base
+        survivors[self.value].pAccel_base = accel or survivors[self.value].pAccel_base
+    end,
+
+    set_stats_level = function(self, maxhp, damage, regen, attack_speed, critical_chance)
+        if type(maxhp) ~= "number" and type(maxhp) ~= "nil" then log.error("Max HP level should be a number, got a "..type(maxhp), 2) return end
+        if type(damage) ~= "number" and type(damage) ~= "nil" then log.error("Damage level should be a number, got a "..type(damage), 2) return end
+        if type(regen) ~= "number" and type(regen) ~= "nil" then log.error("Regen level should be a number, got a "..type(regen), 2) return end
+        if type(attack_speed) ~= "number" and type(attack_speed) ~= "nil" then log.error("Attack Speed level should be a number, got a "..type(attack_speed), 2) return end
+        if type(critical_chance) ~= "number" and type(critical_chance) ~= "nil" then log.error("Critical Chance level should be a number, got a "..type(critical_chance), 2) return end
+        if type(armor) ~= "number" and type(armor) ~= "nil" then log.error("Armor level should be a number, got a "..type(armor), 2) return end
+
+        survivors[self.value].maxhp_level = maxhp or survivors[self.value].maxhp_level
+        survivors[self.value].damage_level = damage or survivors[self.value].damage_level
+        survivors[self.value].regen_level = regen or survivors[self.value].regen_level
+        survivors[self.value].attack_speed_level = attack_speed or survivors[self.value].attack_speed_level
+        survivors[self.value].critical_chance_level = critical_chance or survivors[self.value].critical_chance_level
+        survivors[self.value].armor_level = armor or survivors[self.value].armor_level
+    end,
+
+    set_scale = function(self, xscale, yscale)
+        if type(xscale) ~= "number" then log.error("Xscale should be a number, got a "..type(xscale), 2) return end
+        if type(yscale) ~= "number" and type(yscale) ~= "nil" then log.error("Yscale should be a number, got a "..type(yscale), 2) return end
+
+        survivors[self.value].xscale = xscale
+        survivors[self.value].yscale = yscale or xscale
     end,
 }
 

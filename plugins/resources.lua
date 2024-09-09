@@ -5,7 +5,7 @@ Resources = {}
 
 -- == Section Sprites == --
 
-Resources.sprite_load = function(path, img_num, remove_back, smoooth, x_orig, y_orig, speed, bbox_left, bbox_top, bbox_right, bbox_bottom)
+Resources.sprite_load = function(path, img_num, x_orig, y_orig, remove_back, smooth, speed, bbox_left, bbox_top, bbox_right, bbox_bottom)
     local sprite = gm.sprite_add(
         path, 
         (img_num ~= nil and {img_num} or {1})[1], 

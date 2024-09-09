@@ -229,7 +229,8 @@ methods_skill = {
     end,
 
     set_skill_upgrade = function(self, upgraded_skill)
-        self.upgrade_skill = upgraded_skill
+        if upgraded_skill.RMT_wrapper ~= "Skill" then log.error("The upgraded skill provided is not a Skill", 2) return end
+        self.upgrade_skill = upgraded_skill.value
     end,
 }
 
@@ -298,7 +299,7 @@ metatable_skill = {
             log.error("Cannot modify wrapper values", 2)
             return
         end
-        
+
         metatable_skill_gs.__newindex(table, key, value)
     end
 }
