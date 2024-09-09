@@ -147,12 +147,12 @@ methods_actor = {
 
 
     apply_knockback = function(self, kind, direction, duration)
-        gm.actor_knockback_inflict(self.value, kind, direction, duration *60)
-
         -- Other types don't completely stun
         if kind > Actor.KNOCKBACK_KIND.standard then
             gm.actor_knockback_inflict(self.value, Actor.KNOCKBACK_KIND.standard, direction, duration *60)
         end
+        
+        gm.actor_knockback_inflict(self.value, kind, direction, duration *60)
     end,
 
 
