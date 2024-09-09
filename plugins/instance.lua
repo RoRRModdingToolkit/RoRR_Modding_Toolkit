@@ -281,3 +281,14 @@ gm.post_script_hook(gm.constants.__input_system_tick, function(self, other, resu
         end
     end
 end)
+
+
+gm.post_script_hook(gm.constants.actor_transform, function(self, other, result, args)
+    if instance_data[args[1].value.id] then
+        instance_data[args[2].value.id] = {}
+        for k, v in pairs(instance_data[args[1].value.id]) do
+            instance_data[args[2].value.id][k] = instance_data[args[1].value.id][k]
+        end
+        instance_data[args[1].value.id] = nil
+    end
+end)

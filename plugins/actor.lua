@@ -6,34 +6,60 @@ local callbacks = {}
 
 
 
+-- ========== Enums ==========
+
+Actor.KNOCKBACK_KIND = {
+    none        = 0,
+    standard    = 1,
+    freeze      = 2,
+    deepfreeze  = 3,
+    pull        = 4
+}
+
+
+Actor.KNOCKBACK_DIR = {
+    left    = -1,
+    right   = 1
+}
+
+
+
 -- ========== Static Methods ==========
 
-Actor.add_callback = function(callback, func, skill)
+Actor.add_callback = function(callback, func, skill, all_damage)
+    if all_damage then callback = callback.."All" end
+
+    local other_callbacks = {
+        "onStatRecalc",
+        "onPostStatRecalc",
+        "onBasicUse",
+        "onAttack",
+        "onAttackAll",
+        "onPostAttack",
+        "onPostAttackAll",
+        "onHit",
+        "onHitAll",
+        "onKill",
+        "onDamaged",
+        "onDamageBlocked",
+        "onHeal",
+        "onShieldBreak",
+        "onInteract",
+        "onEquipmentUse",
+        "onPreStep",
+        "onPostStep",
+        "onDraw"
+    }
+
     if callback == "onSkillUse" then
         if type(skill) == "table" then skill = skill.value end
         if not callbacks["onSkillUse"] then callbacks["onSkillUse"] = {} end
         if not callbacks["onSkillUse"][skill] then callbacks["onSkillUse"][skill] = {} end
         table.insert(callbacks["onSkillUse"][skill], func)
 
-    elseif callback == "onStatRecalc"
-        or callback == "onPostStatRecalc"
-        or callback == "onBasicUse"
-        or callback == "onAttack"
-        or callback == "onPostAttack"
-        or callback == "onHit"
-        or callback == "onKill"
-        or callback == "onDamaged"
-        or callback == "onDamageBlocked"
-        or callback == "onHeal"
-        or callback == "onShieldBreak"
-        or callback == "onInteract"
-        or callback == "onEquipmentUse"
-        or callback == "onPreStep"
-        or callback == "onPostStep"
-        or callback == "onDraw"
-        then
-            if not callbacks[callback] then callbacks[callback] = {} end
-            table.insert(callbacks[callback], func)
+    elseif Helper.table_has(other_callbacks, callback) then
+        if not callbacks[callback] then callbacks[callback] = {} end
+        table.insert(callbacks[callback], func)
 
     else log.error("Invalid callback name", 2)
 
@@ -122,6 +148,16 @@ methods_actor = {
     end,
 
 
+    apply_knockback = function(self, kind, direction, duration)
+        -- Other types don't completely stun
+        if kind > Actor.KNOCKBACK_KIND.standard then
+            gm.actor_knockback_inflict(self.value, Actor.KNOCKBACK_KIND.standard, direction, duration *60)
+        end
+        
+        gm.actor_knockback_inflict(self.value, kind, direction, duration *60)
+    end,
+
+
     kill = function(self)
         if self.hp then self.hp = -1000000.0 end
     end,
@@ -196,9 +232,9 @@ methods_actor_callbacks = {
     onPostStatRecalc    = function(self, func) Actor.add_callback("onPostStatRecalc", func) end,
     onSkillUse          = function(self, func, skill) Actor.add_callback("onSkillUse", func, skill) end,
     onBasicUse          = function(self, func) Actor.add_callback("onBasicUse", func) end,
-    onAttack            = function(self, func) Actor.add_callback("onAttack", func) end,
-    onPostAttack        = function(self, func) Actor.add_callback("onPostAttack", func) end,
-    onHit               = function(self, func) Actor.add_callback("onHit", func) end,
+    onAttack            = function(self, func, all_damage) Actor.add_callback("onAttack", func, all_damage) end,
+    onPostAttack        = function(self, func, all_damage) Actor.add_callback("onPostAttack", func, all_damage) end,
+    onHit               = function(self, func, all_damage) Actor.add_callback("onHit", func, all_damage) end,
     onKill              = function(self, func) Actor.add_callback("onKill", func) end,
     onDamaged           = function(self, func) Actor.add_callback("onDamaged", func) end,
     onDamageBlocked     = function(self, func) Actor.add_callback("onDamageBlocked", func) end,
@@ -344,10 +380,28 @@ local function actor_onAttack(self, other, result, args)
 end
 
 
+local function actor_onAttackAll(self, other, result, args)
+    if callbacks["onAttackAll"] then
+        for _, fn in ipairs(callbacks["onAttackAll"]) do
+            fn(Instance.wrap(self), args[2].value)    -- Actor, Damager attack_info
+        end
+    end
+end
+
+
 local function actor_onPostAttack(self, other, result, args)
     if not args[2].value.proc or not args[2].value.parent then return end
     if callbacks["onPostAttack"] then
         for _, fn in ipairs(callbacks["onPostAttack"]) do
+            fn(Instance.wrap(args[2].value.parent), args[2].value)    -- Actor, Damager attack_info
+        end
+    end
+end
+
+
+local function actor_onPostAttackAll(self, other, result, args)
+    if callbacks["onPostAttackAll"] then
+        for _, fn in ipairs(callbacks["onPostAttackAll"]) do
             fn(Instance.wrap(args[2].value.parent), args[2].value)    -- Actor, Damager attack_info
         end
     end
@@ -359,6 +413,16 @@ local function actor_onHit(self, other, result, args)
     if callbacks["onHit"] then
         for _, fn in ipairs(callbacks["onHit"]) do
             fn(Instance.wrap(args[2].value), Instance.wrap(args[3].value), self.attack_info) -- Attacker, Victim, Damager attack_info
+        end
+    end
+end
+
+
+local function actor_onHitAll(self, other, result, args)
+    if callbacks["onHitAll"] then
+        local attack = args[2].value
+        for _, fn in ipairs(callbacks["onHitAll"]) do
+            fn(Instance.wrap(attack.inflictor), Instance.wrap(attack.target_true), attack.attack_info) -- Attacker, Victim, Damager attack_info
         end
     end
 end
@@ -414,8 +478,11 @@ end
 
 Actor.__initialize = function()
     Callback.add("onAttackCreate", "RMT.actor_onAttack", actor_onAttack, true)
+    Callback.add("onAttackCreate", "RMT.actor_onAttackAll", actor_onAttackAll, true)
     Callback.add("onAttackHandleEnd", "RMT.actor_onPostAttack", actor_onPostAttack, true)
+    Callback.add("onAttackHandleEnd", "RMT.actor_onPostAttackAll", actor_onPostAttackAll, true)
     Callback.add("onHitProc", "RMT.actor_onHit", actor_onHit, true)
+    Callback.add("onAttackHit", "RMT.actor_onHitAll", actor_onHitAll, true)
     Callback.add("onKillProc", "RMT.actor_onKill", actor_onKill, true)
     Callback.add("onDamagedProc", "RMT.actor_onDamaged", actor_onDamaged, true)
     Callback.add("onDamageBlocked", "RMT.actor_onDamageBlocked", actor_onDamageBlocked, true)

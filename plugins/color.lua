@@ -27,7 +27,7 @@ local abstraction_color = {
     WHITE           = 0xffffff,
     YELLOW          = 0x00ffff,
     -- item colors
-    ITEM_WHITE      = 0xffffff
+    ITEM_WHITE      = 0xffffff,
     ITEM_GREEN      = 0x58b475,
     ITEM_RED        = 0x3d27c9,
     ITEM_YELLOW     = 0x41cdda,

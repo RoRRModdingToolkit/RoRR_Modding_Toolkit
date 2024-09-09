@@ -165,7 +165,29 @@ methods_item = {
     end,
     
 
-    add_callback = function(self, callback, func)
+    add_callback = function(self, callback, func, all_damage)
+        if all_damage then callback = callback.."All" end
+
+        local other_callbacks = {
+            "onStatRecalc",
+            "onPostStatRecalc",
+            "onBasicUse",
+            "onAttack",
+            "onAttackAll",
+            "onPostAttack",
+            "onPostAttackAll",
+            "onHit",
+            "onHitAll",
+            "onKill",
+            "onDamaged",
+            "onDamageBlocked",
+            "onHeal",
+            "onShieldBreak",
+            "onInteract",
+            "onEquipmentUse",
+            "onStep",
+            "onDraw"
+        }
 
         if callback == "onPickup" then
             local callback_id = self.on_acquired
@@ -177,24 +199,9 @@ methods_item = {
             if not callbacks[callback_id] then callbacks[callback_id] = {} end
             table.insert(callbacks[callback_id], func)
 
-        elseif callback == "onStatRecalc"
-            or callback == "onPostStatRecalc"
-            or callback == "onBasicUse"
-            or callback == "onAttack"
-            or callback == "onPostAttack"
-            or callback == "onHit"
-            or callback == "onKill"
-            or callback == "onDamaged"
-            or callback == "onDamageBlocked"
-            or callback == "onHeal"
-            or callback == "onShieldBreak"
-            or callback == "onInteract"
-            or callback == "onEquipmentUse"
-            or callback == "onStep"
-            or callback == "onDraw"
-            then
-                if not callbacks[callback] then callbacks[callback] = {} end
-                table.insert(callbacks[callback], {self.value, func})
+        elseif Helper.table_has(other_callbacks, callback) then
+            if not callbacks[callback] then callbacks[callback] = {} end
+            table.insert(callbacks[callback], {self.value, func})
 
         else log.error("Invalid callback name", 2)
 
@@ -301,9 +308,9 @@ methods_item_callbacks = {
     onStatRecalc        = function(self, func) self:add_callback("onStatRecalc", func) end,
     onPostStatRecalc    = function(self, func) self:add_callback("onPostStatRecalc", func) end,
     onBasicUse          = function(self, func) self:add_callback("onBasicUse", func) end,
-    onAttack            = function(self, func) self:add_callback("onAttack", func) end,
-    onPostAttack        = function(self, func) self:add_callback("onPostAttack", func) end,
-    onHit               = function(self, func) self:add_callback("onHit", func) end,
+    onAttack            = function(self, func, all_damage) self:add_callback("onAttack", func, all_damage) end,
+    onPostAttack        = function(self, func, all_damage) self:add_callback("onPostAttack", func, all_damage) end,
+    onHit               = function(self, func, all_damage) self:add_callback("onHit", func, all_damage) end,
     onKill              = function(self, func) self:add_callback("onKill", func) end,
     onDamaged           = function(self, func) self:add_callback("onDamaged", func) end,
     onDamageBlocked     = function(self, func) self:add_callback("onDamageBlocked", func) end,
@@ -468,6 +475,21 @@ local function item_onAttack(self, other, result, args)
 end
 
 
+local function item_onAttackAll(self, other, result, args)
+    if callbacks["onAttackAll"] then
+        for _, c in ipairs(callbacks["onAttackAll"]) do
+            local item = c[1]
+            local actor = Instance.wrap(args[2].value.parent)
+            local count = actor:item_stack_count(item)
+            if count > 0 then
+                local func = c[2]
+                func(actor, args[2].value, count)    -- Actor, Damager attack_info, Stack count
+            end
+        end
+    end
+end
+
+
 local function item_onPostAttack(self, other, result, args)
     if not args[2].value.proc or not args[2].value.parent then return end
     if callbacks["onPostAttack"] then
@@ -484,8 +506,23 @@ local function item_onPostAttack(self, other, result, args)
 end
 
 
+local function item_onPostAttackAll(self, other, result, args)
+    if not args[2].value.parent then return end
+    if callbacks["onPostAttackAll"] then
+        for _, c in ipairs(callbacks["onPostAttackAll"]) do
+            local item = c[1]
+            local actor = Instance.wrap(args[2].value.parent)
+            local count = actor:item_stack_count(item)
+            if count > 0 then
+                local func = c[2]
+                func(actor, args[2].value, count)    -- Actor, Damager attack_info, Stack count
+            end
+        end
+    end
+end
+
+
 local function item_onHit(self, other, result, args)
-    if not self.attack_info.proc then return end
     if callbacks["onHit"] then
         for _, c in ipairs(callbacks["onHit"]) do
             local item = c[1]
@@ -494,6 +531,22 @@ local function item_onHit(self, other, result, args)
             if count > 0 then
                 local func = c[2]
                 func(actor, Instance.wrap(args[3].value), self.attack_info, count) -- Attacker, Victim, Damager attack_info, Stack count
+            end
+        end
+    end
+end
+
+
+local function item_onHitAll(self, other, result, args)
+    if callbacks["onHitAll"] then
+        local attack = args[2].value
+        for _, c in ipairs(callbacks["onHitAll"]) do
+            local item = c[1]
+            local actor = Instance.wrap(attack.inflictor)
+            local count = actor:item_stack_count(item)
+            if count > 0 then
+                local func = c[2]
+                func(actor, Instance.wrap(attack.target_true), attack.attack_info, count) -- Attacker, Victim, Damager attack_info, Stack count
             end
         end
     end
@@ -639,8 +692,11 @@ end
 
 Item.__initialize = function()
     Callback.add("onAttackCreate", "RMT.item_onAttack", item_onAttack, true)
+    Callback.add("onAttackCreate", "RMT.item_onAttackAll", item_onAttackAll, true)
     Callback.add("onAttackHandleEnd", "RMT.item_onPostAttack", item_onPostAttack, true)
+    Callback.add("onAttackHandleEnd", "RMT.item_onPostAttackAll", item_onPostAttackAll, true)
     Callback.add("onHitProc", "RMT.item_onHit", item_onHit, true)
+    Callback.add("onAttackHit", "RMT.item_onHitAll", item_onHitAll, true)
     Callback.add("onKillProc", "RMT.item_onKill", item_onKill, true)
     Callback.add("onDamagedProc", "RMT.item_onDamaged", item_onDamaged, true)
     Callback.add("onDamageBlocked", "RMT.item_onDamageBlocked", item_onDamageBlocked, true)
