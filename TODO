@@ -12,3 +12,5 @@ o Apply Instance wrapper everywhere (on gm.array_get, etc.)
 
 - Add actor:reduce_cooldown(slot)
 - Also think of better way to do cooldown reduction on a slot (I think Hardlight Afterburner already does this)
+
+- Overwrite fire_bullet and fire_explosion to guarantee stun application

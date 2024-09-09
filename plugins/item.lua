@@ -165,7 +165,9 @@ methods_item = {
     end,
     
 
-    add_callback = function(self, callback, func)
+    add_callback = function(self, callback, func, all_damage)
+        if all_damage then callback = callback.."All" end
+
         local other_callbacks = {
             "onStatRecalc",
             "onPostStatRecalc",
@@ -306,12 +308,9 @@ methods_item_callbacks = {
     onStatRecalc        = function(self, func) self:add_callback("onStatRecalc", func) end,
     onPostStatRecalc    = function(self, func) self:add_callback("onPostStatRecalc", func) end,
     onBasicUse          = function(self, func) self:add_callback("onBasicUse", func) end,
-    onAttack            = function(self, func) self:add_callback("onAttack", func) end,
-    onAttackAll         = function(self, func) self:add_callback("onAttackAll", func) end,
-    onPostAttack        = function(self, func) self:add_callback("onPostAttack", func) end,
-    onPostAttackAll     = function(self, func) self:add_callback("onPostAttackAll", func) end,
-    onHit               = function(self, func) self:add_callback("onHit", func) end,
-    onHitAll            = function(self, func) self:add_callback("onHitAll", func) end,
+    onAttack            = function(self, func, all_damage) self:add_callback("onAttack", func, all_damage) end,
+    onPostAttack        = function(self, func, all_damage) self:add_callback("onPostAttack", func, all_damage) end,
+    onHit               = function(self, func, all_damage) self:add_callback("onHit", func, all_damage) end,
     onKill              = function(self, func) self:add_callback("onKill", func) end,
     onDamaged           = function(self, func) self:add_callback("onDamaged", func) end,
     onDamageBlocked     = function(self, func) self:add_callback("onDamageBlocked", func) end,

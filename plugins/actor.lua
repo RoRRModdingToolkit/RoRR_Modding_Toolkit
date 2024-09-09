@@ -26,7 +26,9 @@ Actor.KNOCKBACK_DIR = {
 
 -- ========== Static Methods ==========
 
-Actor.add_callback = function(callback, func, skill)
+Actor.add_callback = function(callback, func, skill, all_damage)
+    if all_damage then callback = callback.."All" end
+
     local other_callbacks = {
         "onStatRecalc",
         "onPostStatRecalc",
@@ -230,12 +232,9 @@ methods_actor_callbacks = {
     onPostStatRecalc    = function(self, func) Actor.add_callback("onPostStatRecalc", func) end,
     onSkillUse          = function(self, func, skill) Actor.add_callback("onSkillUse", func, skill) end,
     onBasicUse          = function(self, func) Actor.add_callback("onBasicUse", func) end,
-    onAttack            = function(self, func) Actor.add_callback("onAttack", func) end,
-    onAttackAll         = function(self, func) Actor.add_callback("onAttackAll", func) end,
-    onPostAttack        = function(self, func) Actor.add_callback("onPostAttack", func) end,
-    onPostAttackAll     = function(self, func) Actor.add_callback("onPostAttackAll", func) end,
-    onHit               = function(self, func) Actor.add_callback("onHit", func) end,
-    onHitAll            = function(self, func) Actor.add_callback("onHitAll", func) end,
+    onAttack            = function(self, func, all_damage) Actor.add_callback("onAttack", func, all_damage) end,
+    onPostAttack        = function(self, func, all_damage) Actor.add_callback("onPostAttack", func, all_damage) end,
+    onHit               = function(self, func, all_damage) Actor.add_callback("onHit", func, all_damage) end,
     onKill              = function(self, func) Actor.add_callback("onKill", func) end,
     onDamaged           = function(self, func) Actor.add_callback("onDamaged", func) end,
     onDamageBlocked     = function(self, func) Actor.add_callback("onDamageBlocked", func) end,
