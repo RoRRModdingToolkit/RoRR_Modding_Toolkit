@@ -6,6 +6,24 @@ local callbacks = {}
 
 
 
+-- ========== Enums ==========
+
+Actor.KNOCKBACK_KIND = {
+    none        = 0,
+    standard    = 1,
+    freeze      = 2,
+    deepfreeze  = 3,
+    pull        = 4
+}
+
+
+Actor.KNOCKBACK_DIR = {
+    left    = -1,
+    right   = 1
+}
+
+
+
 -- ========== Static Methods ==========
 
 Actor.add_callback = function(callback, func, skill)
@@ -119,6 +137,11 @@ methods_actor = {
 
     remove_immune = function(self)
         self.invincible = 0
+    end,
+
+
+    apply_knockback = function(self, kind, direction, duration)
+        gm.actor_knockback_inflict(self.value, kind, direction, duration *60)
     end,
 
 
