@@ -148,6 +148,11 @@ methods_actor = {
 
     apply_knockback = function(self, kind, direction, duration)
         gm.actor_knockback_inflict(self.value, kind, direction, duration *60)
+
+        -- Other types don't completely stun
+        if kind > Actor.KNOCKBACK_KIND.standard then
+            gm.actor_knockback_inflict(self.value, Actor.KNOCKBACK_KIND.standard, direction, duration *60)
+        end
     end,
 
 
@@ -478,7 +483,7 @@ Actor.__initialize = function()
     Callback.add("onAttackHandleEnd", "RMT.actor_onPostAttack", actor_onPostAttack, true)
     Callback.add("onAttackHandleEnd", "RMT.actor_onPostAttackAll", actor_onPostAttackAll, true)
     Callback.add("onHitProc", "RMT.actor_onHit", actor_onHit, true)
-    Callback.add("onHitProc", "RMT.actor_onHitAll", actor_onHitAll, true)
+    Callback.add("onAttackHit", "RMT.actor_onHitAll", actor_onHitAll, true)
     Callback.add("onKillProc", "RMT.actor_onKill", actor_onKill, true)
     Callback.add("onDamagedProc", "RMT.actor_onDamaged", actor_onDamaged, true)
     Callback.add("onDamageBlocked", "RMT.actor_onDamageBlocked", actor_onDamageBlocked, true)
