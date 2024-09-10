@@ -23,6 +23,15 @@ Actor.KNOCKBACK_DIR = {
 }
 
 
+Actor.DAMAGER = {
+    no_proc     = 0,
+    no_crit     = 1,
+    can_proc    = 2,
+    can_crit    = 3,
+    allow_stun  = 4
+}
+
+
 
 -- ========== Static Methods ==========
 
@@ -83,6 +92,7 @@ methods_actor = {
 
 
     fire_bullet = function(self, x, y, direction, range, damage, pierce_multiplier, hit_sprite)
+        -- By default: proc, crit, stun
         local damager = self.value:fire_bullet(0, x, y, (pierce_multiplier and 1) or 0, damage, range, hit_sprite or -1, direction, 1.0, 1.0, -1.0)
         if pierce_multiplier then damager.damage_degrade = (1.0 - pierce_multiplier) end
         return damager
@@ -90,20 +100,51 @@ methods_actor = {
 
 
     fire_explosion = function(self, x, y, x_radius, y_radius, damage, stun, hit_sprite)
+        -- By default: proc, crit, stun
         local damager = self.value:fire_explosion(0, x, y, damage, hit_sprite or -1, 2, -1, x_radius / 32.0, y_radius / 8.0)
         if stun then damager.stun = stun end
         return damager
     end,
 
 
-    take_damage = function(self, damage, source, x, y, color, crit_sfx)
-        local source_inst = nil
-        if source then
-            if type(source) == "table" then source = source.value end
-            source_inst = source
+    -- take_damage = function(self, damage, source, x, y, color, crit_sfx)
+    --     local source_inst = nil
+    --     if source then
+    --         if type(source) == "table" then source = source.value end
+    --         source_inst = source
+    --     end
+    --     if not crit_sfx then crit_sfx = false end
+    --     gm.damage_inflict(self.value, damage, 0.0, source_inst, x or self.x, y or self.y - 28, damage, 1.0, color or Color.WHITE, crit_sfx)
+    -- end,
+
+
+    take_damage = function(self, damage, source, direction, hit_sprite, color, flags, damager_values)
+        -- By default: no proc, no crit, no stun
+        local flags = flags or {}
+        
+        local source_ = self.value
+        if source then source_ = source end
+
+        local can_proc = Helper.table_has(flags, Actor.DAMAGER.can_proc)
+        local can_crit = Helper.table_has(flags, Actor.DAMAGER.can_crit)
+        local allow_stun = Helper.table_has(flags, Actor.DAMAGER.allow_stun)
+
+        local damager = gm._mod_attack_fire_direct(source_, self.value, self.x, self.y, 0, damage, hit_sprite or -1, can_proc).attack_info
+        if color then damager.damage_color = color end
+
+        -- Remove crit if not can_crit
+        if can_crit == false and damager.critical then
+            damager.damage = damager.damage / 2.0
+            damager.critical = false
         end
-        if not crit_sfx then crit_sfx = false end
-        gm.damage_inflict(self.value, damage, 0.0, source_inst, x or self.x, y or self.y - 28, damage, 1.0, color or Color.WHITE, crit_sfx)
+
+        -- Allow stun
+        if allow_stun then
+            damager.allow_stun = true
+            damager.knockback_direction = direction
+        end
+
+        return damager
     end,
 
 
@@ -492,7 +533,7 @@ Actor.__initialize = function()
 
     Actor:onDamaged(function(actor, damager)
         -- Allow stun application even if damager.proc is false
-        if damager.stun > 0 and damager.proc == 0.0 and damager.allow_stun == 1.0 then
+        if damager.stun > 0 and (damager.proc == 0.0 or damager.proc == false) and damager.allow_stun == 1.0 then
             actor:apply_knockback(damager.knockback_kind, damager.knockback_direction, damager.stun * 1.5)
         end
     end)
