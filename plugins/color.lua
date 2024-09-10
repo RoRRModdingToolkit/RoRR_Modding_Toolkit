@@ -48,25 +48,25 @@ local abstraction_color = {
 
 -- ========== Static Functions (using gamemaker calls) ==========
 
-Color.make_rgb = function(red, green, blue)
-    return gm.make_colour_rgb(red, green, blue)
-end
+-- Color.make_rgb = function(red, green, blue)
+--     return gm.make_colour_rgb(red, green, blue)
+-- end
 
-Color.make_hsv = function(hue, saturation, value)
-    return gm.make_colour_hsv(hue, sat, val)
-end
+-- Color.make_hsv = function(hue, saturation, value)
+--     return gm.make_colour_hsv(hue, sat, val)
+-- end
 
-Color.make_hex = function(hex)
-    if type(hex) ~= "string" or #hex ~= 6 then
-        log.error("Not a valid color hex code", 2)
-        return nil
-    end
+-- Color.make_hex = function(hex)
+--     if type(hex) ~= "string" or #hex ~= 6 then
+--         log.error("Not a valid color hex code", 2)
+--         return nil
+--     end
 
-    local r = gm.real(gm.ptr( string.sub(hex, 1, 2) ))
-    local g = gm.real(gm.ptr( string.sub(hex, 3, 4) ))
-    local b = gm.real(gm.ptr( string.sub(hex, 5, 6) ))
-    return Color.make_rgb(r, g, b)
-end
+--     local r = gm.real(gm.ptr( string.sub(hex, 1, 2) ))
+--     local g = gm.real(gm.ptr( string.sub(hex, 3, 4) ))
+--     local b = gm.real(gm.ptr( string.sub(hex, 5, 6) ))
+--     return Color.make_rgb(r, g, b)
+-- end
 
 -- ========== Static Functions (no gamemaker calls) ==========
 
@@ -162,9 +162,9 @@ end
 -- ========== Metatables ==========
 
 metatable_color = {
-  -- Create color by calling Color(hex_string)
+  -- Create color by calling Color(lua hex)
   __call = function(table, hex)
-    return Color.make_hex(hex)
+    return Color.from_hex(hex)
   end,
 
 
