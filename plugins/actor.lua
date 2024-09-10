@@ -91,10 +91,53 @@ methods_actor = {
     end,
 
 
-    fire_bullet = function(self, x, y, direction, range, damage, pierce_multiplier, hit_sprite)
+    -- fire_bullet = function(self, x, y, direction, range, damage, pierce_multiplier, hit_sprite)
+    --     -- By default: proc, crit, stun
+    --     local damager = self.value:fire_bullet(0, x, y, (pierce_multiplier and 1) or 0, damage, range, hit_sprite or -1, direction, 1.0, 1.0, -1.0)
+    --     if pierce_multiplier then damager.damage_degrade = (1.0 - pierce_multiplier) end
+    --     return damager
+    -- end,
+
+
+    fire_bullet = function(self, x, y, range, direction, damage, pierce_multiplier, stun, color, hit_sprite, flags)
         -- By default: proc, crit, stun
-        local damager = self.value:fire_bullet(0, x, y, (pierce_multiplier and 1) or 0, damage, range, hit_sprite or -1, direction, 1.0, 1.0, -1.0)
-        if pierce_multiplier then damager.damage_degrade = (1.0 - pierce_multiplier) end
+        local flags = flags or {}
+        
+        local source_ = self.value
+        if source then source_ = source end
+
+        local can_pierce = false
+        if pierce_multiplier then can_pierce = true end
+
+        local no_proc = Helper.table_has(flags, Actor.DAMAGER.no_proc)
+        local no_crit = Helper.table_has(flags, Actor.DAMAGER.no_crit)
+        local allow_stun = Helper.table_has(flags, Actor.DAMAGER.allow_stun)
+
+        local damager = gm._mod_attack_fire_bullet(self.value, x, y, range, direction, damage, hit_sprite or -1, can_pierce, not no_proc).attack_info
+        if color then damager.damage_color = color
+        else damager.damage_color = Color.WHITE_ALMOST
+        end
+
+        -- Remove crit if no_crit
+        if no_crit and damager.critical then
+            damager.damage = damager.damage / 2.0
+            damager.critical = false
+        end
+
+        -- Set pierce value
+        if pierce_multiplier then
+            damager.damage_degrade = (1.0 - pierce_multiplier)
+        end
+
+        -- Set stun value
+        if stun and stun > 0 then
+            allow_stun = true
+            damager.stun = stun
+        end
+
+        -- Allow stun
+        if allow_stun then damager.allow_stun = true end
+
         return damager
     end,
 
@@ -118,7 +161,7 @@ methods_actor = {
     -- end,
 
 
-    take_damage = function(self, damage, source, direction, hit_sprite, color, flags, damager_values)
+    take_damage = function(self, damage, source, kb_direction, color, stun, hit_sprite, flags)
         -- By default: no proc, no crit, no stun
         local flags = flags or {}
         
@@ -130,7 +173,9 @@ methods_actor = {
         local allow_stun = Helper.table_has(flags, Actor.DAMAGER.allow_stun)
 
         local damager = gm._mod_attack_fire_direct(source_, self.value, self.x, self.y, 0, damage, hit_sprite or -1, can_proc).attack_info
-        if color then damager.damage_color = color end
+        if color then damager.damage_color = color
+        else damager.damage_color = Color.WHITE_ALMOST
+        end
 
         -- Remove crit if not can_crit
         if can_crit == false and damager.critical then
@@ -138,10 +183,16 @@ methods_actor = {
             damager.critical = false
         end
 
+        -- Set stun value
+        if stun and stun > 0 then
+            allow_stun = true
+            damager.stun = stun
+        end
+
         -- Allow stun
         if allow_stun then
             damager.allow_stun = true
-            damager.knockback_direction = direction
+            damager.knockback_direction = kb_direction
         end
 
         return damager
