@@ -44,7 +44,7 @@ function __initialize()
     -- Instance.__initialize()
     Item.__initialize()
     
-    Language.__initialize()
+    -- Language.__initialize()
 end
 
 

@@ -2,6 +2,9 @@
 
 Language = {}
 
+-- EDIT: Something something WARNING recursive_directory
+-- doesn't error but maybe worth checking out sometime
+
 
 
 -- ========== Functions ==========
@@ -46,10 +49,10 @@ end
 
 -- ========== Hooks and Other ==========
 
-Language.__initialize = function()
-    -- Load once after initial game setup
-    Language.load_from_mods()
-end
+-- Language.__initialize = function()
+--     -- Load once after initial game setup
+--     Language.load_from_mods()
+-- end
 
 
 gm.post_script_hook(gm.constants.translate_load_active_language, function(self, other, result, args)
