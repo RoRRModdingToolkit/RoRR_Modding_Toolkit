@@ -16,6 +16,7 @@ require("./helper")
 require("./initialize")
 require("./instance")
 require("./item")
+require("./language")
 require("./list")
 require("./net")
 require("./object")
@@ -42,6 +43,8 @@ function __initialize()
     Equipment.__initialize()
     -- Instance.__initialize()
     Item.__initialize()
+    
+    Language.__initialize()
 end
 
 
