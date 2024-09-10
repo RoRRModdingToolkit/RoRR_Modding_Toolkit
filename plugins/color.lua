@@ -26,6 +26,7 @@ local abstraction_color = {
     TEAL            = 0x808000,
     WHITE           = 0xffffff,
     YELLOW          = 0x00ffff,
+
     -- item colors
     ITEM_WHITE      = 0xffffff,
     ITEM_GREEN      = 0x58b475,
@@ -35,6 +36,7 @@ local abstraction_color = {
     ITEM_PURPLE     = 0xc76aab,
     ITEM_GRAY       = 0x555555,
     ITEM_GREY       = 0x555555,
+
     -- text colors
     TEXT_YELLOW     = 0x7bd2ef,
     TEXT_BLUE       = 0xd29a31,
@@ -44,6 +46,8 @@ local abstraction_color = {
     TEXT_LTGREY     = 0xc0c0c0,
     TEXT_DKGRAY     = 0x808080,
     TEXT_DKGREY     = 0x808080,
+
+    WHITE_ALMOST    = 0xfffffe
 }
 
 -- ========== Static Functions (using gamemaker calls) ==========
