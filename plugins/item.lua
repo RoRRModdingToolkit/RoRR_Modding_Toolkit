@@ -569,6 +569,7 @@ end
 
 
 local function item_onDamaged(self, other, result, args)
+    if not args[3].value.attack_info then return end
     if callbacks["onDamaged"] then
         for _, c in ipairs(callbacks["onDamaged"]) do
             local item = c[1]

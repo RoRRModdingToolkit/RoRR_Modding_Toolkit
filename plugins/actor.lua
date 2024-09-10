@@ -438,6 +438,7 @@ end
 
 
 local function actor_onDamaged(self, other, result, args)
+    if not args[3].value.attack_info then return end
     if callbacks["onDamaged"] then
         for _, fn in ipairs(callbacks["onDamaged"]) do
             fn(Instance.wrap(args[2].value), args[3].value.attack_info)   -- Actor, Damager attack_info
