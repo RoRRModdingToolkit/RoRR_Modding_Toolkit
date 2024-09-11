@@ -130,6 +130,16 @@ Helper.table_has = function(table_, value)
 end
 
 
+Helper.table_remove = function(table_, value)
+    for i, v in pairs(table_) do
+        if v == value then
+            table.remove(table_, i)
+            return
+        end
+    end
+end
+
+
 Helper.table_merge = function(...)
     local new = {}
     for _, t in ipairs{...} do
