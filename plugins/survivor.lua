@@ -9,6 +9,7 @@ local instance_callbacks = {}
 
 -- TODO maybe find a better way to do this?
 local survivors = {}
+local skins = {}
 
 
 -- ========== Enums ==========
@@ -219,8 +220,25 @@ methods_survivor = {
         return id
     end,
 
-    add_skill = function(self, skill, skill_family, achievement)
-        if not achievement then achievement = -1 end
+    add_skill = function(self, skill, skill_family_index, achievement)
+
+        local skill_family = nil
+        if skill_family_index == 1 then
+            skill_family = self.skill_family_z.elements
+        elseif  skill_family_index == 2 then
+            skill_family = self.skill_family_x.elements
+        elseif skill_family_index == 3 then
+            skill_family = self.skill_family_c.elements
+        elseif skill_family_index == 4 then
+            skill_family = self.skill_family_v.elements
+        else
+            log.error("Skill Family Index should be between 1 and 4, got "..skill_family_index, 2)
+            return
+        end
+
+        for _, skill_el in ipairs(skill_family) do
+            if skill_el.skill_id == skill.value then return end
+        end
 
         local survivor_loadout_unlockables = gm.variable_global_get("survivor_loadout_unlockables")
         
@@ -229,7 +247,7 @@ methods_survivor = {
         gm.static_set(survivor_loadout, gm.static_get(skill_family[1]))
 
         survivor_loadout.skill_id = skill.value
-        survivor_loadout.achievement_id = achievement -- TODO make it compatible with the achievement module
+        survivor_loadout.achievement_id = (achievement and achievement.value) or -1
         survivor_loadout.save_flag_viewed = nil
         survivor_loadout.index = gm.array_length(survivor_loadout_unlockables)
 
@@ -238,48 +256,58 @@ methods_survivor = {
     end,
 
     add_primary = function(self, skill, achievement)
-        self:add_skill(skill, self.skill_family_z.elements, achievement)
+        self:add_skill(skill, 1, achievement)
     end,
     
     add_secondary = function(self, skill, achievement)
-        self:add_skill(skill, self.skill_family_x.elements, achievement)
+        self:add_skill(skill, 2, achievement)
     end,
     
     add_utility = function(self, skill, achievement)
-        self:add_skill(skill, self.skill_family_c.elements, achievement)
+        self:add_skill(skill, 3, achievement)
     end,
     
     add_special = function(self, skill, achievement)
-        self:add_skill(skill, self.skill_family_v.elements, achievement)
+        self:add_skill(skill, 4, achievement)
     end,
 
-    get_skill = function(self, skill_family, family_index)
+    get_skill = function(self, skill_family_index, family_index)
+        local skill_family = nil
+        if skill_family_index == 1 then
+            skill_family = self.skill_family_z.elements
+        elseif  skill_family_index == 2 then
+            skill_family = self.skill_family_x.elements
+        elseif skill_family_index == 3 then
+            skill_family = self.skill_family_c.elements
+        elseif skill_family_index == 4 then
+            skill_family = self.skill_family_v.elements
+        else
+            log.error("Skill Family Index should be between 1 and 4, got "..skill_family_index, 2)
+            return
+        end
+
         family_index = family_index or 1
         if family_index > #skill_family or family_index < 1 then 
-            log.error("Family index is out of bound!")
+            log.error("Family index is out of bound!", 2)
             return nil
         end
         return Skill.wrap(skill_family[family_index].skill_id)
     end,
     
     get_primary = function(self, family_index)
-        local elements = self.skill_family_z.elements
-        return self:get_skill(elements, family_index)
+        return self:get_skill(1, family_index)
     end,
 
     get_secondary = function(self, family_index)
-        local elements = self.skill_family_x.elements
-        return self:get_skill(elements, family_index)
+        return self:get_skill(2, family_index)
     end,
 
     get_utility = function(self, family_index)
-        local elements = self.skill_family_c.elements
-        return self:get_skill(elements, family_index)
+        return self:get_skill(3, family_index)
     end,
 
     get_special = function(self, family_index)
-        local elements = self.skill_family_v.elements
-        return self:get_skill(elements, family_index)
+        return self:get_skill(4, family_index)
     end,
 
     set_animations = function(self, sprites)
@@ -301,7 +329,7 @@ methods_survivor = {
     end,
 
     set_primary_color = function(self, R, G, B)
-        self.primary_color = gm.make_colour_rgb(R, G, B)
+        self.primary_color = Color.from_rgb(R, G, B)
     end,
 
     set_text = function(self, name, description, end_quote)
@@ -311,13 +339,13 @@ methods_survivor = {
         self.token_end_quote = end_quote
     end,
 
-    set_stats_base = function(self, maxhp, damage, regen, attack_speed, critical_chance, armor, maxshield)
+    set_stats_base = function(self, maxhp, damage, regen, armor, attack_speed, critical_chance, maxshield)
         if type(maxhp) ~= "number" and type(maxhp) ~= "nil" then log.error("Max HP base should be a number, got a "..type(maxhp), 2) return end
         if type(damage) ~= "number" and type(damage) ~= "nil" then log.error("Damage base should be a number, got a "..type(damage), 2) return end
         if type(regen) ~= "number" and type(regen) ~= "nil" then log.error("Regen base should be a number, got a "..type(regen), 2) return end
+        if type(armor) ~= "number" and type(armor) ~= "nil" then log.error("Armor base should be a number, got a "..type(armor), 2) return end
         if type(attack_speed) ~= "number" and type(attack_speed) ~= "nil" then log.error("Attack Speed base should be a number, got a "..type(attack_speed), 2) return end
         if type(critical_chance) ~= "number" and type(critical_chance) ~= "nil" then log.error("Critical Chance base should be a number, got a "..type(critical_chance), 2) return end
-        if type(armor) ~= "number" and type(armor) ~= "nil" then log.error("Armor base should be a number, got a "..type(armor), 2) return end
         if type(maxshield) ~= "number" and type(maxshield) ~= "nil" then log.error("Max Shield base should be a number, got a "..type(maxshield), 2) return end
 
         survivors[self.value].maxhp_base = maxhp or survivors[self.value].maxhp_base
@@ -347,9 +375,9 @@ methods_survivor = {
         if type(maxhp) ~= "number" and type(maxhp) ~= "nil" then log.error("Max HP level should be a number, got a "..type(maxhp), 2) return end
         if type(damage) ~= "number" and type(damage) ~= "nil" then log.error("Damage level should be a number, got a "..type(damage), 2) return end
         if type(regen) ~= "number" and type(regen) ~= "nil" then log.error("Regen level should be a number, got a "..type(regen), 2) return end
+        if type(armor) ~= "number" and type(armor) ~= "nil" then log.error("Armor level should be a number, got a "..type(armor), 2) return end
         if type(attack_speed) ~= "number" and type(attack_speed) ~= "nil" then log.error("Attack Speed level should be a number, got a "..type(attack_speed), 2) return end
         if type(critical_chance) ~= "number" and type(critical_chance) ~= "nil" then log.error("Critical Chance level should be a number, got a "..type(critical_chance), 2) return end
-        if type(armor) ~= "number" and type(armor) ~= "nil" then log.error("Armor level should be a number, got a "..type(armor), 2) return end
 
         survivors[self.value].maxhp_level = maxhp or survivors[self.value].maxhp_level
         survivors[self.value].damage_level = damage or survivors[self.value].damage_level
@@ -389,32 +417,22 @@ methods_survivor = {
         survivors[self.value].yscale = yscale or xscale
     end,
 
-    -- IMPORTANT!! Need to rework this (because its ugly as hell)
-    -- Only the alt skin!!
-    -- Need to add possibility to put achievements
-    add_skin = function(self, nb_skin)
-
-        -- Find max index in all skin family
-        local max_index = 0
-        for i, survivor in ipairs(Class.SURVIVOR) do
-            local skin_family = survivor:get(10)
-            for j=1, #skin_family.elements do
-                if skin_family.elements[j].index > max_index then
-                    max_index = skin_family.elements[j].index
-                end
+    add_skin = function(self, name, skin_index, achievement)
+        for _, skin_name in ipairs(skins) do
+            if skin_name == name then 
+                -- log.error("Skin Name already exist: "..name)
+                return 
             end
         end
 
-        max_index = max_index + 10
-
-        for i=1, nb_skin do
-            local skin_alt = gm.struct_create()
-            gm.static_set(skin_alt, gm.static_get(self.skin_family.elements[1]))
-            skin_alt.skin_id = i
-            skin_alt.achievement_id = -1
-            skin_alt.index = max_index + i
-            gm.array_push(self.skin_family.elements, skin_alt)
-        end
+        local artifact_skin = Artifact.new_skin(achievement)
+        local skin_alt = gm.struct_create()
+        gm.static_set(skin_alt, gm.static_get(self.skin_family.elements[1]))
+        skin_alt.skin_id = skin_index
+        skin_alt.achievement_id = achievement or -1
+        skin_alt.index = artifact_skin
+        gm.array_push(self.skin_family.elements, skin_alt)
+        skins[#skins + 1] = name
     end,
 }
 
