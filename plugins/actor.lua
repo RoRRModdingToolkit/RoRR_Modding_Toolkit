@@ -561,9 +561,9 @@ end
 
 
 local function actor_onHitAll(self, other, result, args)
+    local attack = args[2].value
     if not attack.inflictor then return end
     if callbacks["onHitAll"] then
-        local attack = args[2].value
         for _, fn in ipairs(callbacks["onHitAll"]) do
             fn(Instance.wrap(attack.inflictor), Instance.wrap(attack.target_true), attack.attack_info) -- Attacker, Victim, Damager attack_info
         end

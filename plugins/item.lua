@@ -538,9 +538,9 @@ end
 
 
 local function item_onHitAll(self, other, result, args)
+    local attack = args[2].value
     if not attack.inflictor then return end
     if callbacks["onHitAll"] then
-        local attack = args[2].value
         for _, c in ipairs(callbacks["onHitAll"]) do
             local item = c[1]
             local actor = Instance.wrap(attack.inflictor)
