@@ -538,6 +538,7 @@ end
 
 
 local function item_onHitAll(self, other, result, args)
+    if not attack.inflictor then return end
     if callbacks["onHitAll"] then
         local attack = args[2].value
         for _, c in ipairs(callbacks["onHitAll"]) do
