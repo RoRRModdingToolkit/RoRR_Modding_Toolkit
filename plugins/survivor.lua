@@ -429,7 +429,7 @@ methods_survivor = {
         local skin_alt = gm.struct_create()
         gm.static_set(skin_alt, gm.static_get(self.skin_family.elements[1]))
         skin_alt.skin_id = skin_index
-        skin_alt.achievement_id = achievement or -1
+        skin_alt.achievement_id = (achievement and achievement.value) or -1
         skin_alt.index = artifact_skin
         gm.array_push(self.skin_family.elements, skin_alt)
         skins[#skins + 1] = name
