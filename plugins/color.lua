@@ -42,6 +42,7 @@ local abstraction_color = {
     TEXT_BLUE       = 0xd29a31,
     TEXT_GREEN      = 0x86b67e,
     TEXT_RED        = 0x6666cf,
+    TEXT_ORANGE     = 0x5673f9,
     TEXT_LTGRAY     = 0xc0c0c0,
     TEXT_LTGREY     = 0xc0c0c0,
     TEXT_DKGRAY     = 0x808080,
