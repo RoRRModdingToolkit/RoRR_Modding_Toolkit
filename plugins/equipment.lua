@@ -328,7 +328,7 @@ gm.pre_script_hook(gm.constants.equipment_set, function(self, other, result, arg
             local player = Instance.wrap(args[1].value)
             local equip = player:get_equipment()
             if equip and equip.value == fn[1] then
-                fn[2](player)  -- Player
+                fn[2](player, Equipment.wrap(args[2].value))  -- Player, New equipment wrapper
             end
         end
     end
@@ -341,7 +341,6 @@ gm.post_script_hook(gm.constants.equipment_set, function(self, other, result, ar
             local player = Instance.wrap(args[1].value)
             local equip = player:get_equipment()
             if equip and equip.value == fn[1] then
-                player:recalculate_stats()
                 fn[2](player)  -- Player
             end
         end
