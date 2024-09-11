@@ -460,7 +460,7 @@ end)
 -- ========== Callbacks ==========
 
 local function item_onAttack(self, other, result, args)
-    if not args[2].value.proc then return end
+    if not args[2].value.proc or not args[2].value.parent then return end
     if callbacks["onAttack"] then
         for _, c in ipairs(callbacks["onAttack"]) do
             local item = c[1]
@@ -476,6 +476,7 @@ end
 
 
 local function item_onAttackAll(self, other, result, args)
+    if not args[2].value.parent then return end
     if callbacks["onAttackAll"] then
         for _, c in ipairs(callbacks["onAttackAll"]) do
             local item = c[1]
