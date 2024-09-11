@@ -5,12 +5,12 @@ Resources = {}
 
 -- == Section Sprites == --
 
-Resources.sprite_load = function(path, img_num, x_orig, y_orig, remove_back, smooth, speed, bbox_left, bbox_top, bbox_right, bbox_bottom)
-    local sprite = gm.sprite_add(
+Resources.sprite_load = function(namespace, name, path, img_num, x_orig, y_orig, speed, bbox_left, bbox_top, bbox_right, bbox_bottom)
+    local sprite = gm.sprite_add_w(
+        namespace,
+        name,
         path, 
         (img_num ~= nil and {img_num} or {1})[1], 
-        (remove_back ~= nil and {remove_back} or {false})[1], 
-        (smooth ~= nil and {smooth} or {false})[1],
         (x_orig ~= nil and {x_orig} or {0})[1], 
         (y_orig ~= nil and {y_orig} or {0})[1]
     )
