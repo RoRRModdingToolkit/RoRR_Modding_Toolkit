@@ -4,6 +4,8 @@ Equipment = {}
 
 local callbacks = {}
 
+local is_passive = {}
+
 
 
 -- ========== Enums ==========
@@ -171,6 +173,13 @@ methods_equipment = {
 
     set_cooldown = function(self, cooldown)
         self.cooldown = cooldown * 60.0
+    end,
+
+
+    set_passive = function(self, bool)
+        if bool and not is_passive[self.value] then is_passive[self.value] = true
+        elseif not bool and is_passive[self.value] then is_passive[self.value] = nil
+        end
     end,
 
 
@@ -345,6 +354,13 @@ gm.post_script_hook(gm.constants.equipment_set, function(self, other, result, ar
                 fn[2](player)  -- Player
             end
         end
+    end
+end)
+
+
+gm.pre_script_hook(gm.constants.item_use_equipment, function(self, other, result, args)
+    if is_passive[Instance.wrap(self):get_equipment().value] then
+        return false
     end
 end)
 
