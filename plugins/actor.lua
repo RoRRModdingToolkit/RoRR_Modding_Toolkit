@@ -102,9 +102,6 @@ methods_actor = {
     fire_bullet = function(self, x, y, range, direction, damage, pierce_multiplier, stun, color, hit_sprite, flags)
         -- By default: proc, crit, stun
         local flags = flags or {}
-        
-        local source_ = self.value
-        if source then source_ = source end
 
         local can_pierce = false
         if pierce_multiplier then can_pierce = true end
@@ -142,10 +139,42 @@ methods_actor = {
     end,
 
 
-    fire_explosion = function(self, x, y, x_radius, y_radius, damage, stun, hit_sprite)
+    -- fire_explosion = function(self, x, y, x_radius, y_radius, damage, stun, hit_sprite)
+    --     -- By default: proc, crit, stun
+    --     local damager = self.value:fire_explosion(0, x, y, damage, hit_sprite or -1, 2, -1, x_radius / 32.0, y_radius / 8.0)
+    --     if stun then damager.stun = stun end
+    --     return damager
+    -- end,
+
+
+    fire_explosion = function(self, x, y, width, height, damage, stun, color, explosion_sprite, sparks_sprite, flags)
         -- By default: proc, crit, stun
-        local damager = self.value:fire_explosion(0, x, y, damage, hit_sprite or -1, 2, -1, x_radius / 32.0, y_radius / 8.0)
-        if stun then damager.stun = stun end
+        local flags = flags or {}
+
+        local no_proc = Helper.table_has(flags, Actor.DAMAGER.no_proc)
+        local no_crit = Helper.table_has(flags, Actor.DAMAGER.no_crit)
+        local allow_stun = Helper.table_has(flags, Actor.DAMAGER.allow_stun)
+
+        local damager = gm._mod_attack_fire_explosion(self.value, x, y, width, height, damage, explosion_sprite or -1, sparks_sprite or -1, not no_proc).attack_info
+        if color then damager.damage_color = color
+        else damager.damage_color = Color.WHITE_ALMOST
+        end
+
+        -- Remove crit if no_crit
+        if no_crit and damager.critical then
+            damager.damage = damager.damage / 2.0
+            damager.critical = false
+        end
+
+        -- Set stun value
+        if stun and stun > 0 then
+            allow_stun = true
+            damager.stun = stun
+        end
+
+        -- Allow stun
+        if allow_stun then damager.allow_stun = true end
+
         return damager
     end,
 
