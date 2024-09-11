@@ -4,6 +4,8 @@ Equipment = {}
 
 local callbacks = {}
 
+local is_passive = {}
+
 
 
 -- ========== Enums ==========
@@ -131,6 +133,7 @@ methods_equipment = {
             table.insert(callbacks[callback_id], func)
 
         elseif callback == "onPickup"
+            or callback == "onDrop"
             or callback == "onStatRecalc"
             or callback == "onPostStatRecalc"
             or callback == "onStep"
@@ -173,6 +176,13 @@ methods_equipment = {
     end,
 
 
+    set_passive = function(self, bool)
+        if bool and not is_passive[self.value] then is_passive[self.value] = true
+        elseif not bool and is_passive[self.value] then is_passive[self.value] = nil
+        end
+    end,
+
+
     is_unlocked = function(self)
         return (not self.achievement_id) or gm.achievement_is_unlocked(self.achievement_id)
     end,
@@ -206,6 +216,7 @@ methods_equipment = {
 methods_equipment_callbacks = {
 
     onPickup            = function(self, func) self:add_callback("onPickup", func) end,
+    onDrop              = function(self, func) self:add_callback("onDrop", func) end,
     onUse               = function(self, func) self:add_callback("onUse", func) end,
     onStatRecalc        = function(self, func) self:add_callback("onStatRecalc", func) end,
     onPostStatRecalc    = function(self, func) self:add_callback("onPostStatRecalc", func) end,
@@ -320,15 +331,36 @@ gm.post_script_hook(gm.constants.recalculate_stats, function(self, other, result
 end)
 
 
+gm.pre_script_hook(gm.constants.equipment_set, function(self, other, result, args)
+    if callbacks["onDrop"] then
+        for _, fn in ipairs(callbacks["onDrop"]) do
+            local player = Instance.wrap(args[1].value)
+            local equip = player:get_equipment()
+            if equip and equip.value == fn[1] then
+                fn[2](player, Equipment.wrap(args[2].value))  -- Player, New equipment wrapper
+            end
+        end
+    end
+end)
+
+
 gm.post_script_hook(gm.constants.equipment_set, function(self, other, result, args)
+    local player = Instance.wrap(args[1].value)
+    player:recalculate_stats()
     if callbacks["onPickup"] then
         for _, fn in ipairs(callbacks["onPickup"]) do
-            local player = Instance.wrap(args[1].value)
             local equip = player:get_equipment()
             if equip and equip.value == fn[1] then
                 fn[2](player)  -- Player
             end
         end
+    end
+end)
+
+
+gm.pre_script_hook(gm.constants.item_use_equipment, function(self, other, result, args)
+    if is_passive[Instance.wrap(self):get_equipment().value] then
+        return false
     end
 end)
 

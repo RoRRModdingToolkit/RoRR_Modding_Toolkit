@@ -460,7 +460,7 @@ end)
 -- ========== Callbacks ==========
 
 local function item_onAttack(self, other, result, args)
-    if not args[2].value.proc then return end
+    if not args[2].value.proc or not args[2].value.parent then return end
     if callbacks["onAttack"] then
         for _, c in ipairs(callbacks["onAttack"]) do
             local item = c[1]
@@ -476,6 +476,7 @@ end
 
 
 local function item_onAttackAll(self, other, result, args)
+    if not args[2].value.parent then return end
     if callbacks["onAttackAll"] then
         for _, c in ipairs(callbacks["onAttackAll"]) do
             local item = c[1]
@@ -538,8 +539,9 @@ end
 
 
 local function item_onHitAll(self, other, result, args)
+    local attack = args[2].value
+    if not Instance.exists(attack.inflictor) then return end
     if callbacks["onHitAll"] then
-        local attack = args[2].value
         for _, c in ipairs(callbacks["onHitAll"]) do
             local item = c[1]
             local actor = Instance.wrap(attack.inflictor)
