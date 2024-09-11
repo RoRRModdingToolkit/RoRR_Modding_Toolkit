@@ -16,7 +16,7 @@ Resources.sprite_load = function(namespace, name, path, img_num, x_orig, y_orig,
     )
 
     if sprite == -1 then
-        log.error("Couldn't load sprite"..path..". Loading default sprite instead.")
+        log.error("Couldn't load sprite "..path..". Loading default sprite instead.")
         return 0
     end
 
