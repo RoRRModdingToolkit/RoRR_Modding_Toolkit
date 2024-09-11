@@ -131,6 +131,7 @@ methods_equipment = {
             table.insert(callbacks[callback_id], func)
 
         elseif callback == "onPickup"
+            or callback == "onDrop"
             or callback == "onStatRecalc"
             or callback == "onPostStatRecalc"
             or callback == "onStep"
@@ -206,6 +207,7 @@ methods_equipment = {
 methods_equipment_callbacks = {
 
     onPickup            = function(self, func) self:add_callback("onPickup", func) end,
+    onDrop              = function(self, func) self:add_callback("onDrop", func) end,
     onUse               = function(self, func) self:add_callback("onUse", func) end,
     onStatRecalc        = function(self, func) self:add_callback("onStatRecalc", func) end,
     onPostStatRecalc    = function(self, func) self:add_callback("onPostStatRecalc", func) end,
@@ -320,12 +322,26 @@ gm.post_script_hook(gm.constants.recalculate_stats, function(self, other, result
 end)
 
 
+gm.pre_script_hook(gm.constants.equipment_set, function(self, other, result, args)
+    if callbacks["onDrop"] then
+        for _, fn in ipairs(callbacks["onDrop"]) do
+            local player = Instance.wrap(args[1].value)
+            local equip = player:get_equipment()
+            if equip and equip.value == fn[1] then
+                fn[2](player)  -- Player
+            end
+        end
+    end
+end)
+
+
 gm.post_script_hook(gm.constants.equipment_set, function(self, other, result, args)
     if callbacks["onPickup"] then
         for _, fn in ipairs(callbacks["onPickup"]) do
             local player = Instance.wrap(args[1].value)
             local equip = player:get_equipment()
             if equip and equip.value == fn[1] then
+                player:recalculate_stats()
                 fn[2](player)  -- Player
             end
         end
