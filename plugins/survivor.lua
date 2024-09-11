@@ -5,10 +5,10 @@ Survivor = {}
 local abstraction_data = setmetatable({}, {__mode = "k"})
 
 local callbacks = {}
+local instance_callbacks = {}
 
 -- TODO maybe find a better way to do this?
 local survivors = {}
-
 
 
 -- ========== Enums ==========
@@ -105,6 +105,7 @@ Survivor.new = function(namespace, identifier)
         drone_idle              = gm.constants.sDronePlayerCommandoShoot,
         drone_shoot             = gm.constants.sCommandoDecoy,
         climb_hurt              = -1,
+        palette                 = gm.constants.sCommandoPalette,
         
         -- Default Stats Base
         maxhp_base              = 110.0,
@@ -151,6 +152,7 @@ Survivor.new = function(namespace, identifier)
         actor.sprite_drone_idle     = survivors[actor.class].drone_idle
         actor.sprite_drone_shoot    = survivors[actor.class].drone_shoot
         actor.sprite_climb_hurt     = survivors[actor.class].climb_hurt    
+        actor.sprite_palette        = survivors[actor.class].palette
 
         -- Set base stats
         actor.maxhp_base            = survivors[actor.class].maxhp_base
@@ -208,6 +210,13 @@ methods_survivor = {
             if not callbacks[callback_id] then callbacks[callback_id] = {} end
             table.insert(callbacks[callback_id], func)
         end
+    end,
+    
+    -- Put that somewhere else
+    add_instance_callback = function(self, func)
+        local id = #instance_callbacks + 1
+        instance_callbacks[id] = func
+        return id
     end,
 
     add_skill = function(self, skill, skill_family, achievement)
@@ -286,6 +295,9 @@ methods_survivor = {
         survivors[self.value].drone_idle    = sprites.drone_idle or survivors[self.value].drone_idle
         survivors[self.value].drone_shoot   = sprites.drone_shoot or survivors[self.value].drone_shoot
         survivors[self.value].climb_hurt    = sprites.climb_hurt or survivors[self.value].climb_hurt
+        survivors[self.value].palette       = sprites.palette or survivors[self.value].palette
+
+        self.sprite_palette                 = sprites.palette or survivors[self.value].palette
     end,
 
     set_primary_color = function(self, R, G, B)
@@ -331,7 +343,7 @@ methods_survivor = {
         survivors[self.value].pAccel_base = accel or survivors[self.value].pAccel_base
     end,
 
-    set_stats_level = function(self, maxhp, damage, regen, attack_speed, critical_chance)
+    set_stats_level = function(self, maxhp, damage, regen, armor, attack_speed, critical_chance)
         if type(maxhp) ~= "number" and type(maxhp) ~= "nil" then log.error("Max HP level should be a number, got a "..type(maxhp), 2) return end
         if type(damage) ~= "number" and type(damage) ~= "nil" then log.error("Damage level should be a number, got a "..type(damage), 2) return end
         if type(regen) ~= "number" and type(regen) ~= "nil" then log.error("Regen level should be a number, got a "..type(regen), 2) return end
@@ -347,12 +359,62 @@ methods_survivor = {
         survivors[self.value].armor_level = armor or survivors[self.value].armor_level
     end,
 
+    set_palettes = function(self, palette, portrait_palette, loadout_palette)
+        self.sprite_palette = palette
+        survivors[self.value].palette = palette
+
+        self.sprite_portrait_palette = portrait_palette
+        slef,sprite_loadout_palette = loadout_palette
+    end,
+
+    set_cape_offset = function(self, xoffset, yoffset, xoffset_rope, yoffset_rope)
+        if type(xoffset) ~= "number" then log.error("X Offset should be a number, got a "..type(maxhp), 2) return end
+        if type(yoffset) ~= "number" then log.error("Y Offset should be a number, got a "..type(maxhp), 2) return end
+        if type(xoffset_rope) ~= "number" then log.error("X Offset Rope should be a number, got a "..type(maxhp), 2) return end
+        if type(yoffset_rope) ~= "number" then log.error("Y Offset Rope should be a number, got a "..type(maxhp), 2) return end
+
+        if type(self.cape_offset) == "nil" then self.cape_offset = gm.array_create(4) end
+        
+        self.cape_offset[1] = xoffset
+        self.cape_offset[2] = yoffset
+        self.cape_offset[3] = xoffset_rope
+        self.cape_offset[4] = yoffset_rope
+    end,
+    
     set_scale = function(self, xscale, yscale)
         if type(xscale) ~= "number" then log.error("Xscale should be a number, got a "..type(xscale), 2) return end
         if type(yscale) ~= "number" and type(yscale) ~= "nil" then log.error("Yscale should be a number, got a "..type(yscale), 2) return end
 
         survivors[self.value].xscale = xscale
         survivors[self.value].yscale = yscale or xscale
+    end,
+
+    -- IMPORTANT!! Need to rework this (because its ugly as hell)
+    -- Only the alt skin!!
+    -- Need to add possibility to put achievements
+    add_skin = function(self, nb_skin)
+
+        -- Find max index in all skin family
+        local max_index = 0
+        for i, survivor in ipairs(Class.SURVIVOR) do
+            local skin_family = survivor:get(10)
+            for j=1, #skin_family.elements do
+                if skin_family.elements[j].index > max_index then
+                    max_index = skin_family.elements[j].index
+                end
+            end
+        end
+
+        max_index = max_index + 10
+
+        for i=1, nb_skin do
+            local skin_alt = gm.struct_create()
+            gm.static_set(skin_alt, gm.static_get(self.skin_family.elements[1]))
+            skin_alt.skin_id = i
+            skin_alt.achievement_id = -1
+            skin_alt.index = max_index + i
+            gm.array_push(self.skin_family.elements, skin_alt)
+        end
     end,
 }
 
@@ -432,6 +494,23 @@ gm.post_script_hook(gm.constants.callback_execute, function(self, other, result,
     if callbacks[args[1].value] then
         for _, fn in pairs(callbacks[args[1].value]) do
             fn(args[2].value) --(actor, initial_set)
+        end
+    end
+end)
+
+-- Need to put that somewhere else
+-- And add more callback type?
+gm.post_script_hook(gm.constants.instance_callback_call, function(self, other, result, args)
+    for _, fn in pairs(instance_callbacks) do
+
+        -- on Hit
+        if #args == 6 and debug.getinfo(fn).nparams == 4 then
+            fn(args[3].value, args[4].value, args[5].value, args[6].value) --(object_instance, hit_instance, hit_x, hit_y)
+        end
+
+        -- on End
+        if #args == 3 and debug.getinfo(fn).nparams == 1 then
+            fn(args[3].value) --(object_instance)
         end
     end
 end)
