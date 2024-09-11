@@ -7,6 +7,7 @@ RoRR_Modding_Toolkit = true
 require("./actor")
 require("./alarm")
 require("./array")
+require("./artifact")
 require("./buff")
 require("./callback")
 require("./class")
