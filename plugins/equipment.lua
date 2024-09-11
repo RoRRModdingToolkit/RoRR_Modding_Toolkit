@@ -336,9 +336,10 @@ end)
 
 
 gm.post_script_hook(gm.constants.equipment_set, function(self, other, result, args)
+    local player = Instance.wrap(args[1].value)
+    player:recalculate_stats()
     if callbacks["onPickup"] then
         for _, fn in ipairs(callbacks["onPickup"]) do
-            local player = Instance.wrap(args[1].value)
             local equip = player:get_equipment()
             if equip and equip.value == fn[1] then
                 fn[2](player)  -- Player
