@@ -208,7 +208,9 @@ methods_actor = {
         local flags = flags or {}
         
         local source_ = self.value
-        if source then source_ = source end
+        if source then
+            source_ = Wrap.unwrap(source)
+        end
 
         local can_proc = Helper.table_has(flags, Actor.DAMAGER.can_proc)
         local can_crit = Helper.table_has(flags, Actor.DAMAGER.can_crit)
