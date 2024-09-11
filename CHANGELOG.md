@@ -117,3 +117,4 @@
     * Skill.find
 * Added Array and List classes.
 * Resources.sprite_load can now set the rectangular collision mask of the sprite (relative to its origin).
+* Many other changes that we will probably forget to document here (check the new documentation pages when they drop).

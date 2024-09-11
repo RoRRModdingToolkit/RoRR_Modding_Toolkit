@@ -23,6 +23,15 @@ Actor.KNOCKBACK_DIR = {
 }
 
 
+Actor.DAMAGER = {
+    no_proc     = 0,
+    no_crit     = 1,
+    can_proc    = 2,
+    can_crit    = 3,
+    allow_stun  = 4
+}
+
+
 
 -- ========== Static Methods ==========
 
@@ -82,28 +91,111 @@ methods_actor = {
     end,
 
 
-    fire_bullet = function(self, x, y, direction, range, damage, pierce_multiplier, hit_sprite)
-        local damager = self.value:fire_bullet(0, x, y, (pierce_multiplier and 1) or 0, damage, range, hit_sprite or -1, direction, 1.0, 1.0, -1.0)
-        if pierce_multiplier then damager.damage_degrade = (1.0 - pierce_multiplier) end
+    -- fire_bullet = function(self, x, y, direction, range, damage, pierce_multiplier, hit_sprite)
+    --     -- By default: proc, crit, stun
+    --     local damager = self.value:fire_bullet(0, x, y, (pierce_multiplier and 1) or 0, damage, range, hit_sprite or -1, direction, 1.0, 1.0, -1.0)
+    --     if pierce_multiplier then damager.damage_degrade = (1.0 - pierce_multiplier) end
+    --     return damager
+    -- end,
+
+
+    fire_bullet = function(self, x, y, range, direction, damage, pierce_multiplier, stun, color, hit_sprite, flags)
+        -- By default: proc, crit, stun
+        local flags = flags or {}
+        
+        local source_ = self.value
+        if source then source_ = source end
+
+        local can_pierce = false
+        if pierce_multiplier then can_pierce = true end
+
+        local no_proc = Helper.table_has(flags, Actor.DAMAGER.no_proc)
+        local no_crit = Helper.table_has(flags, Actor.DAMAGER.no_crit)
+        local allow_stun = Helper.table_has(flags, Actor.DAMAGER.allow_stun)
+
+        local damager = gm._mod_attack_fire_bullet(self.value, x, y, range, direction, damage, hit_sprite or -1, can_pierce, not no_proc).attack_info
+        if color then damager.damage_color = color
+        else damager.damage_color = Color.WHITE_ALMOST
+        end
+
+        -- Remove crit if no_crit
+        if no_crit and damager.critical then
+            damager.damage = damager.damage / 2.0
+            damager.critical = false
+        end
+
+        -- Set pierce value
+        if pierce_multiplier then
+            damager.damage_degrade = (1.0 - pierce_multiplier)
+        end
+
+        -- Set stun value
+        if stun and stun > 0 then
+            allow_stun = true
+            damager.stun = stun
+        end
+
+        -- Allow stun
+        if allow_stun then damager.allow_stun = true end
+
         return damager
     end,
 
 
     fire_explosion = function(self, x, y, x_radius, y_radius, damage, stun, hit_sprite)
+        -- By default: proc, crit, stun
         local damager = self.value:fire_explosion(0, x, y, damage, hit_sprite or -1, 2, -1, x_radius / 32.0, y_radius / 8.0)
         if stun then damager.stun = stun end
         return damager
     end,
 
 
-    take_damage = function(self, damage, source, x, y, color, crit_sfx)
-        local source_inst = nil
-        if source then
-            if type(source) == "table" then source = source.value end
-            source_inst = source
+    -- take_damage = function(self, damage, source, x, y, color, crit_sfx)
+    --     local source_inst = nil
+    --     if source then
+    --         if type(source) == "table" then source = source.value end
+    --         source_inst = source
+    --     end
+    --     if not crit_sfx then crit_sfx = false end
+    --     gm.damage_inflict(self.value, damage, 0.0, source_inst, x or self.x, y or self.y - 28, damage, 1.0, color or Color.WHITE, crit_sfx)
+    -- end,
+
+
+    take_damage = function(self, damage, source, kb_direction, color, stun, hit_sprite, flags)
+        -- By default: no proc, no crit, no stun
+        local flags = flags or {}
+        
+        local source_ = self.value
+        if source then source_ = source end
+
+        local can_proc = Helper.table_has(flags, Actor.DAMAGER.can_proc)
+        local can_crit = Helper.table_has(flags, Actor.DAMAGER.can_crit)
+        local allow_stun = Helper.table_has(flags, Actor.DAMAGER.allow_stun)
+
+        local damager = gm._mod_attack_fire_direct(source_, self.value, self.x, self.y, 0, damage, hit_sprite or -1, can_proc).attack_info
+        if color then damager.damage_color = color
+        else damager.damage_color = Color.WHITE_ALMOST
         end
-        if not crit_sfx then crit_sfx = false end
-        gm.damage_inflict(self.value, damage, 0.0, source_inst, x or self.x, y or self.y - 28, damage, 1.0, color or Color.WHITE, crit_sfx)
+
+        -- Remove crit if not can_crit
+        if can_crit == false and damager.critical then
+            damager.damage = damager.damage / 2.0
+            damager.critical = false
+        end
+
+        -- Set stun value
+        if stun and stun > 0 then
+            allow_stun = true
+            damager.stun = stun
+        end
+
+        -- Allow stun
+        if allow_stun then
+            damager.allow_stun = true
+            damager.knockback_direction = kb_direction
+        end
+
+        return damager
     end,
 
 
@@ -232,9 +324,9 @@ methods_actor_callbacks = {
     onPostStatRecalc    = function(self, func) Actor.add_callback("onPostStatRecalc", func) end,
     onSkillUse          = function(self, func, skill) Actor.add_callback("onSkillUse", func, skill) end,
     onBasicUse          = function(self, func) Actor.add_callback("onBasicUse", func) end,
-    onAttack            = function(self, func, all_damage) Actor.add_callback("onAttack", func, all_damage) end,
-    onPostAttack        = function(self, func, all_damage) Actor.add_callback("onPostAttack", func, all_damage) end,
-    onHit               = function(self, func, all_damage) Actor.add_callback("onHit", func, all_damage) end,
+    onAttack            = function(self, func, all_damage) Actor.add_callback("onAttack", func, nil, all_damage) end,
+    onPostAttack        = function(self, func, all_damage) Actor.add_callback("onPostAttack", func, nil, all_damage) end,
+    onHit               = function(self, func, all_damage) Actor.add_callback("onHit", func, nil, all_damage) end,
     onKill              = function(self, func) Actor.add_callback("onKill", func) end,
     onDamaged           = function(self, func) Actor.add_callback("onDamaged", func) end,
     onDamageBlocked     = function(self, func) Actor.add_callback("onDamageBlocked", func) end,
@@ -438,6 +530,7 @@ end
 
 
 local function actor_onDamaged(self, other, result, args)
+    if not args[3].value.attack_info then return end
     if callbacks["onDamaged"] then
         for _, fn in ipairs(callbacks["onDamaged"]) do
             fn(Instance.wrap(args[2].value), args[3].value.attack_info)   -- Actor, Damager attack_info
@@ -488,4 +581,11 @@ Actor.__initialize = function()
     Callback.add("onDamageBlocked", "RMT.actor_onDamageBlocked", actor_onDamageBlocked, true)
     Callback.add("onInteractableActivate", "RMT.actor_onInteract", actor_onInteract, true)
     Callback.add("onEquipmentUse", "RMT.actor_onEquipmentUse", actor_onEquipmentUse, true)
+
+    Actor:onDamaged(function(actor, damager)
+        -- Allow stun application even if damager.proc is false
+        if damager.stun > 0 and (damager.proc == 0.0 or damager.proc == false) and damager.allow_stun == 1.0 then
+            actor:apply_knockback(damager.knockback_kind, damager.knockback_direction, damager.stun * 1.5)
+        end
+    end)
 end

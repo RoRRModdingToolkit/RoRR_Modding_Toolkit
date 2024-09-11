@@ -15,3 +15,5 @@ o Apply Instance wrapper everywhere (on gm.array_get, etc.)
 
 - Overwrite fire_bullet and fire_explosion to guarantee stun application
 - Might need to change onHit to a different hook to pass in a modifiable attack_info (maybe)
+
+- actor:fire_explosion rewrite
