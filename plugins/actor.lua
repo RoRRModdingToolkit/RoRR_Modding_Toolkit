@@ -28,7 +28,8 @@ Actor.DAMAGER = {
     no_crit     = 1,
     can_proc    = 2,
     can_crit    = 3,
-    allow_stun  = 4
+    allow_stun  = 4,
+    raw_damage  = 5
 }
 
 
@@ -109,6 +110,12 @@ methods_actor = {
         local no_proc = Helper.table_has(flags, Actor.DAMAGER.no_proc)
         local no_crit = Helper.table_has(flags, Actor.DAMAGER.no_crit)
         local allow_stun = Helper.table_has(flags, Actor.DAMAGER.allow_stun)
+        local raw_damage = Helper.table_has(flags, Actor.DAMAGER.raw_damage)
+
+        -- Raw damage
+        if raw_damage then
+            damage = damage / self.value.damage
+        end
 
         local damager = gm._mod_attack_fire_bullet(self.value, x, y, range, direction, damage, hit_sprite or -1, can_pierce, not no_proc).attack_info
         if color then damager.damage_color = color
@@ -154,6 +161,12 @@ methods_actor = {
         local no_proc = Helper.table_has(flags, Actor.DAMAGER.no_proc)
         local no_crit = Helper.table_has(flags, Actor.DAMAGER.no_crit)
         local allow_stun = Helper.table_has(flags, Actor.DAMAGER.allow_stun)
+        local raw_damage = Helper.table_has(flags, Actor.DAMAGER.raw_damage)
+
+        -- Raw damage
+        if raw_damage then
+            damage = damage / self.value.damage
+        end
 
         local damager = gm._mod_attack_fire_explosion(self.value, x, y, width, height, damage, explosion_sprite or -1, sparks_sprite or -1, not no_proc).attack_info
         if color then damager.damage_color = color
@@ -200,6 +213,12 @@ methods_actor = {
         local can_proc = Helper.table_has(flags, Actor.DAMAGER.can_proc)
         local can_crit = Helper.table_has(flags, Actor.DAMAGER.can_crit)
         local allow_stun = Helper.table_has(flags, Actor.DAMAGER.allow_stun)
+        local raw_damage = Helper.table_has(flags, Actor.DAMAGER.raw_damage)
+
+        -- Raw damage
+        if raw_damage then
+            damage = damage / source_.damage
+        end
 
         local damager = gm._mod_attack_fire_direct(source_, self.value, self.x, self.y, 0, damage, hit_sprite or -1, can_proc).attack_info
         if color then damager.damage_color = color
