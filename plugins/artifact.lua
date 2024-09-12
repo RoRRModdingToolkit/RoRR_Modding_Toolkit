@@ -27,7 +27,7 @@ local other_callbacks = {
     "prePlayerHUDDraw",
     "onPlayerHUDDraw",
     "onPlayerInventoryUpdate",
-    "onPlayerDeath",
+    -- "onPlayerDeath",
     "onCheckpointRespawn",
     "onPickupCollected",
     "onPickupRoll",
@@ -125,6 +125,8 @@ methods_artifact = {
         elseif Helper.table_has(other_callbacks, callback) then
             if not callbacks[callback] then callbacks[callback] = {} end
             table.insert(callbacks[callback], func)
+            print(callback)
+            print(callbacks[callback])
         else log.error("Invalid callback name", 2) end
     end,
 
@@ -162,7 +164,7 @@ methods_artifact_callbacks = {
     prePlayerHUDDraw                = function(self, func) self:add_callback("prePlayerHUDDraw", func) end,
     onPlayerHUDDraw                 = function(self, func) self:add_callback("onPlayerHUDDraw", func) end,
     onPlayerInventoryUpdate         = function(self, func) self:add_callback("onPlayerInventoryUpdate", func) end,
-    onPlayerDeath                   = function(self, func) self:add_callback("onPlayerDeath", func) end,
+    -- onPlayerDeath                   = function(self, func) self:add_callback("onPlayerDeath", func) end,
     onCheckpointRespawn             = function(self, func) self:add_callback("onCheckpointRespawn", func) end,
     onPickupCollected               = function(self, func) self:add_callback("onPickupCollected", func) end,
     onPickupRoll                    = function(self, func) self:add_callback("onPickupRoll", func) end,
@@ -417,8 +419,11 @@ local function artifact_onPlayerInventoryUpdate(self, other, result, args)
 end
 
 local function artifact_onPlayerDeath(self, other, result, args)
+    print("I AM")
     if callbacks["onPlayerDeath"] then
+        print("INSIDE")
         for _, fn in ipairs(callbacks["onPlayerDeath"]) do
+            print("UR WALL")
             fn(self, other, result, args)
         end
     end
@@ -519,7 +524,7 @@ Artifact.__initialize = function()
     Callback.add("prePlayerHUDDraw", "RMT.artifact_prePlayerHUDDraw", artifact_prePlayerHUDDraw, true)
     Callback.add("onPlayerHUDDraw", "RMT.artifact_onPlayerHUDDraw", artifact_onPlayerHUDDraw, true)
     Callback.add("onPlayerInventoryUpdate", "RMT.artifact_onPlayerInventoryUpdate", artifact_onPlayerInventoryUpdate, true)
-    Callback.add("onPlayerDeath", "RMT.artifact_onPlayerDeath", artifact_onPlayerDeath, true)
+    -- Callback.add("onPlayerDeath", "RMT.artifact_onPlayerDeath", artifact_onPlayerDeath, true)
     Callback.add("onCheckpointRespawn", "RMT.artifact_onCheckpointRespawn", artifact_onCheckpointRespawn, true)
     Callback.add("onPickupCollected", "RMT.artifact_onPickupCollected", artifact_onPickupCollected, true)
     Callback.add("onPickupRoll", "RMT.artifact_onPickupRoll", artifact_onPickupRoll, true)
