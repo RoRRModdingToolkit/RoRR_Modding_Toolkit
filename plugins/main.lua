@@ -40,6 +40,7 @@ function __initialize()
     -- Survivor.__initialize()
 
     Actor.__initialize()
+    Artifact.__initialize()
     Buff.__initialize()
     Equipment.__initialize()
     -- Instance.__initialize()
