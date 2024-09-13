@@ -9,7 +9,6 @@ local instance_callbacks = {}
 
 -- TODO maybe find a better way to do this?
 local survivors = {}
-local skins = {}
 
 
 -- ========== Enums ==========
@@ -418,7 +417,7 @@ methods_survivor = {
     end,
 
     add_skin = function(self, name, skin_index, achievement)
-        for _, skin_name in ipairs(skins) do
+        for _, skin_name in ipairs(survivors[self.value].skins) do
             if skin_name == name then 
                 -- log.error("Skin Name already exist: "..name)
                 return 
@@ -432,7 +431,35 @@ methods_survivor = {
         skin_alt.achievement_id = (achievement and achievement.value) or -1
         skin_alt.index = artifact_skin
         gm.array_push(self.skin_family.elements, skin_alt)
-        skins[#skins + 1] = name
+        survivors[self.value].skins[#survivors[self.value].skins + 1] = name
+    end,
+
+    get_stats_base = function(self)
+        return {
+            maxhp              = survivors[self.value].maxhp_base,
+            damage             = survivors[self.value].damage_base,
+            regen              = survivors[self.value].regen_base,
+            armor              = survivors[self.value].armor_base,
+            attack_speed       = survivors[self.value].attack_speed_base,
+            critical_chance    = survivors[self.value].critical_chance_base,
+            maxshield          = survivors[self.value].maxshield_base,
+            pHmax              = survivors[self.value].pHmax_base,
+            pVmax              = survivors[self.value].pVmax_base,
+            pGravity1          = survivors[self.value].pGravity1_base,
+            pGravity2          = survivors[self.value].pGravity2_base,
+            pAccel             = survivors[self.value].pAccel_base
+        }
+    end,
+
+    get_stats_level = function(self)
+        return {
+            maxhp              = survivors[self.value].maxhp_level,
+            damage             = survivors[self.value].damage_level,
+            regen              = survivors[self.value].regen_level,
+            armor              = survivors[self.value].armor_level,
+            attack_speed       = survivors[self.value].attack_speed_level,
+            critical_chance    = survivors[self.value].critical_chance_level
+        }
     end,
 }
 
