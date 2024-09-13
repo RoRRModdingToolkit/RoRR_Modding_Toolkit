@@ -127,7 +127,10 @@ Survivor.new = function(namespace, identifier)
         regen_level             = 0.002,
         attack_speed_level      = 0.0,
         critical_chance_level   = 0.0,
-        armor_level             = 2.0
+        armor_level             = 2.0,
+
+        -- Skin array
+        skins                   = {}
     }
 
     -- Make survivor abstraction
@@ -323,8 +326,6 @@ methods_survivor = {
         survivors[self.value].drone_shoot   = sprites.drone_shoot or survivors[self.value].drone_shoot
         survivors[self.value].climb_hurt    = sprites.climb_hurt or survivors[self.value].climb_hurt
         survivors[self.value].palette       = sprites.palette or survivors[self.value].palette
-
-        self.sprite_palette                 = sprites.palette or survivors[self.value].palette
     end,
 
     set_primary_color = function(self, R, G, B)
@@ -391,7 +392,7 @@ methods_survivor = {
         survivors[self.value].palette = palette
 
         self.sprite_portrait_palette = portrait_palette
-        slef,sprite_loadout_palette = loadout_palette
+        self.sprite_loadout_palette = loadout_palette
     end,
 
     set_cape_offset = function(self, xoffset, yoffset, xoffset_rope, yoffset_rope)
