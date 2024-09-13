@@ -190,19 +190,25 @@ methods_instance = {
     end,
 
 
-    get_collisions = function(self, obj)
+    get_collisions = function(self, ...)
         if not self:exists() then return {}, 0 end
 
-        obj = Wrap.unwrap(obj)
-
-        local list = List.new()
-        self.value:collision_rectangle_list(self.bbox_left, self.bbox_top, self.bbox_right, self.bbox_bottom, obj, false, true, list.value, false)
+        local t = {...}
+        if type(t[1]) == "table" and (not t[1].RMT_wrapper) then t = t[1] end
 
         local insts = {}
-        for _, inst in ipairs(list) do
-            table.insert(insts, inst)
+
+        for i, obj in ipairs(t) do
+            obj = Wrap.unwrap(obj)
+
+            local list = List.new()
+            self.value:collision_rectangle_list(self.bbox_left, self.bbox_top, self.bbox_right, self.bbox_bottom, obj, false, true, list.value, false)
+
+            for _, inst in ipairs(list) do
+                table.insert(insts, inst)
+            end
+            list:destroy()
         end
-        list:destroy()
 
         return insts, #insts
     end,
@@ -275,6 +281,8 @@ metatable_instance = {
 -- Find out what is called when an instance is destroyed and hook that instead
 -- because this is running every frame
 gm.post_script_hook(gm.constants.__input_system_tick, function(self, other, result, args)
+    if gm.variable_global_get("pause") then return end
+    
     for k, v in pairs(instance_data) do
         if not Instance.exists(k) then
             instance_data[k] = nil
