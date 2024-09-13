@@ -4,6 +4,7 @@ log.info("Successfully loaded ".._ENV["!guid"]..".")
 
 RoRR_Modding_Toolkit = true
 
+require("./achievement")
 require("./actor")
 require("./alarm")
 require("./array")
@@ -26,6 +27,7 @@ require("./resources")
 require("./skill")
 require("./state")
 require("./survivor")
+require("./survivor_log")
 require("./wrap")
 
 

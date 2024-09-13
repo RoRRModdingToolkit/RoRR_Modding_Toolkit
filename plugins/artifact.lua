@@ -125,8 +125,6 @@ methods_artifact = {
         elseif Helper.table_has(other_callbacks, callback) then
             if not callbacks[callback] then callbacks[callback] = {} end
             table.insert(callbacks[callback], func)
-            print(callback)
-            print(callbacks[callback])
         else log.error("Invalid callback name", 2) end
     end,
 
