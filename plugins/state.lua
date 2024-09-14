@@ -16,13 +16,34 @@ State.ARRAY = {
     on_exit                     = 3,
     on_step                     = 4,
     on_get_interrupt_priority   = 5,
-    callable_serialize          = 6,
-    callable_deserialize        = 7,
+    callable_serialize          = 6,    --WIP
+    callable_deserialize        = 7,    --WIP
     is_skill_state              = 8,
     is_climb_state              = 9,
     activity_flags              = 10
 }
 
+State.ACTIVITY_FLAG = {
+    none                = 0,
+    allow_rope_cancel   = 1,
+    allow_aim_turn      = 2
+}
+
+State.ACTOR_STATE_INTERRUPT_PRIORITY = {
+    any                     = 0,
+    skill_interrupt_period  = 1,
+    skill                   = 2,
+    priority_skill          = 3,
+    legacy_activity_state   = 4,
+    climb                   = 5,
+    pain                    = 6,
+    frozen                  = 7,
+    charge                  = 8,
+    vehicle                 = 9,
+    burrowed                = 10,
+    spawn                   = 11,
+    teleport                = 12
+}
 
 
 -- ========== Static Methods ==========
@@ -110,6 +131,15 @@ methods_state = {
         end
     end,
 
+    -- WIP (typecheck)
+    set_callables = function(self, serialize, deserialize)
+        self.callable_serialize = serialize
+        self.callable_deserialize = deserialize
+    end,
+
+    -- set_activity_flag = function(self, activity_flag)
+
+    -- end,
 }
 
 methods_state_callbacks = {
