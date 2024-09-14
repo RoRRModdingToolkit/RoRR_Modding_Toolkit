@@ -1,3 +1,6 @@
+**Currently undergoing massive restructuring.**  
+**The final result should not be too different from how it is now though.**  
+
 Friendly abstractions of the game's internal functions for easier modding.  
 Documentation can be found [here](https://github.com/RoRRModdingToolkit/RoRR_Modding_Toolkit/wiki).  
 
