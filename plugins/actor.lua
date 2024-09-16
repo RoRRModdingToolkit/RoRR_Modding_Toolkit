@@ -202,7 +202,6 @@ methods_actor = {
     --     gm.damage_inflict(self.value, damage, 0.0, source_inst, x or self.x, y or self.y - 28, damage, 1.0, color or Color.WHITE, crit_sfx)
     -- end,
 
-
     take_damage = function(self, damage, source, color, stun, kb_direction, hit_sprite, flags)
         -- By default: no proc, no crit, no stun
         local flags = flags or {}
@@ -246,6 +245,11 @@ methods_actor = {
         end
 
         return damager
+    end,
+    
+
+    kill = function(self)
+        if self.hp then self.hp = -1000000.0 end
     end,
 
 
@@ -297,11 +301,6 @@ methods_actor = {
         end
         
         gm.actor_knockback_inflict(self.value, kind, direction, duration *60)
-    end,
-
-
-    kill = function(self)
-        if self.hp then self.hp = -1000000.0 end
     end,
 
 
