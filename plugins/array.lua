@@ -16,7 +16,7 @@ end
 Array.wrap = function(array)
     local abstraction = {}
     abstraction_data[abstraction] = {
-        RMT_wrapper = "Array",
+        RMT_object = "Array",
         value = array
     }
     setmetatable(abstraction, metatable_array)
@@ -118,7 +118,7 @@ metatable_array = {
     __index = function(table, key)
         -- Allow getting but not setting these
         if key == "value" then return abstraction_data[table].value end
-        if key == "RMT_wrapper" then return abstraction_data[table].RMT_wrapper end
+        if key == "RMT_object" then return abstraction_data[table].RMT_object end
 
         -- Methods
         if methods_array[key] then
@@ -131,7 +131,7 @@ metatable_array = {
     
 
     __newindex = function(table, key, value)
-        if key == "value" or key == "RMT_wrapper" then
+        if key == "value" or key == "RMT_object" then
             log.error("Cannot modify wrapper values", 2)
             return
         end

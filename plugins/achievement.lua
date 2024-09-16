@@ -65,7 +65,7 @@ end
 Achievement.wrap = function(achievement_id)
     local abstraction = {}
     abstraction_data[abstraction] = {
-        RMT_wrapper = "Achievement",
+        RMT_object = "Achievement",
         value = achievement_id
     }
     setmetatable(abstraction, metatable_achievement)
@@ -152,7 +152,7 @@ methods_achievement = {
     set_milestone = function(self, milestone_id, survivor)
         if type(milestone_id) ~= "number" then log.error("Milestone ID is not a number, got a "..type(milestone_id), 2) return end
         if milestone_id < 0 or milestone_id > 2 then log.error("Milestone ID should be between 0 and 2, got "..tostring(milestone_id), 2) return end
-        if type(survivor) ~= "table" or survivor.RMT_wrapper ~= "Survivor" or not survivor.value then log.error("Survivor is not a RMT survivor, got a "..type(survivor), 2) return end
+        if type(survivor) ~= "table" or survivor.RMT_object ~= "Survivor" or not survivor.value then log.error("Survivor is not a RMT survivor, got a "..type(survivor), 2) return end
 
         self.milestone_alt_unlock = milestone_id
         self.milestone_survivor = survivor.value
@@ -228,7 +228,7 @@ metatable_achievement = {
     __index = function(table, key)
         -- Allow getting but not setting these
         if key == "value" then return abstraction_data[table].value end
-        if key == "RMT_wrapper" then return abstraction_data[table].RMT_wrapper end
+        if key == "RMT_object" then return abstraction_data[table].RMT_object end
 
         -- Methods
         if methods_achievement[key] then
@@ -241,7 +241,7 @@ metatable_achievement = {
     
 
     __newindex = function(table, key, value)
-        if key == "value" or key == "RMT_wrapper" then
+        if key == "value" or key == "RMT_object" then
             log.error("Cannot modify wrapper values", 2)
             return
         end

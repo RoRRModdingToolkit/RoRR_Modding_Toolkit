@@ -69,7 +69,7 @@ end
 Artifact.wrap = function(artifact_id)
     local abstraction = {}
     abstraction_data[abstraction] = {
-        RMT_wrapper = "Artifact",
+        RMT_object = "Artifact",
         value = artifact_id
     }
     setmetatable(abstraction, metatable_artifact)
@@ -215,7 +215,7 @@ metatable_artifact = {
     __index = function(table, key)
         -- Allow getting but not setting these
         if key == "value" then return abstraction_data[table].value end
-        if key == "RMT_wrapper" then return abstraction_data[table].RMT_wrapper end
+        if key == "RMT_object" then return abstraction_data[table].RMT_object end
 
         -- Methods
         if methods_artifact[key] then
@@ -228,7 +228,7 @@ metatable_artifact = {
     
 
     __newindex = function(table, key, value)
-        if key == "value" or key == "RMT_wrapper" then
+        if key == "value" or key == "RMT_object" then
             log.error("Cannot modify wrapper values", 2)
             return
         end

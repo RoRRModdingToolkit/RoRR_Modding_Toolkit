@@ -16,7 +16,7 @@ end
 List.wrap = function(list)
     local abstraction = {}
     abstraction_data[abstraction] = {
-        RMT_wrapper = "List",
+        RMT_object = "List",
         value = list
     }
     setmetatable(abstraction, metatable_list)
@@ -125,7 +125,7 @@ metatable_list = {
     __index = function(table, key)
         -- Allow getting but not setting these
         if key == "value" then return abstraction_data[table].value end
-        if key == "RMT_wrapper" then return abstraction_data[table].RMT_wrapper end
+        if key == "RMT_object" then return abstraction_data[table].RMT_object end
 
         -- Methods
         if methods_list[key] then
@@ -138,7 +138,7 @@ metatable_list = {
     
 
     __newindex = function(table, key, value)
-        if key == "value" or key == "RMT_wrapper" then
+        if key == "value" or key == "RMT_object" then
             log.error("Cannot modify wrapper values", 2)
             return
         end

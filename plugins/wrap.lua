@@ -31,6 +31,6 @@ end
 
 
 Wrap.unwrap = function(value)
-    if type(value) == "table" and value.RMT_wrapper then return value.value end
+    if type(value) == "table" and value.RMT_object then return value.value end
     return value
 end
