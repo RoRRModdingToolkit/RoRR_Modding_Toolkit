@@ -30,6 +30,8 @@ Object.CUSTOM_START = 800
 -- ========== Static Methods ==========
 
 Object.new = function(namespace, identifier, parent)
+    if Object.find(namespace, identifier) then return nil end
+
     local obj = gm.object_add_w(namespace, identifier, parent)
     return Object.wrap(obj)
 end
