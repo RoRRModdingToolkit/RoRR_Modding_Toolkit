@@ -649,7 +649,7 @@ Actor.__initialize = function()
     Actor:onDamaged(function(actor, damager)
         -- Allow stun application even if damager.proc is false
         if damager.stun > 0 and (damager.proc == 0.0 or damager.proc == false) and damager.allow_stun == 1.0 then
-            actor:apply_knockback(damager.knockback_kind, damager.knockback_direction, damager.stun * 1.5)
+            actor:apply_stun(damager.knockback_kind, damager.knockback_direction, damager.stun * 1.5)
         end
     end)
 end
