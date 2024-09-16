@@ -33,6 +33,14 @@ Actor.DAMAGER = {
 }
 
 
+Actor.SKILL = {
+    primary     = 0,
+    secondary   = 1,
+    utility     = 2,
+    special     = 3
+}
+
+
 
 -- ========== Static Methods ==========
 
