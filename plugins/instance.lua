@@ -119,6 +119,11 @@ Instance.find_all = function(...)
 end
 
 
+Instance.count = function(obj)
+    return gm._mod_instance_number(Wrap.unwrap(obj))
+end
+
+
 Instance.wrap = function(inst)
     local abstraction = {}
     abstraction_data[abstraction] = {

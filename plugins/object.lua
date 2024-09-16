@@ -62,11 +62,6 @@ Object.new = function(namespace, identifier, parent)
 end
 
 
-Object.count = function(obj)
-    return gm._mod_instance_number(obj)
-end
-
-
 Object.wrap = function(object_id)
     local abstraction = {}
     abstraction_data[abstraction] = {
