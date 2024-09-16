@@ -652,8 +652,4 @@ Actor.__initialize = function()
             actor:apply_knockback(damager.knockback_kind, damager.knockback_direction, damager.stun * 1.5)
         end
     end)
-
-    Actor:onStatRecalc(function(actor)
-        log.info(actor.shield)
-    end)
 end
