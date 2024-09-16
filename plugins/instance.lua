@@ -235,13 +235,13 @@ metatable_instance_gs = {
 
 
     -- Setter
-    __newindex = function(table, key, value)
+    __newindex = function(table, key, value)            
         value = Wrap.unwrap(value)
         gm.variable_instance_set(table.value, key, value)
 
         -- Automatically set "shield" alongside "maxshield"
         -- to prevent the shield regen sfx from playing
-        if key == "maxshield" then
+        if key == "maxshield" and (gm.variable_global_get("_current_frame") >= table.in_danger_last_frame) then
             gm.variable_instance_set(table.value, "shield", value)
         end
     end

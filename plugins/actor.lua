@@ -426,16 +426,28 @@ setmetatable(Actor, metatable_actor_callbacks)
 
 -- ========== Hooks ==========
 
+gm.pre_script_hook(gm.constants.recalculate_stats, function(self, other, result, args)
+    -- Internal
+    local actor = Instance.wrap(self)
+    local actor_data = actor:get_data("RMT-internal")
+    actor_data.current_shield = actor.shield
+end)
+
+
 gm.post_script_hook(gm.constants.recalculate_stats, function(self, other, result, args)
+    local actor = Instance.wrap(self)
+    local actor_data = actor:get_data("RMT-internal")
+    actor.shield = actor_data.current_shield
+
     if callbacks["onStatRecalc"] then
         for _, fn in ipairs(callbacks["onStatRecalc"]) do
-            fn(Instance.wrap(self))   -- Actor
+            fn(actor)   -- Actor
         end
     end
 
     if callbacks["onPostStatRecalc"] then
         for _, fn in ipairs(callbacks["onPostStatRecalc"]) do
-            fn(Instance.wrap(self))   -- Actor
+            fn(actor)   -- Actor
         end
     end
 end)
@@ -639,5 +651,9 @@ Actor.__initialize = function()
         if damager.stun > 0 and (damager.proc == 0.0 or damager.proc == false) and damager.allow_stun == 1.0 then
             actor:apply_knockback(damager.knockback_kind, damager.knockback_direction, damager.stun * 1.5)
         end
+    end)
+
+    Actor:onStatRecalc(function(actor)
+        log.info(actor.shield)
     end)
 end
