@@ -241,7 +241,7 @@ metatable_instance_gs = {
 
         -- Automatically set "shield" alongside "maxshield"
         -- to prevent the shield regen sfx from playing
-        if table.value == "maxshield" then
+        if key == "maxshield" then
             gm.variable_instance_set(table.value, "shield", value)
         end
     end
