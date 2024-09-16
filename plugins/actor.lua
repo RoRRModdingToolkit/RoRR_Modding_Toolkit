@@ -203,7 +203,7 @@ methods_actor = {
     -- end,
 
 
-    take_damage = function(self, damage, source, kb_direction, color, stun, hit_sprite, flags)
+    take_damage = function(self, damage, source, color, stun, kb_direction, hit_sprite, flags)
         -- By default: no proc, no crit, no stun
         local flags = flags or {}
         
