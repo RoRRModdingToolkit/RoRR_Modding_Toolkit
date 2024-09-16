@@ -31,18 +31,6 @@ Equipment.ARRAY = {
 
 -- ========== Static Methods ==========
 
-Equipment.find = function(namespace, identifier)
-    if identifier then namespace = namespace.."-"..identifier end
-    local equip = gm.equipment_find(namespace)
-
-    if equip then
-        return Equipment.wrap(equip)
-    end
-
-    return nil
-end
-
-
 Equipment.new = function(namespace, identifier)
     if Equipment.find(namespace, identifier) then return nil end
 
@@ -85,6 +73,32 @@ Equipment.new = function(namespace, identifier)
 
 
     return abstraction
+end
+
+
+Equipment.find = function(namespace, identifier)
+    if identifier then namespace = namespace.."-"..identifier end
+    local equip = gm.equipment_find(namespace)
+
+    if equip then
+        return Equipment.wrap(equip)
+    end
+
+    return nil
+end
+
+
+Equipment.get_random = function()
+    local equips = {}
+
+    -- Add valid equipment to table
+    for i, _ in ipairs(Class.EQUIPMENT) do
+        local equip = Equipment.wrap(i - 1)
+        table.insert(equips, equip)
+    end
+
+    -- Pick random equipment from table
+    return equips[gm.irandom_range(1, #equips)]
 end
 
 

@@ -66,18 +66,6 @@ Item.TYPE = {
 
 -- ========== Static Methods ==========
 
-Item.find = function(namespace, identifier)
-    if identifier then namespace = namespace.."-"..identifier end
-    local item = gm.item_find(namespace)
-
-    if item then
-        return Item.wrap(item)
-    end
-
-    return nil
-end
-
-
 Item.new = function(namespace, identifier, no_log)
     if Item.find(namespace, identifier) then return nil end
 
@@ -115,6 +103,40 @@ Item.new = function(namespace, identifier, no_log)
     end)
 
     return abstraction
+end
+
+
+Item.find = function(namespace, identifier)
+    if identifier then namespace = namespace.."-"..identifier end
+    local item = gm.item_find(namespace)
+
+    if item then
+        return Item.wrap(item)
+    end
+
+    return nil
+end
+
+
+Item.get_random = function(...)
+    local tiers = {}
+    if ... then
+        tiers = {...}
+        if type(tiers[1]) == "table" then tiers = tiers[1] end
+    end
+
+    local items = {}
+
+    -- Add valid items to table
+    for i, _ in ipairs(Class.ITEM) do
+        local item = Item.wrap(i - 1)
+        if (#tiers <= 0 and item.tier < Item.TIER.notier and item.identifier ~= "dummyItem") or Helper.table_has(tiers, item.tier) then
+            table.insert(items, item)
+        end
+    end
+
+    -- Pick random item from table
+    return items[gm.irandom_range(1, #items)]
 end
 
 
