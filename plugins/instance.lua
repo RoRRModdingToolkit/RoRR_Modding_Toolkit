@@ -271,7 +271,7 @@ metatable_instance = {
 
     __newindex = function(table, key, value)
         if key == "value" or key == "RMT_object" then
-            log.error("Cannot modify wrapper values", 2)
+            log.error("Cannot modify RMT object values", 2)
             return
         end
         
