@@ -185,6 +185,7 @@ methods_item = {
             "onShieldBreak",
             "onInteract",
             "onEquipmentUse",
+            "onNewStage",
             "onStep",
             "onDraw"
         }
@@ -318,6 +319,7 @@ methods_item_callbacks = {
     onShieldBreak       = function(self, func) self:add_callback("onShieldBreak", func) end,
     onInteract          = function(self, func) self:add_callback("onInteract", func) end,
     onEquipmentUse      = function(self, func) self:add_callback("onEquipmentUse", func) end,
+    onNewStage          = function(self, func) self:add_callback("onNewStage", func) end,
     onStep              = function(self, func) self:add_callback("onStep", func) end,
     onDraw              = function(self, func) self:add_callback("onDraw", func) end
 
@@ -450,6 +452,24 @@ gm.pre_script_hook(gm.constants.actor_heal_networked, function(self, other, resu
             local count = actor:item_stack_count(fn[1])
             if count > 0 then
                 fn[2](actor, args[2].value, count)   -- Actor, Heal amount, Stack count
+            end
+        end
+    end
+end)
+
+
+gm.post_script_hook(gm.constants.stage_roll_next, function(self, other, result, args)
+    if callbacks["onNewStage"] then
+        for n, a in ipairs(has_custom_item) do
+            if Instance.exists(a) then
+                for _, c in ipairs(callbacks["onNewStage"]) do
+                    local actor = Instance.wrap(a)
+                    local count = actor:item_stack_count(c[1])
+                    if count > 0 then
+                        c[2](actor, count)  -- Actor, Stack count
+                    end
+                end
+            else table.remove(has_custom_item, n)
             end
         end
     end
