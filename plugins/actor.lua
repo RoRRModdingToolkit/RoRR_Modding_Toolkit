@@ -62,7 +62,7 @@ Actor.add_callback = function(callback, func, skill, all_damage)
     }
 
     if callback == "onSkillUse" then
-        if type(skill) == "table" then skill = skill.value end
+        skill = Wrap.unwrap(skill)
         if not callbacks["onSkillUse"] then callbacks["onSkillUse"] = {} end
         if not callbacks["onSkillUse"][skill] then callbacks["onSkillUse"][skill] = {} end
         table.insert(callbacks["onSkillUse"][skill], func)
