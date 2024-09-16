@@ -67,7 +67,7 @@ Instance.find = function(...)
 
         local inst = gm.instance_find(obj, 0)
         if obj >= 800.0 then
-            local count = Object.count(gm.constants.oCustomObject)
+            local count = Instance.count(gm.constants.oCustomObject)
             for i = 0, count - 1 do
                 local ins = gm.instance_find(gm.constants.oCustomObject, i)
                 if ins.__object_index == obj then
@@ -97,14 +97,14 @@ Instance.find_all = function(...)
         if type(obj) == "table" then obj = obj.value end
 
         if obj < 800.0 then
-            local count = Object.count(obj)
+            local count = Instance.count(obj)
             for n = 0, count - 1 do
                 local inst = gm.instance_find(obj, n)
                 table.insert(insts, Instance.wrap(inst))
             end
 
         else
-            local count = Object.count(gm.constants.oCustomObject)
+            local count = Instance.count(gm.constants.oCustomObject)
             for n = 0, count - 1 do
                 local inst = gm.instance_find(gm.constants.oCustomObject, n)
                 if inst.__object_index == obj then
