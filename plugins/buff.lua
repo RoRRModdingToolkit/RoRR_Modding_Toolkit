@@ -35,21 +35,6 @@ Buff.ARRAY = {
 
 -- ========== Static Methods ==========
 
-Buff.find = function(namespace, identifier)
-    if identifier then namespace = namespace.."-"..identifier end
-
-    for i, buff in ipairs(Class.BUFF) do
-        local _namespace = buff:get(0)
-        local _identifier = buff:get(1)
-        if namespace == _namespace.."-".._identifier then
-            return Buff.wrap(i - 1)
-        end
-    end
-
-    return nil
-end
-
-
 Buff.new = function(namespace, identifier)
     if Buff.find(namespace, identifier) then return nil end
 
@@ -73,6 +58,21 @@ Buff.new = function(namespace, identifier)
     end)
 
     return abstraction
+end
+
+
+Buff.find = function(namespace, identifier)
+    if identifier then namespace = namespace.."-"..identifier end
+
+    for i, buff in ipairs(Class.BUFF) do
+        local _namespace = buff:get(0)
+        local _identifier = buff:get(1)
+        if namespace == _namespace.."-".._identifier then
+            return Buff.wrap(i - 1)
+        end
+    end
+
+    return nil
 end
 
 

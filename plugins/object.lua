@@ -29,6 +29,12 @@ Object.CUSTOM_START = 800
 
 -- ========== Static Methods ==========
 
+Object.new = function(namespace, identifier, parent)
+    local obj = gm.object_add_w(namespace, identifier, parent)
+    return Object.wrap(obj)
+end
+
+
 Object.find = function(namespace, identifier)
     -- Vanilla object_index
     if type(namespace) == "number" then
@@ -53,12 +59,6 @@ Object.find = function(namespace, identifier)
     end
 
     return nil
-end
-
-
-Object.new = function(namespace, identifier, parent)
-    local obj = gm.object_add_w(namespace, identifier, parent)
-    return Object.wrap(obj)
 end
 
 
