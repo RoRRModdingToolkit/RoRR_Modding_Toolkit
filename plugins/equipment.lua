@@ -31,18 +31,6 @@ Equipment.ARRAY = {
 
 -- ========== Static Methods ==========
 
-Equipment.find = function(namespace, identifier)
-    if identifier then namespace = namespace.."-"..identifier end
-    local equip = gm.equipment_find(namespace)
-
-    if equip then
-        return Equipment.wrap(equip)
-    end
-
-    return nil
-end
-
-
 Equipment.new = function(namespace, identifier)
     if Equipment.find(namespace, identifier) then return nil end
 
@@ -88,9 +76,35 @@ Equipment.new = function(namespace, identifier)
 end
 
 
+Equipment.find = function(namespace, identifier)
+    if identifier then namespace = namespace.."-"..identifier end
+    local equip = gm.equipment_find(namespace)
+
+    if equip then
+        return Equipment.wrap(equip)
+    end
+
+    return nil
+end
+
+
+Equipment.get_random = function()
+    local equips = {}
+
+    -- Add valid equipment to table
+    for i, _ in ipairs(Class.EQUIPMENT) do
+        local equip = Equipment.wrap(i - 1)
+        table.insert(equips, equip)
+    end
+
+    -- Pick random equipment from table
+    return equips[gm.irandom_range(1, #equips)]
+end
+
+
 Equipment.wrap = function(equipment_id)
     local abstraction = {
-        RMT_wrapper = "Equipment",
+        RMT_object = "Equipment",
         value = equipment_id
     }
     setmetatable(abstraction, metatable_equipment)
@@ -308,7 +322,7 @@ gm.post_script_hook(gm.constants.recalculate_stats, function(self, other, result
     if callbacks["onStatRecalc"] then
         for _, fn in ipairs(callbacks["onStatRecalc"]) do
             local actor = Instance.wrap(self)
-            if actor.RMT_wrapper == "Player" then
+            if actor.RMT_object == "Player" then
                 local equip = actor:get_equipment()
                 if equip and equip.value == fn[1] then
                     fn[2](actor)  -- Player
@@ -320,7 +334,7 @@ gm.post_script_hook(gm.constants.recalculate_stats, function(self, other, result
     if callbacks["onPostStatRecalc"] then
         for _, fn in ipairs(callbacks["onPostStatRecalc"]) do
             local actor = Instance.wrap(self)
-            if actor.RMT_wrapper == "Player" then
+            if actor.RMT_object == "Player" then
                 local equip = actor:get_equipment()
                 if equip and equip.value == fn[1] then
                     fn[2](actor)  -- Player

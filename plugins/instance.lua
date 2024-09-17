@@ -60,14 +60,14 @@ end
 
 Instance.find = function(...)
     local t = {...}
-    if type(t[1]) == "table" and (not t[1].RMT_wrapper) then t = t[1] end
+    if type(t[1]) == "table" and (not t[1].RMT_object) then t = t[1] end
 
     for _, obj in ipairs(t) do
-        if type(obj) == "table" then obj = obj.value end
+        obj = Wrap.unwrap(obj)
 
         local inst = gm.instance_find(obj, 0)
         if obj >= 800.0 then
-            local count = Object.count(gm.constants.oCustomObject)
+            local count = Instance.count(gm.constants.oCustomObject)
             for i = 0, count - 1 do
                 local ins = gm.instance_find(gm.constants.oCustomObject, i)
                 if ins.__object_index == obj then
@@ -89,22 +89,22 @@ end
 
 Instance.find_all = function(...)
     local t = {...}
-    if type(t[1]) == "table" and (not t[1].RMT_wrapper) then t = t[1] end
+    if type(t[1]) == "table" and (not t[1].RMT_object) then t = t[1] end
 
     local insts = {}
 
     for _, obj in ipairs(t) do
-        if type(obj) == "table" then obj = obj.value end
+        obj = Wrap.unwrap(obj)
 
         if obj < 800.0 then
-            local count = Object.count(obj)
+            local count = Instance.count(obj)
             for n = 0, count - 1 do
                 local inst = gm.instance_find(obj, n)
                 table.insert(insts, Instance.wrap(inst))
             end
 
         else
-            local count = Object.count(gm.constants.oCustomObject)
+            local count = Instance.count(gm.constants.oCustomObject)
             for n = 0, count - 1 do
                 local inst = gm.instance_find(gm.constants.oCustomObject, n)
                 if inst.__object_index == obj then
@@ -119,18 +119,23 @@ Instance.find_all = function(...)
 end
 
 
+Instance.count = function(obj)
+    return gm._mod_instance_number(Wrap.unwrap(obj))
+end
+
+
 Instance.wrap = function(inst)
     local abstraction = {}
     abstraction_data[abstraction] = {
-        RMT_wrapper = "Instance",
+        RMT_object = "Instance",
         value = inst
     }
     if inst.object_index == gm.constants.oP then
         setmetatable(abstraction, metatable_player)
-        abstraction_data[abstraction].RMT_wrapper = "Player"
+        abstraction_data[abstraction].RMT_object = "Player"
     elseif gm.object_is_ancestor(inst.object_index, gm.constants.pActor) == 1.0 then
         setmetatable(abstraction, metatable_actor)
-        abstraction_data[abstraction].RMT_wrapper = "Actor"
+        abstraction_data[abstraction].RMT_object = "Actor"
     else setmetatable(abstraction, metatable_instance)
     end
     return abstraction
@@ -140,7 +145,7 @@ end
 Instance.wrap_invalid = function()
     local abstraction = {}
     abstraction_data[abstraction] = {
-        RMT_wrapper = "Instance",
+        RMT_object = "Instance",
         value = -4
     }
     setmetatable(abstraction, metatable_instance)
@@ -174,11 +179,27 @@ methods_instance = {
     end,
 
 
-    get_data = function(self, name)
-        if not name then name = "main" end
+    get_data = function(self, subtable, mod_id)
+        subtable = subtable or "main"
+
+        if not mod_id then
+            -- Find ID of mod that called this method
+            mod_id = "main"
+            local src = debug.getinfo(2, "S").source
+            local split = Array.wrap(gm.string_split(src, "\\"))
+            for i = 1, #split do
+                if split[i] == "plugins" and i < #split then
+                    mod_id = split[i + 1]
+                    break
+                end
+            end
+        end
+
+        -- Create data table if it doesn't already exist and return it
         if not instance_data[self.value.id] then instance_data[self.value.id] = {} end
-        if not instance_data[self.value.id][name] then instance_data[self.value.id][name] = {} end
-        return instance_data[self.value.id][name]
+        if not instance_data[self.value.id][mod_id] then instance_data[self.value.id][mod_id] = {} end
+        if not instance_data[self.value.id][mod_id][subtable] then instance_data[self.value.id][mod_id][subtable] = {} end
+        return instance_data[self.value.id][mod_id][subtable]
     end,
 
 
@@ -194,7 +215,7 @@ methods_instance = {
         if not self:exists() then return {}, 0 end
 
         local t = {...}
-        if type(t[1]) == "table" and (not t[1].RMT_wrapper) then t = t[1] end
+        if type(t[1]) == "table" and (not t[1].RMT_object) then t = t[1] end
 
         local insts = {}
 
@@ -235,8 +256,15 @@ metatable_instance_gs = {
 
 
     -- Setter
-    __newindex = function(table, key, value)
-        gm.variable_instance_set(table.value, key, Wrap.unwrap(value))
+    __newindex = function(table, key, value)            
+        value = Wrap.unwrap(value)
+        gm.variable_instance_set(table.value, key, value)
+
+        -- Automatically set "shield" alongside "maxshield"
+        -- to prevent the shield regen sfx from playing
+        if key == "maxshield" and (gm.variable_global_get("_current_frame") >= table.in_danger_last_frame) then
+            gm.variable_instance_set(table.value, "shield", value)
+        end
     end
 }
 
@@ -245,7 +273,7 @@ metatable_instance = {
     __index = function(table, key)
         -- Allow getting but not setting these
         if key == "value" then return abstraction_data[table].value end
-        if key == "RMT_wrapper" then return abstraction_data[table].RMT_wrapper end
+        if key == "RMT_object" then return abstraction_data[table].RMT_object end
 
         -- Methods
         if methods_instance[key] then
@@ -258,8 +286,8 @@ metatable_instance = {
 
 
     __newindex = function(table, key, value)
-        if key == "value" or key == "RMT_wrapper" then
-            log.error("Cannot modify wrapper values", 2)
+        if key == "value" or key == "RMT_object" then
+            log.error("Cannot modify RMT object values", 2)
             return
         end
         

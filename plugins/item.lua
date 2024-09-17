@@ -66,18 +66,6 @@ Item.TYPE = {
 
 -- ========== Static Methods ==========
 
-Item.find = function(namespace, identifier)
-    if identifier then namespace = namespace.."-"..identifier end
-    local item = gm.item_find(namespace)
-
-    if item then
-        return Item.wrap(item)
-    end
-
-    return nil
-end
-
-
 Item.new = function(namespace, identifier, no_log)
     if Item.find(namespace, identifier) then return nil end
 
@@ -118,10 +106,44 @@ Item.new = function(namespace, identifier, no_log)
 end
 
 
+Item.find = function(namespace, identifier)
+    if identifier then namespace = namespace.."-"..identifier end
+    local item = gm.item_find(namespace)
+
+    if item then
+        return Item.wrap(item)
+    end
+
+    return nil
+end
+
+
+Item.get_random = function(...)
+    local tiers = {}
+    if ... then
+        tiers = {...}
+        if type(tiers[1]) == "table" then tiers = tiers[1] end
+    end
+
+    local items = {}
+
+    -- Add valid items to table
+    for i, _ in ipairs(Class.ITEM) do
+        local item = Item.wrap(i - 1)
+        if (#tiers <= 0 and item.tier < Item.TIER.notier and item.identifier ~= "dummyItem") or Helper.table_has(tiers, item.tier) then
+            table.insert(items, item)
+        end
+    end
+
+    -- Pick random item from table
+    return items[gm.irandom_range(1, #items)]
+end
+
+
 Item.wrap = function(item_id)
     local abstraction = {}
     abstraction_data[abstraction] = {
-        RMT_wrapper = "Item",
+        RMT_object = "Item",
         value = item_id
     }
     setmetatable(abstraction, metatable_item)
@@ -185,6 +207,7 @@ methods_item = {
             "onShieldBreak",
             "onInteract",
             "onEquipmentUse",
+            "onNewStage",
             "onStep",
             "onDraw"
         }
@@ -318,6 +341,7 @@ methods_item_callbacks = {
     onShieldBreak       = function(self, func) self:add_callback("onShieldBreak", func) end,
     onInteract          = function(self, func) self:add_callback("onInteract", func) end,
     onEquipmentUse      = function(self, func) self:add_callback("onEquipmentUse", func) end,
+    onNewStage          = function(self, func) self:add_callback("onNewStage", func) end,
     onStep              = function(self, func) self:add_callback("onStep", func) end,
     onDraw              = function(self, func) self:add_callback("onDraw", func) end
 
@@ -370,7 +394,7 @@ metatable_item = {
     __index = function(table, key)
         -- Allow getting but not setting these
         if key == "value" then return abstraction_data[table].value end
-        if key == "RMT_wrapper" then return abstraction_data[table].RMT_wrapper end
+        if key == "RMT_object" then return abstraction_data[table].RMT_object end
 
         -- Methods
         if methods_item[key] then
@@ -383,8 +407,8 @@ metatable_item = {
     
 
     __newindex = function(table, key, value)
-        if key == "value" or key == "RMT_wrapper" then
-            log.error("Cannot modify wrapper values", 2)
+        if key == "value" or key == "RMT_object" then
+            log.error("Cannot modify RMT object values", 2)
             return
         end
         
@@ -450,6 +474,24 @@ gm.pre_script_hook(gm.constants.actor_heal_networked, function(self, other, resu
             local count = actor:item_stack_count(fn[1])
             if count > 0 then
                 fn[2](actor, args[2].value, count)   -- Actor, Heal amount, Stack count
+            end
+        end
+    end
+end)
+
+
+gm.post_script_hook(gm.constants.stage_roll_next, function(self, other, result, args)
+    if callbacks["onNewStage"] then
+        for n, a in ipairs(has_custom_item) do
+            if Instance.exists(a) then
+                for _, c in ipairs(callbacks["onNewStage"]) do
+                    local actor = Instance.wrap(a)
+                    local count = actor:item_stack_count(c[1])
+                    if count > 0 then
+                        c[2](actor, count)  -- Actor, Stack count
+                    end
+                end
+            else table.remove(has_custom_item, n)
             end
         end
     end

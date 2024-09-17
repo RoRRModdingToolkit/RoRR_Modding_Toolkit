@@ -43,14 +43,6 @@ Skill.ARRAY = {
 }
 
 
-Skill.SLOT = {
-    primary     = 0,
-    secondary   = 1,
-    utility     = 2,
-    special     = 3
-}
-
-
 
 -- ========== Static Methods ==========
 
@@ -74,7 +66,7 @@ end
 Skill.wrap = function(skill_id)
     local abstraction = {}
     abstraction_data[abstraction] = {
-        RMT_wrapper = "Skill",
+        RMT_object = "Skill",
         value = skill_id
     }
     setmetatable(abstraction, metatable_skill)
@@ -229,7 +221,7 @@ methods_skill = {
     end,
 
     set_skill_upgrade = function(self, upgraded_skill)
-        if upgraded_skill.RMT_wrapper ~= "Skill" then log.error("The upgraded skill provided is not a Skill", 2) return end
+        if upgraded_skill.RMT_object ~= "Skill" then log.error("The upgraded skill provided is not a Skill", 2) return end
         self.upgrade_skill = upgraded_skill.value
     end,
 }
@@ -282,7 +274,7 @@ metatable_skill = {
     __index = function(table, key)
         -- Allow getting but not setting these
         if key == "value" then return abstraction_data[table].value end
-        if key == "RMT_wrapper" then return abstraction_data[table].RMT_wrapper end
+        if key == "RMT_object" then return abstraction_data[table].RMT_object end
         
         -- Methods
         if methods_skill[key] then
@@ -295,8 +287,8 @@ metatable_skill = {
     
 
     __newindex = function(table, key, value)
-        if key == "value" or key == "RMT_wrapper" then
-            log.error("Cannot modify wrapper values", 2)
+        if key == "value" or key == "RMT_object" then
+            log.error("Cannot modify RMT object values", 2)
             return
         end
 

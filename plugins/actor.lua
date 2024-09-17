@@ -33,6 +33,14 @@ Actor.DAMAGER = {
 }
 
 
+Actor.SKILL = {
+    primary     = 0,
+    secondary   = 1,
+    utility     = 2,
+    special     = 3
+}
+
+
 
 -- ========== Static Methods ==========
 
@@ -62,7 +70,7 @@ Actor.add_callback = function(callback, func, skill, all_damage)
     }
 
     if callback == "onSkillUse" then
-        if type(skill) == "table" then skill = skill.value end
+        skill = Wrap.unwrap(skill)
         if not callbacks["onSkillUse"] then callbacks["onSkillUse"] = {} end
         if not callbacks["onSkillUse"][skill] then callbacks["onSkillUse"][skill] = {} end
         table.insert(callbacks["onSkillUse"][skill], func)
@@ -202,8 +210,7 @@ methods_actor = {
     --     gm.damage_inflict(self.value, damage, 0.0, source_inst, x or self.x, y or self.y - 28, damage, 1.0, color or Color.WHITE, crit_sfx)
     -- end,
 
-
-    take_damage = function(self, damage, source, kb_direction, color, stun, hit_sprite, flags)
+    take_damage = function(self, damage, source, color, stun, kb_direction, hit_sprite, flags)
         -- By default: no proc, no crit, no stun
         local flags = flags or {}
         
@@ -246,6 +253,11 @@ methods_actor = {
         end
 
         return damager
+    end,
+    
+
+    kill = function(self)
+        if self.hp then self.hp = -1000000.0 end
     end,
 
 
@@ -290,18 +302,13 @@ methods_actor = {
     end,
 
 
-    apply_knockback = function(self, kind, direction, duration)
+    apply_stun = function(self, kind, direction, duration)
         -- Other types don't completely stun
         if kind > Actor.KNOCKBACK_KIND.standard then
             gm.actor_knockback_inflict(self.value, Actor.KNOCKBACK_KIND.standard, direction, duration *60)
         end
         
         gm.actor_knockback_inflict(self.value, kind, direction, duration *60)
-    end,
-
-
-    kill = function(self)
-        if self.hp then self.hp = -1000000.0 end
     end,
 
 
@@ -426,16 +433,28 @@ setmetatable(Actor, metatable_actor_callbacks)
 
 -- ========== Hooks ==========
 
+gm.pre_script_hook(gm.constants.recalculate_stats, function(self, other, result, args)
+    -- Internal
+    local actor = Instance.wrap(self)
+    local actor_data = actor:get_data("RMT-internal")
+    actor_data.current_shield = actor.shield
+end)
+
+
 gm.post_script_hook(gm.constants.recalculate_stats, function(self, other, result, args)
+    local actor = Instance.wrap(self)
+    local actor_data = actor:get_data("RMT-internal")
+    actor.shield = actor_data.current_shield
+
     if callbacks["onStatRecalc"] then
         for _, fn in ipairs(callbacks["onStatRecalc"]) do
-            fn(Instance.wrap(self))   -- Actor
+            fn(actor)   -- Actor
         end
     end
 
     if callbacks["onPostStatRecalc"] then
         for _, fn in ipairs(callbacks["onPostStatRecalc"]) do
-            fn(Instance.wrap(self))   -- Actor
+            fn(actor)   -- Actor
         end
     end
 end)
@@ -637,7 +656,7 @@ Actor.__initialize = function()
     Actor:onDamaged(function(actor, damager)
         -- Allow stun application even if damager.proc is false
         if damager.stun > 0 and (damager.proc == 0.0 or damager.proc == false) and damager.allow_stun == 1.0 then
-            actor:apply_knockback(damager.knockback_kind, damager.knockback_direction, damager.stun * 1.5)
+            actor:apply_stun(damager.knockback_kind, damager.knockback_direction, damager.stun * 1.5)
         end
     end)
 end

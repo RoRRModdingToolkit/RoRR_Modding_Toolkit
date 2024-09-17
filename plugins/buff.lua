@@ -35,21 +35,6 @@ Buff.ARRAY = {
 
 -- ========== Static Methods ==========
 
-Buff.find = function(namespace, identifier)
-    if identifier then namespace = namespace.."-"..identifier end
-
-    for i, buff in ipairs(Class.BUFF) do
-        local _namespace = buff:get(0)
-        local _identifier = buff:get(1)
-        if namespace == _namespace.."-".._identifier then
-            return Buff.wrap(i - 1)
-        end
-    end
-
-    return nil
-end
-
-
 Buff.new = function(namespace, identifier)
     if Buff.find(namespace, identifier) then return nil end
 
@@ -76,10 +61,25 @@ Buff.new = function(namespace, identifier)
 end
 
 
+Buff.find = function(namespace, identifier)
+    if identifier then namespace = namespace.."-"..identifier end
+
+    for i, buff in ipairs(Class.BUFF) do
+        local _namespace = buff:get(0)
+        local _identifier = buff:get(1)
+        if namespace == _namespace.."-".._identifier then
+            return Buff.wrap(i - 1)
+        end
+    end
+
+    return nil
+end
+
+
 Buff.wrap = function(buff_id)
     local abstraction = {}
     abstraction_data[abstraction] = {
-        RMT_wrapper = "Buff",
+        RMT_object = "Buff",
         value = buff_id
     }
     setmetatable(abstraction, metatable_buff)
@@ -198,7 +198,7 @@ metatable_buff = {
     __index = function(table, key)
         -- Allow getting but not setting these
         if key == "value" then return abstraction_data[table].value end
-        if key == "RMT_wrapper" then return abstraction_data[table].RMT_wrapper end
+        if key == "RMT_object" then return abstraction_data[table].RMT_object end
 
         -- Methods
         if methods_buff[key] then
@@ -211,8 +211,8 @@ metatable_buff = {
     
 
     __newindex = function(table, key, value)
-        if key == "value" or key == "RMT_wrapper" then
-            log.error("Cannot modify wrapper values", 2)
+        if key == "value" or key == "RMT_object" then
+            log.error("Cannot modify RMT object values", 2)
             return
         end
         
