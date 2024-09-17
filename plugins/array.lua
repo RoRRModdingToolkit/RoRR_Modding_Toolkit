@@ -14,6 +14,11 @@ end
 
 
 Array.wrap = function(array)
+    if not gm.is_array(array) then
+        log.error("Argument is not an array", 2)
+        return
+    end
+
     local abstraction = {}
     abstraction_data[abstraction] = {
         RMT_object = "Array",
