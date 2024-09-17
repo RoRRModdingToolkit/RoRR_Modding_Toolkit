@@ -63,7 +63,7 @@ Instance.find = function(...)
     if type(t[1]) == "table" and (not t[1].RMT_object) then t = t[1] end
 
     for _, obj in ipairs(t) do
-        if type(obj) == "table" then obj = obj.value end
+        obj = Wrap.unwrap(obj)
 
         local inst = gm.instance_find(obj, 0)
         if obj >= 800.0 then
@@ -94,7 +94,7 @@ Instance.find_all = function(...)
     local insts = {}
 
     for _, obj in ipairs(t) do
-        if type(obj) == "table" then obj = obj.value end
+        obj = Wrap.unwrap(obj)
 
         if obj < 800.0 then
             local count = Instance.count(obj)
