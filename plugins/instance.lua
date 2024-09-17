@@ -179,25 +179,27 @@ methods_instance = {
     end,
 
 
-    get_data = function(self, subtable)
+    get_data = function(self, subtable, mod_id)
         subtable = subtable or "main"
 
-        -- Find ID of mod that called this method
-        local name = "main"
-        local src = debug.getinfo(2, "S").source
-        local split = Array.wrap(gm.string_split(src, "\\"))
-        for i = 1, #split do
-            if split[i] == "plugins" and i < #split then
-                name = split[i + 1]
-                break
+        if not mod_id then
+            -- Find ID of mod that called this method
+            mod_id = "main"
+            local src = debug.getinfo(2, "S").source
+            local split = Array.wrap(gm.string_split(src, "\\"))
+            for i = 1, #split do
+                if split[i] == "plugins" and i < #split then
+                    mod_id = split[i + 1]
+                    break
+                end
             end
         end
 
         -- Create data table if it doesn't already exist and return it
         if not instance_data[self.value.id] then instance_data[self.value.id] = {} end
-        if not instance_data[self.value.id][name] then instance_data[self.value.id][name] = {} end
-        if not instance_data[self.value.id][name][subtable] then instance_data[self.value.id][name][subtable] = {} end
-        return instance_data[self.value.id][name][subtable]
+        if not instance_data[self.value.id][mod_id] then instance_data[self.value.id][mod_id] = {} end
+        if not instance_data[self.value.id][mod_id][subtable] then instance_data[self.value.id][mod_id][subtable] = {} end
+        return instance_data[self.value.id][mod_id][subtable]
     end,
 
 
