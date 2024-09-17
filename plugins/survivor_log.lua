@@ -61,8 +61,7 @@ end
 
 -- 
 Survivor_Log.new = function(survivor, portrait_id, portrait_index)
-    
-    if type(survivor) ~= "table" or survivor.RMT_wrapper ~= "Survivor" or not survivor.value then log.error("Survivor is not a RMT survivor, got a "..type(survivor), 2) return end
+    if type(survivor) ~= "table" or (survivor.RMT_wrapper ~= "Survivor" and not survivor.value) then log.error("Survivor is not a RMT survivor, got a "..type(survivor), 2) return end
     if type(portrait_id) ~= "number" and type(portrait_id) ~= "nil" then log.error("Portrait ID is not a number, got a "..type(portrait_id), 2) return end
     if type(portrait_index) ~= "number" and type(portrait_index) ~= "nil" then log.error("Portrait Index is not a number, got a "..type(portrait_index), 2) return end
     
@@ -109,12 +108,12 @@ end
 
 methods_survivor_log = {
 
-    set_text = function(self, story, id, departed, arrival)
-        self.token_story = story
-        self.token_id  = id
-        self.token_departed  = departed
-        self.token_arrival  = arrival
-    end,
+    -- set_text = function(self, story, id, departed, arrival)
+    --     self.token_story = story
+    --     self.token_id  = id
+    --     self.token_departed  = departed
+    --     self.token_arrival  = arrival
+    -- end,
 }
 
 

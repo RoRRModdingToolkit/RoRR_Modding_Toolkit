@@ -152,7 +152,7 @@ methods_achievement = {
     set_milestone = function(self, milestone_id, survivor)
         if type(milestone_id) ~= "number" then log.error("Milestone ID is not a number, got a "..type(milestone_id), 2) return end
         if milestone_id < 0 or milestone_id > 2 then log.error("Milestone ID should be between 0 and 2, got "..tostring(milestone_id), 2) return end
-        if type(survivor) ~= "table" or survivor.RMT_wrapper ~= "Survivor" or not survivor.value then log.error("Survivor is not a RMT survivor, got a "..type(survivor), 2) return end
+        if type(survivor) ~= "table" or (survivor.RMT_wrapper ~= "Survivor" and not survivor.value) then log.error("Survivor is not a RMT survivor, got a "..type(survivor), 2) return end
 
         self.milestone_alt_unlock = milestone_id
         self.milestone_survivor = survivor.value
