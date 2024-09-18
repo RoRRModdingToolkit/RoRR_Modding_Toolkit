@@ -76,9 +76,12 @@ methods_player = {
 
 
     get_equipment_use_direction = function(self)
-        local use_dir = self.value:player_util_local_player_get_equipment_activation_direction()
-        if use_dir == true then return 1.0, use_dir end
-        if use_dir == false then return -1.0, use_dir end
+        local num = self.value:player_util_local_player_get_equipment_activation_direction()
+        local bool = true
+        if num == true then num = 1.0 end
+        if num == false then num = -1.0 end
+        if num == -1.0 then bool = false end
+        return num, bool
     end
 
 }
