@@ -20,3 +20,7 @@ v actor:fire_explosion rewrite
 
 - ISSUE: onPostStatRecalc is called immediately after onStatRecalc for each module separately
     - Will have to move around onPostStatRecalc to a single function or something
+
+- Add actor:get_active_skill(slot)
+- Add actor:add_skill_stock(slot)
+- Add tracers for actor:fire_bullet()
