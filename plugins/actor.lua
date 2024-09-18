@@ -460,7 +460,7 @@ gm.post_script_hook(gm.constants.recalculate_stats, function(self, other, result
 end)
 
 
-gm.pre_script_hook(gm.constants.skill_activate, function(self, other, result, args)
+gm.post_script_hook(gm.constants.skill_activate, function(self, other, result, args)
     local actor = Instance.wrap(self)
 
     if callbacks["onSkillUse"] then
@@ -482,7 +482,7 @@ gm.pre_script_hook(gm.constants.skill_activate, function(self, other, result, ar
 end)
 
 
-gm.pre_script_hook(gm.constants.actor_heal_networked, function(self, other, result, args)
+gm.post_script_hook(gm.constants.actor_heal_networked, function(self, other, result, args)
     if callbacks["onHeal"] then
         for _, fn in ipairs(callbacks["onHeal"]) do
             fn(Instance.wrap(args[1].value), args[2].value)   -- Actor, Heal amount

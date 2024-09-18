@@ -7,6 +7,9 @@ local abstraction_data = setmetatable({}, {__mode = "k"})
 local callbacks = {}
 local has_custom_item = {}
 
+local disabled_loot = {}
+local loot_toggled = {}     -- Loot pools that have been added to this frame
+
 
 
 -- ========== Enums ==========
@@ -334,7 +337,46 @@ methods_item = {
 
 
     toggle_loot = function(self, enabled)
+        if enabled == nil then return end
+
+        local loot_pools = Array.wrap(gm.variable_global_get("treasure_loot_pools"))
+        local item_array = Class.ITEM:get(self.value)
+        local obj = item_array:get(8)
         
+        if enabled then
+            if disabled_loot[self.value] then
+                -- Add back to loot pools
+                for _, pool_id in ipairs(disabled_loot[self.value]) do
+                    local drop_pool = List.wrap(loot_pools:get(pool_id).drop_pool)
+                    drop_pool:add(obj)
+
+                    if not Helper.table_has(loot_toggled, pool_id) then
+                        table.insert(loot_toggled, pool_id)
+                    end
+                end
+
+                disabled_loot[self.value] = nil
+            end
+
+        else
+            if not disabled_loot[self.value] then
+                -- Remove from loot pools
+                -- and store the pool indexes
+                local pools = {}
+                
+                for i = 0, #loot_pools - 1 do
+                    local drop_pool = List.wrap(loot_pools:get(i).drop_pool)
+                    local pos = drop_pool:find(obj)
+                    if pos then
+                        drop_pool:delete(pos)
+                        table.insert(pools, i)
+                    end
+                end
+
+                disabled_loot[self.value] = pools
+            end
+
+        end
     end
 
 }
@@ -469,7 +511,7 @@ gm.post_script_hook(gm.constants.recalculate_stats, function(self, other, result
 end)
 
 
-gm.pre_script_hook(gm.constants.skill_activate, function(self, other, result, args)
+gm.post_script_hook(gm.constants.skill_activate, function(self, other, result, args)
     if args[1].value ~= 0.0 or gm.array_get(self.skills, 0).active_skill.skill_id == 70.0 then return true end
     if callbacks["onBasicUse"] then
         for _, fn in ipairs(callbacks["onBasicUse"]) do
@@ -483,7 +525,7 @@ gm.pre_script_hook(gm.constants.skill_activate, function(self, other, result, ar
 end)
 
 
-gm.pre_script_hook(gm.constants.actor_heal_networked, function(self, other, result, args)
+gm.post_script_hook(gm.constants.actor_heal_networked, function(self, other, result, args)
     if callbacks["onHeal"] then
         for _, fn in ipairs(callbacks["onHeal"]) do
             local actor = Instance.wrap(args[1].value)
@@ -511,6 +553,32 @@ gm.post_script_hook(gm.constants.stage_roll_next, function(self, other, result, 
             end
         end
     end
+end)
+
+
+gm.pre_script_hook(gm.constants.__input_system_tick, function()
+    -- Sort loot tables that have been added to
+    for _, pool_id in ipairs(loot_toggled) do
+        local loot_pools = Array.wrap(gm.variable_global_get("treasure_loot_pools"))
+
+        -- Get item IDs from objects and sort
+        local ids = List.new()
+        local drop_pool = List.wrap(loot_pools:get(pool_id).drop_pool)
+        for _, obj in ipairs(drop_pool) do
+            ids:add(gm.object_to_item(obj))
+        end
+        ids:sort()
+
+        -- Add objects of sorted IDs back into loot pool
+        drop_pool:clear()
+        for _, id in ipairs(ids) do
+            local item = Class.ITEM:get(id)
+            local obj = item:get(8)
+            drop_pool:add(obj)
+        end
+        ids:destroy()
+    end
+    loot_toggled = {}
 end)
 
 

@@ -5,6 +5,7 @@ Equipment = {}
 local callbacks = {}
 
 local is_passive = {}
+local disabled_loot = {}
 
 
 
