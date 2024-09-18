@@ -72,6 +72,13 @@ methods_player = {
 
     reduce_equipment_cooldown = function(self, amount)
         gm.player_grant_equipment_cooldown_reduction(self.value, amount)
+    end,
+
+
+    get_equipment_use_direction = function(self)
+        local use_dir = self.value:player_util_local_player_get_equipment_activation_direction()
+        if use_dir == true then return 1.0, use_dir end
+        if use_dir == false then return -1.0, use_dir end
     end
 
 }
