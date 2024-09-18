@@ -5,7 +5,9 @@ Equipment = {}
 local callbacks = {}
 
 local is_passive = {}
+
 local disabled_loot = {}
+local loot_toggled = {}     -- Loot pools that have been added to this frame
 
 
 
@@ -222,7 +224,46 @@ methods_equipment = {
 
 
     toggle_loot = function(self, enabled)
+        if enabled == nil then return end
+
+        local loot_pools = Array.wrap(gm.variable_global_get("treasure_loot_pools"))
+        local equip_array = Class.EQUIPMENT:get(self.value)
+        local obj = equip_array:get(8)
         
+        if enabled then
+            if disabled_loot[self.value] then
+                -- Add back to loot pools
+                for _, pool_id in ipairs(disabled_loot[self.value]) do
+                    local drop_pool = List.wrap(loot_pools:get(pool_id).drop_pool)
+                    drop_pool:add(obj)
+
+                    if not Helper.table_has(loot_toggled, pool_id) then
+                        table.insert(loot_toggled, pool_id)
+                    end
+                end
+
+                disabled_loot[self.value] = nil
+            end
+
+        else
+            if not disabled_loot[self.value] then
+                -- Remove from loot pools
+                -- and store the pool indexes
+                local pools = {}
+                
+                for i = 0, #loot_pools - 1 do
+                    local drop_pool = List.wrap(loot_pools:get(i).drop_pool)
+                    local pos = drop_pool:find(obj)
+                    if pos then
+                        drop_pool:delete(pos)
+                        table.insert(pools, i)
+                    end
+                end
+
+                disabled_loot[self.value] = pools
+            end
+
+        end
     end
 
 }
@@ -377,6 +418,32 @@ gm.pre_script_hook(gm.constants.item_use_equipment, function(self, other, result
     if is_passive[Instance.wrap(self):get_equipment().value] then
         return false
     end
+end)
+
+
+gm.pre_script_hook(gm.constants.__input_system_tick, function()
+    -- Sort loot tables that have been added to
+    for _, pool_id in ipairs(loot_toggled) do
+        local loot_pools = Array.wrap(gm.variable_global_get("treasure_loot_pools"))
+
+        -- Get equipment IDs from objects and sort
+        local ids = List.new()
+        local drop_pool = List.wrap(loot_pools:get(pool_id).drop_pool)
+        for _, obj in ipairs(drop_pool) do
+            ids:add(gm.object_to_equipment(obj))
+        end
+        ids:sort()
+
+        -- Add objects of sorted IDs back into loot pool
+        drop_pool:clear()
+        for _, id in ipairs(ids) do
+            local equip = Class.EQUIPMENT:get(id)
+            local obj = equip:get(8)
+            drop_pool:add(obj)
+        end
+        ids:destroy()
+    end
+    loot_toggled = {}
 end)
 
 
