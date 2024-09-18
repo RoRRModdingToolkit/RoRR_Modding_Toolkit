@@ -50,13 +50,17 @@ State.ACTOR_STATE_INTERRUPT_PRIORITY = {
 
 State.find = function(namespace, identifier)
     if identifier then namespace = namespace.."-"..identifier end
-    
-    for i, state in ipairs(Class.ACTOR_STATE) do
-        if gm.is_array(state.value) then
+
+    -- ipairs doesn't work on this class
+    -- because there are random "nil"s scattered around
+    -- where indexes were skipped
+    for i = 0, #Class.ACTOR_STATE - 1 do
+        local state = Class.ACTOR_STATE:get(i)
+        if state then
             local _namespace = state:get(0)
             local _identifier = state:get(1)
             if namespace == _namespace.."-".._identifier then
-                return State.wrap(i - 1)
+                return State.wrap(i)
             end
         end
     end
