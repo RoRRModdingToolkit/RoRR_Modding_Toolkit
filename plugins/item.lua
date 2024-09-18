@@ -118,6 +118,22 @@ Item.find = function(namespace, identifier)
 end
 
 
+Item.find_all = function(filter)
+    local items = {}
+
+    local ind = 1   -- namespace
+    if type(filter) == "number" then ind = 7 end    -- tier
+
+    for i, item in ipairs(Class.ITEM) do
+        if item[ind] == filter then
+            table.insert(items, Item.wrap(i - 1))
+        end
+    end
+
+    return items, #items > 0
+end
+
+
 Item.get_random = function(...)
     local tiers = {}
     if ... then
