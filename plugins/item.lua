@@ -204,7 +204,7 @@ methods_item = {
     create = function(self, x, y, target)
         if not self.object_id then return nil end
 
-        gm.item_drop_object(self.object_id, x, y, target, false)
+        gm.item_drop_object(self.object_id, x, y, Wrap.unwrap(target), false)
 
         -- Look for drop (because gm.item_drop_object does not actually return the instance for some reason)
         -- The drop spawns 40 px above y parameter
