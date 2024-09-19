@@ -165,7 +165,10 @@ Item.spawn_crate = function(x, y, tier, items)
     -- Replace default items with custom set
     if items then
         local arr = Array.new()
-        for _, item in ipairs(items) do arr:push(Wrap.unwrap(item)) end
+        for _, item in ipairs(items) do
+            if type(item) ~= "table" then item = Item.wrap(item) end
+            arr:push(item.object_id)
+        end
         inst.contents = arr
     end
 
