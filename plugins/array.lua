@@ -35,12 +35,14 @@ end
 methods_array = {
 
     get = function(self, index)
+        index = Wrap.unwrap(index)
         if index < 0 or index >= self:size() then return nil end
         return Wrap.wrap(gm.array_get(self.value, index))
     end,
 
 
     set = function(self, index, value)
+        index = Wrap.unwrap(index)
         gm.array_set(self.value, index, Wrap.unwrap(value))
     end,
 
@@ -101,7 +103,7 @@ methods_array = {
 metatable_array_gs = {
     -- Getter
     __index = function(table, key)
-        key = tonumber(key)
+        key = tonumber(Wrap.unwrap(key))
         if key and key >= 1 and key <= table:size() then
             return Wrap.wrap(gm.array_get(table.value, key - 1))
         end
@@ -111,7 +113,7 @@ metatable_array_gs = {
 
     -- Setter
     __newindex = function(table, key, value)
-        key = tonumber(key)
+        key = tonumber(Wrap.unwrap(key))
         if key then
             gm.array_set(table.value, key - 1, Wrap.unwrap(value))
         end
