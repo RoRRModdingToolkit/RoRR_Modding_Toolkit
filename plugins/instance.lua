@@ -43,6 +43,12 @@ Instance.projectiles = {
 }
 
 
+Instance.worm_bodies = {
+    gm.constants.oWormBody,
+    gm.constants.oWurmBody
+}
+
+
 
 -- ========== Static Methods ==========
 
