@@ -373,6 +373,11 @@ methods_actor = {
     end,
 
 
+    get_active_skill = function(self, slot)
+        return self.skills:get(slot).active_skill
+    end,
+
+
     enter_state = function(self, state)
         gm.actor_set_state(self.value, Wrap.unwrap(state))
     end
