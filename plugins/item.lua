@@ -166,7 +166,7 @@ Item.spawn_crate = function(x, y, tier, items)
     if items then
         local arr = Array.new()
         for _, item in ipairs(items) do arr:push(Wrap.unwrap(item)) end
-        c.contents = arr
+        inst.contents = arr
     end
 
     return inst
