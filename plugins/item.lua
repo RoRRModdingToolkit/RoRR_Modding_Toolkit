@@ -219,7 +219,7 @@ methods_item = {
             end
         end
 
-        return Instance.wrap(drop)
+        return drop
     end,
     
 
