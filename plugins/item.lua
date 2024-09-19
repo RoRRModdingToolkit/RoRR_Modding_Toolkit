@@ -159,6 +159,20 @@ Item.get_random = function(...)
 end
 
 
+Item.spawn_crate = function(x, y, tier, items)
+    local inst = Object.find("ror-generated_CommandCrate_"..tier):create(x, y)
+
+    -- Replace default items with custom set
+    if items then
+        local arr = Array.new()
+        for _, item in ipairs(items) do arr:push(Wrap.unwrap(item)) end
+        c.contents = arr
+    end
+
+    return inst
+end
+
+
 Item.wrap = function(item_id)
     local abstraction = {}
     abstraction_data[abstraction] = {
