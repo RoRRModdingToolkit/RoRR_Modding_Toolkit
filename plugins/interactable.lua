@@ -194,12 +194,14 @@ gm.pre_script_hook(gm.constants.interactable_set_active, function(self, other, r
         for _, c in ipairs(callbacks["onActivate"]) do
             if c[1] == args[1].value.__object_index then
                 override = true
-                args[1].value.activator = args[2].value
                 c[2](Instance.wrap(args[1].value), Instance.wrap(args[2].value)) -- Interactable, Actor
             end
         end
     end
-    if override then return false end
+    if override then
+        args[1].value.activator = args[2].value
+        return false
+    end
 end)
 
 
