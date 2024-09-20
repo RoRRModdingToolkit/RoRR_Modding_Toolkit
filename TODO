@@ -23,3 +23,5 @@ v actor:fire_explosion rewrite
 
 v Add actor:get_active_skill(slot)
 - Add tracers for actor:fire_bullet()
+
+v Add interactable cards for Interactable

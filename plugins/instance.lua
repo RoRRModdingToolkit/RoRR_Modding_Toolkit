@@ -136,7 +136,10 @@ Instance.wrap = function(inst)
         RMT_object = "Instance",
         value = inst
     }
-    if inst.object_index == gm.constants.oP then
+    if inst.object_index == gm.constants.oCustomObject_pInteractable then
+        setmetatable(abstraction, metatable_interactable_instance)
+        abstraction_data[abstraction].RMT_object = "Interactable Instance"
+    elseif inst.object_index == gm.constants.oP then
         setmetatable(abstraction, metatable_player)
         abstraction_data[abstraction].RMT_object = "Player"
     elseif gm.object_is_ancestor(inst.object_index, gm.constants.pActor) == 1.0 then

@@ -47,6 +47,7 @@ function __initialize()
     Buff.__initialize()
     Equipment.__initialize()
     -- Instance.__initialize()
+    Interactable.__initialize()
     Item.__initialize()
     
     -- Language.__initialize()
