@@ -233,7 +233,9 @@ local function interactable_instance_onDraw(self, other, result, args)
         local cust_ints = Instance.find_all(gm.constants.oCustomObject_pInteractable)
         for n, inst in ipairs(cust_ints) do
             for _, c in ipairs(callbacks["onStateDraw"]) do
-                if c[1] == inst.__object_index and c[3] == inst.active then
+                local active = c[3]
+                if active > 0 then active = active + 2 end
+                if c[1] == inst.__object_index and active == inst.active then
                     c[2](inst) -- Interactable
                 end
             end
