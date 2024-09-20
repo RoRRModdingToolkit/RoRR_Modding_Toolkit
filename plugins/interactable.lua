@@ -3,7 +3,6 @@
 Interactable = {}
 
 local abstraction_data = setmetatable({}, {__mode = "k"})
-local abstraction_data_2 = setmetatable({}, {__mode = "k"})
 
 local callbacks = {}
 
