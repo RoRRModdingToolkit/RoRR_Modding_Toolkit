@@ -80,6 +80,15 @@ methods_interactable = {
                 return intc, i - 1
             end
         end
+    end,
+
+
+    add_to_stage = function(self, namespace, identifier)
+        if identifier then namespace = namespace.."-"..identifier end
+
+        local card_array, id = self:get_card()
+        local list = List.wrap(Class.STAGE:get(gm.stage_find(namespace)):get(6))
+        list:add(id)
     end
 
 }
