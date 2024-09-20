@@ -8,13 +8,34 @@ local callbacks = {}
 
 
 
+-- ========== Enums ==========
+
+Interactable.ARRAY = {
+    spawn_cost                      = 2,
+    spawn_weight                    = 3,
+    object_id                       = 4,
+    required_tile_space             = 5,
+    spawn_with_sacrifice            = 6,
+    is_new_interactable             = 7,
+    default_spawn_rarity_override   = 8,
+    decrease_weight_on_spawn        = 9
+}
+
+
+
 -- ========== Static Methods ==========
 
 Interactable.new = function(namespace, identifier)
     if Object.find(namespace, identifier) then return nil end
 
-    local obj = gm.object_add_w(namespace, identifier, gm.constants.pInteractable)
-    return Interactable.wrap(obj)
+    -- Create interactable and its card
+    local obj = Interactable.wrap(gm.object_add_w(namespace, identifier, gm.constants.pInteractable))
+    gm.interactable_card_create(namespace, identifier)
+
+    -- Set interactable values
+    obj.object_id = obj.value
+
+    return obj
 end
 
 
@@ -51,6 +72,16 @@ methods_interactable = {
         end
     end,
 
+
+    get_card = function(self)
+        for i, intc in ipairs(Class.INTERACTABLE_CARD) do
+            if self.namespace == intc:get(0)
+            and self.identifier == intc:get(1) then
+                return intc
+            end
+        end
+    end
+
 }
 
 
@@ -85,6 +116,13 @@ methods_interactable_instance = {
 
 metatable_interactable = {
     __index = function(table, key)
+        -- Return interactable card value
+        local index = Interactable.ARRAY[key]
+        if index then
+            local intc_array = table:get_card()
+            return intc_array:get(index)
+        end
+
         -- Methods
         if methods_interactable[key] then
             return methods_interactable[key]
@@ -105,6 +143,15 @@ metatable_interactable = {
     
 
     __newindex = function(table, key, value)
+        -- Set interactable card value
+        local index = Interactable.ARRAY[key]
+        if index then
+            local intc_array = table:get_card()
+            intc_array:set(index, value)
+            return
+        end
+
+        -- Pass to Object setter
         metatable_object_gs.__newindex(table, key, value)
     end
 }
