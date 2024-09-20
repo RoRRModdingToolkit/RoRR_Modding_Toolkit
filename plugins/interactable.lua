@@ -77,7 +77,7 @@ methods_interactable = {
         for i, intc in ipairs(Class.INTERACTABLE_CARD) do
             if self.namespace == intc:get(0)
             and self.identifier == intc:get(1) then
-                return intc
+                return intc, i - 1
             end
         end
     end
