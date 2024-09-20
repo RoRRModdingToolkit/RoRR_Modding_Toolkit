@@ -87,6 +87,11 @@ methods_object = {
 
 
     add_callback = function(self, callback, func)
+        self:add_callback_obj_actual(callback, func)
+    end,
+
+
+    add_callback_obj_actual = function(self, callback, func)
         if self.value < Object.CUSTOM_START then return end
 
         if callback == "onCreate"

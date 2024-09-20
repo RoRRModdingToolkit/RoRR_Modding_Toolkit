@@ -68,7 +68,7 @@ methods_interactable = {
                 if not callbacks[callback] then callbacks[callback] = {} end
                 table.insert(callbacks[callback], {self.value, func, state})
 
-        else log.error("Invalid callback name", 2)
+        else self:add_callback_obj_actual(callback, func)
 
         end
     end,
