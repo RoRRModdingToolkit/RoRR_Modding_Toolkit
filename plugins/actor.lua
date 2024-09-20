@@ -100,14 +100,6 @@ methods_actor = {
     end,
 
 
-    -- fire_bullet = function(self, x, y, direction, range, damage, pierce_multiplier, hit_sprite)
-    --     -- By default: proc, crit, stun
-    --     local damager = self.value:fire_bullet(0, x, y, (pierce_multiplier and 1) or 0, damage, range, hit_sprite or -1, direction, 1.0, 1.0, -1.0)
-    --     if pierce_multiplier then damager.damage_degrade = (1.0 - pierce_multiplier) end
-    --     return damager
-    -- end,
-
-
     fire_bullet = function(self, x, y, range, direction, damage, pierce_multiplier, stun, color, hit_sprite, flags)
         -- By default: proc, crit, stun
         local flags = flags or {}
@@ -154,14 +146,6 @@ methods_actor = {
     end,
 
 
-    -- fire_explosion = function(self, x, y, x_radius, y_radius, damage, stun, hit_sprite)
-    --     -- By default: proc, crit, stun
-    --     local damager = self.value:fire_explosion(0, x, y, damage, hit_sprite or -1, 2, -1, x_radius / 32.0, y_radius / 8.0)
-    --     if stun then damager.stun = stun end
-    --     return damager
-    -- end,
-
-
     fire_explosion = function(self, x, y, width, height, damage, stun, color, explosion_sprite, sparks_sprite, flags)
         -- By default: proc, crit, stun
         local flags = flags or {}
@@ -199,16 +183,6 @@ methods_actor = {
         return damager
     end,
 
-
-    -- take_damage = function(self, damage, source, x, y, color, crit_sfx)
-    --     local source_inst = nil
-    --     if source then
-    --         if type(source) == "table" then source = source.value end
-    --         source_inst = source
-    --     end
-    --     if not crit_sfx then crit_sfx = false end
-    --     gm.damage_inflict(self.value, damage, 0.0, source_inst, x or self.x, y or self.y - 28, damage, 1.0, color or Color.WHITE, crit_sfx)
-    -- end,
 
     take_damage = function(self, damage, source, color, stun, kb_direction, hit_sprite, flags)
         -- By default: no proc, no crit, no stun
@@ -446,14 +420,14 @@ setmetatable(Actor, metatable_actor_callbacks)
 gm.pre_script_hook(gm.constants.recalculate_stats, function(self, other, result, args)
     -- Internal
     local actor = Instance.wrap(self)
-    local actor_data = actor:get_data("RMT-internal")
+    local actor_data = actor:get_data()
     actor_data.current_shield = actor.shield
 end)
 
 
 gm.post_script_hook(gm.constants.recalculate_stats, function(self, other, result, args)
     local actor = Instance.wrap(self)
-    local actor_data = actor:get_data("RMT-internal")
+    local actor_data = actor:get_data()
     actor.shield = actor_data.current_shield
 
     if callbacks["onStatRecalc"] then
@@ -462,11 +436,7 @@ gm.post_script_hook(gm.constants.recalculate_stats, function(self, other, result
         end
     end
 
-    if callbacks["onPostStatRecalc"] then
-        for _, fn in ipairs(callbacks["onPostStatRecalc"]) do
-            fn(actor)   -- Actor
-        end
-    end
+    actor_data.post_stat_recalc = true
 end)
 
 
@@ -540,6 +510,15 @@ end)
 
 
 -- ========== Callbacks ==========
+
+function actor_onPostStatRecalc(actor)
+    if callbacks["onPostStatRecalc"] then
+        for _, fn in ipairs(callbacks["onPostStatRecalc"]) do
+            fn(actor)   -- Actor
+        end
+    end
+end
+
 
 local function actor_onAttack(self, other, result, args)
     if not args[2].value.proc then return end
@@ -667,6 +646,19 @@ Actor.__initialize = function()
         -- Allow stun application even if damager.proc is false
         if damager.stun > 0 and (damager.proc == 0.0 or damager.proc == false) and damager.allow_stun == 1.0 then
             actor:apply_stun(damager.knockback_kind, damager.knockback_direction, damager.stun * 1.5)
+        end
+    end)
+
+    Actor:onPostStep(function(actor)
+        actorData = actor:get_data()
+
+        -- Run onPostStatRecalc
+        if actorData.post_stat_recalc then
+            actorData.post_stat_recalc = nil
+            actor_onPostStatRecalc(actor)
+            item_onPostStatRecalc(actor)
+            equipment_onPostStatRecalc(actor)
+            buff_onPostStatRecalc(actor)
         end
     end)
 end

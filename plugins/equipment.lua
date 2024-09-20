@@ -361,9 +361,9 @@ end)
 
 
 gm.post_script_hook(gm.constants.recalculate_stats, function(self, other, result, args)
+    local actor = Instance.wrap(self)
     if callbacks["onStatRecalc"] then
         for _, fn in ipairs(callbacks["onStatRecalc"]) do
-            local actor = Instance.wrap(self)
             if actor.RMT_object == "Player" then
                 local equip = actor:get_equipment()
                 if equip and equip.value == fn[1] then
@@ -372,18 +372,7 @@ gm.post_script_hook(gm.constants.recalculate_stats, function(self, other, result
             end
         end
     end
-
-    if callbacks["onPostStatRecalc"] then
-        for _, fn in ipairs(callbacks["onPostStatRecalc"]) do
-            local actor = Instance.wrap(self)
-            if actor.RMT_object == "Player" then
-                local equip = actor:get_equipment()
-                if equip and equip.value == fn[1] then
-                    fn[2](actor)  -- Player
-                end
-            end
-        end
-    end
+    actor:get_data().post_stat_recalc = true
 end)
 
 
@@ -449,6 +438,20 @@ end)
 
 
 -- ========== Callbacks ==========
+
+function equipment_onPostStatRecalc(actor)
+    if callbacks["onPostStatRecalc"] then
+        for _, fn in ipairs(callbacks["onPostStatRecalc"]) do
+            if actor.RMT_object == "Player" then
+                local equip = actor:get_equipment()
+                if equip and equip.value == fn[1] then
+                    fn[2](actor)  -- Player
+                end
+            end
+        end
+    end
+end
+
 
 local function equipment_onStep(self, other, result, args)
     if gm.variable_global_get("pause") then return end

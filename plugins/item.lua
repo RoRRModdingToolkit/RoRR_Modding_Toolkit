@@ -506,25 +506,16 @@ end)
 
 
 gm.post_script_hook(gm.constants.recalculate_stats, function(self, other, result, args)
+    local actor = Instance.wrap(self)
     if callbacks["onStatRecalc"] then
         for _, fn in ipairs(callbacks["onStatRecalc"]) do
-            local actor = Instance.wrap(self)
             local count = actor:item_stack_count(fn[1])
             if count > 0 then
                 fn[2](actor, count)   -- Actor, Stack count
             end
         end
     end
-
-    if callbacks["onPostStatRecalc"] then
-        for _, fn in ipairs(callbacks["onPostStatRecalc"]) do
-            local actor = Instance.wrap(self)
-            local count = actor:item_stack_count(fn[1])
-            if count > 0 then
-                fn[2](actor, count)   -- Actor, Stack count
-            end
-        end
-    end
+    actor:get_data().post_stat_recalc = true
 end)
 
 
@@ -583,6 +574,18 @@ end)
 
 
 -- ========== Callbacks ==========
+
+function item_onPostStatRecalc(actor)
+    if callbacks["onPostStatRecalc"] then
+        for _, fn in ipairs(callbacks["onPostStatRecalc"]) do
+            local count = actor:item_stack_count(fn[1])
+            if count > 0 then
+                fn[2](actor, count)   -- Actor, Stack count
+            end
+        end
+    end
+end
+
 
 local function item_onAttack(self, other, result, args)
     if not args[2].value.proc or not args[2].value.parent then return end
