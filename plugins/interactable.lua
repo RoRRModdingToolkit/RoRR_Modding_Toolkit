@@ -34,6 +34,7 @@ Interactable.new = function(namespace, identifier)
 
     -- Set interactable values
     obj.object_id = obj.value
+    obj.obj_depth = 1
 
     return obj
 end
