@@ -555,24 +555,6 @@ gm.post_script_hook(gm.constants.actor_heal_networked, function(self, other, res
 end)
 
 
-gm.post_script_hook(gm.constants.stage_roll_next, function(self, other, result, args)
-    if callbacks["onNewStage"] then
-        for n, a in ipairs(has_custom_item) do
-            if Instance.exists(a) then
-                for _, c in ipairs(callbacks["onNewStage"]) do
-                    local actor = Instance.wrap(a)
-                    local count = actor:item_stack_count(c[1])
-                    if count > 0 then
-                        c[2](actor, count)  -- Actor, Stack count
-                    end
-                end
-            else table.remove(has_custom_item, n)
-            end
-        end
-    end
-end)
-
-
 gm.pre_script_hook(gm.constants.__input_system_tick, function()
     -- Sort loot tables that have been added to
     for _, pool_id in ipairs(loot_toggled) do
@@ -774,6 +756,24 @@ local function item_onEquipmentUse(self, other, result, args)
 end
 
 
+local function item_onNewStage(self, other, result, args)
+    if callbacks["onNewStage"] then
+        for n, a in ipairs(has_custom_item) do
+            if Instance.exists(a) then
+                for _, c in ipairs(callbacks["onNewStage"]) do
+                    local actor = Instance.wrap(a)
+                    local count = actor:item_stack_count(c[1])
+                    if count > 0 then
+                        c[2](actor, count)  -- Actor, Stack count
+                    end
+                end
+            else table.remove(has_custom_item, n)
+            end
+        end
+    end
+end
+
+
 local function item_onStep(self, other, result, args)
     if gm.variable_global_get("pause") then return end
     
@@ -848,6 +848,7 @@ Item.__initialize = function()
     Callback.add("onDamageBlocked", "RMT.item_onDamageBlocked", item_onDamageBlocked, true)
     Callback.add("onInteractableActivate", "RMT.item_onInteract", item_onInteract, true)
     Callback.add("onEquipmentUse", "RMT.item_onEquipmentUse", item_onEquipmentUse, true)
+    Callback.add("onStageStart", "RMT.item_onNewStage", item_onNewStage, true)
     Callback.add("preStep", "RMT.item_onStep", item_onStep, true)
     Callback.add("postHUDDraw", "RMT.item_onDraw", item_onDraw, true)
 end
