@@ -40,11 +40,11 @@ Interactable.new = function(namespace, identifier)
 end
 
 
-Interactable.wrap = function(object_id)
+Interactable.wrap = function(interactable_id)
     local abstraction = {}
     abstraction_data[abstraction] = {
         RMT_object = "Interactable",
-        value = object_id
+        value = interactable_id
     }
     setmetatable(abstraction, metatable_interactable)
     return abstraction
