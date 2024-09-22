@@ -51,6 +51,8 @@ end
 
 
 Net.send = function(func_id, target, player_name, ...)
+    if Net.get_type() == Net.TYPE.single then return end
+
     local my_player = gm.variable_global_get("my_player")
     local message = "[RMT_NET]"..func_id.."|||"..Helper.table_to_string({...})
 
