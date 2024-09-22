@@ -344,6 +344,11 @@ methods_actor = {
     end,
 
 
+    get_default_skill = function(self, slot)
+        return self.skills:get(slot).default_skill
+    end,
+
+
     enter_state = function(self, state)
         gm.actor_set_state(self.value, Wrap.unwrap(state))
     end
