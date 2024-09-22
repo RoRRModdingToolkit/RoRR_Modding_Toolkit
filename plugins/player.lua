@@ -65,6 +65,12 @@ methods_player = {
     end,
 
 
+    set_equipment = function(self, equip)
+        equip = Wrap.unwrap(equip)
+        gm.equipment_set(self.value, equip)
+    end,
+
+
     get_equipment_cooldown = function(self)
         return gm.player_get_equipment_cooldown(self.value)
     end,
