@@ -50,13 +50,17 @@ State.ACTOR_STATE_INTERRUPT_PRIORITY = {
 
 State.find = function(namespace, identifier)
     if identifier then namespace = namespace.."-"..identifier end
-    
-    for i, state in ipairs(Class.ACTOR_STATE) do
-        if gm.is_array(state.value) then
+
+    -- ipairs doesn't work on this class
+    -- because there are random "nil"s scattered around
+    -- where indexes were skipped
+    for i = 0, #Class.ACTOR_STATE - 1 do
+        local state = Class.ACTOR_STATE:get(i)
+        if state then
             local _namespace = state:get(0)
             local _identifier = state:get(1)
             if namespace == _namespace.."-".._identifier then
-                return State.wrap(i - 1)
+                return State.wrap(i)
             end
         end
     end
@@ -217,7 +221,7 @@ metatable_state = {
 gm.post_script_hook(gm.constants.callback_execute, function(self, other, result, args)
     if callbacks[args[1].value] then
         for _, fn in pairs(callbacks[args[1].value]) do
-            fn(args[2].value, args[3].value) --(actor, data)
+            fn(Instance.wrap(args[2].value), args[3].value) --(actor, data)
         end
     end
 end)

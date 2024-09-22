@@ -43,6 +43,12 @@ Instance.projectiles = {
 }
 
 
+Instance.worm_bodies = {
+    gm.constants.oWormBody,
+    gm.constants.oWurmBody
+}
+
+
 
 -- ========== Static Methods ==========
 
@@ -104,11 +110,29 @@ Instance.find_all = function(...)
             end
 
         else
-            local count = Instance.count(gm.constants.oCustomObject)
-            for n = 0, count - 1 do
-                local inst = gm.instance_find(gm.constants.oCustomObject, n)
-                if inst.__object_index == obj then
-                    table.insert(insts, Instance.wrap(inst))
+            local customs = {
+                gm.constants.oCustomObject,
+                gm.constants.oCustomObject_pPickupItem,
+                gm.constants.oCustomObject_pPickupEquipment,
+                gm.constants.oCustomObject_pEnemyClassic,
+                gm.constants.oCustomObject_pEnemyFlying,
+                gm.constants.oCustomObject_pBossClassic,
+                gm.constants.oCustomObject_pBoss,
+                gm.constants.oCustomObject_pInteractable,
+                gm.constants.oCustomObject_pInteractableChest,
+                gm.constants.oCustomObject_pInteractableDrone,
+                gm.constants.oCustomObject_pInteractableCrate,
+                gm.constants.oCustomObject_pMapObjects,
+                gm.constants.oCustomObject_pNPC,
+                gm.constants.oCustomObject_pDrone
+            }
+            for _, custom in ipairs(customs) do
+                local count = Instance.count(custom)
+                for n = 0, count - 1 do
+                    local inst = gm.instance_find(custom, n)
+                    if inst.__object_index == obj then
+                        table.insert(insts, Instance.wrap(inst))
+                    end
                 end
             end
 
@@ -130,7 +154,10 @@ Instance.wrap = function(inst)
         RMT_object = "Instance",
         value = inst
     }
-    if inst.object_index == gm.constants.oP then
+    if inst.object_index == gm.constants.oCustomObject_pInteractable then
+        setmetatable(abstraction, metatable_interactable_instance)
+        abstraction_data[abstraction].RMT_object = "Interactable Instance"
+    elseif inst.object_index == gm.constants.oP then
         setmetatable(abstraction, metatable_player)
         abstraction_data[abstraction].RMT_object = "Player"
     elseif gm.object_is_ancestor(inst.object_index, gm.constants.pActor) == 1.0 then

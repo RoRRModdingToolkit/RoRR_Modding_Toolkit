@@ -4,6 +4,14 @@ Language = {}
 
 
 
+-- ========== Static Methods ==========
+
+Language.translate_token = function(token)
+    return gm.ds_map_find_value(gm.variable_global_get("_language_map"), token)
+end
+
+
+
 -- ========== Functions ==========
 
 local function load_from_folder(folder_path)
@@ -18,7 +26,7 @@ local function load_from_folder(folder_path)
 end
 
 
-Language.load_from_mods = function()
+local function load_from_mods()
     -- Loop through all mods
     for i, mod in pairs(mods) do
         if type(mod) == "table" and string.sub(mod["!plugins_mod_folder_path"], -7, -1) ~= "plugins" then
@@ -49,8 +57,7 @@ end
 
 -- ========== Hooks and Other ==========
 
-
 gm.post_script_hook(gm.constants.translate_load_active_language, function(self, other, result, args)
     -- Load on language change
-    Language.load_from_mods()
+    load_from_mods()
 end)

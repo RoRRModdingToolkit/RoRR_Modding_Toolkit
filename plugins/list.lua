@@ -41,11 +41,13 @@ methods_list = {
 
 
     get = function(self, index)
+        index = Wrap.unwrap(index)
         return Wrap.wrap(gm.ds_list_find_value(self.value, index))
     end,
 
 
     set = function(self, index, value)
+        index = Wrap.unwrap(index)
         gm.ds_list_set(self.value, index, Wrap.unwrap(value))
     end,
 
@@ -103,7 +105,7 @@ methods_list = {
 metatable_list_gs = {
     -- Getter
     __index = function(table, key)
-        key = tonumber(key)
+        key = tonumber(Wrap.unwrap(key))
         if key and key >= 1 and key <= table:size() then
             return Wrap.wrap(gm.ds_list_find_value(table.value, key - 1))
         end
@@ -113,7 +115,7 @@ metatable_list_gs = {
 
     -- Setter
     __newindex = function(table, key, value)
-        key = tonumber(key)
+        key = tonumber(Wrap.unwrap(key))
         if key then
             gm.ds_list_set(table.value, key - 1, Wrap.unwrap(value))
         end

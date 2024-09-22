@@ -32,7 +32,7 @@ Object.CUSTOM_START = 800
 Object.new = function(namespace, identifier, parent)
     if Object.find(namespace, identifier) then return nil end
 
-    local obj = gm.object_add_w(namespace, identifier, parent)
+    local obj = gm.object_add_w(namespace, identifier, Wrap.unwrap(parent))
     return Object.wrap(obj)
 end
 
@@ -87,6 +87,11 @@ methods_object = {
 
 
     add_callback = function(self, callback, func)
+        self:add_callback_obj_actual(callback, func)
+    end,
+
+
+    add_callback_obj_actual = function(self, callback, func)
         if self.value < Object.CUSTOM_START then return end
 
         if callback == "onCreate"
