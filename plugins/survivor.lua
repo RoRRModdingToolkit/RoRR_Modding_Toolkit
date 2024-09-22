@@ -10,6 +10,9 @@ local instance_callbacks = {}
 -- TODO maybe find a better way to do this?
 local survivors = {}
 
+-- Sprites to use for the skins (portrait and select menu)
+local asset_name_overrides = {}
+
 
 -- ========== Enums ==========
 
@@ -416,7 +419,9 @@ methods_survivor = {
         survivors[self.value].yscale = yscale or xscale
     end,
 
-    add_skin = function(self, name, skin_index, achievement)
+    -- TODO ask GrooveSalad for the code of UnderYourSkin to automatically
+    -- generates those new sprites based on the palettes
+    add_skin = function(self, name, skin_index, skin_loadout, skin_portrait, skin_portraitsmall, achievement)
         for _, skin_name in ipairs(survivors[self.value].skins) do
             if skin_name == name then 
                 -- log.error("Skin Name already exist: "..name)
@@ -424,12 +429,19 @@ methods_survivor = {
             end
         end
 
+        local skin_pal_swap = math.tointeger(gm.actor_skin_get_default_palette_swap(skin_index))
+
+        print("__newsprite"..math.tointeger(self.sprite_loadout).."_PAL"..skin_pal_swap)
+        asset_name_overrides["__newsprite"..math.tointeger(self.sprite_loadout).."_PAL"..skin_pal_swap] = skin_loadout or self.sprite_loadout
+        asset_name_overrides["__newsprite"..math.tointeger(self.sprite_portrait).."_PAL"..skin_pal_swap] = skin_portrait or self.sprite_portrait
+        asset_name_overrides["__newsprite"..math.tointeger(self.sprite_portrait_small).."_PAL"..skin_pal_swap] = skin_portraitsmall or self.sprite_portrait_small
+
         gm.array_insert(
             self.skin_family.elements,
             #self.skin_family.elements,
             gm["@@NewGMLObject@@"](
                 gm.constants.SurvivorSkinLoadoutUnlockable,
-                gm.actor_skin_get_default_palette_swap(skin_index),
+                skin_pal_swap,
                 (achievement and achievement.value) or -1
             )
         )
@@ -566,5 +578,13 @@ gm.post_script_hook(gm.constants.instance_callback_call, function(self, other, r
         if #args == 3 and debug.getinfo(fn).nparams == 1 then
             fn(args[3].value) --(object_instance)
         end
+    end
+end)
+
+-- 
+gm.post_script_hook(gm.constants.asset_get_index, function(self, other, result, args)
+    local asset_name = args[1].value
+    if asset_name_overrides[asset_name] ~= nil then
+        result.value = asset_name_overrides[asset_name]
     end
 end)
