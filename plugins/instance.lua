@@ -193,6 +193,8 @@ methods_instance = {
     destroy = function(self)
         if not self:exists() then return end
 
+        instance_data[self.value.id] = nil
+
         gm.instance_destroy(self.value)
         abstraction_data[self].value = -4
     end,
@@ -326,23 +328,18 @@ metatable_instance = {
 
 -- ========== Hooks ==========
 
--- Doesn't work??
--- gm.post_script_hook(gm.constants.instance_destroy, function(self, other, result, args)
---     Helper.log_hook(self, other, result, args)
---     -- instance_data[self.value] = nil
--- end)
-
-
--- Find out what is called when an instance is destroyed and hook that instead
--- because this is running every frame
-gm.post_script_hook(gm.constants.__input_system_tick, function(self, other, result, args)
-    if gm.variable_global_get("pause") then return end
-    
+-- Remove non-existent instances from instance_data on room change
+gm.post_script_hook(gm.constants.room_goto, function(self, other, result, args)
     for k, v in pairs(instance_data) do
         if not Instance.exists(k) then
             instance_data[k] = nil
         end
     end
+end)
+
+
+gm.post_script_hook(gm.constants.actor_set_dead, function(self, other, result, args)
+    instance_data[self.id] = nil
 end)
 
 
