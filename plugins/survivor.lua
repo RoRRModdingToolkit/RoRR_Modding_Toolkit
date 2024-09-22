@@ -325,7 +325,6 @@ methods_survivor = {
         survivors[self.value].drone_idle    = sprites.drone_idle or survivors[self.value].drone_idle
         survivors[self.value].drone_shoot   = sprites.drone_shoot or survivors[self.value].drone_shoot
         survivors[self.value].climb_hurt    = sprites.climb_hurt or survivors[self.value].climb_hurt
-        survivors[self.value].palette       = sprites.palette or survivors[self.value].palette
     end,
 
     set_primary_color = function(self, R, G, B)
@@ -425,13 +424,22 @@ methods_survivor = {
             end
         end
 
-        local artifact_skin = Artifact.new_skin(achievement)
-        local skin_alt = gm.struct_create()
-        gm.static_set(skin_alt, gm.static_get(self.skin_family.elements[1]))
-        skin_alt.skin_id = skin_index
-        skin_alt.achievement_id = (achievement and achievement.value) or -1
-        skin_alt.index = artifact_skin
-        gm.array_push(self.skin_family.elements, skin_alt)
+        gm.array_insert(
+            self.skin_family.elements,
+            #self.skin_family.elements,
+            gm["@@NewGMLObject@@"](
+                gm.constants.SurvivorSkinLoadoutUnlockable,
+                gm.actor_skin_get_default_palette_swap(skin_index),
+                (achievement and achievement.value) or -1
+            )
+        )
+        -- local artifact_skin = Artifact.new_skin(achievement)
+        -- local skin_alt = gm.struct_create()
+        -- gm.static_set(skin_alt, gm.static_get(self.skin_family.elements[1]))
+        -- skin_alt.skin_id = gm.actor_skin_get_default_palette_swap(skin_index)
+        -- skin_alt.achievement_id = (achievement and achievement.value) or -1
+        -- skin_alt.index = artifact_skin
+        -- gm.array_push(self.skin_family.elements, skin_alt)
         survivors[self.value].skins[#survivors[self.value].skins + 1] = name
     end,
 
