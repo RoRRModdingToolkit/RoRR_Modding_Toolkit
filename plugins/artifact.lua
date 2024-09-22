@@ -58,7 +58,8 @@ Artifact.ARRAY = {
 -- ========== Static Methods ==========
 
 Artifact.find = function(namespace, identifier)
-    local id_string = namespace.."-"..identifier
+    if identifier then namespace = namespace.."-"..identifier end
+    local id_string = namespace
     local artifact_id = gm.artifact_find(id_string)
 
     if not artifact_id then return nil end
