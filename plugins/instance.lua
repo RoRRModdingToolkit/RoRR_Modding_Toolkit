@@ -110,11 +110,29 @@ Instance.find_all = function(...)
             end
 
         else
-            local count = Instance.count(gm.constants.oCustomObject)
-            for n = 0, count - 1 do
-                local inst = gm.instance_find(gm.constants.oCustomObject, n)
-                if inst.__object_index == obj then
-                    table.insert(insts, Instance.wrap(inst))
+            local customs = {
+                gm.constants.oCustomObject,
+                gm.constants.oCustomObject_pPickupItem,
+                gm.constants.oCustomObject_pPickupEquipment,
+                gm.constants.oCustomObject_pEnemyClassic,
+                gm.constants.oCustomObject_pEnemyFlying,
+                gm.constants.oCustomObject_pBossClassic,
+                gm.constants.oCustomObject_pBoss,
+                gm.constants.oCustomObject_pInteractable,
+                gm.constants.oCustomObject_pInteractableChest,
+                gm.constants.oCustomObject_pInteractableDrone,
+                gm.constants.oCustomObject_pInteractableCrate,
+                gm.constants.oCustomObject_pMapObjects,
+                gm.constants.oCustomObject_pNPC,
+                gm.constants.oCustomObject_pDrone
+            }
+            for _, custom in ipairs(customs) do
+                local count = Instance.count(custom)
+                for n = 0, count - 1 do
+                    local inst = gm.instance_find(custom, n)
+                    if inst.__object_index == obj then
+                        table.insert(insts, Instance.wrap(inst))
+                    end
                 end
             end
 
