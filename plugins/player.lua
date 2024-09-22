@@ -65,9 +65,9 @@ methods_player = {
     end,
 
 
-    set_equipment = function(self, equip)
-        equip = Wrap.unwrap(equip)
-        gm.equipment_set(self.value, equip)
+    set_equipment = function(self, equipment)
+        equipment = Wrap.unwrap(equipment)
+        gm.equipment_set(self.value, equipment)
     end,
 
 
