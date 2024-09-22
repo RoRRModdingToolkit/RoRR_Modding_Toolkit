@@ -532,7 +532,7 @@ end
 
 
 local function actor_onPostAttack(self, other, result, args)
-    if not args[2].value.proc or not args[2].value.parent then return end
+    if not args[2].value.proc or not Instance.exists(args[2].value.parent) then return end
     if callbacks["onPostAttack"] then
         for _, fn in ipairs(callbacks["onPostAttack"]) do
             fn(Instance.wrap(args[2].value.parent), args[2].value)    -- Actor, Damager attack_info
@@ -542,7 +542,7 @@ end
 
 
 local function actor_onPostAttackAll(self, other, result, args)
-    if not args[2].value.parent then return end
+    if not Instance.exists(args[2].value.parent) then return end
     if callbacks["onPostAttackAll"] then
         for _, fn in ipairs(callbacks["onPostAttackAll"]) do
             fn(Instance.wrap(args[2].value.parent), args[2].value)    -- Actor, Damager attack_info
