@@ -58,10 +58,10 @@ end
 -- ========== Hooks ==========
 
 -- Write "Modded" under version number at top-left corner
-gm.post_code_execute(function(self, other, code, result, flags)
-    if code.name:match("oStartMenu_Draw_0") then
-        gm.draw_set_alpha(0.5)
-        gm.draw_text(6, gm.camera_get_view_y(gm.camera_get_active()) + 20, "Modded")
-        gm.draw_set_alpha(1)
-    end
-end)
+-- gm.post_code_execute(function(self, other, code, result, flags)
+--     if code.name:match("oStartMenu_Draw_0") then
+--         gm.draw_set_alpha(0.5)
+--         gm.draw_text(6, gm.camera_get_view_y(gm.camera_get_active()) + 20, "Modded")
+--         gm.draw_set_alpha(1)
+--     end
+-- end)
