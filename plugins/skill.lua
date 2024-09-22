@@ -43,6 +43,14 @@ Skill.ARRAY = {
 }
 
 
+Skill.SLOT = {
+    primary     = 0,
+    secondary   = 1,
+    utility     = 2,
+    special     = 3
+}
+
+
 
 -- ========== Static Methods ==========
 
