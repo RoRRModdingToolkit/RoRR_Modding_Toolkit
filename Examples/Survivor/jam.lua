@@ -61,9 +61,9 @@ __initialize = function()
     
     -- Palette used for alt skins
     local sprPalette = Resources.sprite_load("RMT", "jam_palette", path.combine(PATH, "jam", "palette.png"))
-    local sprPaletteLoadout = Resources.sprite_load("RMT", "jam_paletteLoadout", path.combine(PATH, "jam", "paletteLoadout.png"))
-
-
+    local sprSelectPalette = Resources.sprite_load("RMT", "sSelectJammanPalette", path.combine(PATH, "jam", "sSelectJammanPalette.png"))
+    
+    
     -- Set the Name, Description and EndQuote of the survivor
     jam:set_text(
         "Jam Man",
@@ -75,14 +75,27 @@ __initialize = function()
     jam:set_primary_color(162, 62, 224)
     
     -- The character's sprite in the selection pod
-    jam.sprite_loadout = Resources.sprite_load("RMT", "jam_select", path.combine(PATH, "jam", "select.png"), 4, 28, 0)
-
+    jam.sprite_loadout = Resources.sprite_load("RMT", "sSelectJamman", path.combine(PATH, "jam", "sSelectJamman.png"), 4, 28, 0)
+    
+    -- The character's sprite portrait
+    jam.sprite_portrait = Resources.sprite_load("RMT", "sJammanPortrait", path.combine(PATH, "jam", "sJammanPortrait.png"), 3)
+    
+    -- The character's sprite small portrait
+    jam.sprite_portrait_small = Resources.sprite_load("RMT", "sJammanPortraitSmall", path.combine(PATH, "jam", "sJammanPortraitSmall.png"))
+    
     -- The character's sprite palettes (WIP)
-    jam:set_palettes(sprPalette, sprPaletteLoadout, sprPaletteLoadout)
-
+    jam:set_palettes(sprPalette, sprSelectPalette, sprSelectPalette)
+    
     -- Create alternative skin for the survivor
-    jam:add_skin("jammanpurple", 1)
-    jam:add_skin("jammanred", 2)
+    local jamman_loadout_PAL1 = Resources.sprite_load("RMT", "sSelectJamman_PAL1", path.combine(PATH, "jam", "sSelectJamman_PAL1.png"), 4, 28, 0)
+    local jamman_portrait_PAL1 = Resources.sprite_load("RMT", "sJammanPortrait_PAL1", path.combine(PATH, "jam", "sJammanPortrait_PAL1.png"), 3)
+    local jamman_portraitsmall_PAL1 = Resources.sprite_load("RMT", "sJammanPortraitSmall_PAL1", path.combine(PATH, "jam", "sJammanPortraitSmall_PAL1.png"))
+    jam:add_skin("jammanpurple", 1, jamman_loadout_PAL1, jamman_portrait_PAL1, jamman_portraitsmall_PAL1)
+    
+    local jamman_loadout_PAL2 = Resources.sprite_load("RMT", "sSelectJamman_PAL2", path.combine(PATH, "jam", "sSelectJamman_PAL2.png"), 4, 28, 0)
+    local jamman_portrait_PAL2 = Resources.sprite_load("RMT", "sJammanPortrait_PAL2", path.combine(PATH, "jam", "sJammanPortrait_PAL2.png"), 3)
+    local jamman_portraitsmall_PAL2 = Resources.sprite_load("RMT", "sJammanPortraitSmall_PAL2", path.combine(PATH, "jam", "sJammanPortraitSmall_PAL2.png"))
+    jam:add_skin("jammanred", 2, jamman_loadout_PAL2, jamman_portrait_PAL2, jamman_portraitsmall_PAL2)
     
     -- The character's walk animation on the title screen when selected
     jam.sprite_title = sprites.walk
@@ -148,7 +161,7 @@ __initialize = function()
 
     -- Called when the player tries to use its primary skill
     skill_stab:onActivate(function(actor, skill, index)
-        gm.actor_set_state(actor, state_stab.value)
+        gm.actor_set_state(actor.value, state_stab.value)
     end)
 
     -- Reset the sprite animation to frame 0
@@ -159,29 +172,31 @@ __initialize = function()
     
     -- Implement the actual mechanics of the skill
     state_stab:onStep(function(actor, data)
-        actor:skill_util_fix_hspeed()
+        local actorAc = actor.value
+
+        actorAc:skill_util_fix_hspeed()
         
-        actor:actor_animation_set(actor:actor_get_skill_animation(skill_stab.value), 0.25)
+        actorAc:actor_animation_set(actorAc:actor_get_skill_animation(skill_stab.value), 0.25)
         
-        if data.fired == 0 and actor.image_index >= 4.0 then
-            local damage = actor:skill_get_damage(skill_stab.value)
+        if data.fired == 0 and actorAc.image_index >= 4.0 then
+            local damage = actorAc:skill_get_damage(skill_stab.value)
             
-            if actor:is_authority() then
-                if not actor:skill_util_update_heaven_cracker(actor, damage) then
+            if actorAc:is_authority() then
+                if not actorAc:skill_util_update_heaven_cracker(actorAc, damage) then
                     local buff_shadow_clone = Buff.find("ror", "shadowClone")
-                    for i=0, gm.get_buff_stack(actor, buff_shadow_clone.value) do
-                        local attack = gm._mod_attack_fire_explosion(actor, actor.x + gm.cos(gm.degtorad(actor:skill_util_facing_direction())) * 25, actor.y, 40, 45, damage, -1, gm.constants.sSparks7)
+                    for i=0, gm.get_buff_stack(actorAc, buff_shadow_clone.value) do
+                        local attack = gm._mod_attack_fire_explosion(actorAc, actorAc.x + gm.cos(gm.degtorad(actorAc:skill_util_facing_direction())) * 25, actorAc.y, 40, 45, damage, -1, gm.constants.sSparks7)
                         attack.max_hit_number = 5
                         attack.attack_info.climb = i * 8
                     end
                 end
             end
 
-            actor:sound_play(gm.constants.wClayShoot1, 1, 0.8 + math.random() * 0.2)
+            actorAc:sound_play(gm.constants.wClayShoot1, 1, 0.8 + math.random() * 0.2)
             data.fired = 1
         end
 
-        actor:skill_util_exit_state_on_anim_end()
+        actorAc:skill_util_exit_state_on_anim_end()
     end)
 
 
@@ -197,7 +212,7 @@ __initialize = function()
 
     -- Called when the player tries to use its secondary skill
     skill_raspberry:onActivate(function(actor, skill, index)
-        gm.actor_set_state(actor, state_raspberry.value)
+        gm.actor_set_state(actor.value, state_raspberry.value)
     end)
 
     -- Reset the sprite animation to frame 0
@@ -208,27 +223,29 @@ __initialize = function()
     
     -- Implement the actual mechanics of the skill
     state_raspberry:onStep(function(actor, data)
-        actor:skill_util_fix_hspeed()
-        
-        actor:actor_animation_set(actor:actor_get_skill_animation(skill_raspberry.value), 0.25)
+        local actorAc = actor.value
 
-        if data.fired == 0 and actor.image_index >= 1.0 then
-            local damage = actor:skill_get_damage(skill_raspberry.value)
+        actorAc:skill_util_fix_hspeed()
+        
+        actorAc:actor_animation_set(actorAc:actor_get_skill_animation(skill_raspberry.value), 0.25)
+
+        if data.fired == 0 and actorAc.image_index >= 1.0 then
+            local damage = actorAc:skill_get_damage(skill_raspberry.value)
             
-            if actor:is_authority() then
+            if actorAc:is_authority() then
                 local buff_shadow_clone = Buff.find("ror", "shadowClone")
-                for i=0, gm.get_buff_stack(actor, buff_shadow_clone.value) do
-                    local attack = gm._mod_attack_fire_bullet(actor, actor.x, actor.y, 500, actor:skill_util_facing_direction(), damage, gm.constants.sSparks7, true, true)
+                for i=0, gm.get_buff_stack(actorAc, buff_shadow_clone.value) do
+                    local attack = gm._mod_attack_fire_bullet(actorAc, actorAc.x, actorAc.y, 500, actorAc:skill_util_facing_direction(), damage, gm.constants.sSparks7, true, true)
                     attack.jamdot = true
                     attack.attack_info.climb = i * 8
                 end
             end
 
-            actor:sound_play(gm.constants.wBullet2, 1, 0.9 + math.random() * 0.2)
+            actorAc:sound_play(gm.constants.wBullet2, 1, 0.9 + math.random() * 0.2)
             data.fired = 1
         end
 
-        actor:skill_util_exit_state_on_anim_end()
+        actorAc:skill_util_exit_state_on_anim_end()
     end)
 
     jam:add_instance_callback(function(obj_inst, hit_inst, hit_x, hit_y)
@@ -257,7 +274,7 @@ __initialize = function()
 
     -- Called when the player tries to use its secondary alt skill
     skill_spoiled:onActivate(function(actor, skill, index)
-        gm.actor_set_state(actor, state_spoiled.value)
+        gm.actor_set_state(actor.value, state_spoiled.value)
     end)
 
     -- Reset the sprite animation to frame 0
@@ -268,27 +285,29 @@ __initialize = function()
     
     -- Implement the actual mechanics of the skill
     state_spoiled:onStep(function(actor, data)
-        actor:skill_util_fix_hspeed()
-        
-        actor:actor_animation_set(actor:actor_get_skill_animation(skill_spoiled.value), 0.25)
+        local actorAc = actor.value
 
-        if data.fired == 0 and actor.image_index >= 1.0 then
-            local damage = actor:skill_get_damage(skill_spoiled.value)
+        actorAc:skill_util_fix_hspeed()
+        
+        actorAc:actor_animation_set(actorAc:actor_get_skill_animation(skill_spoiled.value), 0.25)
+
+        if data.fired == 0 and actorAc.image_index >= 1.0 then
+            local damage = actorAc:skill_get_damage(skill_spoiled.value)
             
-            if actor:is_authority() then
+            if actorAc:is_authority() then
                 local buff_shadow_clone = Buff.find("ror", "shadowClone")
-                for i=0, gm.get_buff_stack(actor, buff_shadow_clone.value) do
-                    local attack = gm._mod_attack_fire_bullet(actor, actor.x, actor.y, 500, actor:skill_util_facing_direction(), damage, gm.constants.sSparks7, true, true)
+                for i=0, gm.get_buff_stack(actorAc, buff_shadow_clone.value) do
+                    local attack = gm._mod_attack_fire_bullet(actorAc, actorAc.x, actorAc.y, 500, actorAc:skill_util_facing_direction(), damage, gm.constants.sSparks7, true, true)
                     attack.attack_info.attack_flags = 1 << 1
                     attack.attack_info.climb = i * 8
                 end
             end
 
-            actor:sound_play(gm.constants.wBullet2, 1, 0.9 + math.random() * 0.2)
+            actorAc:sound_play(gm.constants.wBullet2, 1, 0.9 + math.random() * 0.2)
             data.fired = 1
         end
 
-        actor:skill_util_exit_state_on_anim_end()
+        actorAc:skill_util_exit_state_on_anim_end()
     end)
 
 
@@ -304,7 +323,7 @@ __initialize = function()
 
     -- Called when the player tries to use its utility skill
     skill_roll:onActivate(function(actor, skill, index)
-        gm.actor_set_state(actor, state_roll.value)
+        gm.actor_set_state(actor.value, state_roll.value)
     end)
 
     -- Reset the sprite animation to frame 0
@@ -315,32 +334,34 @@ __initialize = function()
     
     -- Implement the actual mechanics of the skill
     state_roll:onStep(function(actor, data)
-        actor:skill_util_fix_hspeed()
-        
-        actor.sprite_index = actor:actor_get_skill_animation(skill_roll.value)
-        actor.image_speed = 0.25
+        local actorAc = actor.value
 
-        if data.dodged == 0 and actor.image_index >= 8.0 then
+        actorAc:skill_util_fix_hspeed()
+        
+        actorAc.sprite_index = actorAc:actor_get_skill_animation(skill_roll.value)
+        actorAc.image_speed = 0.25
+
+        if data.dodged == 0 and actorAc.image_index >= 8.0 then
             -- Ran on the last frame of the animation
 
             -- Reset the player's invincibility
-            if actor.invincible <= 5 then
-                actor.invincible = 0
+            if actorAc.invincible <= 5 then
+                actorAc.invincible = 0
             end
         else
             -- Ran all other frames of the animation
 			
 			-- Make the player invincible
 			-- Only set the invincibility when below a certain value to make sure we don't override other invincibility effects
-            if actor.invincible < 5 then 
-                actor.invincible = 5
+            if actorAc.invincible < 5 then 
+                actorAc.invincible = 5
             end
             
             -- Set the player's horizontal speed
-            actor.pHspeed = gm.cos(gm.degtorad(actor:skill_util_facing_direction())) * actor.pHmax * 2.2
+            actorAc.pHspeed = gm.cos(gm.degtorad(actorAc:skill_util_facing_direction())) * actorAc.pHmax * 2.2
         end
         
-        actor:skill_util_exit_state_on_anim_end()
+        actorAc:skill_util_exit_state_on_anim_end()
     end)
 
 
@@ -356,7 +377,7 @@ __initialize = function()
 
     -- Called when the player tries to use its special skill
     skill_spikes:onActivate(function(actor, skill, index)
-        gm.actor_set_state(actor, state_spikes.value)
+        gm.actor_set_state(actor.value, state_spikes.value)
     end)
 
     -- Reset the sprite animation to frame 0
@@ -367,32 +388,34 @@ __initialize = function()
     
     -- Implement the actual mechanics of the skill
     state_spikes:onStep(function(actor, data)
-        actor:skill_util_fix_hspeed()
-        
-        actor:actor_animation_set(actor:actor_get_skill_animation(skill_spikes.value), 0.25)
+        local actorAc = actor.value
 
-        if (data.spikes == 3 and actor.image_index >= 6.0) or (data.spikes == 2 and actor.image_index >= 10.0) or (data.spikes == 1 and (actor.image_index >= 14.0 or actor.image_index >= 13.9)) then
-            local damage = actor:skill_get_damage(skill_stab.value)
+        actorAc:skill_util_fix_hspeed()
+        
+        actorAc:actor_animation_set(actorAc:actor_get_skill_animation(skill_spikes.value), 0.25)
+
+        if (data.spikes == 3 and actorAc.image_index >= 6.0) or (data.spikes == 2 and actorAc.image_index >= 10.0) or (data.spikes == 1 and (actorAc.image_index >= 14.0 or actorAc.image_index >= 13.9)) then
+            local damage = actorAc:skill_get_damage(skill_stab.value)
             
-            if actor:is_authority() then
-                if not actor:skill_util_update_heaven_cracker(actor, damage) then
+            if actorAc:is_authority() then
+                if not actorAc:skill_util_update_heaven_cracker(actorAc, damage) then
                     local buff_shadow_clone = Buff.find("ror", "shadowClone")
-                    for i=0, gm.get_buff_stack(actor, buff_shadow_clone.value) do
+                    for i=0, gm.get_buff_stack(actorAc, buff_shadow_clone.value) do
                         -- Calculate the offset from the player
-                        local pos = ((actor.image_index - 2) / 4) * 48 + i * 12
+                        local pos = ((actorAc.image_index - 2) / 4) * 48 + i * 12
 
                         -- Create the spike
-                        local attack = gm._mod_attack_fire_explosion(actor, actor.x + gm.cos(gm.degtorad(actor:skill_util_facing_direction())) * pos, actor.y, 40, 80, damage, sprJamSpike, sprSparksSpike)
+                        local attack = gm._mod_attack_fire_explosion(actorAc, actorAc.x + gm.cos(gm.degtorad(actorAc:skill_util_facing_direction())) * pos, actorAc.y, 40, 80, damage, sprJamSpike, sprSparksSpike)
                         attack.attack_info.climb = i * 8
                     end
                 end
             end
 
-            actor:sound_play(gm.constants.wBoss1Shoot1, 1, 1.2 + math.random() * 0.3)          
+            actorAc:sound_play(gm.constants.wBoss1Shoot1, 1, 1.2 + math.random() * 0.3)          
             data.spikes = data.spikes - 1  
         end
         
-        actor:skill_util_exit_state_on_anim_end()
+        actorAc:skill_util_exit_state_on_anim_end()
     end)
 
 
@@ -408,7 +431,7 @@ __initialize = function()
 
     -- Called when the player tries to use its special upgrade skill
     skill_spikesScepter:onActivate(function(actor, skill, index)
-        gm.actor_set_state(actor, state_spikesScepter.value)
+        gm.actor_set_state(actor.value, state_spikesScepter.value)
     end)
 
     -- Reset the sprite animation to frame 0
@@ -419,23 +442,25 @@ __initialize = function()
     
     -- Implement the actual mechanics of the skill
     state_spikesScepter:onStep(function(actor, data)
-        actor:skill_util_fix_hspeed()
-        
-        actor:actor_animation_set(actor:actor_get_skill_animation(skill_spikesScepter.value), 0.25)
+        local actorAc = actor.value
 
-        if (data.spikes == 3 and actor.image_index >= 6.0) or (data.spikes == 2 and actor.image_index >= 10.0) or (data.spikes == 1 and (actor.image_index >= 14.0 or actor.image_index >= 13.9)) then
-            local damage = actor:skill_get_damage(skill_stab.value)
+        actorAc:skill_util_fix_hspeed()
+        
+        actorAc:actor_animation_set(actorAc:actor_get_skill_animation(skill_spikesScepter.value), 0.25)
+
+        if (data.spikes == 3 and actorAc.image_index >= 6.0) or (data.spikes == 2 and actorAc.image_index >= 10.0) or (data.spikes == 1 and (actorAc.image_index >= 14.0 or actorAc.image_index >= 13.9)) then
+            local damage = actorAc:skill_get_damage(skill_stab.value)
             
-            if actor:is_authority() then
-                if not actor:skill_util_update_heaven_cracker(actor, damage) then
+            if actorAc:is_authority() then
+                if not actorAc:skill_util_update_heaven_cracker(actorAc, damage) then
                     local buff_shadow_clone = Buff.find("ror", "shadowClone")
-                    for i=0, gm.get_buff_stack(actor, buff_shadow_clone.value) do
+                    for i=0, gm.get_buff_stack(actorAc, buff_shadow_clone.value) do
                         -- Calculate the offset from the player
-                        local pos = ((actor.image_index - 2) / 4) * 48 + i * 12
+                        local pos = ((actorAc.image_index - 2) / 4) * 48 + i * 12
 
                         -- Create the spike
-                        local attack1 = gm._mod_attack_fire_explosion(actor, actor.x + gm.cos(gm.degtorad(actor:skill_util_facing_direction())) * pos, actor.y, 40, 80, damage, sprJamSpike, sprSparksSpike)
-                        local attack2 = gm._mod_attack_fire_explosion(actor, actor.x - gm.cos(gm.degtorad(actor:skill_util_facing_direction())) * pos, actor.y, 40, 80, damage, sprJamSpike, sprSparksSpike)
+                        local attack1 = gm._mod_attack_fire_explosion(actorAc, actorAc.x + gm.cos(gm.degtorad(actorAc:skill_util_facing_direction())) * pos, actorAc.y, 40, 80, damage, sprJamSpike, sprSparksSpike)
+                        local attack2 = gm._mod_attack_fire_explosion(actorAc, actorAc.x - gm.cos(gm.degtorad(actorAc:skill_util_facing_direction())) * pos, actorAc.y, 40, 80, damage, sprJamSpike, sprSparksSpike)
                         attack1.attack_info.climb = i * 8
                         attack2.attack_info.climb = i * 8
                     end
@@ -443,11 +468,11 @@ __initialize = function()
             end
 
             -- Layer sound effects when scepter is active
-            actor:sound_play(gm.constants.wGuardDeath, 0.6, 1.2 + math.random() * 0.3)            
-            actor:sound_play(gm.constants.wBoss1Shoot1, 1, 1.2 + math.random() * 0.3)  
+            actorAc:sound_play(gm.constants.wGuardDeath, 0.6, 1.2 + math.random() * 0.3)            
+            actorAc:sound_play(gm.constants.wBoss1Shoot1, 1, 1.2 + math.random() * 0.3)  
             data.spikes = data.spikes - 1          
         end
         
-        actor:skill_util_exit_state_on_anim_end()
+        actorAc:skill_util_exit_state_on_anim_end()
     end)
 end

@@ -18,13 +18,7 @@ if hot_reloading then
 end
 hot_reloading = true
 
-local function devconsole(self, other, result, args)
-    gm.instance_create_depth(0, 0, -100000001, 776)
-end
-
 __initialize = function()
-
-    devconsole()
     
     -- Create a new skill       (namespace, identifier, cooldown, damage, sprite_id, sprite_subimage, animation, is_primary, is_utility)
     local new_skill = Skill.new("RMT", "skilltest", 4, 5.0, gm.constants.sCommandoSkills, 0, gm.constants.sRobomandoShoot1, true, false)
@@ -43,7 +37,7 @@ __initialize = function()
 
     -- When skill is activated change actor state
     new_skill:onActivate(function(actor, skill, index)
-        gm.actor_set_state(actor, new_state.value)
+        gm.actor_set_state(actor.value, new_state.value)
     end)
 
     -- When entering the state set the animation to the first frame
@@ -55,29 +49,30 @@ __initialize = function()
     
     -- During the skill animation, fix speed, set animation, and code the behaviour of the skill
     new_state:onStep(function(actor, data)
-        actor:skill_util_fix_hspeed()
+        local actorAc = actor.value
+        actorAc:skill_util_fix_hspeed()
         
-        actor:actor_animation_set(actor:actor_get_skill_animation(new_skill.value), 0.25)
+        actorAc:actor_animation_set(actorAc:actor_get_skill_animation(new_skill.value), 0.25)
 
         if data.fired == 0 then
-            local damage = actor:skill_get_damage(new_skill.value)
+            local damage = actorAc:skill_get_damage(new_skill.value)
             
-            if actor:is_authority() then
-                if not actor:skill_util_update_heaven_cracker(actor, damage) then
+            if actorAc:is_authority() then
+                if not actorAc:skill_util_update_heaven_cracker(actorAc, damage) then
                     local buff_shadow_clone = Buff.find("ror", "shadowClone")
-                    for i=0, gm.get_buff_stack(actor, buff_shadow_clone.value) do
+                    for i=0, gm.get_buff_stack(actorAc, buff_shadow_clone.value) do
                         -- (??, x, y, damage_team??, damage, range, spark_sprite, facing_dir, is_crit??, can_proc??, can_pierce??)
-                        local attack = actor:fire_bullet(0, actor.x, actor.y, 0, damage, 1400, gm.constants.sSparks1, actor:skill_util_facing_direction(), 1, 1, -1)
+                        local attack = actorAc:fire_bullet(0, actorAc.x, actorAc.y, 0, damage, 1400, gm.constants.sSparks1, actorAc:skill_util_facing_direction(), 1, 1, -1)
                         attack.climb = i * 8
                         attack.tracer_kind = 16 -- TODO add a better way to use attack_tracer_kind
                     end
                 end
             end
 
-            actor:sound_play(gm.constants.wBullet1, 1, gm.random_range(0.85, 1))
+            actorAc:sound_play(gm.constants.wBullet1, 1, gm.random_range(0.85, 1))
             data.fired = 1
         end
 
-        actor:skill_util_exit_state_on_anim_end()
+        actorAc:skill_util_exit_state_on_anim_end()
     end)
 end
