@@ -89,15 +89,18 @@ Instance.find = function(...)
                 gm.constants.oCustomObject_pNPC,
                 gm.constants.oCustomObject_pDrone
             }
+            local _exit = false
             for _, custom in ipairs(customs) do
                 local count = Instance.count(custom)
                 for i = 0, count - 1 do
                     local ins = gm.instance_find(custom, i)
                     if ins.__object_index == obj then
                         inst = ins
+                        _exit = true
                         break
                     end
                 end
+                if _exit then break end
             end
         end
 
