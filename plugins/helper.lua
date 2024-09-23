@@ -156,7 +156,8 @@ end
 
 Helper.table_to_string = function(table_)
     local str = ""
-    for i, v in ipairs(table_) do
+    for i = 1, #table_ do
+        local v = table_[i]
         if type(v) == "table" then str = str.."[[||"..Helper.table_to_string(v).."||]]||"
         else str = str..tostring(v).."||"
         end
