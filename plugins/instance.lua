@@ -73,12 +73,30 @@ Instance.find = function(...)
 
         local inst = gm.instance_find(obj, 0)
         if obj >= 800.0 then
-            local count = Instance.count(gm.constants.oCustomObject)
-            for i = 0, count - 1 do
-                local ins = gm.instance_find(gm.constants.oCustomObject, i)
-                if ins.__object_index == obj then
-                    inst = ins
-                    break
+            local customs = {
+                gm.constants.oCustomObject,
+                gm.constants.oCustomObject_pPickupItem,
+                gm.constants.oCustomObject_pPickupEquipment,
+                gm.constants.oCustomObject_pEnemyClassic,
+                gm.constants.oCustomObject_pEnemyFlying,
+                gm.constants.oCustomObject_pBossClassic,
+                gm.constants.oCustomObject_pBoss,
+                gm.constants.oCustomObject_pInteractable,
+                gm.constants.oCustomObject_pInteractableChest,
+                gm.constants.oCustomObject_pInteractableDrone,
+                gm.constants.oCustomObject_pInteractableCrate,
+                gm.constants.oCustomObject_pMapObjects,
+                gm.constants.oCustomObject_pNPC,
+                gm.constants.oCustomObject_pDrone
+            }
+            for _, custom in ipairs(customs) do
+                local count = Instance.count(custom)
+                for i = 0, count - 1 do
+                    local ins = gm.instance_find(custom, i)
+                    if ins.__object_index == obj then
+                        inst = ins
+                        break
+                    end
                 end
             end
         end
