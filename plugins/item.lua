@@ -70,7 +70,10 @@ Item.TYPE = {
 -- ========== Static Methods ==========
 
 Item.new = function(namespace, identifier, no_log)
-    if Item.find(namespace, identifier) then return nil end
+    if Item.find(namespace, identifier) then
+        log.error("Item already exists", 2)
+        return nil
+    end
 
     -- Create item
     local item = gm.item_create(
