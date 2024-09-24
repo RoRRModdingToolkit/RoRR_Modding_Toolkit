@@ -1,9 +1,9 @@
 -- Callback
--- Original system written by SmoothSpatula
 
 Callback = {}
 
 local callbacks = {}
+local pre_callbacks = {}
 
 
 
@@ -17,8 +17,23 @@ Callback.TYPE = {}
 
 Callback.add = function(callback, id, func, replace)
     local callback_id = Callback.TYPE[callback]
+    if not callback_id then
+        log.error("Invalid callback name", 2)
+        return
+    end
     if not callbacks[callback_id] then callbacks[callback_id] = {} end
     if replace or not callbacks[callback_id][id] then callbacks[callback_id][id] = func end
+end
+
+
+Callback.add_pre = function(callback, id, func, replace)
+    local callback_id = Callback.TYPE[callback]
+    if not callback_id then
+        log.error("Invalid callback name", 2)
+        return
+    end
+    if not pre_callbacks[callback_id] then pre_callbacks[callback_id] = {} end
+    if replace or not pre_callbacks[callback_id][id] then pre_callbacks[callback_id][id] = func end
 end
 
 
@@ -29,6 +44,11 @@ Callback.get_callback_count = function()
     local count = 0
     for k, v in pairs(callbacks) do
         for _, c in pairs(callbacks) do
+            count = count + 1
+        end
+    end
+    for k, v in pairs(pre_callbacks) do
+        for _, c in pairs(pre_callbacks) do
             count = count + 1
         end
     end
@@ -48,13 +68,23 @@ gm.post_script_hook(gm.constants.callback_execute, function(self, other, result,
 end)
 
 
+gm.pre_script_hook(gm.constants.callback_execute, function(self, other, result, args)
+    if pre_callbacks[args[1].value] then
+        for _, fn in pairs(pre_callbacks[args[1].value]) do
+            fn(self, other, result, args)
+        end
+    end
+end)
+
+
 
 -- ========== Initialize ==========
 
 Callback.__initialize = function()
     -- Populate Callback.TYPE
     local callback_names = gm.variable_global_get("callback_names")
-    for i = 1, #callback_names do
-        Callback.TYPE[callback_names[i]] = i - 1
+    local size = gm.array_length(callback_names)
+    for i = 0, size - 1 do
+        Callback.TYPE[gm.array_get(callback_names, i)] = i
     end
 end

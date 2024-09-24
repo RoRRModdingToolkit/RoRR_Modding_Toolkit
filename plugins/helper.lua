@@ -11,7 +11,7 @@ Helper.log_toolkit_stats = function()
     log.info("----------")
 
     log.info("Callback callbacks: "..Callback.get_callback_count())
-    log.info("Actor callbacks: "..Actor.get_callback_count())
+    -- log.info("Actor callbacks: "..Actor.get_callback_count())
     log.info("Buff callbacks: "..Buff.get_callback_count())
     log.info("Item callbacks: "..Item.get_callback_count())
 
@@ -99,6 +99,14 @@ Helper.log_hook = function(self, other, result, args)
 end
 
 
+Helper.log_struct = function(struct)
+    local names = gm.struct_get_names(struct)
+    for _, name in ipairs(names) do
+        log.info(name.." = "..tostring(gm.variable_struct_get(struct, name)))
+    end
+end
+
+
 Helper.chance = function(n)
     return gm.random_range(0, 1) <= n
 end
@@ -122,6 +130,16 @@ Helper.table_has = function(table_, value)
 end
 
 
+Helper.table_remove = function(table_, value)
+    for i, v in pairs(table_) do
+        if v == value then
+            table.remove(table_, i)
+            return
+        end
+    end
+end
+
+
 Helper.table_merge = function(...)
     local new = {}
     for _, t in ipairs{...} do
@@ -138,7 +156,8 @@ end
 
 Helper.table_to_string = function(table_)
     local str = ""
-    for i, v in ipairs(table_) do
+    for i = 1, #table_ do
+        local v = table_[i]
         if type(v) == "table" then str = str.."[[||"..Helper.table_to_string(v).."||]]||"
         else str = str..tostring(v).."||"
         end

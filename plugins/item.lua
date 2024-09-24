@@ -1,7 +1,8 @@
 -- Item
--- Original custom items mod written by GrooveSalad
 
 Item = {}
+
+local abstraction_data = setmetatable({}, {__mode = "k"})
 
 local callbacks = {}
 local has_custom_item = {}
@@ -12,6 +13,26 @@ local loot_toggled = {}     -- Loot pools that have been added to this frame
 
 
 -- ========== Enums ==========
+
+Item.ARRAY = {
+    namespace       = 0,
+    identifier      = 1,
+    token_name      = 2,
+    token_text      = 3,
+    on_acquired     = 4,
+    on_removed      = 5,
+    tier            = 6,
+    sprite_id       = 7,
+    object_id       = 8,
+    item_log_id     = 9,
+    achievement_id  = 10,
+    is_hidden       = 11,
+    effect_display  = 12,
+    actor_component = 13,
+    loot_tags       = 14,
+    is_new_item     = 15
+}
+
 
 Item.TIER = {
     common      = 0,
@@ -26,15 +47,15 @@ Item.TIER = {
 
 
 Item.LOOT_TAG = {
-    category_damage                 = 1,
-    category_healing                = 2,
-    category_utility                = 4,
-    equipment_blacklist_enigma      = 8,
-    equipment_blacklist_chaos       = 16,
-    equipment_blacklist_activator   = 32,
-    item_blacklist_engi_turrets     = 64,
-    item_blacklist_vendor           = 128,
-    item_blacklist_infuser          = 256
+    category_damage                 = 1 << 0,
+    category_healing                = 1 << 1,
+    category_utility                = 1 << 2,
+    equipment_blacklist_enigma      = 1 << 3,
+    equipment_blacklist_chaos       = 1 << 4,
+    equipment_blacklist_activator   = 1 << 5,
+    item_blacklist_engi_turrets     = 1 << 6,
+    item_blacklist_vendor           = 1 << 7,
+    item_blacklist_infuser          = 1 << 8
 }
 
 
@@ -46,142 +67,13 @@ Item.TYPE = {
 
 
 
--- ========== General Functions ==========
+-- ========== Static Methods ==========
 
-Item.find = function(namespace, identifier)
-    if not identifier then return gm.item_find(namespace) end
-    return gm.item_find(namespace.."-"..identifier)
-end
-
-
-Item.find_all = function(...)
-    local tiers = {...}
-    local items = {}
-
-    local size = gm.array_length(Class.ITEM)
-    for i = 0, size - 1 do
-        for _, tier in ipairs(tiers) do
-            local item = gm.array_get(Class.ITEM, i)
-            if gm.array_get(item, 6) == tier then
-                table.insert(items, i)
-                break
-            end
-        end
+Item.new = function(namespace, identifier, no_log)
+    if Item.find(namespace, identifier) then
+        log.error("Item already exists", 2)
+        return nil
     end
-
-    return items
-end
-
-
-Item.get_data = function(item)
-    local item_arr = gm.array_get(Class.ITEM, item)
-    return {
-        namespace       = gm.array_get(item_arr, 0),
-        identifier      = gm.array_get(item_arr, 1),
-        token_name      = gm.array_get(item_arr, 2),
-        token_text      = gm.array_get(item_arr, 3),
-        on_acquired     = gm.array_get(item_arr, 4),
-        on_removed      = gm.array_get(item_arr, 5),
-        tier            = gm.array_get(item_arr, 6),
-        sprite_id       = gm.array_get(item_arr, 7),
-        object_id       = gm.array_get(item_arr, 8),
-        item_log_id     = gm.array_get(item_arr, 9),
-        achievement_id  = gm.array_get(item_arr, 10),
-        is_hidden       = gm.array_get(item_arr, 11),
-        effect_display  = gm.array_get(item_arr, 12),
-        actor_component = gm.array_get(item_arr, 13),
-        loot_tags       = gm.array_get(item_arr, 14),
-        is_new_item     = gm.array_get(item_arr, 15)
-    }
-end
-
-
-Item.get_random = function(...)
-    local items = Item.find_all(...)
-    return items[gm.irandom_range(1, #items)]
-end
-
-
-Item.get_stack_count = function(actor, item, type_)
-    if not Instance.exists(actor) then return 0 end
-    if not gm.object_is_ancestor(actor.object_index, gm.constants.pActor) then return 0 end
-
-    if type_ == Item.TYPE.real then return gm.item_count(actor, item, false) end
-    if type_ == Item.TYPE.temporary then return gm.item_count(actor, item, true) end
-    return gm.item_count(actor, item, false) + gm.item_count(actor, item, true)
-end
-
-
-Item.spawn_drop = function(item, x, y, target)
-    local obj = Item.get_data(item).object_id
-    if obj then gm.item_drop_object(obj, x, y, target, false) end
-
-    -- Look for drop (because gm.item_drop_object does not actually return the instance for some reason)
-    -- The drop spawns 40 px above y parameter
-    local drop = nil
-    local drops = Instance.find_all(gm.constants.pPickupItem, gm.constants.oCustomObject_pPickupItem)
-    for _, d in ipairs(drops) do
-        if math.abs(d.x - x) <= 1.0 and math.abs(d.y - (y - 40.0)) <= 1.0 then
-            drop = d
-            d.y = d.y + 40.0
-            d.ystart = d.y
-            break
-        end
-    end
-
-    return drop
-end
-
-
-Item.toggle_loot = function(item, enabled)
-    if enabled == nil then return end
-
-    local loot_pools = gm.variable_global_get("treasure_loot_pools")
-
-    local item_array = gm.array_get(Class.ITEM, item)
-    local obj = gm.array_get(item_array, 8)
-    
-    if enabled then
-        if disabled_loot[item] then
-            -- Add back to loot pools
-            for _, pool_id in ipairs(disabled_loot[item]) do
-                gm.ds_list_add(gm.array_get(loot_pools, pool_id).drop_pool, obj)
-                if not Helper.table_has(loot_toggled, pool_id) then
-                    table.insert(loot_toggled, pool_id)
-                end
-            end
-
-            disabled_loot[item] = nil
-        end
-
-    else
-        if not disabled_loot[item] then
-            -- Remove from loot pools
-            -- and store the pool indexes
-            local pools = {}
-
-            local size = gm.array_length(loot_pools)
-            for i = 0, size - 1 do
-                local drops = gm.array_get(loot_pools, i).drop_pool
-                local pos = gm.ds_list_find_index(drops, obj)
-                if pos >= 0 then
-                    gm.ds_list_delete(drops, pos)
-                    table.insert(pools, i)
-                end
-            end
-
-            disabled_loot[item] = pools
-        end
-
-    end
-end
-
-
-
--- ========== Custom Item Functions ==========
-
-Item.create = function(namespace, identifier, no_log)
-    if Item.find(namespace, identifier) then return nil end
 
     -- Create item
     local item = gm.item_create(
@@ -193,295 +85,712 @@ Item.create = function(namespace, identifier, no_log)
         0
     )
 
+    -- Make item abstraction
+    local abstraction = Item.wrap(item)
+
+    -- Create item log
     if not no_log then
-        -- Create item log
-        local item_array = gm.array_get(Class.ITEM, item)
         local log = gm.item_log_create(
             namespace,
             identifier,
             nil,
             nil,
-            gm.array_get(item_array, 8)
+            abstraction.object_id
         )
 
-        -- Set item log ID into item array
-        gm.array_set(item_array, 9, log)
+        abstraction.item_log_id = log
     end
 
     -- Add onPickup callback to add actor to has_custom_item table
-    Item.add_callback(item, "onPickup", function(actor, stack)
-        if not Helper.table_has(has_custom_item, actor) then
-            table.insert(has_custom_item, actor)
+    abstraction:add_callback("onPickup", function(actor, stack)
+        if not Helper.table_has(has_custom_item, actor.value) then
+            table.insert(has_custom_item, actor.value)
         end
     end)
 
-    return item
+    return abstraction
 end
 
 
-Item.set_sprite = function(item, sprite)
-    -- Set class_item sprite
-    local array = gm.array_get(Class.ITEM, item)
-    gm.array_set(array, 7, sprite)
+Item.find = function(namespace, identifier)
+    if identifier then namespace = namespace.."-"..identifier end
+    local item = gm.item_find(namespace)
 
-    -- Set item object sprite
-    local obj = gm.array_get(array, 8)
-    gm.object_set_sprite_w(obj, sprite)
-
-    -- Set item log sprite
-    if array[10] then
-        local log_array = gm.array_get(Class.ITEM_LOG, gm.array_get(array, 9))
-        gm.array_set(log_array, 9, sprite)
+    if item then
+        return Item.wrap(item)
     end
+
+    return nil
 end
 
 
-Item.set_tier = function(item, tier)
-    -- Set class_item tier
-    local array = gm.array_get(Class.ITEM, item)
-    gm.array_set(array, 6, tier)
+Item.find_all = function(filter)
+    local items = {}
 
-    local obj = gm.array_get(array, 8)
-    local pools = gm.variable_global_get("treasure_loot_pools")
+    local ind = 1   -- namespace
+    if type(filter) == "number" then ind = 7 end    -- tier
 
-
-    -- Remove from all loot pools (if found)
-    local size = gm.array_length(pools)
-    for i = 0, size - 1 do
-        local drops = gm.array_get(pools, i).drop_pool
-        local pos = gm.ds_list_find_index(drops, obj)
-        if pos >= 0 then gm.ds_list_delete(drops, pos) end
-    end
-
-    -- Add to new loot pool
-    local pool = pools[tier + 1]
-    local drops = pool.drop_pool
-    gm.ds_list_add(drops, obj)
-
-
-    -- Remove previous item log position (if found)
-    local item_log_order = gm.variable_global_get("item_log_display_list")
-    local pos = gm.ds_list_find_index(item_log_order, array[10])
-    if pos >= 0 then gm.ds_list_delete(item_log_order, pos) end
-
-    -- Set item log position
-    local pos = 0
-    for i = 0, gm.ds_list_size(item_log_order) - 1 do
-        local log_id = gm.ds_list_find_value(item_log_order, i)
-        local log_ = gm.array_get(Class.ITEM_LOG, log_id)
-        local item_id = Item.find(log_[1], log_[2])
-        
-        local tier_ = Item.TIER.equipment
-        if item_id then
-            local iter_item = gm.array_get(Class.ITEM, item_id)
-            tier_ = gm.array_get(iter_item, 6)
-        end
-        if tier_ > tier then
-            pos = i
-            break
+    for i, item in ipairs(Class.ITEM) do
+        if item[ind] == filter then
+            table.insert(items, Item.wrap(i - 1))
         end
     end
-    gm.ds_list_insert(item_log_order, pos, array[10])
+
+    return items, #items > 0
 end
 
 
-Item.set_loot_tags = function(item, ...)
-    local tags = 0
-    for _, t in ipairs{...} do tags = tags + t end
-
-    local array = gm.array_get(Class.ITEM, item)
-    gm.array_set(array, 14, tags)
-end
-
-
-Item.add_achievement = function(item, progress_req, single_run)
-    local array = gm.array_get(Class.ITEM, item)
-
-    local namespace = gm.array_get(array, 0)
-    local identifier = gm.array_get(array, 1)
-
-    local ach = gm.achievement_create(namespace, identifier)
-    gm.achievement_set_unlock_item(ach, item)
-    gm.achievement_set_requirement(ach, progress_req or 1)
-
-    if single_run then
-        local ach_array = gm.array_get(Class.ACHIEVEMENT, ach)
-        gm.array_set(ach_array, 21, single_run)
+Item.get_random = function(...)
+    local tiers = {}
+    if ... then
+        tiers = {...}
+        if type(tiers[1]) == "table" then tiers = tiers[1] end
     end
+
+    local items = {}
+
+    -- Add valid items to table
+    for i, _ in ipairs(Class.ITEM) do
+        local item = Item.wrap(i - 1)
+        if (#tiers <= 0 and item.tier < Item.TIER.notier and item.identifier ~= "dummyItem") or Helper.table_has(tiers, item.tier) then
+            table.insert(items, item)
+        end
+    end
+
+    -- Pick random item from table
+    return items[gm.irandom_range(1, #items)]
 end
 
 
-Item.progress_achievement = function(item, amount)
-    local array = gm.array_get(Class.ITEM, item)
-    local ach_id = gm.array_get(array, 10)
+Item.spawn_crate = function(x, y, tier, items)
+    local inst = Object.find("ror-generated_CommandCrate_"..tier):create(x, y)
 
-    if gm.achievement_is_unlocked(ach_id) then return end
-    gm.achievement_add_progress(ach_id, amount or 1)
+    -- Replace default items with custom set
+    if items then
+        local arr = Array.new()
+        for _, item in ipairs(items) do
+            if type(item) ~= "table" then item = Item.wrap(item) end
+            arr:push(item.object_id)
+        end
+        inst.contents = arr
+    end
+
+    return inst
 end
 
 
-Item.add_callback = function(item, callback, func)
-    local array = gm.array_get(Class.ITEM, item)
+Item.wrap = function(item_id)
+    local abstraction = {}
+    abstraction_data[abstraction] = {
+        RMT_object = "Item",
+        value = item_id
+    }
+    setmetatable(abstraction, metatable_item)
+    return abstraction
+end
 
-    if callback == "onPickup" then
-        local callback_id = gm.array_get(array, 4)
-        if not callbacks[callback_id] then callbacks[callback_id] = {} end
-        table.insert(callbacks[callback_id], func)
 
-    elseif callback == "onRemove" then
-        local callback_id = gm.array_get(array, 5)
-        if not callbacks[callback_id] then callbacks[callback_id] = {} end
-        table.insert(callbacks[callback_id], func)
+Item.get_callback_count = function()
+    local count = 0
+    for k, v in pairs(callbacks) do
+        count = count + #v
+    end
+    return count
+end
 
-    elseif callback == "onBasicUse"
-        or callback == "onAttack"
-        or callback == "onPostAttack"
-        or callback == "onHit"
-        or callback == "onKill"
-        or callback == "onDamaged"
-        or callback == "onDamageBlocked"
-        or callback == "onHeal"
-        or callback == "onShieldBreak"
-        or callback == "onInteract"
-        or callback == "onEquipmentUse"
-        or callback == "onStep"
-        or callback == "onDraw"
-        then
+
+
+-- ========== Instance Methods ==========
+
+methods_item = {
+
+    create = function(self, x, y, target)
+        if not self.object_id then return nil end
+
+        gm.item_drop_object(self.object_id, x, y, Wrap.unwrap(target), false)
+
+        -- Look for drop (because gm.item_drop_object does not actually return the instance for some reason)
+        -- The drop spawns 40 px above y parameter
+        local drop = nil
+        local drops = Instance.find_all(gm.constants.pPickupItem, gm.constants.oCustomObject_pPickupItem)
+        for _, d in ipairs(drops) do
+            if math.abs(d.x - x) <= 1.0 and math.abs(d.y - (y - 40.0)) <= 1.0 then
+                drop = d
+                d.y = d.y + 40.0
+                d.ystart = d.y
+                break
+            end
+        end
+
+        return drop
+    end,
+    
+
+    add_callback = function(self, callback, func, all_damage)
+        if all_damage then callback = callback.."All" end
+
+        local other_callbacks = {
+            "onStatRecalc",
+            "onPostStatRecalc",
+            "onBasicUse",
+            "onAttack",
+            "onAttackAll",
+            "onPostAttack",
+            "onPostAttackAll",
+            "onHit",
+            "onHitAll",
+            "onKill",
+            "onDamaged",
+            "onDamageBlocked",
+            "onHeal",
+            "onShieldBreak",
+            "onInteract",
+            "onEquipmentUse",
+            "onNewStage",
+            "onStep",
+            "onDraw"
+        }
+
+        if callback == "onPickup" then
+            local callback_id = self.on_acquired
+            if not callbacks[callback_id] then callbacks[callback_id] = {} end
+            table.insert(callbacks[callback_id], func)
+    
+        elseif callback == "onRemove" then
+            local callback_id = self.on_removed
+            if not callbacks[callback_id] then callbacks[callback_id] = {} end
+            table.insert(callbacks[callback_id], func)
+
+        elseif Helper.table_has(other_callbacks, callback) then
             if not callbacks[callback] then callbacks[callback] = {} end
-            table.insert(callbacks[callback], {item, func})
+            table.insert(callbacks[callback], {self.value, func})
 
+        else log.error("Invalid callback name", 2)
+
+        end
+    end,
+
+
+    set_sprite = function(self, sprite)
+        -- Set class_item sprite
+        self.sprite_id = sprite
+
+        -- Set item object sprite
+        gm.object_set_sprite_w(self.object_id, sprite)
+
+        -- Set item log sprite
+        if self.item_log_id then
+            local log_array = Class.ITEM_LOG:get(self.item_log_id)
+            log_array:set(9, sprite)
+        end
+    end,
+
+
+    set_tier = function(self, tier)
+        self.tier = tier
+
+
+        -- Remove from all loot pools that the item is in
+        local pools = Array.wrap(gm.variable_global_get("treasure_loot_pools"))
+        for _, drop in ipairs(pools) do
+            local drop_pool = List.wrap(drop.drop_pool)
+            local pos = drop_pool:find(self.object_id)
+            if pos then drop_pool:delete(pos) end
+        end
+
+        -- Add to new loot pool
+        local pool = List.wrap(pools:get(tier).drop_pool)
+        pool:add(self.object_id)
+        
+
+        -- Remove previous item log position (if found)
+        local item_log_order = List.wrap(gm.variable_global_get("item_log_display_list"))
+        local pos = item_log_order:find(self.item_log_id)
+        if pos then item_log_order:delete(pos) end
+
+        -- Set new item log position
+        local pos = 0
+        for i, log_id in ipairs(item_log_order) do
+            local log_ = Class.ITEM_LOG:get(log_id)
+            local iter_item = Item.find(log_:get(0), log_:get(1))
+            
+            local tier_ = Item.TIER.equipment
+            if iter_item then tier_ = iter_item.tier end
+            if tier_ > tier then
+                pos = i
+                break
+            end
+        end
+        item_log_order:insert(pos - 1, self.item_log_id)
+    end,
+
+
+    set_loot_tags = function(self, ...)
+        local tags = 0
+        for _, t in ipairs{...} do tags = tags + t end
+
+        self.loot_tags = tags
+    end,
+
+
+    is_unlocked = function(self)
+        return (not self.achievement_id) or gm.achievement_is_unlocked(self.achievement_id)
+    end,
+
+
+    add_achievement = function(self, progress_req, single_run)
+        local ach = gm.achievement_create(self.namespace, self.identifier)
+        gm.achievement_set_unlock_item(ach, self.value)
+        gm.achievement_set_requirement(ach, progress_req or 1)
+    
+        if single_run then
+            local ach_array = Class.ACHIEVEMENT:get(ach)
+            ach_array:set(21, single_run)
+        end
+    end,
+
+
+    progress_achievement = function(self, amount)
+        if self:is_unlocked() then return end
+        gm.achievement_add_progress(self.achievement_id, amount or 1)
+    end,
+
+
+    toggle_loot = function(self, enabled)
+        if enabled == nil then return end
+
+        local loot_pools = Array.wrap(gm.variable_global_get("treasure_loot_pools"))
+        local item_array = Class.ITEM:get(self.value)
+        local obj = item_array:get(8)
+        
+        if enabled then
+            if disabled_loot[self.value] then
+                -- Add back to loot pools
+                for _, pool_id in ipairs(disabled_loot[self.value]) do
+                    local drop_pool = List.wrap(loot_pools:get(pool_id).drop_pool)
+                    drop_pool:add(obj)
+
+                    if not Helper.table_has(loot_toggled, pool_id) then
+                        table.insert(loot_toggled, pool_id)
+                    end
+                end
+
+                disabled_loot[self.value] = nil
+            end
+
+        else
+            if not disabled_loot[self.value] then
+                -- Remove from loot pools
+                -- and store the pool indexes
+                local pools = {}
+                
+                for i = 0, #loot_pools - 1 do
+                    local drop_pool = List.wrap(loot_pools:get(i).drop_pool)
+                    local pos = drop_pool:find(obj)
+                    if pos then
+                        drop_pool:delete(pos)
+                        table.insert(pools, i)
+                    end
+                end
+
+                disabled_loot[self.value] = pools
+            end
+
+        end
+    end
+
+}
+
+
+methods_item_callbacks = {
+
+    onPickup            = function(self, func) self:add_callback("onPickup", func) end,
+    onRemove            = function(self, func) self:add_callback("onRemove", func) end,
+    onStatRecalc        = function(self, func) self:add_callback("onStatRecalc", func) end,
+    onPostStatRecalc    = function(self, func) self:add_callback("onPostStatRecalc", func) end,
+    onBasicUse          = function(self, func) self:add_callback("onBasicUse", func) end,
+    onAttack            = function(self, func, all_damage) self:add_callback("onAttack", func, all_damage) end,
+    onPostAttack        = function(self, func, all_damage) self:add_callback("onPostAttack", func, all_damage) end,
+    onHit               = function(self, func, all_damage) self:add_callback("onHit", func, all_damage) end,
+    onKill              = function(self, func) self:add_callback("onKill", func) end,
+    onDamaged           = function(self, func) self:add_callback("onDamaged", func) end,
+    onDamageBlocked     = function(self, func) self:add_callback("onDamageBlocked", func) end,
+    onHeal              = function(self, func) self:add_callback("onHeal", func) end,
+    onShieldBreak       = function(self, func) self:add_callback("onShieldBreak", func) end,
+    onInteract          = function(self, func) self:add_callback("onInteract", func) end,
+    onEquipmentUse      = function(self, func) self:add_callback("onEquipmentUse", func) end,
+    onNewStage          = function(self, func) self:add_callback("onNewStage", func) end,
+    onStep              = function(self, func) self:add_callback("onStep", func) end,
+    onDraw              = function(self, func) self:add_callback("onDraw", func) end
+
+}
+
+
+
+-- ========== Metatables ==========
+
+metatable_item_gs = {
+    -- Getter
+    __index = function(table, key)
+        local index = Item.ARRAY[key]
+        if index then
+            local item_array = Class.ITEM:get(table.value)
+            return item_array:get(index)
+        end
+        log.error("Non-existent item property", 2)
+        return nil
+    end,
+
+
+    -- Setter
+    __newindex = function(table, key, value)
+        local index = Item.ARRAY[key]
+        if index then
+            local item_array = Class.ITEM:get(table.value)
+            item_array:set(index, value)
+            return
+        end
+        log.error("Non-existent item property", 2)
+    end
+}
+
+
+metatable_item_callbacks = {
+    __index = function(table, key)
+        -- Methods
+        if methods_item_callbacks[key] then
+            return methods_item_callbacks[key]
+        end
+
+        -- Pass to next metatable
+        return metatable_item_gs.__index(table, key)
+    end
+}
+
+
+metatable_item = {
+    __index = function(table, key)
+        -- Allow getting but not setting these
+        if key == "value" then return abstraction_data[table].value end
+        if key == "RMT_object" then return abstraction_data[table].RMT_object end
+
+        -- Methods
+        if methods_item[key] then
+            return methods_item[key]
+        end
+
+        -- Pass to next metatable
+        return metatable_item_callbacks.__index(table, key)
+    end,
+    
+
+    __newindex = function(table, key, value)
+        if key == "value" or key == "RMT_object" then
+            log.error("Cannot modify RMT object values", 2)
+            return
+        end
+        
+        metatable_item_gs.__newindex(table, key, value)
+    end
+}
+
+
+
+-- ========== Hooks ==========
+
+gm.post_script_hook(gm.constants.callback_execute, function(self, other, result, args)
+    -- onPickup and onRemove
+    if callbacks[args[1].value] then
+        for _, fn in ipairs(callbacks[args[1].value]) do
+            fn(Instance.wrap(args[2].value), args[3].value)
+        end
+    end
+end)
+
+
+gm.post_script_hook(gm.constants.recalculate_stats, function(self, other, result, args)
+    local actor = Instance.wrap(self)
+    if callbacks["onStatRecalc"] then
+        for _, fn in ipairs(callbacks["onStatRecalc"]) do
+            local count = actor:item_stack_count(fn[1])
+            if count > 0 then
+                fn[2](actor, count)   -- Actor, Stack count
+            end
+        end
+    end
+    actor:get_data().post_stat_recalc = true
+end)
+
+
+gm.post_script_hook(gm.constants.skill_activate, function(self, other, result, args)
+    if args[1].value ~= 0.0 or gm.array_get(self.skills, 0).active_skill.skill_id == 70.0 then return true end
+    if callbacks["onBasicUse"] then
+        for _, fn in ipairs(callbacks["onBasicUse"]) do
+            local actor = Instance.wrap(self)
+            local count = actor:item_stack_count(fn[1])
+            if count > 0 then
+                fn[2](actor, count)   -- Actor, Stack count
+            end
+        end
+    end
+end)
+
+
+gm.post_script_hook(gm.constants.actor_heal_networked, function(self, other, result, args)
+    if callbacks["onHeal"] then
+        for _, fn in ipairs(callbacks["onHeal"]) do
+            local actor = Instance.wrap(args[1].value)
+            local count = actor:item_stack_count(fn[1])
+            if count > 0 then
+                fn[2](actor, args[2].value, count)   -- Actor, Heal amount, Stack count
+            end
+        end
+    end
+end)
+
+
+gm.pre_script_hook(gm.constants.__input_system_tick, function()
+    -- Sort loot tables that have been added to
+    for _, pool_id in ipairs(loot_toggled) do
+        local loot_pools = Array.wrap(gm.variable_global_get("treasure_loot_pools"))
+
+        -- Get item IDs from objects and sort
+        local ids = List.new()
+        local drop_pool = List.wrap(loot_pools:get(pool_id).drop_pool)
+        for _, obj in ipairs(drop_pool) do
+            ids:add(gm.object_to_item(obj))
+        end
+        ids:sort()
+
+        -- Add objects of sorted IDs back into loot pool
+        drop_pool:clear()
+        for _, id in ipairs(ids) do
+            local item = Class.ITEM:get(id)
+            local obj = item:get(8)
+            drop_pool:add(obj)
+        end
+        ids:destroy()
+    end
+    loot_toggled = {}
+end)
+
+
+
+-- ========== Callbacks ==========
+
+function item_onPostStatRecalc(actor)
+    if callbacks["onPostStatRecalc"] then
+        for _, fn in ipairs(callbacks["onPostStatRecalc"]) do
+            local count = actor:item_stack_count(fn[1])
+            if count > 0 then
+                fn[2](actor, count)   -- Actor, Stack count
+            end
+        end
     end
 end
 
 
-
--- ========== Internal ==========
-
-function onAttack(self, other, result, args)
-    if not args[2].value.proc then return end
+local function item_onAttack(self, other, result, args)
+    if not args[2].value.proc or not Instance.exists(args[2].value.parent) then return end
     if callbacks["onAttack"] then
         for _, c in ipairs(callbacks["onAttack"]) do
             local item = c[1]
-            local count = Item.get_stack_count(args[2].value.parent, item)
+            local actor = Instance.wrap(args[2].value.parent)
+            local count = actor:item_stack_count(item)
             if count > 0 then
                 local func = c[2]
-                func(self, args[2].value, count)    -- Actor, Damager attack_info, Stack count
+                func(actor, args[2].value, count)    -- Actor, Damager attack_info, Stack count
             end
         end
     end
 end
 
 
-function onPostAttack(self, other, result, args)
-    if not args[2].value.proc or not args[2].value.parent then return end
+local function item_onAttackAll(self, other, result, args)
+    if not Instance.exists(args[2].value.parent) then return end
+    if callbacks["onAttackAll"] then
+        for _, c in ipairs(callbacks["onAttackAll"]) do
+            local item = c[1]
+            local actor = Instance.wrap(args[2].value.parent)
+            local count = actor:item_stack_count(item)
+            if count > 0 then
+                local func = c[2]
+                func(actor, args[2].value, count)    -- Actor, Damager attack_info, Stack count
+            end
+        end
+    end
+end
+
+
+local function item_onPostAttack(self, other, result, args)
+    if not args[2].value.proc or not Instance.exists(args[2].value.parent) then return end
     if callbacks["onPostAttack"] then
         for _, c in ipairs(callbacks["onPostAttack"]) do
             local item = c[1]
-            local count = Item.get_stack_count(args[2].value.parent, item)
+            local actor = Instance.wrap(args[2].value.parent)
+            local count = actor:item_stack_count(item)
             if count > 0 then
                 local func = c[2]
-                func(args[2].value.parent, args[2].value, count)    -- Actor, Damager attack_info, Stack count
+                func(actor, args[2].value, count)    -- Actor, Damager attack_info, Stack count
             end
         end
     end
 end
 
 
-function onHit(self, other, result, args)
-    if not self.attack_info.proc then return end
+local function item_onPostAttackAll(self, other, result, args)
+    if not Instance.exists(args[2].value.parent) then return end
+    if callbacks["onPostAttackAll"] then
+        for _, c in ipairs(callbacks["onPostAttackAll"]) do
+            local item = c[1]
+            local actor = Instance.wrap(args[2].value.parent)
+            local count = actor:item_stack_count(item)
+            if count > 0 then
+                local func = c[2]
+                func(actor, args[2].value, count)    -- Actor, Damager attack_info, Stack count
+            end
+        end
+    end
+end
+
+
+local function item_onHit(self, other, result, args)
     if callbacks["onHit"] then
         for _, c in ipairs(callbacks["onHit"]) do
             local item = c[1]
-            local count = Item.get_stack_count(args[2].value, item)
+            local actor = Instance.wrap(args[2].value)
+            local count = actor:item_stack_count(item)
             if count > 0 then
                 local func = c[2]
-                func(args[2].value, args[3].value, self.attack_info, count) -- Attacker, Victim, Damager attack_info, Stack count
+                func(actor, Instance.wrap(args[3].value), self.attack_info, count) -- Attacker, Victim, Damager attack_info, Stack count
             end
         end
     end
 end
 
 
-function onKill(self, other, result, args)
+local function item_onHitAll(self, other, result, args)
+    local attack = args[2].value
+    if not Instance.exists(attack.inflictor) then return end
+    if callbacks["onHitAll"] then
+        for _, c in ipairs(callbacks["onHitAll"]) do
+            local item = c[1]
+            local actor = Instance.wrap(attack.inflictor)
+            local count = actor:item_stack_count(item)
+            if count > 0 then
+                local func = c[2]
+                func(actor, Instance.wrap(attack.target_true), attack.attack_info, count) -- Attacker, Victim, Damager attack_info, Stack count
+            end
+        end
+    end
+end
+
+
+local function item_onKill(self, other, result, args)
     if callbacks["onKill"] then
         for _, c in ipairs(callbacks["onKill"]) do
             local item = c[1]
-            local count = Item.get_stack_count(args[3].value, item)
+            local actor = Instance.wrap(args[3].value)
+            local count = actor:item_stack_count(item)
             if count > 0 then
                 local func = c[2]
-                func(args[3].value, args[2].value, count)   -- Attacker, Victim, Stack count
+                func(actor, Instance.wrap(args[2].value), count)   -- Attacker, Victim, Stack count
             end
         end
     end
 end
 
 
-function onDamaged(self, other, result, args)
+local function item_onDamaged(self, other, result, args)
+    if not args[3].value.attack_info then return end
     if callbacks["onDamaged"] then
         for _, c in ipairs(callbacks["onDamaged"]) do
             local item = c[1]
-            local count = Item.get_stack_count(args[2].value, item)
+            local actor = Instance.wrap(args[2].value)
+            local count = actor:item_stack_count(item)
             if count > 0 then
                 local func = c[2]
-                func(args[2].value, args[3].value.attack_info, count)   -- Actor, Damager attack_info, Stack count
+                func(actor, args[3].value.attack_info, count)   -- Actor, Damager attack_info, Stack count
             end
         end
     end
 end
 
 
-function onDamageBlocked(self, other, result, args)
+local function item_onDamageBlocked(self, other, result, args)
     if callbacks["onDamageBlocked"] then
         for _, c in ipairs(callbacks["onDamageBlocked"]) do
             local item = c[1]
-            local count = Item.get_stack_count(self, item)
+            local actor = Instance.wrap(self)
+            local count = actor:item_stack_count(item)
             if count > 0 then
                 local func = c[2]
-                func(self, other.attack_info, count)   -- Actor, Damager attack_info, Stack count
+                func(actor, other.attack_info, count)   -- Actor, Damager attack_info, Stack count
             end
         end
     end
 end
 
 
-function onInteract(self, other, result, args)
+local function item_onInteract(self, other, result, args)
     if callbacks["onInteract"] then
         for _, c in ipairs(callbacks["onInteract"]) do
             local item = c[1]
-            local count = Item.get_stack_count(args[3].value, item)
+            local actor = Instance.wrap(args[3].value)
+            local count = actor:item_stack_count(item)
             if count > 0 then
                 local func = c[2]
-                func(args[3].value, args[2].value, count)   -- Actor, Interactable, Stack count
+                func(actor, Instance.wrap(args[2].value), count)   -- Actor, Interactable, Stack count
             end
         end
     end
 end
 
 
-function onEquipmentUse(self, other, result, args)
+local function item_onEquipmentUse(self, other, result, args)
     if callbacks["onEquipmentUse"] then
         for _, c in ipairs(callbacks["onEquipmentUse"]) do
             local item = c[1]
-            local count = Item.get_stack_count(args[2].value, item)
+            local actor = Instance.wrap(args[2].value)
+            local count = actor:item_stack_count(item)
             if count > 0 then
                 local func = c[2]
-                func(args[2].value, args[3].value, count)   -- Actor, Equipment ID, Stack count
+                func(actor, Equipment.wrap(args[3].value), count)   -- Actor, Equipment ID, Stack count
             end
         end
     end
 end
 
 
-function onStep(self, other, result, args)
+local function item_onNewStage(self, other, result, args)
+    if callbacks["onNewStage"] then
+        for n, a in ipairs(has_custom_item) do
+            if Instance.exists(a) then
+                for _, c in ipairs(callbacks["onNewStage"]) do
+                    local actor = Instance.wrap(a)
+                    local count = actor:item_stack_count(c[1])
+                    if count > 0 then
+                        c[2](actor, count)  -- Actor, Stack count
+                    end
+                end
+            else table.remove(has_custom_item, n)
+            end
+        end
+    end
+end
+
+
+local function item_onStep(self, other, result, args)
     if gm.variable_global_get("pause") then return end
     
     if callbacks["onStep"] then
         for n, a in ipairs(has_custom_item) do
             if Instance.exists(a) then
                 for _, c in ipairs(callbacks["onStep"]) do
-                    local count = Item.get_stack_count(a, c[1])
+                    local actor = Instance.wrap(a)
+                    local count = actor:item_stack_count(c[1])
                     if count > 0 then
-                        c[2](a, count)  -- Actor, Stack count
+                        c[2](actor, count)  -- Actor, Stack count
                     end
                 end
             else table.remove(has_custom_item, n)
@@ -496,9 +805,10 @@ function onStep(self, other, result, args)
                 if a.RMT_has_shield and a.shield <= 0.0 then
                     a.RMT_has_shield = nil
                     for _, c in ipairs(callbacks["onShieldBreak"]) do
-                        local count = Item.get_stack_count(a, c[1])
+                        local actor = Instance.wrap(a)
+                        local count = actor:item_stack_count(c[1])
                         if count > 0 then
-                            c[2](a, count)  -- Actor, Stack count
+                            c[2](actor, count)  -- Actor, Stack count
                         end
                     end
                 end
@@ -509,16 +819,17 @@ function onStep(self, other, result, args)
 end
 
 
-function onDraw(self, other, result, args)
+local function item_onDraw(self, other, result, args)
     if gm.variable_global_get("pause") then return end
 
     if callbacks["onDraw"] then
         for n, a in ipairs(has_custom_item) do
             if Instance.exists(a) then
                 for _, c in ipairs(callbacks["onDraw"]) do
-                    local count = Item.get_stack_count(a, c[1])
+                    local actor = Instance.wrap(a)
+                    local count = actor:item_stack_count(c[1])
                     if count > 0 then
-                        c[2](a, count)  -- Actor, Stack count
+                        c[2](actor, count)  -- Actor, Stack count
                     end
                 end
             else table.remove(has_custom_item, n)
@@ -528,93 +839,22 @@ function onDraw(self, other, result, args)
 end
 
 
-Item.get_callback_count = function()
-    local count = 0
-    for k, v in pairs(callbacks) do
-        count = count + #v
-    end
-    return count
-end
-
-
-
--- ========== Hooks ==========
-
-gm.post_script_hook(gm.constants.callback_execute, function(self, other, result, args)
-    if callbacks[args[1].value] then
-        for _, fn in pairs(callbacks[args[1].value]) do
-            fn(args[2].value, args[3].value)
-        end
-    end
-end)
-
-
-gm.pre_script_hook(gm.constants.skill_activate, function(self, other, result, args)
-    if args[1].value ~= 0.0 or gm.array_get(self.skills, 0).active_skill.skill_id == 70.0 then return true end
-    if callbacks["onBasicUse"] then
-        for _, fn in pairs(callbacks["onBasicUse"]) do
-            local count = Item.get_stack_count(self, fn[1])
-            if count > 0 then
-                fn[2](self, count)   -- Actor, Stack count
-            end
-        end
-    end
-end)
-
-
-gm.pre_script_hook(gm.constants.actor_heal_networked, function(self, other, result, args)
-    if callbacks["onHeal"] then
-        for _, fn in pairs(callbacks["onHeal"]) do
-            local count = Item.get_stack_count(args[1].value, fn[1])
-            if count > 0 then
-                fn[2](args[1].value, args[2].value, count)   -- Actor, Heal amount, Stack count
-            end
-        end
-    end
-end)
-
-
-gm.pre_script_hook(gm.constants.__input_system_tick, function()
-    -- Sort loot tables that have been added to
-    for _, pool_id in ipairs(loot_toggled) do
-        local loot_pools = gm.variable_global_get("treasure_loot_pools")
-
-        -- Get item IDs from objects and sort
-        local ids = gm.ds_list_create()
-        local pool = gm.array_get(loot_pools, pool_id).drop_pool
-        local size = gm.ds_list_size(pool)
-        for i = 0, size - 1 do
-            local obj = gm.ds_list_find_value(pool, i)
-            gm.ds_list_add(ids, gm.object_to_item(obj))
-        end
-        gm.ds_list_sort(ids, true)
-
-        -- Add objects of sorted IDs back into loot pool
-        gm.ds_list_clear(pool)
-        for i = 0, size - 1 do
-            local id = gm.ds_list_find_value(ids, i)
-            local _item = gm.array_get(Class.ITEM, id)
-            local obj = gm.array_get(_item, 8)
-            gm.ds_list_add(pool, obj)
-        end
-        gm.ds_list_destroy(ids)
-    end
-    loot_toggled = {}
-end)
-
-
 
 -- ========== Initialize ==========
 
 Item.__initialize = function()
-    Callback.add("onAttackCreate", "RMT.item_onAttack", onAttack, true)
-    Callback.add("onAttackHandleEnd", "RMT.item_onPostAttack", onPostAttack, true)
-    Callback.add("onHitProc", "RMT.item_onHit", onHit, true)
-    Callback.add("onKillProc", "RMT.item_onKill", onKill, true)
-    Callback.add("onDamagedProc", "RMT.item_onDamaged", onDamaged, true)
-    Callback.add("onDamageBlocked", "RMT.item_onDamageBlocked", onDamageBlocked, true)
-    Callback.add("onInteractableActivate", "RMT.item_onInteract", onInteract, true)
-    Callback.add("onEquipmentUse", "RMT.item_onEquipmentUse", onEquipmentUse, true)
-    Callback.add("preStep", "RMT.item_onStep", onStep, true)
-    Callback.add("postHUDDraw", "RMT.item_onDraw", onDraw, true)
+    Callback.add("onAttackCreate", "RMT.item_onAttack", item_onAttack, true)
+    Callback.add("onAttackCreate", "RMT.item_onAttackAll", item_onAttackAll, true)
+    Callback.add("onAttackHandleEnd", "RMT.item_onPostAttack", item_onPostAttack, true)
+    Callback.add("onAttackHandleEnd", "RMT.item_onPostAttackAll", item_onPostAttackAll, true)
+    Callback.add("onHitProc", "RMT.item_onHit", item_onHit, true)
+    Callback.add("onAttackHit", "RMT.item_onHitAll", item_onHitAll, true)
+    Callback.add("onKillProc", "RMT.item_onKill", item_onKill, true)
+    Callback.add("onDamagedProc", "RMT.item_onDamaged", item_onDamaged, true)
+    Callback.add("onDamageBlocked", "RMT.item_onDamageBlocked", item_onDamageBlocked, true)
+    Callback.add("onInteractableActivate", "RMT.item_onInteract", item_onInteract, true)
+    Callback.add("onEquipmentUse", "RMT.item_onEquipmentUse", item_onEquipmentUse, true)
+    Callback.add("onStageStart", "RMT.item_onNewStage", item_onNewStage, true)
+    Callback.add("preStep", "RMT.item_onStep", item_onStep, true)
+    Callback.add("postHUDDraw", "RMT.item_onDraw", item_onDraw, true)
 end

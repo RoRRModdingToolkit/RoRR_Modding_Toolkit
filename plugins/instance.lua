@@ -1,7 +1,10 @@
 -- Instance
--- Originally in HelperFunctions by Klehrik
 
 Instance = {}
+
+local abstraction_data = setmetatable({}, {__mode = "k"})
+
+local instance_data = {}
 
 
 
@@ -40,60 +43,117 @@ Instance.projectiles = {
 }
 
 
+Instance.worm_bodies = {
+    gm.constants.oWormBody,
+    gm.constants.oWurmBody
+}
 
--- ========== Functions ==========
+
+
+-- ========== Static Methods ==========
 
 Instance.exists = function(inst)
+    inst = Wrap.unwrap(inst)
     return gm.instance_exists(inst) == 1.0
+end
+
+
+Instance.destroy = function(inst)
+    inst = Wrap.unwrap(inst)
+    gm.instance_destroy(inst)
 end
 
 
 Instance.find = function(...)
     local t = {...}
-    if type(t[1]) == "table" then t = t[1] end
+    if type(t[1]) == "table" and (not t[1].RMT_object) then t = t[1] end
 
-    for _, ind in ipairs(t) do
-        -- Vanilla objects
-        if ind < Object.ID_encoding then
-            local inst = gm.instance_find(ind, 0)
-            if Instance.exists(inst) then return inst end
+    for _, obj in ipairs(t) do
+        obj = Wrap.unwrap(obj)
 
-        -- RMT Custom objects
-        else
-            for i = 0, gm.instance_number(gm.constants.oCustomObject_pPickupItem) - 1 do
-                local inst = gm.instance_find(gm.constants.oCustomObject_pPickupItem, i)
-                if Instance.exists(inst) then
-                    if inst.RMT_Object and inst.RMT_Object == ind then return inst end
+        local inst = gm.instance_find(obj, 0)
+        if obj >= 800.0 then
+            local customs = {
+                gm.constants.oCustomObject,
+                gm.constants.oCustomObject_pPickupItem,
+                gm.constants.oCustomObject_pPickupEquipment,
+                gm.constants.oCustomObject_pEnemyClassic,
+                gm.constants.oCustomObject_pEnemyFlying,
+                gm.constants.oCustomObject_pBossClassic,
+                gm.constants.oCustomObject_pBoss,
+                gm.constants.oCustomObject_pInteractable,
+                gm.constants.oCustomObject_pInteractableChest,
+                gm.constants.oCustomObject_pInteractableDrone,
+                gm.constants.oCustomObject_pInteractableCrate,
+                gm.constants.oCustomObject_pMapObjects,
+                gm.constants.oCustomObject_pNPC,
+                gm.constants.oCustomObject_pDrone
+            }
+            local _exit = false
+            for _, custom in ipairs(customs) do
+                local count = Instance.count(custom)
+                for i = 0, count - 1 do
+                    local ins = gm.instance_find(custom, i)
+                    if ins.__object_index == obj then
+                        inst = ins
+                        _exit = true
+                        break
+                    end
                 end
+                if _exit then break end
             end
+        end
 
+        if inst ~= nil and inst ~= -4.0 then
+            return Instance.wrap(inst)
         end
     end
 
-    return nil
+    -- None
+    return Instance.wrap_invalid()
 end
 
 
 Instance.find_all = function(...)
     local t = {...}
-    if type(t[1]) == "table" then t = t[1] end
+    if type(t[1]) == "table" and (not t[1].RMT_object) then t = t[1] end
 
     local insts = {}
 
-    for _, ind in ipairs(t) do
-        -- Vanilla objects
-        if ind < Object.ID_encoding then
-            for n = 0, gm.instance_number(ind) - 1 do
-                local inst = gm.instance_find(ind, n)
-                if Instance.exists(inst) then table.insert(insts, inst) end
+    for _, obj in ipairs(t) do
+        obj = Wrap.unwrap(obj)
+
+        if obj < 800.0 then
+            local count = Instance.count(obj)
+            for n = 0, count - 1 do
+                local inst = gm.instance_find(obj, n)
+                table.insert(insts, Instance.wrap(inst))
             end
 
-        -- RMT Custom objects
         else
-            for n = 0, gm.instance_number(gm.constants.oCustomObject_pPickupItem) - 1 do
-                local inst = gm.instance_find(gm.constants.oCustomObject_pPickupItem, n)
-                if Instance.exists(inst) then
-                    if inst.RMT_Object and inst.RMT_Object == ind then table.insert(insts, inst) end
+            local customs = {
+                gm.constants.oCustomObject,
+                gm.constants.oCustomObject_pPickupItem,
+                gm.constants.oCustomObject_pPickupEquipment,
+                gm.constants.oCustomObject_pEnemyClassic,
+                gm.constants.oCustomObject_pEnemyFlying,
+                gm.constants.oCustomObject_pBossClassic,
+                gm.constants.oCustomObject_pBoss,
+                gm.constants.oCustomObject_pInteractable,
+                gm.constants.oCustomObject_pInteractableChest,
+                gm.constants.oCustomObject_pInteractableDrone,
+                gm.constants.oCustomObject_pInteractableCrate,
+                gm.constants.oCustomObject_pMapObjects,
+                gm.constants.oCustomObject_pNPC,
+                gm.constants.oCustomObject_pDrone
+            }
+            for _, custom in ipairs(customs) do
+                local count = Instance.count(custom)
+                for n = 0, count - 1 do
+                    local inst = gm.instance_find(custom, n)
+                    if inst.__object_index == obj then
+                        table.insert(insts, Instance.wrap(inst))
+                    end
                 end
             end
 
@@ -104,100 +164,212 @@ Instance.find_all = function(...)
 end
 
 
-Instance.number = function(index)
-    -- Vanilla objects
-    if index < Object.ID_encoding then return gm.instance_number(index)
+Instance.count = function(obj)
+    return gm._mod_instance_number(Wrap.unwrap(obj))
+end
 
-    -- RMT Custom objects
-    else
-        local number = 0
-        for n = 0, gm.instance_number(gm.constants.oCustomObject_pPickupItem) - 1 do
-            local inst = gm.instance_find(gm.constants.oCustomObject_pPickupItem, n)
-            if Instance.exists(inst) then
-                if inst.RMT_Object and inst.RMT_Object == index - Object.ID_encoding then number = number + 1 end
+
+Instance.wrap = function(inst)
+    local abstraction = {}
+    abstraction_data[abstraction] = {
+        RMT_object = "Instance",
+        value = inst
+    }
+    if inst.object_index == gm.constants.oCustomObject_pInteractable then
+        setmetatable(abstraction, metatable_interactable_instance)
+        abstraction_data[abstraction].RMT_object = "Interactable Instance"
+    elseif inst.object_index == gm.constants.oP then
+        setmetatable(abstraction, metatable_player)
+        abstraction_data[abstraction].RMT_object = "Player"
+    elseif gm.object_is_ancestor(inst.object_index, gm.constants.pActor) == 1.0 then
+        setmetatable(abstraction, metatable_actor)
+        abstraction_data[abstraction].RMT_object = "Actor"
+    else setmetatable(abstraction, metatable_instance)
+    end
+    return abstraction
+end
+
+
+Instance.wrap_invalid = function()
+    local abstraction = {}
+    abstraction_data[abstraction] = {
+        RMT_object = "Instance",
+        value = -4
+    }
+    setmetatable(abstraction, metatable_instance)
+    return abstraction
+end
+
+
+
+-- ========== Instance Methods ==========
+
+methods_instance = {
+
+    exists = function(self)
+        return gm.instance_exists(self.value) == 1.0
+    end,
+
+
+    destroy = function(self)
+        if not self:exists() then return end
+
+        instance_data[self.value.id] = nil
+
+        gm.instance_destroy(self.value)
+        abstraction_data[self].value = -4
+    end,
+
+
+    same = function(self, other)
+        if not self:exists() then return false end
+
+        other = Wrap.unwrap(other)
+        return self.value == other
+    end,
+
+
+    get_data = function(self, subtable, mod_id)
+        subtable = subtable or "main"
+
+        if not mod_id then
+            -- Find ID of mod that called this method
+            mod_id = "main"
+            local src = debug.getinfo(2, "S").source
+            local split = Array.wrap(gm.string_split(src, "\\"))
+            for i = 1, #split do
+                if split[i] == "plugins" and i < #split then
+                    mod_id = split[i + 1]
+                    break
+                end
             end
         end
-        return number
+
+        -- Create data table if it doesn't already exist and return it
+        if not instance_data[self.value.id] then instance_data[self.value.id] = {} end
+        if not instance_data[self.value.id][mod_id] then instance_data[self.value.id][mod_id] = {} end
+        if not instance_data[self.value.id][mod_id][subtable] then instance_data[self.value.id][mod_id][subtable] = {} end
+        return instance_data[self.value.id][mod_id][subtable]
+    end,
+
+
+    is_colliding = function(self, obj, x, y)
+        if not self:exists() then return false end
+
+        obj = Wrap.unwrap(obj)
+        return self.value:place_meeting(x or self.x, y or self.y, obj) == 1.0
+    end,
+
+
+    get_collisions = function(self, ...)
+        if not self:exists() then return {}, 0 end
+
+        local t = {...}
+        if type(t[1]) == "table" and (not t[1].RMT_object) then t = t[1] end
+
+        local insts = {}
+
+        for i, obj in ipairs(t) do
+            obj = Wrap.unwrap(obj)
+
+            local list = List.new()
+            self.value:collision_rectangle_list(self.bbox_left, self.bbox_top, self.bbox_right, self.bbox_bottom, obj, false, true, list.value, false)
+
+            for _, inst in ipairs(list) do
+                table.insert(insts, inst)
+            end
+            list:destroy()
+        end
+
+        return insts, #insts
+    end,
+
+
+    draw_collision = function(self)
+        if not self:exists() then return end
+
+        local c = Color.WHITE
+        gm.draw_rectangle_color(self.bbox_left, self.bbox_top, self.bbox_right, self.bbox_bottom, c, c, c, c, true)
     end
-end
+
+}
 
 
-Instance.spawn_crate = function(x, y, tier, items, depth)
-    local lang_map = gm.variable_global_get("_language_map")
-    local class_item = gm.variable_global_get("class_item")
 
-    local sprites = {gm.constants.sCommandCrateCommon, gm.constants.sCommandCrateUncommon, gm.constants.sCommandCrateRare, gm.constants.sCommandCrateEquipment, gm.constants.sCommandCrateBoss}
-    local sprites_use = {gm.constants.sCommandCrateCommonUse, gm.constants.sCommandCrateUncommonUse, gm.constants.sCommandCrateRareUse, gm.constants.sCommandCrateEquipmentUse, gm.constants.sCommandCrateBossUse}
-    local isi = {6.0, 8.0, 10.0, 14.0, 12.0}
-    local isii = {5.0, 7.0, 9.0, 13.0, 11.0}
+-- ========== Metatables ==========
 
-    -- Move downwards until on the ground
-    while not gm.position_meeting(x, y, gm.constants.pBlockStatic) and y < gm.variable_global_get("room_height") do y = y + 1 end
+metatable_instance_gs = {
+    -- Getter
+    __index = function(table, key)
+        return Wrap.wrap(gm.variable_instance_get(table.value, key))
+    end,
 
-    -- Taken from Scrappers mod
-    local c = gm.instance_create_depth(x, y, depth or 0, gm.constants.oCustomObject_pInteractableCrate)
 
-    -- Most of the following are necessary,
-    -- and are not set from creating the instance directly (via gm.instance_create)
-    c.active = 0.0
-    c.owner = -4.0
-    c.activator = -4.0
-    c.buy_button_visible = 0.0
-    c.can_activate_frame = 0.0
-    c.mouse_x_last = 0.0
-    c.mouse_y_last = 0.0
-    c.mouse_hovered_last = 0.0
-    c.last_move_was_mouse = false
-    c.using_mouse = false
-    c.last_activated_frame = -1.0
-    c.cam_rect_x1 = x - 100
-    c.cam_rect_y1 = y - 100
-    c.cam_rect_x2 = x + 100
-    c.cam_rect_y2 = y + 100
-    c.contents = nil
-    c.inventory = 76.0 + (tier * 2.0)
-    c.flash = 0.0
-    c.interact_scroll_index = isi[tier + 1]
-    c.interact_scroll_index_inactive = isii[tier + 1]
-    c.surf_text_cost_large = -1.0
-    c.surf_text_cost_small = -1.0
-    c.translation_key = "interactable.pInteractableCrate"
-    c.text = gm.ds_map_find_value(lang_map, c.translation_key..".text")
-    c.spawned = true
-    c.cost = 0.0
-    c.cost_color = 8114927.0
-    c.cost_type = 0.0
-    c.selection = 0.0
-    c.select_cd = 0.0
-    c.sprite_index = sprites[tier + 1]
-    c.sprite_death = sprites_use[tier + 1]
-    c.fade_alpha = 0.0
-    c.col_index = tier
-    c.m_id = gm.set_m_id(true)  -- I have no idea what the argument is supposed to be, but this works
-    c.my_player = -4.0
-    c.__custom_id = tier
-    c.__object_index = 800.0 + tier
-    c.image_speed = 0.06
-    c.tier = tier
+    -- Setter
+    __newindex = function(table, key, value)            
+        value = Wrap.unwrap(value)
+        gm.variable_instance_set(table.value, key, value)
 
-    -- Replace default crate items with custom set
-    if items then
-        c.contents = gm.array_create()
-        for _, i in ipairs(items) do
-            gm.array_push(c.contents, class_item[i + 1][9])
+        -- Automatically set "shield" alongside "maxshield"
+        -- to prevent the shield regen sfx from playing
+        if key == "maxshield" and (gm.variable_global_get("_current_frame") >= table.in_danger_last_frame) then
+            gm.variable_instance_set(table.value, "shield", value)
         end
     end
-
-    -- [Host] Send spawn data to clients
-    if Net.get_type() == Net.TYPE.host then Net.send("RMT.spawnCrate", Net.TARGET.all, nil, x, y, tier, items, depth) end
-
-    return c
-end
+}
 
 
+metatable_instance = {
+    __index = function(table, key)
+        -- Allow getting but not setting these
+        if key == "value" then return abstraction_data[table].value end
+        if key == "RMT_object" then return abstraction_data[table].RMT_object end
 
--- ========== Initialize ==========
+        -- Methods
+        if methods_instance[key] then
+            return methods_instance[key]
+        end
 
-Instance.__initialize = function()
-    Net.register("RMT.spawnCrate", Instance.spawn_crate)
-end
+        -- Pass to next metatable
+        return metatable_instance_gs.__index(table, key)
+    end,
+
+
+    __newindex = function(table, key, value)
+        if key == "value" or key == "RMT_object" then
+            log.error("Cannot modify RMT object values", 2)
+            return
+        end
+        
+        metatable_instance_gs.__newindex(table, key, value)
+    end
+}
+
+
+
+-- ========== Hooks ==========
+
+-- Remove non-existent instances from instance_data on room change
+gm.post_script_hook(gm.constants.room_goto, function(self, other, result, args)
+    for k, v in pairs(instance_data) do
+        if not Instance.exists(k) then
+            instance_data[k] = nil
+        end
+    end
+end)
+
+
+gm.post_script_hook(gm.constants.actor_set_dead, function(self, other, result, args)
+    instance_data[self.id] = nil
+end)
+
+
+gm.post_script_hook(gm.constants.actor_transform, function(self, other, result, args)
+    if instance_data[args[1].value.id] then
+        instance_data[args[2].value.id] = {}
+        for k, v in pairs(instance_data[args[1].value.id]) do
+            instance_data[args[2].value.id][k] = instance_data[args[1].value.id][k]
+        end
+        instance_data[args[1].value.id] = nil
+    end
+end)
