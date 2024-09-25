@@ -245,19 +245,28 @@ methods_survivor = {
             if skill_el.skill_id == skill.value then return end
         end
 
-        local survivor_loadout_unlockables = gm.variable_global_get("survivor_loadout_unlockables")
+        gm.array_insert(
+            skill_family,
+            #skill_family,
+            gm.SurvivorSkillLoadoutUnlockable(
+                skill.value,
+                (achievement and achievement.value) or -1
+            )
+        )
+
+        -- local survivor_loadout_unlockables = gm.variable_global_get("survivor_loadout_unlockables")
         
-        local survivor_loadout = gm.struct_create()
+        -- local survivor_loadout = gm.struct_create()
 
-        gm.static_set(survivor_loadout, gm.static_get(skill_family[1]))
+        -- gm.static_set(survivor_loadout, gm.static_get(skill_family[1]))
 
-        survivor_loadout.skill_id = skill.value
-        survivor_loadout.achievement_id = (achievement and achievement.value) or -1
-        survivor_loadout.save_flag_viewed = nil
-        survivor_loadout.index = gm.array_length(survivor_loadout_unlockables)
+        -- survivor_loadout.skill_id = skill.value
+        -- survivor_loadout.achievement_id = (achievement and achievement.value) or -1
+        -- survivor_loadout.save_flag_viewed = nil
+        -- survivor_loadout.index = gm.array_length(survivor_loadout_unlockables)
 
-        gm.array_push(survivor_loadout_unlockables, survivor_loadout)
-        gm.array_push(skill_family, survivor_loadout)
+        -- gm.array_push(survivor_loadout_unlockables, survivor_loadout)
+        -- gm.array_push(skill_family, survivor_loadout)
     end,
 
     add_primary = function(self, skill, achievement)
@@ -431,16 +440,24 @@ methods_survivor = {
 
         local skin_pal_swap = math.tointeger(gm.actor_skin_get_default_palette_swap(skin_index))
 
-        print("__newsprite"..math.tointeger(self.sprite_loadout).."_PAL"..skin_pal_swap)
         asset_name_overrides["__newsprite"..math.tointeger(self.sprite_loadout).."_PAL"..skin_pal_swap] = skin_loadout or self.sprite_loadout
         asset_name_overrides["__newsprite"..math.tointeger(self.sprite_portrait).."_PAL"..skin_pal_swap] = skin_portrait or self.sprite_portrait
         asset_name_overrides["__newsprite"..math.tointeger(self.sprite_portrait_small).."_PAL"..skin_pal_swap] = skin_portraitsmall or self.sprite_portrait_small
 
+        -- gm.array_insert(
+        --     self.skin_family.elements,
+        --     #self.skin_family.elements,
+        --     gm["@@NewGMLObject@@"](
+        --         gm.constants.SurvivorSkinLoadoutUnlockable,
+        --         skin_pal_swap,
+        --         (achievement and achievement.value) or -1
+        --     )
+        -- )
+        
         gm.array_insert(
             self.skin_family.elements,
             #self.skin_family.elements,
-            gm["@@NewGMLObject@@"](
-                gm.constants.SurvivorSkinLoadoutUnlockable,
+            gm.SurvivorSkinLoadoutUnlockable(
                 skin_pal_swap,
                 (achievement and achievement.value) or -1
             )

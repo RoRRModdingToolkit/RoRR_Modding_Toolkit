@@ -116,6 +116,37 @@ methods_achievement = {
         self.token_unlock_name = unlock_name
     end,
 
+    -- achievement_set_alt_milestone_unlock
+    -- achievement_get_unlocked_string
+    -- achievement_is_skin_unlock
+    -- achievement_is_skill_unlock
+    -- achievement_get_gameover_string ??
+    -- achievement_get_unlock_header_string ??
+    -- achievement_get_type_string ??
+    -- achievement_is_unlocked
+    -- achievement_is_unlocked_or_null
+    -- achievement_is_NOT_unlocked_any_player ??
+    -- achievement_is_unlocked_or_null_any_player ??
+    -- achievement_set_requirement
+    -- achievement_force_set_unlocked
+    -- achievement_add_progress
+    -- achievement_on_unlocked ??
+    -- achievement_progress_player
+    -- achievement_associate_trial ??
+    -- achievement_is_parent_unlocked_or_null
+    -- achievement_get_content_name ??
+    -- achievement_get_content_description ??
+    -- achievement_get_content_name_color ??
+    -- achievement_reset_unlock
+    -- achievement_set_unlock_survivor
+    -- achievement_set_unlock_equipment
+    -- achievement_set_unlock_item
+    -- achievement_set_unlock_artifact
+    -- achievement_set_unlock_survivor_loadout_unlockable
+    -- achievement_auto_configure_prism ?? (prov skin?)
+    -- _mod_achievement_get_unlock_kind
+    -- _mod_achievement_get_requirement
+
     set_unlock = function(self, unlock_kind, unlock_id)
         if not Helper.table_has(Artifact.KIND, unlock_kind) then log.error("Unlock Kind is not recognized, got "..tostring(unlock_kind), 2) return end
 
