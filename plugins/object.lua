@@ -1,175 +1,241 @@
 -- Object
 
--- This is not a true implementation using a oCustomObject, but rather
--- creates a custom item and pretends that it is a new object via overrides.
-
 Object = {}
 
-local PREFIX = "[RMT_OBJ]"
-local callbacks = {
-    Init = {},
-    Step = {},
-    Draw = {},
-    Hitbox = {}
+local abstraction_data = setmetatable({}, {__mode = "k"})
+
+local callbacks = {}
+
+
+
+-- ========== Enums ==========
+
+Object.ARRAY = {
+    base        = 0,
+    obj_depth   = 1,
+    obj_sprite  = 2,
+    identifier  = 3,
+    namespace   = 4,
+    on_create   = 5,
+    on_destroy  = 6,
+    on_step     = 7,
+    on_draw     = 8
 }
 
 
-
--- ========== Internal ==========
-
-Object.ID_encoding = 10000
+Object.CUSTOM_START = 800
 
 
 
--- ========== General Functions ==========
+-- ========== Static Methods ==========
+
+Object.new = function(namespace, identifier, parent)
+    if Object.find(namespace, identifier) then return nil end
+
+    local obj = gm.object_add_w(namespace, identifier, Wrap.unwrap(parent))
+    return Object.wrap(obj)
+end
+
 
 Object.find = function(namespace, identifier)
-    local id = Item.find(namespace, PREFIX..identifier)
-    if id then return id + Object.ID_encoding end
+    -- Vanilla object_index
+    if type(namespace) == "number" then
+        return Object.wrap(namespace)
+    end
+
+    if identifier then namespace = namespace.."-"..identifier end
+
+    -- Custom objects
+    local ind = gm.object_find(namespace)
+    if ind then
+        return Object.wrap(ind)
+    end
+
+    -- Vanilla namespaced objects
+    if string.sub(namespace, 1, 3) == "ror" then
+        local obj = gm.constants["o"..string.upper(string.sub(namespace, 5, 5))..string.sub(namespace, 6, #namespace)]
+        if obj then
+            return Object.wrap(obj)
+        end
+        return nil
+    end
+
     return nil
 end
 
 
-Object.spawn = function(object, x, y)
-    local drop = Item.spawn_drop(object - Object.ID_encoding, x, y, -4)
-    drop.RMT_Object = object
-
-    -- Run all Init callbacks on the object
-    for _, fn in ipairs(callbacks["Init"][object - Object.ID_encoding]) do
-        fn(drop)
-    end
-
-    return drop
+Object.wrap = function(object_id)
+    local abstraction = {}
+    abstraction_data[abstraction] = {
+        RMT_object = "Object",
+        value = object_id
+    }
+    setmetatable(abstraction, metatable_object)
+    return abstraction
 end
 
 
-Object.is_colliding = function(instance, other)
-    local bbox = Object.get_collision_box(instance)
 
-    if Instance.exists(other) then
-        local other_bbox = {
-            left    = other.bbox_left,
-            top     = other.bbox_top,
-            right   = other.bbox_right,
-            bottom  = other.bbox_bottom
-        }
-        if other.RMT_Object then other_bbox = Object.get_collision_box(other) end
+-- ========== Instance Methods ==========
 
-        if not (other_bbox.left > bbox.right or other_bbox.right < bbox.left
-            or other_bbox.top > bbox.bottom or other_bbox.bottom < bbox.top) then
-            return true
+methods_object = {
+
+    create = function(self, x, y)
+        local inst = gm.instance_create(x, y, self.value)
+        return Instance.wrap(inst)
+    end,
+
+
+    add_callback = function(self, callback, func)
+        self:add_callback_obj_actual(callback, func)
+    end,
+
+
+    add_callback_obj_actual = function(self, callback, func)
+        if self.value < Object.CUSTOM_START then return end
+
+        if callback == "onCreate"
+        or callback == "onDestroy"
+        or callback == "onStep"
+        or callback == "onDraw"
+        then
+            local callback_id = self["on_"..string.lower(string.sub(callback, 3, 3))..string.sub(callback, 4, #callback)]
+            if not callbacks[callback_id] then callbacks[callback_id] = {} end
+            table.insert(callbacks[callback_id], func)
+
+        else log.error("Invalid callback name", 2)
+
         end
+    end,
+
+
+    get_sprite = function(self)
+        return gm.object_get_sprite_w(self.value)
+    end,
+
+
+    set_sprite = function(self, sprite)
+        gm.object_set_sprite_w(self.value, sprite)
+    end,
+
+
+    get_depth = function(self)
+        local depths = Array.wrap(gm.variable_global_get("object_depths"))
+        return depths:get(self.value)
+    end,
+
+
+    set_depth = function(self, depth)
+        -- Does not apply retroactively to existing instances
+        local depths = Array.wrap(gm.variable_global_get("object_depths"))
+        depths:set(self.value, depth)
     end
 
-    return false
-end
+}
 
 
-Object.get_collisions = function(instance, index)
-    local cols = {}
-    local bbox = Object.get_collision_box(instance)
+methods_object_callbacks = {
 
-    local insts = Instance.find_all(index)
-    for _, inst in ipairs(insts) do
-        local other_bbox = {
-            left    = inst.bbox_left,
-            top     = inst.bbox_top,
-            right   = inst.bbox_right,
-            bottom  = inst.bbox_bottom
-        }
-        if inst.RMT_Object then other_bbox = Object.get_collision_box(inst) end
+    onCreate        = function(self, func) self:add_callback("onCreate", func) end,
+    onDestroy       = function(self, func) self:add_callback("onDestroy", func) end,
+    onStep          = function(self, func) self:add_callback("onStep", func) end,
+    onDraw          = function(self, func) self:add_callback("onDraw", func) end
 
-        if not (instance == inst) and
-        not (other_bbox.left > bbox.right or other_bbox.right < bbox.left
-        or other_bbox.top > bbox.bottom or other_bbox.bottom < bbox.top) then
-            table.insert(cols, inst)
+}
+
+
+
+-- ========== Metatables ==========
+
+metatable_object_gs = {
+    -- Getter
+    __index = function(table, key)
+        if table.value >= Object.CUSTOM_START then
+            local index = Object.ARRAY[key]
+            if index then
+                local custom_object = Array.wrap(gm.variable_global_get("custom_object"))
+                local obj_array = custom_object:get(table.value - Object.CUSTOM_START)
+                return obj_array:get(index)
+            end
+            log.error("Non-existent object property", 2)
+            return nil
         end
+        log.error("No object properties for vanilla objects", 2)
+        return nil
+    end,
+
+
+    -- Setter
+    __newindex = function(table, key, value)
+        if table.value >= Object.CUSTOM_START then
+            local index = Object.ARRAY[key]
+            if index then
+                local custom_object = Array.wrap(gm.variable_global_get("custom_object"))
+                local obj_array = custom_object:get(table.value - Object.CUSTOM_START)
+                obj_array:set(index, value)
+                return
+            end
+            log.error("Non-existent object property", 2)
+            return
+        end
+        log.error("No object properties for vanilla objects", 2)
     end
-
-    return cols, #cols > 0
-end
+}
 
 
-Object.get_collision_box = function(instance)
-    local hitbox = callbacks["Hitbox"][instance.RMT_Object - Object.ID_encoding]
-    return {
-        left    = hitbox.left   + instance.x,
-        top     = hitbox.top    + instance.y,
-        right   = hitbox.right  + instance.x,
-        bottom  = hitbox.bottom + instance.y
-    }
-end
+metatable_object_callbacks = {
+    __index = function(table, key)
+        -- Allow getting but not setting these
+        if key == "value" then return abstraction_data[table].value end
+        if key == "RMT_object" then return abstraction_data[table].RMT_object end
 
+        -- Methods
+        if methods_object_callbacks[key] then
+            return methods_object_callbacks[key]
+        end
 
+        -- Pass to next metatable
+        return metatable_object_gs.__index(table, key)
+    end,
+    
 
--- ========== Custom Object Functions ==========
-
-Object.create = function(namespace, identifier)
-    if Object.find(namespace, PREFIX..identifier) then return nil end
-
-    -- Create object
-    local object = Item.create(namespace, PREFIX..identifier, true)
-
-    -- Create callback tables
-    callbacks["Init"][object] = {}
-    callbacks["Step"][object] = {}
-    callbacks["Draw"][object] = {}
-    callbacks["Hitbox"][object] = {
-        left    = 0,
-        top     = 0,
-        right   = 0,
-        bottom  = 0
-    }
-
-    -- Return object ID, with an encoding of +10000
-    -- so that they remain separate from GM object_indexes
-    return object + Object.ID_encoding
-end
-
-
-Object.set_hitbox = function(object, left, top, right, bottom)
-    callbacks["Hitbox"][object - Object.ID_encoding] = {
-        left    = left,
-        top     = top,
-        right   = right,
-        bottom  = bottom
-    }
-end
-
-
-Object.add_callback = function(object, callback, func)
-    local object = object - Object.ID_encoding
-
-    local array = gm.variable_global_get("class_item")[object + 1]
-
-    if callback == "Init"
-    or callback == "Step"
-    or callback == "Draw"
-    then
-        table.insert(callbacks[callback][object], func)
-
+    __newindex = function(table, key, value)
+        metatable_object_gs.__newindex(table, key, value)
     end
-end
+}
+
+
+metatable_object = {
+    __index = function(table, key)
+        -- Methods
+        if methods_object[key] then
+            return methods_object[key]
+        end
+
+        -- Pass to next metatable
+        return metatable_object_callbacks.__index(table, key)
+    end,
+    
+
+    __newindex = function(table, key, value)
+        if key == "value" or key == "RMT_object" then
+            log.error("Cannot modify RMT object values", 2)
+            return
+        end
+        
+        metatable_object_gs.__newindex(table, key, value)
+    end
+}
 
 
 
 -- ========== Hooks ==========
 
-gm.pre_code_execute(function(self, other, code, result, flags)
-    if code.name:match("oCustomObject_pPickupItem_Step_0") and self.RMT_Object then
-        for _, fn in ipairs(callbacks["Step"][self.RMT_Object - Object.ID_encoding]) do
-            fn(self)
+gm.post_script_hook(gm.constants.callback_execute, function(self, other, result, args)
+    -- Custom object callbacks
+    if callbacks[args[1].value] then
+        for _, fn in pairs(callbacks[args[1].value]) do
+            fn(Instance.wrap(args[2].value))   -- Instance
         end
-        return false
-    end
-end)
-
-
-gm.pre_code_execute(function(self, other, code, result, flags)
-    if code.name:match("oCustomObject_pPickupItem_Draw_0") and self.RMT_Object then
-        for _, fn in ipairs(callbacks["Draw"][self.RMT_Object - Object.ID_encoding]) do
-            fn(self)
-        end
-        return false
     end
 end)

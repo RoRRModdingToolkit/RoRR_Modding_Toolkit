@@ -2,6 +2,8 @@
 
 Buff = {}
 
+local abstraction_data = setmetatable({}, {__mode = "k"})
+
 local callbacks = {}
 local has_custom_buff = {}
 
@@ -9,72 +11,31 @@ local has_custom_buff = {}
 
 -- ========== Enums ==========
 
-Buff.PROPERTY = {
-    show_icon               = 2,    -- Whether or not to show the buff icon. <br>`true` by default.
-    icon_sprite             = 3,    -- The GameMaker sprite_index. <br>add descriotinp
-    icon_subimage           = 4,    -- The image_index of the sprite to show. <br>`0` by default.
-    icon_frame_speed        = 5,    -- The speed at which to animate the icon. <br>`0` by default.
-    icon_stack_subimage     = 6,    -- Whether or not to increase the image_index per stack. <br>`true` by default.
-    draw_stack_number       = 7,    -- Whether or not to display the stack number on the icon.
-    stack_number_col        = 8,    -- description here (array) <br>`nil` by default
-    max_stack               = 9,    -- The maximum stack count. <br>`1` by default.
-    is_timed                = 13,   -- If `false`, the buff will persist until manually removed. <br>`true` by default.
-    is_debuff               = 14,   -- If `true`, the buff is considered a debuff. <br>`false` by default.
-    client_handles_removal  = 15    -- If `true`, the client handles removal instead of the server. <br>`false` by default.
+Buff.ARRAY = {
+    namespace               = 0,
+    identifier              = 1,
+    show_icon               = 2,
+    icon_sprite             = 3,
+    icon_subimage           = 4,
+    icon_frame_speed        = 5,
+    icon_stack_subimage     = 6,
+    draw_stack_number       = 7,
+    stack_number_col        = 8,
+    max_stack               = 9,
+    on_apply                = 10,
+    on_remove               = 11,
+    on_step                 = 12,
+    is_timed                = 13,
+    is_debuff               = 14,
+    client_handles_removal  = 15,
+    effect_display          = 16
 }
 
 
 
--- ========== General Functions ==========
+-- ========== Static Methods ==========
 
-Buff.find = function(namespace, identifier)
-    if identifier then namespace = namespace.."-"..identifier end
-
-    local size = gm.array_length(Class.BUFF)
-    for i = 0, size - 1 do
-        local buff = gm.array_get(Class.BUFF, i)
-        local _namespace = gm.array_get(buff, 0)
-        local _identifier = gm.array_get(buff, 1)
-        if namespace == _namespace.."-".._identifier then return i end
-    end
-
-    return nil
-end
-
-
-Buff.apply = function(actor, buff, time, stack)
-    if gm.array_length(actor.buff_stack) <= buff then gm.array_resize(actor.buff_stack, buff + 1) end
-    gm.apply_buff(actor, buff, time, stack or 1)
-
-    -- Clamp to max stack or under
-    -- Funny stuff happens if this is exceeded
-    local buff_array = gm.array_get(Class.BUFF, buff)
-    local max_stack = gm.array_get(buff_array, 9)
-    gm.array_set(actor.buff_stack, buff, math.min(Buff.get_stack_count(actor, buff), max_stack))
-end
-
-
-Buff.remove = function(actor, buff, stack)
-    if gm.array_length(actor.buff_stack) <= buff then gm.array_resize(actor.buff_stack, buff + 1) end
-    local stack_count = Buff.get_stack_count(actor, buff)
-    if (not stack) or stack >= stack_count then gm.remove_buff(actor, buff)
-    else gm.array_set(actor.buff_stack, buff, stack_count - stack)
-    end
-end
-
-
-Buff.get_stack_count = function(actor, buff)
-    if gm.array_length(actor.buff_stack) <= buff then gm.array_resize(actor.buff_stack, buff + 1) end
-    local count = gm.array_get(actor.buff_stack, buff)
-    if count == nil then return 0 end
-    return count
-end
-
-
-
--- ========== Custom Buff Functions ==========
-
-Buff.create = function(namespace, identifier)
+Buff.new = function(namespace, identifier)
     if Buff.find(namespace, identifier) then return nil end
 
     -- Create buff
@@ -83,79 +44,46 @@ Buff.create = function(namespace, identifier)
         identifier
     )
 
+    -- Make buff abstraction
+    local abstraction = Buff.wrap(buff)
+
     -- Set default stack_number_col to pure white
-    Buff.set_property(buff, Buff.PROPERTY.stack_number_col, gm.array_create(1, 16777215))
+    abstraction.stack_number_col = Array.new(1, Color.WHITE)
 
     -- Add onApply callback to add actor to has_custom_buff table
-    Buff.add_callback(buff, "onApply", function(actor, stack)
-        if not Helper.table_has(has_custom_buff, actor) then
-            table.insert(has_custom_buff, actor)
+    abstraction:add_callback("onApply", function(actor, stack)
+        if not Helper.table_has(has_custom_buff, actor.value) then
+            table.insert(has_custom_buff, actor.value)
         end
     end)
 
-    return buff
+    return abstraction
 end
 
 
-Buff.set_property = function(buff, property, value)
-    local array = gm.array_get(Class.BUFF, buff)
-    gm.array_set(array, property, value)
-end
+Buff.find = function(namespace, identifier)
+    if identifier then namespace = namespace.."-"..identifier end
 
-
-Buff.get_property = function(buff, property, value)
-    local array = gm.array_get(Class.BUFF, buff)
-    return gm.array_get(array, property)
-end
-
-
-Buff.add_callback = function(buff, callback, func)
-    local array = gm.array_get(Class.BUFF, buff)
-
-    if callback == "onApply" then
-        local callback_id = gm.array_get(array, 10)
-        if not callbacks[callback_id] then callbacks[callback_id] = {} end
-        table.insert(callbacks[callback_id], {buff, func})
-
-    elseif callback == "onRemove" then
-        local callback_id = gm.array_get(array, 11)
-        if not callbacks[callback_id] then callbacks[callback_id] = {} end
-        table.insert(callbacks[callback_id], {buff, func})
-
-    elseif callback == "onStep" then
-        local callback_id = gm.array_get(array, 12)
-        if not callbacks[callback_id] then callbacks[callback_id] = {} end
-        table.insert(callbacks[callback_id], {buff, func})
-
-    elseif callback == "onDraw"
-        or callback == "onChange"
-        then
-            if not callbacks[callback] then callbacks[callback] = {} end
-            table.insert(callbacks[callback], {buff, func})
-
-    end
-end
-
-
-
--- ========== Internal ==========
-
-function buff_onDraw(self, other, result, args)
-    if gm.variable_global_get("pause") then return end
-    
-    if callbacks["onDraw"] then
-        for n, a in ipairs(has_custom_buff) do
-            if Instance.exists(a) then
-                for _, c in ipairs(callbacks["onDraw"]) do
-                    local count = Buff.get_stack_count(a, c[1])
-                    if count > 0 then
-                        c[2](a, count)  -- Actor, Stack count
-                    end
-                end
-            else table.remove(has_custom_buff, n)
-            end
+    for i, buff in ipairs(Class.BUFF) do
+        local _namespace = buff:get(0)
+        local _identifier = buff:get(1)
+        if namespace == _namespace.."-".._identifier then
+            return Buff.wrap(i - 1)
         end
     end
+
+    return nil
+end
+
+
+Buff.wrap = function(buff_id)
+    local abstraction = {}
+    abstraction_data[abstraction] = {
+        RMT_object = "Buff",
+        value = buff_id
+    }
+    setmetatable(abstraction, metatable_buff)
+    return abstraction
 end
 
 
@@ -169,13 +97,140 @@ end
 
 
 
+-- ========== Instance Methods ==========
+
+methods_buff = {
+
+    add_callback = function(self, callback, func)
+
+        if callback == "onApply" then
+            local callback_id = self.on_apply
+            if not callbacks[callback_id] then callbacks[callback_id] = {} end
+            table.insert(callbacks[callback_id], {self.value, func})
+    
+        elseif callback == "onRemove" then
+            local callback_id = self.on_remove
+            if not callbacks[callback_id] then callbacks[callback_id] = {} end
+            table.insert(callbacks[callback_id], {self.value, func})
+
+        elseif callback == "onStep" then
+            local callback_id = self.on_step
+            if not callbacks[callback_id] then callbacks[callback_id] = {} end
+            table.insert(callbacks[callback_id], {self.value, func})
+
+        elseif callback == "onStatRecalc"
+            or callback == "onPostStatRecalc"
+            or callback == "onDraw"
+            or callback == "onChange"
+            then
+                if not callbacks[callback] then callbacks[callback] = {} end
+                table.insert(callbacks[callback], {self.value, func})
+
+        else log.error("Invalid callback name", 2)
+
+        end
+    end
+
+}
+
+
+methods_buff_callbacks = {
+
+    onApply             = function(self, func) self:add_callback("onApply", func) end,
+    onRemove            = function(self, func) self:add_callback("onRemove", func) end,
+    onStatRecalc        = function(self, func) self:add_callback("onStatRecalc", func) end,
+    onPostStatRecalc    = function(self, func) self:add_callback("onPostStatRecalc", func) end,
+    onStep              = function(self, func) self:add_callback("onStep", func) end,
+    onDraw              = function(self, func) self:add_callback("onDraw", func) end,
+    onChange            = function(self, func) self:add_callback("onChange", func) end
+
+}
+
+
+
+-- ========== Metatables ==========
+
+metatable_buff_gs = {
+    -- Getter
+    __index = function(table, key)
+        local index = Buff.ARRAY[key]
+        if index then
+            local buff_array = Class.BUFF:get(table.value)
+            return buff_array:get(index)
+        end
+        log.error("Non-existent buff property", 2)
+        return nil
+    end,
+
+
+    -- Setter
+    __newindex = function(table, key, value)
+        local index = Buff.ARRAY[key]
+        if index then
+            local buff_array = Class.BUFF:get(table.value)
+            buff_array:set(index, value)
+            return
+        end
+        log.error("Non-existent buff property", 2)
+    end
+}
+
+
+metatable_buff_callbacks = {
+    __index = function(table, key)
+        -- Methods
+        if methods_buff_callbacks[key] then
+            return methods_buff_callbacks[key]
+        end
+
+        -- Pass to next metatable
+        return metatable_buff_gs.__index(table, key)
+    end,
+    
+
+    __newindex = function(table, key, value)
+        metatable_buff_gs.__newindex(table, key, value)
+    end
+}
+
+
+metatable_buff = {
+    __index = function(table, key)
+        -- Allow getting but not setting these
+        if key == "value" then return abstraction_data[table].value end
+        if key == "RMT_object" then return abstraction_data[table].RMT_object end
+
+        -- Methods
+        if methods_buff[key] then
+            return methods_buff[key]
+        end
+
+        -- Pass to next metatable
+        return metatable_buff_callbacks.__index(table, key)
+    end,
+    
+
+    __newindex = function(table, key, value)
+        if key == "value" or key == "RMT_object" then
+            log.error("Cannot modify RMT object values", 2)
+            return
+        end
+        
+        metatable_buff_gs.__newindex(table, key, value)
+    end
+}
+
+
+
 -- ========== Hooks ==========
 
 gm.post_script_hook(gm.constants.callback_execute, function(self, other, result, args)
+    -- onApply and onRemove
     if callbacks[args[1].value] then
         for _, fn in pairs(callbacks[args[1].value]) do
-            local stack = Buff.get_stack_count(args[2].value, fn[1])
-            fn[2](args[2].value, stack)   -- Actor, Buff stack
+            local actor = Instance.wrap(args[2].value)
+            local stack = actor:buff_stack_count(fn[1])
+            fn[2](actor, stack)     -- Actor, Buff stack
         end
     end
 end)
@@ -187,16 +242,66 @@ gm.pre_script_hook(gm.constants.apply_buff_internal, function(self, other, resul
 end)
 
 
+gm.post_script_hook(gm.constants.recalculate_stats, function(self, other, result, args)
+    local actor = Instance.wrap(self)
+    if callbacks["onStatRecalc"] then
+        for _, fn in ipairs(callbacks["onStatRecalc"]) do
+            local count = actor:buff_stack_count(fn[1])
+            if count > 0 then
+                fn[2](actor, count)   -- Actor, Stack count
+            end
+        end
+    end
+    actor:get_data().post_stat_recalc = true
+end)
+
+
 gm.pre_script_hook(gm.constants.actor_transform, function(self, other, result, args)
     if callbacks["onChange"] then
         for _, fn in pairs(callbacks["onChange"]) do
-            local stack = Buff.get_stack_count(args[1].value, fn[1])
-            if stack > 0 then
-                fn[2](args[1].value, args[2].value, stack)   -- Actor, To, Buff stack
+            local actor = Instance.wrap(args[1].value)
+            local count = actor:buff_stack_count(fn[1])
+            if count > 0 then
+                fn[2](actor, Instance.wrap(args[2].value), count)   -- Actor, To, Buff stack
             end
         end
     end
 end)
+
+
+
+-- ========== Callbacks ==========
+
+function buff_onPostStatRecalc(actor)
+    if callbacks["onPostStatRecalc"] then
+        for _, fn in ipairs(callbacks["onPostStatRecalc"]) do
+            local count = actor:buff_stack_count(fn[1])
+            if count > 0 then
+                fn[2](actor, count)   -- Actor, Stack count
+            end
+        end
+    end
+end
+
+
+local function buff_onDraw(self, other, result, args)
+    if gm.variable_global_get("pause") then return end
+
+    if callbacks["onDraw"] then
+        for n, a in ipairs(has_custom_buff) do
+            if Instance.exists(a) then
+                for _, c in ipairs(callbacks["onDraw"]) do
+                    local actor = Instance.wrap(a)
+                    local count = actor:buff_stack_count(c[1])
+                    if count > 0 then
+                        c[2](actor, count)  -- Actor, Stack count
+                    end
+                end
+            else table.remove(has_custom_buff, n)
+            end
+        end
+    end
+end
 
 
 

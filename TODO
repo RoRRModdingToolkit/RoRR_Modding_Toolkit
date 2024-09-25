@@ -1,0 +1,27 @@
+v Add Equipment class
+    v Modify Actor and Item onEquipmentUse callbacks
+- Add ability for specific (single-instance) Actor callbacks
+- Add Item and Equipment toggle_loot
+v Add new custom Object support (based on info from sarn)
+- Add Difficulty class
+o Apply Instance wrapper everywhere (on gm.array_get, etc.)
+    : Support on GM instance variable get/set; having only this is probably fine
+    ! EDIT: See Notes.txt
+- Fix actor:fire_explosion not stunning without proc being active, which makes no sense
+- Add Instance.spawn_crate back
+
+- Add actor:reduce_cooldown(slot)
+- Also think of better way to do cooldown reduction on a slot (I think Hardlight Afterburner already does this)
+
+- Overwrite fire_bullet and fire_explosion to guarantee stun application
+- Might need to change onHit to a different hook to pass in a modifiable attack_info (maybe)
+
+v actor:fire_explosion rewrite
+
+- ISSUE: onPostStatRecalc is called immediately after onStatRecalc for each module separately
+    - Will have to move around onPostStatRecalc to a single function or something
+
+v Add actor:get_active_skill(slot)
+- Add tracers for actor:fire_bullet()
+
+v Add interactable cards for Interactable

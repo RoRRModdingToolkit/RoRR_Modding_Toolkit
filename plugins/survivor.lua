@@ -1,374 +1,590 @@
 -- Survivor
--- Made by SmoothSpatula using code from Sarn
-
--- == Section survivor_setup (made by Sarn)== --
-survivor_setup = {}
-
--- for interacting with global arrays as classes
-local function gm_array_class(name, fields)
-    local mt = {
-        __index = function(t, k)
-            local f = fields[k]
-            if f then
-                local v = gm.array_get(t.arr, f.idx)
-                if f.typ then
-                    return v
-                elseif f.decode then
-                    return f.decode(v)
-                end
-                return v
-            end
-            return nil
-        end,
-        __newindex = function(t, k, v)
-            local f = fields[k]
-            if f then
-                if f.readonly then
-                    error("field " .. k .. " is read-only")
-                else
-                    return gm.array_set(t.arr, f.idx, v)
-                end
-            else
-                error("setting unknown field " .. k)
-            end
-        end
-    }
-    return function(id)
-        local class_arr = gm.variable_global_get(name)
-        local arr = gm.array_get(class_arr, id)
-        return setmetatable({id = id, arr = arr}, mt)
-    end
-end
-
-survivor_setup.Skill = gm_array_class("class_skill", {
-    namespace  = {idx=0},
-    identifier = {idx=1},
-
-    token_name = {idx=2},
-    token_description = {idx=3},
-
-    sprite     = {idx=4},
-    subimage   = {idx=5},
-
-    cooldown     = {idx=6},
-    damage   = {idx=7},
-    max_stock   = {idx=8},
-    start_with_stock   = {idx=9},
-    auto_restock   = {idx=10},
-    required_stock   = {idx=11},
-    require_key_press   = {idx=12},
-    allow_buffered_input   = {idx=13},
-    use_delay   = {idx=14},
-    animation   = {idx=15},
-    is_utility   = {idx=16},
-    is_primary   = {idx=17},
-    required_interrupt_priority   = {idx=18},
-    hold_facing_direction   = {idx=19},
-    override_strafe_direction   = {idx=20},
-    ignore_aim_direction   = {idx=21},
-    disable_aim_stall   = {idx=22},
-    does_change_activity_state   = {idx=23},
-    
-    on_can_activate   = {idx=24},
-    on_activate   = {idx=25},
-    on_step   = {idx=26},
-    on_equipped   = {idx=27},
-    on_unequipped   = {idx=28},
-    
-    upgrade_skill   = {idx=29},
-})
-
-local skill_family_mt = {
-    __index = function(t,k)
-        if type(k) == "number" then
-            if k >= 0 and k < gm.array_length(t.elements) then
-                -- the actual value in the array is a 'skill loadout unlockable' object, so get the skill id from it
-                return survivor_setup.Skill(gm.variable_struct_get(gm.array_get(t.elements, k), "skill_id"))
-            end
-        end
-        return nil
-    end
-}
-
-local function wrap_skill_family(struct_loadout_family)
-    -- too lazy to write a proper wrapper right now sorry
-    local elements = gm.variable_struct_get(struct_loadout_family, "elements")
-    return setmetatable({struct=struct_loadout_family, elements=elements}, skill_family_mt)
-end
-
-survivor_setup.Survivor = gm_array_class("class_survivor", {
-    namespace  = {idx=0},
-    identifier = {idx=1},
-
-    token_name = {idx=2},
-    token_name_upper = {idx=3},
-    token_description = {idx=4},
-    token_end_quote = {idx=5},
-    
-    skill_family_z = {idx=6,decode=wrap_skill_family},
-    skill_family_x = {idx=7,decode=wrap_skill_family},
-    skill_family_c = {idx=8,decode=wrap_skill_family},
-    skill_family_v = {idx=9,decode=wrap_skill_family},
-    skin_family = {idx=10,decode=nil},
-    all_loadout_families = {idx=11,decode=nil},
-    all_skill_families = {idx=12,decode=nil},
-
-    sprite_loadout        = {idx=13},
-    sprite_title          = {idx=14},
-    sprite_idle           = {idx=15},
-    sprite_portrait       = {idx=16},
-    sprite_portrait_small = {idx=17},
-    sprite_palette = {idx=18},
-    sprite_portrait_palette = {idx=19},
-    sprite_loadout_palette = {idx=20},
-    sprite_credits = {idx=21},
-    primary_color         = {idx=22},
-    select_sound_id         = {idx=23},
-
-    log_id         = {idx=24},
-
-    achievement_id         = {idx=25},
-
-    on_init         = {idx=29},
-    on_step         = {idx=30},
-    on_remove         = {idx=31},
-
-    is_secret         = {idx=32},
-
-    cape_offset         = {idx=33},
-})
-
-function survivor_setup:print_name ()
-    print(survivor_setup.Survivor.token_name)
-end
-
--- == Section 
-
-local survivors = ... or {}
-
-local is_init = false
 
 Survivor = {}
 
--- Section Setup/Stats == --
+local abstraction_data = setmetatable({}, {__mode = "k"})
 
-Survivor.setup_survivor = function(namespace, identifier, name, description, end_quote,
-                        loadout_sprite, portrait_sprite, portraitsmall_sprite, palette_sprite, 
-                        walk_sprite, idle_sprite, death_sprite, jump_sprite, jump_peak_sprite, jumpfall_sprite, climb_sprite,
-                        colour, cape_array)
+local callbacks = {}
+local instance_callbacks = {}
+
+-- TODO maybe find a better way to do this?
+local survivors = {}
+
+-- Sprites to use for the skins (portrait and select menu)
+local asset_name_overrides = {}
+
+
+-- ========== Enums ==========
+
+Survivor.ARRAY = {
+    namespace                   = 0,
+    identifier                  = 1,
+    token_name                  = 2,
+    token_name_upper            = 3,
+    token_description           = 4,
+    token_end_quote             = 5,
+    skill_family_z              = 6,
+    skill_family_x              = 7,
+    skill_family_c              = 8,
+    skill_family_v              = 9,
+    skin_family                 = 10,
+    all_loadout_families        = 11,
+    all_skill_families          = 12,
+    sprite_loadout              = 13,
+    sprite_title                = 14,
+    sprite_idle                 = 15,
+    sprite_portrait             = 16,
+    sprite_portrait_small       = 17,
+    sprite_palette              = 18,
+    sprite_portrait_palette     = 19,
+    sprite_loadout_palette      = 20,
+    sprite_credits              = 21,
+    primary_color               = 22,
+    select_sound_id             = 23,
+    log_id                      = 24,
+    achievement_id              = 25,
+    milestone_kills_1           = 26,
+    milestone_items_1           = 27,
+    milestone_stages_1          = 28,
+    on_init                     = 29,
+    on_step                     = 30,
+    on_remove                   = 31,
+    is_secret                   = 32,
+    cape_offset                 = 33
+}
+
+-- ========== Static Methods ==========
+
+Survivor.find = function(namespace, identifier)
+    if identifier then namespace = namespace.."-"..identifier end
     
-    -- check if survivor already exists (same namespace and identifier)               
-    local CLASS_SURVIVOR = gm.variable_global_get("class_survivor")
-    local survivor_id = nil
-    for i=1, #CLASS_SURVIVOR do
-        if CLASS_SURVIVOR[i][1] == namespace and CLASS_SURVIVOR[i][2] == identifier then
-            survivor_id = i - 1
-            break
+    for i, survivor in ipairs(Class.SURVIVOR) do
+        local _namespace = survivor:get(0)
+        local _identifier = survivor:get(1)
+        if namespace == _namespace.."-".._identifier then
+            return Survivor.wrap(i - 1)
         end
     end
+    
+    return nil
+end
 
-    if survivor_id == nil then
-        survivor_id = gm.survivor_create(namespace, identifier)
-    end
-    survivor = survivor_setup.Survivor(survivor_id)
+Survivor.wrap = function(survivor_id)
+    local abstraction = {}
+    abstraction_data[abstraction] = {
+        RMT_object = "Survivor",
+        value = survivor_id
+    }
+    setmetatable(abstraction, metatable_survivor)
+    
+    return abstraction
+end
 
-    -- Configure Properties
-    survivor.token_name = name
-    survivor.token_name_upper = string.upper(name)
-    survivor.token_description = description
-    survivor.token_end_quote = end_quote
+Survivor.new = function(namespace, identifier)
+    -- Check if survivor already exist
+    local survivor = Survivor.find(namespace, identifier)
+    if survivor then return survivor end
+    
+    -- Create survivor
+    survivor = gm.survivor_create(namespace, identifier)
+    
+    -- TODO maybe find a better way to do this?
+    -- Create default variable for the survivor
+    survivors[survivor] = {
+        -- Default Scale
+        xscale                  = 1.0,
+        yscale                  = 1.0,
 
-    survivor.sprite_loadout = loadout_sprite
-    survivor.sprite_title = walk_sprite
-    survivor.sprite_idle = idle_sprite
-    survivor.sprite_portrait = portrait_sprite
-    survivor.sprite_portrait_small = portraitsmall_sprite
-    survivor.sprite_palette = palette_sprite
-    survivor.sprite_portrait_palette = palette_sprite
-    survivor.sprite_loadout_palette = palette_sprite
-    survivor.sprite_credits = walk_sprite
+        -- Default Sprites
+        idle                    = gm.constants.sCommandoIdle,
+        walk                    = gm.constants.sCommandoWalk,
+        walk_last               = gm.constants.sCommandoWalk,
+        jump                    = gm.constants.sCommandoJump,
+        jump_peak               = gm.constants.sCommandoJumpPeak,
+        fall                    = gm.constants.sCommandoFall,
+        climb                   = gm.constants.sCommandoClimb,
+        death                   = gm.constants.sCommandoDeath,
+        decoy                   = gm.constants.sDronePlayerCommandoIdle,
+        drone_idle              = gm.constants.sDronePlayerCommandoShoot,
+        drone_shoot             = gm.constants.sCommandoDecoy,
+        climb_hurt              = -1,
+        palette                 = gm.constants.sCommandoPalette,
+        
+        -- Default Stats Base
+        maxhp_base              = 110.0,
+        damage_base             = 12.0,
+        regen_base              = 0.01,
+        attack_speed_base       = 1.0,
+        critical_chance_base    = 1.0,
+        armor_base              = 0.0,
+        maxshield_base          = 0.0,
+        pHmax_base              = 2.8,
+        pVmax_base              = 6.0,
+        pGravity1_base          = 0.52,
+        pGravity2_base          = 0.36,
+        pAccel_base             = 0.15,
+    
+        -- Default Stats Level
+        maxhp_level             = 32.0,
+        damage_level            = 2.0,
+        regen_level             = 0.002,
+        attack_speed_level      = 0.0,
+        critical_chance_level   = 0.0,
+        armor_level             = 2.0,
 
-    survivor.primary_color = gm.make_colour_rgb(colour.r, colour.g, colour.b) -- for stats screen
-
-    local vanilla_survivor = survivor_setup.Survivor(0)
-    survivor.on_init = vanilla_survivor.on_init
-    survivor.on_step = vanilla_survivor.on_step
-    survivor.on_remove = vanilla_survivor.on_remove
-
-    survivor.cape_offset = gm.array_create(4, nil)
-
-    local cape_offset = gm.variable_global_get("class_survivor")[survivor_id+1][34]
-    gm.array_set(cape_offset, 0, cape_array[1])
-    gm.array_set(cape_offset, 1, cape_array[2])
-    gm.array_set(cape_offset, 2, cape_array[3])
-    gm.array_set(cape_offset, 3, -1.0)
-
-    survivors[survivor_id] = {
-        ["identifier"] = identifier, 
-        ["idle_sprite"] = idle_sprite, 
-        ["walk_sprite"] = walk_sprite, 
-        ["death_sprite"] = death_sprite,
-        ["jump_sprite"] = jump_sprite,
-        ["jumpfall_sprite"] = jumpfall_sprite,
-        ["jumppeak_sprite"] = jump_peak_sprite,
-        ["climb_sprite"] = climb_sprite
+        -- Skin array
+        skins                   = {}
     }
 
-    return survivor, survivor_id
+    -- Make survivor abstraction
+    local abstraction = Survivor.wrap(survivor)
+
+    abstraction:onInit(function(actor)
+
+        -- Survivor scale
+        actor.image_xscale          = survivors[actor.class].xscale
+        actor.image_yscale          = survivors[actor.class].yscale
+
+        -- Set sprites
+        actor.sprite_idle           = survivors[actor.class].idle
+        actor.sprite_walk           = survivors[actor.class].walk
+        actor.sprite_walk_last      = survivors[actor.class].walk_last
+        actor.sprite_jump           = survivors[actor.class].jump
+        actor.sprite_jump_peak      = survivors[actor.class].jump_peak
+        actor.sprite_fall           = survivors[actor.class].fall
+        actor.sprite_climb          = survivors[actor.class].climb
+        actor.sprite_death          = survivors[actor.class].death
+        actor.sprite_decoy          = survivors[actor.class].decoy
+        actor.sprite_drone_idle     = survivors[actor.class].drone_idle
+        actor.sprite_drone_shoot    = survivors[actor.class].drone_shoot
+        actor.sprite_climb_hurt     = survivors[actor.class].climb_hurt    
+        actor.sprite_palette        = survivors[actor.class].palette
+
+        -- Set base stats
+        actor.maxhp_base            = survivors[actor.class].maxhp_base
+        actor.damage_base           = survivors[actor.class].damage_base
+        actor.hp_regen_base         = survivors[actor.class].regen_base
+        actor.attack_speed_base     = survivors[actor.class].attack_speed_base
+        actor.critical_chance_base  = survivors[actor.class].critical_chance_base
+        actor.armor_base            = survivors[actor.class].armor_base
+        actor.maxshield_base        = survivors[actor.class].maxshield_base
+        actor.pHmax_base            = survivors[actor.class].pHmax_base
+        actor.pVmax_base            = survivors[actor.class].pVmax_base
+        actor.pGravity1_base        = survivors[actor.class].pGravity1_base
+        actor.pGravity2_base        = survivors[actor.class].pGravity2_base
+        actor.pAccel_base           = survivors[actor.class].pAccel_base
+
+        -- Set level stats
+        actor.maxhp_level           = survivors[actor.class].maxhp_level
+        actor.damage_level          = survivors[actor.class].damage_level
+        actor.hp_regen_level        = survivors[actor.class].regen_level
+        actor.attack_speed_level    = survivors[actor.class].attack_speed_level
+        actor.critical_chance_level = survivors[actor.class].critical_chance_level
+        actor.armor_level           = survivors[actor.class].armor_level
+    end)
+
+    return abstraction
 end
 
-Survivor.setup_stats = function(survivor_id, armor, attack_speed, movement_speed, critical_chance, damage, hp_regen, maxhp, maxbarrier, maxshield, maxhp_cap, jump_force)
-    survivors[survivor_id]["armor"] = armor
-    survivors[survivor_id]["attack_speed"] = attack_speed
-    survivors[survivor_id]["movement_speed"] = movement_speed
-    survivors[survivor_id]["critical_chance"] = critical_chance
-    survivors[survivor_id]["damage"] = damage
-    survivors[survivor_id]["hp_regen"] =  hp_regen
-    survivors[survivor_id]["maxhp"] =  maxhp
-    survivors[survivor_id]["maxbarrier"] = maxbarrier
-    survivors[survivor_id]["maxshield"] = maxshield
-    survivors[survivor_id]["maxhp_cap"] = maxhp_cap
-    survivors[survivor_id]["pVmax"] = jump_force
+Survivor.get_callback_count = function()
+    local count = 0
+    for k, v in pairs(callbacks) do
+        count = count + #v
+    end
+    return count
 end
 
-Survivor.setup_level_stats = function(survivor_id, armor_level, attack_speed_level, critical_chance_level, damage_level, hp_regen_level, maxhp_level)
-    survivors[survivor_id]["armor_level"] = armor_level
-    survivors[survivor_id]["attack_speed_level"] = attack_speed_level
-    survivors[survivor_id]["critical_chance_level"] = critical_chance_level
-    survivors[survivor_id]["damage_level"] = damage_level
-    survivors[survivor_id]["hp_regen_level"] =  hp_regen_level
-    survivors[survivor_id]["maxhp_level"] = maxhp_level
-end
 
--- == Section Skill == --
+-- ========== Instance Methods ==========
 
-Survivor.setup_skill = function(skill_ref, name, description, 
-                    sprite, sprite_subimage,animation, 
-                    cooldown, damage, is_primary, skill_id)
-    skill_ref.token_name = name
-    skill_ref.token_description = description
-    skill_ref.sprite = sprite
-    skill_ref.subimage = sprite_subimage
-    skill_ref.animation = animation
-    skill_ref.cooldown = cooldown
-    skill_ref.damage = damage
-    skill_ref.is_primary = is_primary
-    skill_ref.required_stock = is_primary and 0 or 1 -- primary skill dont need stock
-    skill_ref.use_delay = 0
-    skill_ref.require_key_press = not is_primary
-    skill_ref.does_change_activity_state = true
+methods_survivor = {
 
-    local skills = gm.variable_global_get("class_skill")
+    add_callback = function(self, callback, func)
 
-    -- skill_ref.on_can_activate = skills[skill_id][25]
-    -- skill_ref.on_activate = skills[skill_id][26]
+        if callback == "onInit" then
+            local callback_id = self.on_init
+            if not callbacks[callback_id] then callbacks[callback_id] = {} end
+            table.insert(callbacks[callback_id], func)
+        end
+        if callback == "onStep" then
+            local callback_id = self.on_step
+            if not callbacks[callback_id] then callbacks[callback_id] = {} end
+            table.insert(callbacks[callback_id], func)
+        end
+        if callback == "onRemove" then
+            local callback_id = self.on_remove
+            if not callbacks[callback_id] then callbacks[callback_id] = {} end
+            table.insert(callbacks[callback_id], func)
+        end
+    end,
+    
+    -- Put that somewhere else
+    add_instance_callback = function(self, func)
+        local id = #instance_callbacks + 1
+        instance_callbacks[id] = func
+        return id
+    end,
 
-    skill_ref.on_can_activate = skills[skill_id][25]
-    skill_ref.on_activate = skills[skill_id][26]
+    add_skill = function(self, skill, skill_family_index, achievement)
 
-    return skill_ref
-end
+        local skill_family = nil
+        if skill_family_index == 1 then
+            skill_family = self.skill_family_z.elements
+        elseif  skill_family_index == 2 then
+            skill_family = self.skill_family_x.elements
+        elseif skill_family_index == 3 then
+            skill_family = self.skill_family_c.elements
+        elseif skill_family_index == 4 then
+            skill_family = self.skill_family_v.elements
+        else
+            log.error("Skill Family Index should be between 1 and 4, got "..skill_family_index, 2)
+            return
+        end
 
-Survivor.setup_empty_skill = function(skill_ref)
-    skill_ref.token_name = "Locked"
-    skill_ref.token_description = ""
-    skill_ref.sprite = gm.constants.sRobomandoSkills
-    skill_ref.subimage = 3
-    skill_ref.animation = nil
-    skill_ref.cooldown = 0
-    skill_ref.damage = 0
-    skill_ref.is_primary = false
-    skill_ref.required_stock = 10000
-    skill_ref.max_stock = 0
-    skill_ref.use_delay = 0
-    skill_ref.require_key_press = 0
-    skill_ref.does_change_activity_state = false
+        for _, skill_el in ipairs(skill_family) do
+            if skill_el.skill_id == skill.value then return end
+        end
 
-    local skills = gm.variable_global_get("class_skill")
+        local survivor_loadout_unlockables = gm.variable_global_get("survivor_loadout_unlockables")
+        
+        local survivor_loadout = gm.struct_create()
 
-    skill_ref.on_can_activate = skills[1][25]
-    skill_ref.on_activate = skills[1][26]
+        gm.static_set(survivor_loadout, gm.static_get(skill_family[1]))
+
+        survivor_loadout.skill_id = skill.value
+        survivor_loadout.achievement_id = (achievement and achievement.value) or -1
+        survivor_loadout.save_flag_viewed = nil
+        survivor_loadout.index = gm.array_length(survivor_loadout_unlockables)
+
+        gm.array_push(survivor_loadout_unlockables, survivor_loadout)
+        gm.array_push(skill_family, survivor_loadout)
+    end,
+
+    add_primary = function(self, skill, achievement)
+        self:add_skill(skill, 1, achievement)
+    end,
+    
+    add_secondary = function(self, skill, achievement)
+        self:add_skill(skill, 2, achievement)
+    end,
+    
+    add_utility = function(self, skill, achievement)
+        self:add_skill(skill, 3, achievement)
+    end,
+    
+    add_special = function(self, skill, achievement)
+        self:add_skill(skill, 4, achievement)
+    end,
+
+    get_skill = function(self, skill_family_index, family_index)
+        local skill_family = nil
+        if skill_family_index == 1 then
+            skill_family = self.skill_family_z.elements
+        elseif  skill_family_index == 2 then
+            skill_family = self.skill_family_x.elements
+        elseif skill_family_index == 3 then
+            skill_family = self.skill_family_c.elements
+        elseif skill_family_index == 4 then
+            skill_family = self.skill_family_v.elements
+        else
+            log.error("Skill Family Index should be between 1 and 4, got "..skill_family_index, 2)
+            return
+        end
+
+        family_index = family_index or 1
+        if family_index > #skill_family or family_index < 1 then 
+            log.error("Family index is out of bound!", 2)
+            return nil
+        end
+        return Skill.wrap(skill_family[family_index].skill_id)
+    end,
+    
+    get_primary = function(self, family_index)
+        return self:get_skill(1, family_index)
+    end,
+
+    get_secondary = function(self, family_index)
+        return self:get_skill(2, family_index)
+    end,
+
+    get_utility = function(self, family_index)
+        return self:get_skill(3, family_index)
+    end,
+
+    get_special = function(self, family_index)
+        return self:get_skill(4, family_index)
+    end,
+
+    set_animations = function(self, sprites)
+        survivors[self.value].idle          = sprites.idle or survivors[self.value].idle
+        survivors[self.value].walk          = sprites.walk or survivors[self.value].walk
+        survivors[self.value].walk_last     = sprites.walk_last or (sprites.walk or survivors[self.value].walk)
+        survivors[self.value].jump          = sprites.jump or survivors[self.value].jump
+        survivors[self.value].jump_peak     = sprites.jump_peak or (sprites.jump or survivors[self.value].jump_peak)
+        survivors[self.value].fall          = sprites.fall or (sprites.jump or survivors[self.value].fall)
+        survivors[self.value].climb         = sprites.climb or survivors[self.value].climb
+        survivors[self.value].death         = sprites.death or survivors[self.value].death
+        survivors[self.value].decoy         = sprites.decoy or survivors[self.value].decoy
+        survivors[self.value].drone_idle    = sprites.drone_idle or survivors[self.value].drone_idle
+        survivors[self.value].drone_shoot   = sprites.drone_shoot or survivors[self.value].drone_shoot
+        survivors[self.value].climb_hurt    = sprites.climb_hurt or survivors[self.value].climb_hurt
+    end,
+
+    set_primary_color = function(self, R, G, B)
+        self.primary_color = Color.from_rgb(R, G, B)
+    end,
+
+    set_text = function(self, name, description, end_quote)
+        self.token_name = name
+        self.token_name_upper = string.upper(name)
+        self.token_description = description
+        self.token_end_quote = end_quote
+    end,
+
+    set_stats_base = function(self, maxhp, damage, regen, armor, attack_speed, critical_chance, maxshield)
+        if type(maxhp) ~= "number" and type(maxhp) ~= "nil" then log.error("Max HP base should be a number, got a "..type(maxhp), 2) return end
+        if type(damage) ~= "number" and type(damage) ~= "nil" then log.error("Damage base should be a number, got a "..type(damage), 2) return end
+        if type(regen) ~= "number" and type(regen) ~= "nil" then log.error("Regen base should be a number, got a "..type(regen), 2) return end
+        if type(armor) ~= "number" and type(armor) ~= "nil" then log.error("Armor base should be a number, got a "..type(armor), 2) return end
+        if type(attack_speed) ~= "number" and type(attack_speed) ~= "nil" then log.error("Attack Speed base should be a number, got a "..type(attack_speed), 2) return end
+        if type(critical_chance) ~= "number" and type(critical_chance) ~= "nil" then log.error("Critical Chance base should be a number, got a "..type(critical_chance), 2) return end
+        if type(maxshield) ~= "number" and type(maxshield) ~= "nil" then log.error("Max Shield base should be a number, got a "..type(maxshield), 2) return end
+
+        survivors[self.value].maxhp_base = maxhp or survivors[self.value].maxhp_base
+        survivors[self.value].damage_base = damage or survivors[self.value].damage_base
+        survivors[self.value].regen_base = regen or survivors[self.value].regen_base
+        survivors[self.value].attack_speed_base = attack_speed or survivors[self.value].attack_speed_base
+        survivors[self.value].critical_chance_base = critical_chance or survivors[self.value].critical_chance_base
+        survivors[self.value].armor_base = armor or survivors[self.value].armor_base
+        survivors[self.value].maxshield_base = maxshield or survivors[self.value].maxshield_base
+    end,
+    
+    set_physic_base = function(self, hmax, vmax, gravity1, gravity2, accel)
+        if type(hmax) ~= "number" and type(hmax) ~= "nil" then log.error("Hmax base should be a number, got a "..type(hmax), 2) return end
+        if type(vmax) ~= "number" and type(vmax) ~= "nil" then log.error("Vmax base should be a number, got a "..type(vmax), 2) return end
+        if type(gravity1) ~= "number" and type(gravity1) ~= "nil" then log.error("Gravity1 base should be a number, got a "..type(gravity1), 2) return end
+        if type(gravity2) ~= "number" and type(gravity2) ~= "nil" then log.error("Gravity2 base should be a number, got a "..type(gravity2), 2) return end
+        if type(accel) ~= "number" and type(accel) ~= "nil" then log.error("Acceleration base should be a number, got a "..type(accel), 2) return end
+
+        survivors[self.value].pHmax_base = hmax or survivors[self.value].pHmax_base
+        survivors[self.value].pVmax_base = vmax or survivors[self.value].pVmax_base
+        survivors[self.value].pGravity1_base = gravity1 or survivors[self.value].pGravity1_base
+        survivors[self.value].pGravity2_base = gravity2 or survivors[self.value].pGravity2_base
+        survivors[self.value].pAccel_base = accel or survivors[self.value].pAccel_base
+    end,
+
+    set_stats_level = function(self, maxhp, damage, regen, armor, attack_speed, critical_chance)
+        if type(maxhp) ~= "number" and type(maxhp) ~= "nil" then log.error("Max HP level should be a number, got a "..type(maxhp), 2) return end
+        if type(damage) ~= "number" and type(damage) ~= "nil" then log.error("Damage level should be a number, got a "..type(damage), 2) return end
+        if type(regen) ~= "number" and type(regen) ~= "nil" then log.error("Regen level should be a number, got a "..type(regen), 2) return end
+        if type(armor) ~= "number" and type(armor) ~= "nil" then log.error("Armor level should be a number, got a "..type(armor), 2) return end
+        if type(attack_speed) ~= "number" and type(attack_speed) ~= "nil" then log.error("Attack Speed level should be a number, got a "..type(attack_speed), 2) return end
+        if type(critical_chance) ~= "number" and type(critical_chance) ~= "nil" then log.error("Critical Chance level should be a number, got a "..type(critical_chance), 2) return end
+
+        survivors[self.value].maxhp_level = maxhp or survivors[self.value].maxhp_level
+        survivors[self.value].damage_level = damage or survivors[self.value].damage_level
+        survivors[self.value].regen_level = regen or survivors[self.value].regen_level
+        survivors[self.value].attack_speed_level = attack_speed or survivors[self.value].attack_speed_level
+        survivors[self.value].critical_chance_level = critical_chance or survivors[self.value].critical_chance_level
+        survivors[self.value].armor_level = armor or survivors[self.value].armor_level
+    end,
+
+    set_palettes = function(self, palette, portrait_palette, loadout_palette)
+        self.sprite_palette = palette
+        survivors[self.value].palette = palette
+
+        self.sprite_portrait_palette = portrait_palette
+        self.sprite_loadout_palette = loadout_palette
+    end,
+
+    set_cape_offset = function(self, xoffset, yoffset, xoffset_rope, yoffset_rope)
+        if type(xoffset) ~= "number" then log.error("X Offset should be a number, got a "..type(maxhp), 2) return end
+        if type(yoffset) ~= "number" then log.error("Y Offset should be a number, got a "..type(maxhp), 2) return end
+        if type(xoffset_rope) ~= "number" then log.error("X Offset Rope should be a number, got a "..type(maxhp), 2) return end
+        if type(yoffset_rope) ~= "number" then log.error("Y Offset Rope should be a number, got a "..type(maxhp), 2) return end
+
+        if type(self.cape_offset) == "nil" then self.cape_offset = gm.array_create(4) end
+        
+        self.cape_offset[1] = xoffset
+        self.cape_offset[2] = yoffset
+        self.cape_offset[3] = xoffset_rope
+        self.cape_offset[4] = yoffset_rope
+    end,
+    
+    set_scale = function(self, xscale, yscale)
+        if type(xscale) ~= "number" then log.error("Xscale should be a number, got a "..type(xscale), 2) return end
+        if type(yscale) ~= "number" and type(yscale) ~= "nil" then log.error("Yscale should be a number, got a "..type(yscale), 2) return end
+
+        survivors[self.value].xscale = xscale
+        survivors[self.value].yscale = yscale or xscale
+    end,
+
+    -- TODO ask GrooveSalad for the code of UnderYourSkin to automatically
+    -- generates those new sprites based on the palettes
+    add_skin = function(self, name, skin_index, skin_loadout, skin_portrait, skin_portraitsmall, achievement)
+        for _, skin_name in ipairs(survivors[self.value].skins) do
+            if skin_name == name then 
+                -- log.error("Skin Name already exist: "..name)
+                return 
+            end
+        end
+
+        local skin_pal_swap = math.tointeger(gm.actor_skin_get_default_palette_swap(skin_index))
+
+        print("__newsprite"..math.tointeger(self.sprite_loadout).."_PAL"..skin_pal_swap)
+        asset_name_overrides["__newsprite"..math.tointeger(self.sprite_loadout).."_PAL"..skin_pal_swap] = skin_loadout or self.sprite_loadout
+        asset_name_overrides["__newsprite"..math.tointeger(self.sprite_portrait).."_PAL"..skin_pal_swap] = skin_portrait or self.sprite_portrait
+        asset_name_overrides["__newsprite"..math.tointeger(self.sprite_portrait_small).."_PAL"..skin_pal_swap] = skin_portraitsmall or self.sprite_portrait_small
+
+        gm.array_insert(
+            self.skin_family.elements,
+            #self.skin_family.elements,
+            gm["@@NewGMLObject@@"](
+                gm.constants.SurvivorSkinLoadoutUnlockable,
+                skin_pal_swap,
+                (achievement and achievement.value) or -1
+            )
+        )
+        -- local artifact_skin = Artifact.new_skin(achievement)
+        -- local skin_alt = gm.struct_create()
+        -- gm.static_set(skin_alt, gm.static_get(self.skin_family.elements[1]))
+        -- skin_alt.skin_id = gm.actor_skin_get_default_palette_swap(skin_index)
+        -- skin_alt.achievement_id = (achievement and achievement.value) or -1
+        -- skin_alt.index = artifact_skin
+        -- gm.array_push(self.skin_family.elements, skin_alt)
+        survivors[self.value].skins[#survivors[self.value].skins + 1] = name
+    end,
+
+    get_stats_base = function(self)
+        return {
+            maxhp              = survivors[self.value].maxhp_base,
+            damage             = survivors[self.value].damage_base,
+            regen              = survivors[self.value].regen_base,
+            armor              = survivors[self.value].armor_base,
+            attack_speed       = survivors[self.value].attack_speed_base,
+            critical_chance    = survivors[self.value].critical_chance_base,
+            maxshield          = survivors[self.value].maxshield_base,
+            pHmax              = survivors[self.value].pHmax_base,
+            pVmax              = survivors[self.value].pVmax_base,
+            pGravity1          = survivors[self.value].pGravity1_base,
+            pGravity2          = survivors[self.value].pGravity2_base,
+            pAccel             = survivors[self.value].pAccel_base
+        }
+    end,
+
+    get_stats_level = function(self)
+        return {
+            maxhp              = survivors[self.value].maxhp_level,
+            damage             = survivors[self.value].damage_level,
+            regen              = survivors[self.value].regen_level,
+            armor              = survivors[self.value].armor_level,
+            attack_speed       = survivors[self.value].attack_speed_level,
+            critical_chance    = survivors[self.value].critical_chance_level
+        }
+    end,
+}
+
+methods_survivor_callbacks = {
+    onInit      = function(self, func) self:add_callback("onInit", func) end,
+    onStep      = function(self, func) self:add_callback("onStep", func) end,
+    onRemove    = function(self, func) self:add_callback("onRemove", func) end
+}
 
 
+-- ========== Metatables ==========
 
-    return skill_ref
-end
-
--- == Section Initialize == --
-
-Survivor.add_callback = function(survivor_id, callback, init_func)
-    survivors[survivor_id][callback] = init_func
-end
-
-Survivor.survivor_init = function(self)
-    local survs = gm.variable_global_get("class_survivor")
-
-    if not survs or not survivors[self.class] then return end
-    print("achieved survivor_init")
-    self.sprite_idle        = survivors[self.class].idle_sprite
-    self.sprite_walk        = survivors[self.class].walk_sprite
-    self.sprite_jump        = survivors[self.class].jump_sprite
-    self.sprite_jump_peak   = survivors[self.class].jumppeak_sprite or survivors[self.class].jump_sprite
-    self.sprite_fall        = survivors[self.class].jumpfall_sprite or survivors[self.class].jump_sprite
-    self.sprite_climb       = survivors[self.class].climb_sprite or survivors[self.class].idle_sprite
-    self.sprite_death       = survivors[self.class].death_sprite
-    self.sprite_decoy       = survivors[self.class].death_sprite
+metatable_survivor_gs = {
+    -- Getter
+    __index = function(table, key)
+        local index = Survivor.ARRAY[key]
+        if index then
+            local survivor_array = Class.SURVIVOR:get(table.value)
+            return survivor_array:get(index)
+        end
+        return nil
+    end,
 
 
-    if survivors[self.class].movement_speed ~= nil then self.pHmax = survivors[self.class].movement_speed end
-    if survivors[self.class].movement_speed ~= nil then self.pHmax_base = survivors[self.class].movement_speed end
-    if survivors[self.class].movement_speed ~= nil then self.pHmax_raw = survivors[self.class].movement_speed end
-
-    local stats = {"armor", "attack_speed", "critical_chance", "damage", "hp_regen", "maxhp", "maxbarrier", "maxshield", "maxhp_cap"}
-    local level_stats = {"survivor_id", "armor_level", "attack_speed_level", "critical_chance_level", "damage_level", "hp_regen_level", "maxhp_level", "pVmax"}
-    for _,stat in ipairs(stats) do
-        if survivors[self.class][stat] ~= nil then 
-            self[stat.."_base"] = survivors[self.class][stat]
-            self[stat] = survivors[self.class][stat]
+    -- Setter
+    __newindex = function(table, key, value)
+        local index = Survivor.ARRAY[key]
+        if index then
+            local survivor_array = Class.SURVIVOR:get(table.value)
+            survivor_array:set(index, value)
         end
     end
+}
 
-    for _,stat in ipairs(level_stats) do
-        if survivors[self.class][stat] ~= nil then 
-            self[stat] = survivors[self.class][stat]
+metatable_survivor_callbacks = {
+    __index = function(table, key)
+        -- Methods
+        if methods_survivor_callbacks[key] then
+            return methods_survivor_callbacks[key]
         end
+
+        -- Pass to next metatable
+        return metatable_survivor_gs.__index(table, key)
     end
-end
+}
 
--- ========== Callbacks ==========
+metatable_survivor = {
+    __index = function(table, key)
+        -- Allow getting but not setting these
+        if key == "value" then return abstraction_data[table].value end
+        if key == "RMT_object" then return abstraction_data[table].RMT_object end
 
-callbacks = {}
+        -- Methods
+        if methods_survivor[key] then
+            return methods_survivor[key]
+        end
+
+        -- Pass to next metatable
+        return metatable_survivor_callbacks.__index(table, key)
+    end,
+    
+
+    __newindex = function(table, key, value)
+        if key == "value" or key == "RMT_object" then
+            log.error("Cannot modify RMT object values", 2)
+            return
+        end
+
+        metatable_survivor_gs.__newindex(table, key, value)
+    end
+}
+
+
+-- ========== Hooks ==========
 
 gm.post_script_hook(gm.constants.callback_execute, function(self, other, result, args)
-    if not survivors[self.class] then return end
-
-    local callback = callback_names[args[1].value + 1] 
-
-    if args[1].value == callbacks["onPlayerInit"] then
-        Survivor.survivor_init(self)
-    end
-    if survivors[self.class][callback] then
-        survivors[self.class][callback] (self, other, result, args)
+    if callbacks[args[1].value] then
+        for _, fn in pairs(callbacks[args[1].value]) do
+            fn(args[2].value) --(actor, initial_set)
+        end
     end
 end)
 
--- section possible additions : call_later
+-- Need to put that somewhere else
+-- And add more callback type?
+gm.post_script_hook(gm.constants.instance_callback_call, function(self, other, result, args)
+    for _, fn in pairs(instance_callbacks) do
 
--- local myMethod = gm.method(self.id, gm.constants.function_dummy)
--- local _handle = gm.call_later(20, 1, myMethod, false)
+        -- on Hit
+        if #args == 6 and debug.getinfo(fn).nparams == 4 then
+            fn(args[3].value, args[4].value, args[5].value, args[6].value) --(object_instance, hit_instance, hit_x, hit_y)
+        end
 
-
-
--- ========== Initialize ==========
-
-Survivor.__initialize = function()
-    -- Populate callbacks
-    callback_names = gm.variable_global_get("callback_names")
-    for i = 1, #callback_names do
-        callbacks[callback_names[i]] = i - 1
+        -- on End
+        if #args == 3 and debug.getinfo(fn).nparams == 1 then
+            fn(args[3].value) --(object_instance)
+        end
     end
-end
+end)
 
-
-
-return Survivor
+-- 
+gm.post_script_hook(gm.constants.asset_get_index, function(self, other, result, args)
+    local asset_name = args[1].value
+    if asset_name_overrides[asset_name] ~= nil then
+        result.value = asset_name_overrides[asset_name]
+    end
+end)

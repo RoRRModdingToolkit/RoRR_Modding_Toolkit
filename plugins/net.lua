@@ -1,5 +1,4 @@
 -- Net
--- Originally in HelperFunctions by Klehrik
 
 Net = {}
 
@@ -29,14 +28,14 @@ Net.TARGET = {
 
 Net.get_type = function()
     local oPrePlayer = Instance.find(gm.constants.oPrePlayer)
-    if oPrePlayer then
+    if oPrePlayer:exists() then
         if oPrePlayer.m_id == 1.0 then return Net.TYPE.host
         elseif oPrePlayer.m_id > 1.0 then return Net.TYPE.client
         end
     end
 
     local p = Player.get_client()
-    if p then
+    if p:exists() then
         if p.m_id == 1.0 then return Net.TYPE.host
         elseif p.m_id > 1.0 then return Net.TYPE.client
         end
@@ -80,23 +79,23 @@ gm.pre_script_hook(gm.constants.chat_add_user_message, function(self, other, res
         local text = args[2].value
 
         if string.sub(text, 1, 9) == "[RMT_NET]" then
-            local data = gm.string_split(string.sub(text, 10, #text), "|||")
+            local data = Array.wrap(gm.string_split(string.sub(text, 10, #text), "|||"))
 
             -- Check only/exclude
-            if gm.array_length(data) > 2 then
+            if data:size() > 2 then
                 local name = ""
                 local oInit = Instance.find(gm.constants.oInit)
-                if oInit then name = oInit.pref_name end
+                if oInit:exists() then name = oInit.pref_name end
 
-                if (gm.array_get(data, 2) == Net.TARGET.only and name ~= gm.array_get(data, 3))
-                or (gm.array_get(data, 2) == Net.TARGET.exclude and name == gm.array_get(data, 3)) then
+                if (data:get(2) == Net.TARGET.only and name ~= data:get(3))
+                or (data:get(2) == Net.TARGET.exclude and name == data:get(3)) then
                     return false
                 end
             end
 
             -- Run function
-            local func_id = gm.array_get(data, 0)
-            local func_args = Helper.string_to_table(gm.array_get(data, 1))
+            local func_id = data:get(0)
+            local func_args = Helper.string_to_table(data:get(1))
 
             if registered[func_id] then registered[func_id](table.unpack(func_args)) end
 
