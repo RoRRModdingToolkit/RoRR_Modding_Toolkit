@@ -28,3 +28,5 @@ v Add interactable cards for Interactable
 - Add Interactable_Crate class (for custom interactables that use the command crate window)
     - Can reuse Interactable Instance from Interactable
     - Actually could probably work into Interactable with a bit of tweaking
+
+- Add Damager wrapper
