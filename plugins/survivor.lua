@@ -431,7 +431,6 @@ methods_survivor = {
 
         local skin_pal_swap = math.tointeger(gm.actor_skin_get_default_palette_swap(skin_index))
 
-        print("__newsprite"..math.tointeger(self.sprite_loadout).."_PAL"..skin_pal_swap)
         asset_name_overrides["__newsprite"..math.tointeger(self.sprite_loadout).."_PAL"..skin_pal_swap] = skin_loadout or self.sprite_loadout
         asset_name_overrides["__newsprite"..math.tointeger(self.sprite_portrait).."_PAL"..skin_pal_swap] = skin_portrait or self.sprite_portrait
         asset_name_overrides["__newsprite"..math.tointeger(self.sprite_portrait_small).."_PAL"..skin_pal_swap] = skin_portraitsmall or self.sprite_portrait_small
