@@ -35,7 +35,10 @@ Equipment.ARRAY = {
 -- ========== Static Methods ==========
 
 Equipment.new = function(namespace, identifier)
-    if Equipment.find(namespace, identifier) then return nil end
+    if Equipment.find(namespace, identifier) then
+        log.error("Equipment already exists", 2)
+        return nil
+    end
 
     -- Create equipment
     local equipment = gm.equipment_create(

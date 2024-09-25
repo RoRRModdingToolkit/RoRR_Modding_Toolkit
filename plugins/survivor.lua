@@ -228,16 +228,16 @@ methods_survivor = {
     add_skill = function(self, skill, skill_family_index, achievement)
 
         local skill_family = nil
-        if skill_family_index == 1 then
+        if skill_family_index == 0 then
             skill_family = self.skill_family_z.elements
-        elseif  skill_family_index == 2 then
+        elseif skill_family_index == 1 then
             skill_family = self.skill_family_x.elements
-        elseif skill_family_index == 3 then
+        elseif skill_family_index == 2 then
             skill_family = self.skill_family_c.elements
-        elseif skill_family_index == 4 then
+        elseif skill_family_index == 3 then
             skill_family = self.skill_family_v.elements
         else
-            log.error("Skill Family Index should be between 1 and 4, got "..skill_family_index, 2)
+            log.error("Skill Family Index should be between 0 and 3, got "..skill_family_index, 2)
             return
         end
 
@@ -278,16 +278,16 @@ methods_survivor = {
 
     get_skill = function(self, skill_family_index, family_index)
         local skill_family = nil
-        if skill_family_index == 1 then
+        if skill_family_index == 0 then
             skill_family = self.skill_family_z.elements
-        elseif  skill_family_index == 2 then
+        elseif skill_family_index == 1 then
             skill_family = self.skill_family_x.elements
-        elseif skill_family_index == 3 then
+        elseif skill_family_index == 2 then
             skill_family = self.skill_family_c.elements
-        elseif skill_family_index == 4 then
+        elseif skill_family_index == 3 then
             skill_family = self.skill_family_v.elements
         else
-            log.error("Skill Family Index should be between 1 and 4, got "..skill_family_index, 2)
+            log.error("Skill Family Index should be between 0 and 3, got "..skill_family_index, 2)
             return
         end
 

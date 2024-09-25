@@ -33,14 +33,6 @@ Actor.DAMAGER = {
 }
 
 
-Actor.SKILL = {
-    primary     = 0,
-    secondary   = 1,
-    utility     = 2,
-    special     = 3
-}
-
-
 
 -- ========== Static Methods ==========
 
@@ -352,6 +344,11 @@ methods_actor = {
     end,
 
 
+    get_default_skill = function(self, slot)
+        return self.skills:get(slot).default_skill
+    end,
+
+
     enter_state = function(self, state)
         gm.actor_set_state(self.value, Wrap.unwrap(state))
     end
@@ -540,7 +537,7 @@ end
 
 
 local function actor_onPostAttack(self, other, result, args)
-    if not args[2].value.proc or not args[2].value.parent then return end
+    if not args[2].value.proc or not Instance.exists(args[2].value.parent) then return end
     if callbacks["onPostAttack"] then
         for _, fn in ipairs(callbacks["onPostAttack"]) do
             fn(Instance.wrap(args[2].value.parent), args[2].value)    -- Actor, Damager attack_info
@@ -550,7 +547,7 @@ end
 
 
 local function actor_onPostAttackAll(self, other, result, args)
-    if not args[2].value.parent then return end
+    if not Instance.exists(args[2].value.parent) then return end
     if callbacks["onPostAttackAll"] then
         for _, fn in ipairs(callbacks["onPostAttackAll"]) do
             fn(Instance.wrap(args[2].value.parent), args[2].value)    -- Actor, Damager attack_info

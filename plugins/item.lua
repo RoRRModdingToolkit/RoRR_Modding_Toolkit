@@ -70,7 +70,10 @@ Item.TYPE = {
 -- ========== Static Methods ==========
 
 Item.new = function(namespace, identifier, no_log)
-    if Item.find(namespace, identifier) then return nil end
+    if Item.find(namespace, identifier) then
+        log.error("Item already exists", 2)
+        return nil
+    end
 
     -- Create item
     local item = gm.item_create(
@@ -588,7 +591,7 @@ end
 
 
 local function item_onAttack(self, other, result, args)
-    if not args[2].value.proc or not args[2].value.parent then return end
+    if not args[2].value.proc or not Instance.exists(args[2].value.parent) then return end
     if callbacks["onAttack"] then
         for _, c in ipairs(callbacks["onAttack"]) do
             local item = c[1]
@@ -604,7 +607,7 @@ end
 
 
 local function item_onAttackAll(self, other, result, args)
-    if not args[2].value.parent then return end
+    if not Instance.exists(args[2].value.parent) then return end
     if callbacks["onAttackAll"] then
         for _, c in ipairs(callbacks["onAttackAll"]) do
             local item = c[1]
@@ -620,7 +623,7 @@ end
 
 
 local function item_onPostAttack(self, other, result, args)
-    if not args[2].value.proc or not args[2].value.parent then return end
+    if not args[2].value.proc or not Instance.exists(args[2].value.parent) then return end
     if callbacks["onPostAttack"] then
         for _, c in ipairs(callbacks["onPostAttack"]) do
             local item = c[1]
@@ -636,7 +639,7 @@ end
 
 
 local function item_onPostAttackAll(self, other, result, args)
-    if not args[2].value.parent then return end
+    if not Instance.exists(args[2].value.parent) then return end
     if callbacks["onPostAttackAll"] then
         for _, c in ipairs(callbacks["onPostAttackAll"]) do
             local item = c[1]

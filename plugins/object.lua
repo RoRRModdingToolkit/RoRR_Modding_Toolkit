@@ -30,7 +30,10 @@ Object.CUSTOM_START = 800
 -- ========== Static Methods ==========
 
 Object.new = function(namespace, identifier, parent)
-    if Object.find(namespace, identifier) then return nil end
+    if Object.find(namespace, identifier) then
+        log.error("Object already exists", 2)
+        return nil
+    end
 
     local obj = gm.object_add_w(namespace, identifier, Wrap.unwrap(parent))
     return Object.wrap(obj)

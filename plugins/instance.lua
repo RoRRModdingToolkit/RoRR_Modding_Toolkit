@@ -73,13 +73,34 @@ Instance.find = function(...)
 
         local inst = gm.instance_find(obj, 0)
         if obj >= 800.0 then
-            local count = Instance.count(gm.constants.oCustomObject)
-            for i = 0, count - 1 do
-                local ins = gm.instance_find(gm.constants.oCustomObject, i)
-                if ins.__object_index == obj then
-                    inst = ins
-                    break
+            local customs = {
+                gm.constants.oCustomObject,
+                gm.constants.oCustomObject_pPickupItem,
+                gm.constants.oCustomObject_pPickupEquipment,
+                gm.constants.oCustomObject_pEnemyClassic,
+                gm.constants.oCustomObject_pEnemyFlying,
+                gm.constants.oCustomObject_pBossClassic,
+                gm.constants.oCustomObject_pBoss,
+                gm.constants.oCustomObject_pInteractable,
+                gm.constants.oCustomObject_pInteractableChest,
+                gm.constants.oCustomObject_pInteractableDrone,
+                gm.constants.oCustomObject_pInteractableCrate,
+                gm.constants.oCustomObject_pMapObjects,
+                gm.constants.oCustomObject_pNPC,
+                gm.constants.oCustomObject_pDrone
+            }
+            local _exit = false
+            for _, custom in ipairs(customs) do
+                local count = Instance.count(custom)
+                for i = 0, count - 1 do
+                    local ins = gm.instance_find(custom, i)
+                    if ins.__object_index == obj then
+                        inst = ins
+                        _exit = true
+                        break
+                    end
                 end
+                if _exit then break end
             end
         end
 
@@ -192,6 +213,8 @@ methods_instance = {
 
     destroy = function(self)
         if not self:exists() then return end
+
+        instance_data[self.value.id] = nil
 
         gm.instance_destroy(self.value)
         abstraction_data[self].value = -4
@@ -326,23 +349,18 @@ metatable_instance = {
 
 -- ========== Hooks ==========
 
--- Doesn't work??
--- gm.post_script_hook(gm.constants.instance_destroy, function(self, other, result, args)
---     Helper.log_hook(self, other, result, args)
---     -- instance_data[self.value] = nil
--- end)
-
-
--- Find out what is called when an instance is destroyed and hook that instead
--- because this is running every frame
-gm.post_script_hook(gm.constants.__input_system_tick, function(self, other, result, args)
-    if gm.variable_global_get("pause") then return end
-    
+-- Remove non-existent instances from instance_data on room change
+gm.post_script_hook(gm.constants.room_goto, function(self, other, result, args)
     for k, v in pairs(instance_data) do
         if not Instance.exists(k) then
             instance_data[k] = nil
         end
     end
+end)
+
+
+gm.post_script_hook(gm.constants.actor_set_dead, function(self, other, result, args)
+    instance_data[self.id] = nil
 end)
 
 

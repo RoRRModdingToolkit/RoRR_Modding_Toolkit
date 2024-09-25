@@ -15,7 +15,7 @@ Player.get_client = function(obj)
     -- Loop through players and return the one that "is_local"
     for _, p in ipairs(players) do
         if p.is_local then
-            return Instance.wrap(p)
+            return p
         end
     end
 
@@ -29,7 +29,7 @@ Player.get_host = function()
     local players = Instance.find_all(gm.constants.oP)
     for _, p in ipairs(players) do
         if p.m_id == 1.0 then
-            return Instance.wrap(p)
+            return p
         end
     end
 
@@ -42,7 +42,7 @@ Player.get_from_name = function(name)
     local players = Instance.find_all(gm.constants.oP)
     for _, p in ipairs(players) do
         if p.user_name == name then
-            return Instance.wrap(p)
+            return p
         end
     end
 
@@ -62,6 +62,12 @@ methods_player = {
             return Equipment.wrap(equip)
         end
         return nil
+    end,
+
+
+    set_equipment = function(self, equipment)
+        equipment = Wrap.unwrap(equipment)
+        gm.equipment_set(self.value, equipment)
     end,
 
 
