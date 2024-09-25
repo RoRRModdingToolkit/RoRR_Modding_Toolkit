@@ -23,6 +23,23 @@ Object.ARRAY = {
 }
 
 
+Object.PARENT = {
+    actor               = gm.constants.pActor,
+    enemyClassic        = gm.constants.pEnemyClassic,
+    enemyFlying         = gm.constants.pEnemyFlying,
+    boss                = gm.constants.pBoss,
+    bossClassic         = gm.constants.pBossClassic,
+    pickupItem          = gm.constants.pPickupItem,
+    pickupEquipment     = gm.constants.pPickupEquipment,
+    drone               = gm.constants.pDrone,
+    mapObjects          = gm.constants.pMapObjects,
+    interactable        = gm.constants.pInteractable,
+    interactableChest   = gm.constants.pInteractableChest,
+    interactableCrate   = gm.constants.pInteractableCrate,
+    interactableDrone   = gm.constants.pInteractableDrone
+}
+
+
 Object.CUSTOM_START = 800
 
 

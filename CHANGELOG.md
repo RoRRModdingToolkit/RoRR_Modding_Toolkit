@@ -1,3 +1,6 @@
+### v1.1.1
+* Added Object.PARENT enum
+
 ### v1.1.0
 * Rewrote most of the code base
 * Rewrote the Survivor module
