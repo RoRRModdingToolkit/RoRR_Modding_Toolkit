@@ -270,19 +270,19 @@ methods_survivor = {
     end,
 
     add_primary = function(self, skill, achievement)
-        self:add_skill(skill, 1, achievement)
+        self:add_skill(skill, 0, achievement)
     end,
     
     add_secondary = function(self, skill, achievement)
-        self:add_skill(skill, 2, achievement)
+        self:add_skill(skill, 1, achievement)
     end,
     
     add_utility = function(self, skill, achievement)
-        self:add_skill(skill, 3, achievement)
+        self:add_skill(skill, 2, achievement)
     end,
     
     add_special = function(self, skill, achievement)
-        self:add_skill(skill, 4, achievement)
+        self:add_skill(skill, 3, achievement)
     end,
 
     get_skill = function(self, skill_family_index, family_index)
@@ -309,19 +309,19 @@ methods_survivor = {
     end,
     
     get_primary = function(self, family_index)
-        return self:get_skill(1, family_index)
+        return self:get_skill(0, family_index)
     end,
 
     get_secondary = function(self, family_index)
-        return self:get_skill(2, family_index)
+        return self:get_skill(1, family_index)
     end,
 
     get_utility = function(self, family_index)
-        return self:get_skill(3, family_index)
+        return self:get_skill(2, family_index)
     end,
 
     get_special = function(self, family_index)
-        return self:get_skill(4, family_index)
+        return self:get_skill(3, family_index)
     end,
 
     set_animations = function(self, sprites)
