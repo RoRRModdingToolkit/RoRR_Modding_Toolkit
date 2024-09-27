@@ -40,16 +40,6 @@ methods_damager = {
     set_colour = function(self, col) self:set_color(col) end,
 
 
-    set_proc = function(self, bool)
-        if bool == nil then
-            log.error("set_proc needs a boolean value", 2)
-            return
-        end
-
-        self.value.proc = bool
-    end,
-
-
     set_critical = function(self, bool)
         if bool == nil then
             log.error("set_critical needs a boolean value", 2)
@@ -63,6 +53,16 @@ methods_damager = {
             self.value.critical = false
             self.value.damage = self.value.damage / 2.0
         end
+    end,
+
+
+    set_proc = function(self, bool)
+        if bool == nil then
+            log.error("set_proc needs a boolean value", 2)
+            return
+        end
+
+        self.value.proc = bool
     end,
 
 
