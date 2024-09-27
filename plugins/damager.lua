@@ -84,13 +84,8 @@ methods_damager = {
     end,
 
 
-    allow_stun = function(self, bool)
-        if bool == nil then
-            log.error("allow_stun needs a boolean value", 2)
-            return
-        end
-
-        self.value.allow_stun = bool
+    allow_stun = function(self)
+        self.value.RMT_allow_stun = true
     end,
 
 
@@ -99,14 +94,17 @@ methods_damager = {
     end,
 
 
-    set_stun = function(self, seconds)
+    set_stun = function(self, seconds, knockback_dir, knockback_kind)
         if not seconds then
             log.error("No stun duration provided", 2)
             return
         end
 
-        self:allow_stun(true)
+        self:allow_stun()
         self.value.stun = seconds / 1.5
+
+        if knockback_dir then self.knockback_direction = knockback_dir end
+        if knockback_kind then self.knockback_kind = knockback_kind end
     end,
 
 }

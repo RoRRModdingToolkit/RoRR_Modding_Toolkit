@@ -147,10 +147,9 @@ methods_actor = {
 
     apply_stun = function(self, kind, direction, duration)
         -- Other types don't completely stun
-        if kind > Actor.KNOCKBACK_KIND.standard then
-            gm.actor_knockback_inflict(self.value, Actor.KNOCKBACK_KIND.standard, direction, duration *60)
+        if kind > Damager.KNOCKBACK_KIND.standard then
+            gm.actor_knockback_inflict(self.value, Damager.KNOCKBACK_KIND.standard, direction, 1)
         end
-        
         gm.actor_knockback_inflict(self.value, kind, direction, duration *60)
     end,
 
@@ -518,7 +517,7 @@ Actor.__initialize = function()
 
     Actor:onDamaged(function(actor, damager)
         -- Allow stun application even if damager.proc is false
-        if damager.stun > 0 and (damager.proc == 0.0 or damager.proc == false) and damager.allow_stun == 1.0 then
+        if damager.stun > 0 and (damager.proc == 0.0 or damager.proc == false) and damager.RMT_allow_stun then
             actor:apply_stun(damager.knockback_kind, damager.knockback_direction, damager.stun * 1.5)
         end
     end)
