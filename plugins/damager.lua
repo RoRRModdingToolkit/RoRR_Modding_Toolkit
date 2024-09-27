@@ -6,6 +6,24 @@ local abstraction_data = setmetatable({}, {__mode = "k"})
 
 
 
+-- ========== Enums ==========
+
+Damager.KNOCKBACK_KIND = {
+    none        = 0,
+    standard    = 1,
+    freeze      = 2,
+    deepfreeze  = 3,
+    pull        = 4
+}
+
+
+Damager.KNOCKBACK_DIR = {
+    left    = -1,
+    right   = 1
+}
+
+
+
 -- ========== Static Methods ==========
 
 Damager.wrap = function(damager)

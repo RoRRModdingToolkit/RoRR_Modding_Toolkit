@@ -7,6 +7,7 @@
     * Replaced take_damage with fire_direct.
     * Reduced argument counts for Actor fire_ methods.
 * Added Damager class
+    * Moved all Actor enums to Damager.
 
 ### v1.1.0
 * Rewrote most of the code base

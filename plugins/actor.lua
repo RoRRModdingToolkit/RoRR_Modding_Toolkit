@@ -6,24 +6,6 @@ local callbacks = {}
 
 
 
--- ========== Enums ==========
-
-Actor.KNOCKBACK_KIND = {
-    none        = 0,
-    standard    = 1,
-    freeze      = 2,
-    deepfreeze  = 3,
-    pull        = 4
-}
-
-
-Actor.KNOCKBACK_DIR = {
-    left    = -1,
-    right   = 1
-}
-
-
-
 -- ========== Static Methods ==========
 
 Actor.add_callback = function(callback, func, skill, all_damage)
