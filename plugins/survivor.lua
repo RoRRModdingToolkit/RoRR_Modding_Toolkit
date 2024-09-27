@@ -576,7 +576,7 @@ metatable_survivor = {
 gm.post_script_hook(gm.constants.callback_execute, function(self, other, result, args)
     if callbacks[args[1].value] then
         for _, fn in pairs(callbacks[args[1].value]) do
-            fn(args[2].value) --(actor, initial_set)
+            fn(Instance.wrap(args[2].value)) --(actor, initial_set)
         end
     end
 end)
@@ -588,12 +588,12 @@ gm.post_script_hook(gm.constants.instance_callback_call, function(self, other, r
 
         -- on Hit
         if #args == 6 and debug.getinfo(fn).nparams == 4 then
-            fn(args[3].value, args[4].value, args[5].value, args[6].value) --(object_instance, hit_instance, hit_x, hit_y)
+            fn(Instance.wrap(args[3].value), Instance.wrap(args[4].value), args[5].value, args[6].value) --(object_instance, hit_instance, hit_x, hit_y)
         end
 
         -- on End
         if #args == 3 and debug.getinfo(fn).nparams == 1 then
-            fn(args[3].value) --(object_instance)
+            fn(Instance.wrap(args[3].value)) --(object_instance)
         end
     end
 end)

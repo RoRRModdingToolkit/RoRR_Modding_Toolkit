@@ -176,6 +176,11 @@ methods_actor = {
     end,
 
 
+    fire_direct = function(self, target, damage, )
+        
+    end,
+
+
     take_damage = function(self, damage, source, color, stun, kb_direction, hit_sprite, flags)
         -- By default: no proc, no crit, no stun
         local flags = flags or {}
