@@ -2,6 +2,8 @@
 * Added Object.PARENT enum
 * Fixed some instances of Survivor get_skill and add_skill not being changed to 0-based.
 * Fixed Survivor callbacks not wrapping return arguments.
+* Replaced Actor take_damage with fire_direct.
+    * Reduced argument counts for Actor fire_ methods.
 * Added Damager class
 
 ### v1.1.0
