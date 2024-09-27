@@ -599,7 +599,7 @@ local function item_onAttack(self, other, result, args)
             local count = actor:item_stack_count(item)
             if count > 0 then
                 local func = c[2]
-                func(actor, args[2].value, count)    -- Actor, Damager attack_info, Stack count
+                func(actor, Damager.wrap(args[2].value), count)    -- Actor, Damager attack_info, Stack count
             end
         end
     end
@@ -615,7 +615,7 @@ local function item_onAttackAll(self, other, result, args)
             local count = actor:item_stack_count(item)
             if count > 0 then
                 local func = c[2]
-                func(actor, args[2].value, count)    -- Actor, Damager attack_info, Stack count
+                func(actor, Damager.wrap(args[2].value), count)    -- Actor, Damager attack_info, Stack count
             end
         end
     end
@@ -631,7 +631,7 @@ local function item_onPostAttack(self, other, result, args)
             local count = actor:item_stack_count(item)
             if count > 0 then
                 local func = c[2]
-                func(actor, args[2].value, count)    -- Actor, Damager attack_info, Stack count
+                func(actor, Damager.wrap(args[2].value), count)    -- Actor, Damager attack_info, Stack count
             end
         end
     end
@@ -647,7 +647,7 @@ local function item_onPostAttackAll(self, other, result, args)
             local count = actor:item_stack_count(item)
             if count > 0 then
                 local func = c[2]
-                func(actor, args[2].value, count)    -- Actor, Damager attack_info, Stack count
+                func(actor, Damager.wrap(args[2].value), count)    -- Actor, Damager attack_info, Stack count
             end
         end
     end
@@ -662,7 +662,7 @@ local function item_onHit(self, other, result, args)
             local count = actor:item_stack_count(item)
             if count > 0 then
                 local func = c[2]
-                func(actor, Instance.wrap(args[3].value), self.attack_info, count) -- Attacker, Victim, Damager attack_info, Stack count
+                func(actor, Instance.wrap(args[3].value), Damager.wrap(self.attack_info), count) -- Attacker, Victim, Damager attack_info, Stack count
             end
         end
     end
@@ -679,7 +679,7 @@ local function item_onHitAll(self, other, result, args)
             local count = actor:item_stack_count(item)
             if count > 0 then
                 local func = c[2]
-                func(actor, Instance.wrap(attack.target_true), attack.attack_info, count) -- Attacker, Victim, Damager attack_info, Stack count
+                func(actor, Instance.wrap(attack.target_true), Damager.wrap(attack.attack_info), count) -- Attacker, Victim, Damager attack_info, Stack count
             end
         end
     end
@@ -710,7 +710,7 @@ local function item_onDamaged(self, other, result, args)
             local count = actor:item_stack_count(item)
             if count > 0 then
                 local func = c[2]
-                func(actor, args[3].value.attack_info, count)   -- Actor, Damager attack_info, Stack count
+                func(actor, Damager.wrap(args[3].value.attack_info), count)   -- Actor, Damager attack_info, Stack count
             end
         end
     end
@@ -725,7 +725,7 @@ local function item_onDamageBlocked(self, other, result, args)
             local count = actor:item_stack_count(item)
             if count > 0 then
                 local func = c[2]
-                func(actor, other.attack_info, count)   -- Actor, Damager attack_info, Stack count
+                func(actor, Damager.wrap(other.attack_info), count)   -- Actor, Damager attack_info, Stack count
             end
         end
     end

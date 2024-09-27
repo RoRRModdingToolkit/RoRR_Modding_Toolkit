@@ -1,6 +1,7 @@
 ### v1.1.1
 * Added Object.PARENT enum
 * Fixed some instances of Survivor get_skill and add_skill not being changed to 0-based.
+* Added Damager class
 
 ### v1.1.0
 * Rewrote most of the code base

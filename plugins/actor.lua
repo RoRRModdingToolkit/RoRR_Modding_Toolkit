@@ -23,16 +23,6 @@ Actor.KNOCKBACK_DIR = {
 }
 
 
-Actor.DAMAGER = {
-    no_proc     = 0,
-    no_crit     = 1,
-    can_proc    = 2,
-    can_crit    = 3,
-    allow_stun  = 4,
-    raw_damage  = 5
-}
-
-
 
 -- ========== Static Methods ==========
 
@@ -92,138 +82,38 @@ methods_actor = {
     end,
 
 
-    fire_bullet = function(self, x, y, range, direction, damage, pierce_multiplier, stun, color, hit_sprite, flags)
-        -- By default: proc, crit, stun
-        local flags = flags or {}
-
+    fire_bullet = function(self, x, y, range, direction, damage, pierce_multiplier, hit_sprite)
+        -- Set whether or not the bullet damager can pierce
         local can_pierce = false
         if pierce_multiplier then can_pierce = true end
 
-        local no_proc = Helper.table_has(flags, Actor.DAMAGER.no_proc)
-        local no_crit = Helper.table_has(flags, Actor.DAMAGER.no_crit)
-        local allow_stun = Helper.table_has(flags, Actor.DAMAGER.allow_stun)
-        local raw_damage = Helper.table_has(flags, Actor.DAMAGER.raw_damage)
+        local damager = gm._mod_attack_fire_bullet(self.value, x, y, range, direction, damage, hit_sprite or -1, can_pierce, true).attack_info
+        damager.damage_color = Color.WHITE_ALMOST
 
-        -- Raw damage
-        if raw_damage then
-            damage = damage / self.value.damage
-        end
-
-        local damager = gm._mod_attack_fire_bullet(self.value, x, y, range, direction, damage, hit_sprite or -1, can_pierce, not no_proc).attack_info
-        if color then damager.damage_color = color
-        else damager.damage_color = Color.WHITE_ALMOST
-        end
-
-        -- Remove crit if no_crit
-        if no_crit and damager.critical then
-            damager.damage = damager.damage / 2.0
-            damager.critical = false
-        end
-
-        -- Set pierce value
+        -- Set pierce multiplier
         if pierce_multiplier then
             damager.damage_degrade = (1.0 - pierce_multiplier)
         end
 
-        -- Set stun value
-        if stun and stun > 0 then
-            allow_stun = true
-            damager.stun = stun
-        end
-
-        -- Allow stun
-        if allow_stun then damager.allow_stun = true end
-
-        return damager
+        return Damager.wrap(damager)
     end,
 
 
-    fire_explosion = function(self, x, y, width, height, damage, stun, color, explosion_sprite, sparks_sprite, flags)
-        -- By default: proc, crit, stun
-        local flags = flags or {}
+    fire_explosion = function(self, x, y, width, height, damage, explosion_sprite, sparks_sprite)
+        local damager = gm._mod_attack_fire_explosion(self.value, x, y, width, height, damage, explosion_sprite or -1, sparks_sprite or -1, true).attack_info
+        damager.damage_color = Color.WHITE_ALMOST
 
-        local no_proc = Helper.table_has(flags, Actor.DAMAGER.no_proc)
-        local no_crit = Helper.table_has(flags, Actor.DAMAGER.no_crit)
-        local allow_stun = Helper.table_has(flags, Actor.DAMAGER.allow_stun)
-        local raw_damage = Helper.table_has(flags, Actor.DAMAGER.raw_damage)
-
-        -- Raw damage
-        if raw_damage then
-            damage = damage / self.value.damage
-        end
-
-        local damager = gm._mod_attack_fire_explosion(self.value, x, y, width, height, damage, explosion_sprite or -1, sparks_sprite or -1, not no_proc).attack_info
-        if color then damager.damage_color = color
-        else damager.damage_color = Color.WHITE_ALMOST
-        end
-
-        -- Remove crit if no_crit
-        if no_crit and damager.critical then
-            damager.damage = damager.damage / 2.0
-            damager.critical = false
-        end
-
-        -- Set stun value
-        if stun and stun > 0 then
-            allow_stun = true
-            damager.stun = stun
-        end
-
-        -- Allow stun
-        if allow_stun then damager.allow_stun = true end
-
-        return damager
+        return Damager.wrap(damager)
     end,
 
 
-    fire_direct = function(self, target, damage, )
+    fire_direct = function(self, target, damage, hit_sprite)
+        target = Wrap.unwrap(target)
+
+        local damager = gm._mod_attack_fire_direct(self.value, target, target.x, target.y, 0, damage, hit_sprite or -1, true).attack_info
+        damager.damage_color = Color.WHITE_ALMOST
         
-    end,
-
-
-    take_damage = function(self, damage, source, color, stun, kb_direction, hit_sprite, flags)
-        -- By default: no proc, no crit, no stun
-        local flags = flags or {}
-        
-        local source_ = self.value
-        if source then
-            source_ = Wrap.unwrap(source)
-        end
-
-        local can_proc = Helper.table_has(flags, Actor.DAMAGER.can_proc)
-        local can_crit = Helper.table_has(flags, Actor.DAMAGER.can_crit)
-        local allow_stun = Helper.table_has(flags, Actor.DAMAGER.allow_stun)
-        local raw_damage = Helper.table_has(flags, Actor.DAMAGER.raw_damage)
-
-        -- Raw damage
-        if raw_damage then
-            damage = damage / source_.damage
-        end
-
-        local damager = gm._mod_attack_fire_direct(source_, self.value, self.x, self.y, 0, damage, hit_sprite or -1, can_proc).attack_info
-        if color then damager.damage_color = color
-        else damager.damage_color = Color.WHITE_ALMOST
-        end
-
-        -- Remove crit if not can_crit
-        if can_crit == false and damager.critical then
-            damager.damage = damager.damage / 2.0
-            damager.critical = false
-        end
-
-        -- Set stun value
-        if stun and stun > 0 then
-            allow_stun = true
-            damager.stun = stun
-        end
-
-        -- Allow stun
-        if allow_stun then
-            damager.allow_stun = true
-            damager.knockback_direction = kb_direction
-        end
-
-        return damager
+        return Damager.wrap(damager)
     end,
     
 
@@ -526,7 +416,7 @@ local function actor_onAttack(self, other, result, args)
     if not args[2].value.proc then return end
     if callbacks["onAttack"] then
         for _, fn in ipairs(callbacks["onAttack"]) do
-            fn(Instance.wrap(self), args[2].value)    -- Actor, Damager attack_info
+            fn(Instance.wrap(self), Damager.wrap(args[2].value))    -- Actor, Damager attack_info
         end
     end
 end
@@ -535,7 +425,7 @@ end
 local function actor_onAttackAll(self, other, result, args)
     if callbacks["onAttackAll"] then
         for _, fn in ipairs(callbacks["onAttackAll"]) do
-            fn(Instance.wrap(self), args[2].value)    -- Actor, Damager attack_info
+            fn(Instance.wrap(self), Damager.wrap(args[2].value))    -- Actor, Damager attack_info
         end
     end
 end
@@ -545,7 +435,7 @@ local function actor_onPostAttack(self, other, result, args)
     if not args[2].value.proc or not Instance.exists(args[2].value.parent) then return end
     if callbacks["onPostAttack"] then
         for _, fn in ipairs(callbacks["onPostAttack"]) do
-            fn(Instance.wrap(args[2].value.parent), args[2].value)    -- Actor, Damager attack_info
+            fn(Instance.wrap(args[2].value.parent), Damager.wrap(args[2].value))    -- Actor, Damager attack_info
         end
     end
 end
@@ -555,7 +445,7 @@ local function actor_onPostAttackAll(self, other, result, args)
     if not Instance.exists(args[2].value.parent) then return end
     if callbacks["onPostAttackAll"] then
         for _, fn in ipairs(callbacks["onPostAttackAll"]) do
-            fn(Instance.wrap(args[2].value.parent), args[2].value)    -- Actor, Damager attack_info
+            fn(Instance.wrap(args[2].value.parent), Damager.wrap(args[2].value))    -- Actor, Damager attack_info
         end
     end
 end
@@ -565,7 +455,7 @@ local function actor_onHit(self, other, result, args)
     if not self.attack_info.proc then return end
     if callbacks["onHit"] then
         for _, fn in ipairs(callbacks["onHit"]) do
-            fn(Instance.wrap(args[2].value), Instance.wrap(args[3].value), self.attack_info) -- Attacker, Victim, Damager attack_info
+            fn(Instance.wrap(args[2].value), Instance.wrap(args[3].value), Damager.wrap(self.attack_info)) -- Attacker, Victim, Damager attack_info
         end
     end
 end
@@ -576,7 +466,7 @@ local function actor_onHitAll(self, other, result, args)
     if not Instance.exists(attack.inflictor) then return end
     if callbacks["onHitAll"] then
         for _, fn in ipairs(callbacks["onHitAll"]) do
-            fn(Instance.wrap(attack.inflictor), Instance.wrap(attack.target_true), attack.attack_info) -- Attacker, Victim, Damager attack_info
+            fn(Instance.wrap(attack.inflictor), Instance.wrap(attack.target_true), Damager.wrap(attack.attack_info)) -- Attacker, Victim, Damager attack_info
         end
     end
 end
@@ -595,7 +485,7 @@ local function actor_onDamaged(self, other, result, args)
     if not args[3].value.attack_info then return end
     if callbacks["onDamaged"] then
         for _, fn in ipairs(callbacks["onDamaged"]) do
-            fn(Instance.wrap(args[2].value), args[3].value.attack_info)   -- Actor, Damager attack_info
+            fn(Instance.wrap(args[2].value), Damager.wrap(args[3].value.attack_info))   -- Actor, Damager attack_info
         end
     end
 end
@@ -604,7 +494,7 @@ end
 local function actor_onDamageBlocked(self, other, result, args)
     if callbacks["onDamageBlocked"] then
         for _, fn in ipairs(callbacks["onDamageBlocked"]) do
-            fn(Instance.wrap(self), other.attack_info)   -- Actor, Damager attack_info
+            fn(Instance.wrap(self), Damager.wrap(other.attack_info))   -- Actor, Damager attack_info
         end
     end
 end
