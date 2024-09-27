@@ -1,3 +1,6 @@
+### v1.1.2
+* Changed RMT's required line of code so that manually updating is no longer required.
+
 ### v1.1.1
 * Added Object.PARENT enum
 * Survivor class
