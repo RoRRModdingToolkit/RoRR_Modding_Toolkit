@@ -1,10 +1,11 @@
 ### v1.1.3
-* Actor fire_direct now has a direction argument.
+* Actor class
+    * fire_direct now has a direction argument.
+    * Callbacks now require an ID, and can be removed.
 * Added clear_callbacks method to:
     * Item
     * Equipment
     * Object
-* Actor callbacks now require an ID, and can be removed.
 * General Callbacks can now be removed.
 
 ### v1.1.2
