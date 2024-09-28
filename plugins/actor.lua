@@ -341,7 +341,7 @@ gm.post_script_hook(gm.constants.skill_activate, function(self, other, result, a
     local actor = Instance.wrap(self)
 
     if callbacks["onSkillUse"] then
-        for id, skill in ipairs(callbacks["onSkillUse"]) do
+        for id, skill in pairs(callbacks["onSkillUse"]) do
             if gm.array_get(self.skills, args[1].value).active_skill.skill_id == id then
                 for k, fn in pairs(skill) do
                     fn(actor)   -- Actor
