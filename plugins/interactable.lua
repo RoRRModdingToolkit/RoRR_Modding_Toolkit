@@ -26,10 +26,8 @@ Interactable.ARRAY = {
 -- ========== Static Methods ==========
 
 Interactable.new = function(namespace, identifier)
-    if Object.find(namespace, identifier) then
-        log.error("Object already exists", 2)
-        return nil
-    end
+    local obj = Object.find(namespace, identifier)
+    if obj then return Interactable.wrap(obj.value) end
 
     -- Create interactable and its card
     local obj = Interactable.wrap(gm.object_add_w(namespace, identifier, gm.constants.pInteractable))

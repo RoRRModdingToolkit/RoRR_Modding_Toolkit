@@ -113,10 +113,10 @@ methods_actor = {
     end,
 
 
-    fire_direct = function(self, target, damage, direction, hit_sprite)
+    fire_direct = function(self, target, damage, direction, x, y, hit_sprite)
         target = Wrap.unwrap(target)
 
-        local damager = gm._mod_attack_fire_direct(self.value, target, target.x, target.y, direction or 0, damage, hit_sprite or -1, true).attack_info
+        local damager = gm._mod_attack_fire_direct(self.value, target, x or target.x, y or target.y, direction or 0, damage, hit_sprite or -1, true).attack_info
         damager.damage_color = Color.WHITE_ALMOST
         
         return Damager.wrap(damager)

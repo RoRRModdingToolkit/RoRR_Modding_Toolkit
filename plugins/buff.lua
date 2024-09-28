@@ -43,10 +43,8 @@ Buff.ARRAY = {
 -- ========== Static Methods ==========
 
 Buff.new = function(namespace, identifier)
-    if Buff.find(namespace, identifier) then
-        log.error("Buff already exists", 2)
-        return nil
-    end
+    local buff = Buff.find(namespace, identifier)
+    if buff then return buff end
 
     -- Create buff
     local buff = gm.buff_create(

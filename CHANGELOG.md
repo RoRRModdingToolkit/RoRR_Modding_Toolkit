@@ -1,9 +1,11 @@
 ### v1.1.4
-* 
+* Fixed some internal stuff in Actor.
+    * fire_direct now has optional x and y arguments.
+* All `.new()` methods (that didn't already do this) will now return the existing custom content if they already exist, instead of nil.
 
 ### v1.1.3
 * Actor class
-    * fire_direct now has a direction argument.
+    * fire_direct now has an optional direction argument.
     * Callbacks now require an ID, and can be removed.
     * Fixed onSkillUse not seeming to work properly (idk if this was an issue previously or not).
 * Added clear_callbacks method to:
