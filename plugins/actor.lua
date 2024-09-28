@@ -539,14 +539,14 @@ Actor.__initialize = function()
     Callback.add("onInteractableActivate", "RMT.actor_onInteract", actor_onInteract, true)
     Callback.add("onEquipmentUse", "RMT.actor_onEquipmentUse", actor_onEquipmentUse, true)
 
-    Actor:onDamaged(function(actor, damager)
+    Actor:onDamaged("rmt-actorAllowStun", function(actor, damager)
         -- Allow stun application even if damager.proc is false
         if damager.stun > 0 and (damager.proc == 0.0 or damager.proc == false) and damager.RMT_allow_stun then
             actor:apply_stun(damager.knockback_kind, damager.knockback_direction, damager.stun * 1.5)
         end
     end)
 
-    Actor:onPostStep(function(actor)
+    Actor:onPostStep("rmt-runPostStatRecalc", function(actor)
         actorData = actor:get_data()
 
         -- Run onPostStatRecalc
