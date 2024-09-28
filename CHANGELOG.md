@@ -1,5 +1,11 @@
 ### v1.1.3
 * Actor fire_direct now has a direction argument.
+* Added clear_callbacks method to:
+    * Item
+    * Equipment
+    * Object
+* Actor callbacks now require an ID, and can be removed.
+* General Callbacks can now be removed.
 
 ### v1.1.2
 * Changed RMT's required line of code so that manually updating is no longer required.

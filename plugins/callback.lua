@@ -37,6 +37,21 @@ Callback.add_pre = function(callback, id, func, replace)
 end
 
 
+Callback.remove = function(id)
+    for _, c in ipairs(Callback.TYPE) do
+        local c_table = callbacks[c]        -- callbacks["onAttackCreate"]
+        if c_table and c_table[id] then
+            c_table[id] = nil
+        end
+
+        local c_table = pre_callbacks[c]    -- pre_callbacks["onAttackCreate"]
+        if c_table and c_table[id] then
+            c_table[id] = nil
+        end
+    end
+end
+
+
 
 -- ========== Internal ==========
 
