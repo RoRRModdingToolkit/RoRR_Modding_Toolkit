@@ -277,9 +277,11 @@ methods_item = {
 
         for _, c in ipairs(other_callbacks) do
             local c_table = callbacks[c]
-            for i, v in ipairs(c_table) do
-                if v[1] == self.value then
-                    table.remove(c_table, i)
+            if c_table then
+                for i, v in ipairs(c_table) do
+                    if v[1] == self.value then
+                        table.remove(c_table, i)
+                    end
                 end
             end
         end
