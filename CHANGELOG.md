@@ -1,3 +1,6 @@
+### v1.1.3
+* Actor fire_direct now has a direction argument.
+
 ### v1.1.2
 * Changed RMT's required line of code so that manually updating is no longer required.
 
