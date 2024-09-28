@@ -5,6 +5,12 @@ Object = {}
 local abstraction_data = setmetatable({}, {__mode = "k"})
 
 local callbacks = {}
+local other_callbacks = {
+    "onCreate",
+    "onDestroy",
+    "onStep",
+    "onDraw"
+}
 
 
 
@@ -114,11 +120,7 @@ methods_object = {
     add_callback_obj_actual = function(self, callback, func)
         if self.value < Object.CUSTOM_START then return end
 
-        if callback == "onCreate"
-        or callback == "onDestroy"
-        or callback == "onStep"
-        or callback == "onDraw"
-        then
+        if Helper.table_has(other_callbacks, callback) then 
             local callback_id = self["on_"..string.lower(string.sub(callback, 3, 3))..string.sub(callback, 4, #callback)]
             if not callbacks[callback_id] then callbacks[callback_id] = {} end
             table.insert(callbacks[callback_id], func)
@@ -126,6 +128,14 @@ methods_object = {
         else log.error("Invalid callback name", 2)
 
         end
+    end,
+
+
+    clear_callbacks = function(self)
+        callbacks[self.on_create] = nil
+        callbacks[self.on_destroy] = nil
+        callbacks[self.on_step] = nil
+        callbacks[self.on_draw] = nil
     end,
 
 

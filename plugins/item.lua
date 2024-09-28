@@ -5,6 +5,28 @@ Item = {}
 local abstraction_data = setmetatable({}, {__mode = "k"})
 
 local callbacks = {}
+local other_callbacks = {
+    "onStatRecalc",
+    "onPostStatRecalc",
+    "onBasicUse",
+    "onAttack",
+    "onAttackAll",
+    "onPostAttack",
+    "onPostAttackAll",
+    "onHit",
+    "onHitAll",
+    "onKill",
+    "onDamaged",
+    "onDamageBlocked",
+    "onHeal",
+    "onShieldBreak",
+    "onInteract",
+    "onEquipmentUse",
+    "onNewStage",
+    "onStep",
+    "onDraw"
+}
+
 local has_custom_item = {}
 
 local disabled_loot = {}
@@ -229,28 +251,6 @@ methods_item = {
     add_callback = function(self, callback, func, all_damage)
         if all_damage then callback = callback.."All" end
 
-        local other_callbacks = {
-            "onStatRecalc",
-            "onPostStatRecalc",
-            "onBasicUse",
-            "onAttack",
-            "onAttackAll",
-            "onPostAttack",
-            "onPostAttackAll",
-            "onHit",
-            "onHitAll",
-            "onKill",
-            "onDamaged",
-            "onDamageBlocked",
-            "onHeal",
-            "onShieldBreak",
-            "onInteract",
-            "onEquipmentUse",
-            "onNewStage",
-            "onStep",
-            "onDraw"
-        }
-
         if callback == "onPickup" then
             local callback_id = self.on_acquired
             if not callbacks[callback_id] then callbacks[callback_id] = {} end
@@ -267,6 +267,21 @@ methods_item = {
 
         else log.error("Invalid callback name", 2)
 
+        end
+    end,
+
+
+    clear_callbacks = function(self)
+        callbacks[self.on_acquired] = nil
+        callbacks[self.on_removed] = nil
+
+        for _, c in ipairs(other_callbacks) do
+            local c_table = callbacks[c]
+            for i, v in ipairs(c_table) do
+                if v[1] == self.value then
+                    table.remove(c_table, i)
+                end
+            end
         end
     end,
 
