@@ -1,8 +1,11 @@
+### v1.1.4
+* 
+
 ### v1.1.3
 * Actor class
     * fire_direct now has a direction argument.
     * Callbacks now require an ID, and can be removed.
-    * Fixed onSkillUse not seeming to work properly (idk if this was issue previously or not).
+    * Fixed onSkillUse not seeming to work properly (idk if this was an issue previously or not).
 * Added clear_callbacks method to:
     * Item
     * Equipment
