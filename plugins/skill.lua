@@ -177,6 +177,14 @@ methods_skill = {
         end 
     end,
 
+    clear_callbacks = function(self)
+        callbacks[self.on_can_activate] = nil
+        callbacks[self.on_activate] = nil
+        callbacks[self.on_step] = nil
+        callbacks[self.on_equipped] = nil
+        callbacks[self.on_unequipped] = nil
+    end,
+
     set_skill = function(self, name, desc, sprite, subimage, damage, cooldown)
         self.token_name = name
         self.token_description = desc

@@ -225,6 +225,16 @@ methods_survivor = {
         return id
     end,
 
+    clear_callbacks = function(self)
+        callbacks[self.on_init] = nil
+        callbacks[self.on_step] = nil
+        callbacks[self.on_remove] = nil
+
+        for id, _ in pairs(instance_callbacks) do
+            instance_callbacks[id] = nil
+        end
+    end,
+
     add_skill = function(self, skill, skill_family_index, achievement)
 
         local skill_family = nil

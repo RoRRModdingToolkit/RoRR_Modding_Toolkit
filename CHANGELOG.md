@@ -6,6 +6,9 @@
     * Item
     * Equipment
     * Object
+    * Survivor
+    * Skill
+    * State
 * General Callbacks can now be removed.
 
 ### v1.1.2
