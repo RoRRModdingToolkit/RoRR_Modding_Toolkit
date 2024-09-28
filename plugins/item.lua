@@ -285,6 +285,13 @@ methods_item = {
                 end
             end
         end
+
+        -- Add onPickup callback to add actor to has_custom_item table
+        self:add_callback("onPickup", function(actor, stack)
+            if not Helper.table_has(has_custom_item, actor.value) then
+                table.insert(has_custom_item, actor.value)
+            end
+        end)
     end,
 
 

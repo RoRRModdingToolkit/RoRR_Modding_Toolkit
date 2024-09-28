@@ -5,6 +5,7 @@
 * Added clear_callbacks method to:
     * Item
     * Equipment
+    * Buff
     * Object
     * Survivor
     * Skill
