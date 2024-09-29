@@ -1,3 +1,6 @@
+### v1.1.6
+* 
+
 ### v1.1.5
 * Fixed Survivor clear_callbacks removing the automatic onInit callback used for setup.
 
