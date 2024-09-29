@@ -6,7 +6,7 @@ Player = {}
 
 -- ========== Static Methods ==========
 
-Player.get_client = function(obj)
+Player.get_client = function()
     local players = Instance.find_all(gm.constants.oP)
 
     -- Return the first player if there is only one player
