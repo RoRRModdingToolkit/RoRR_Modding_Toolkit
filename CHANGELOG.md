@@ -1,3 +1,7 @@
+### v1.1.6
+* Fixed Survivor add_skin and add_skill
+* Changed Survivor set_stats_* functions' arguments to a table
+
 ### v1.1.5
 * Fixed Survivor clear_callbacks removing the automatic onInit callback used for setup.
 
