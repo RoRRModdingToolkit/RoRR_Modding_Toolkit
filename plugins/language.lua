@@ -43,8 +43,8 @@ local function load_from_mods()
                         load_from_folder(folder_path)
 
                     -- Only check "/plugins" if the plugins folder actually exists
-                    -- elseif string.lower(string.sub(folder_path, -7, -1)) == "plugins" then
-                    --     table.insert(check_paths, check_path.."/plugins")
+                    elseif string.lower(string.sub(folder_path, -7, -1)) == "plugins" then
+                        table.insert(check_paths, check_path.."/plugins")
                     end
                 end
             end

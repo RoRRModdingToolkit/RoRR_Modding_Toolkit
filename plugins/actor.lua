@@ -3,76 +3,72 @@
 Actor = {}
 
 local callbacks = {}
-
-
-
--- ========== Enums ==========
-
-Actor.KNOCKBACK_KIND = {
-    none        = 0,
-    standard    = 1,
-    freeze      = 2,
-    deepfreeze  = 3,
-    pull        = 4
-}
-
-
-Actor.KNOCKBACK_DIR = {
-    left    = -1,
-    right   = 1
-}
-
-
-Actor.DAMAGER = {
-    no_proc     = 0,
-    no_crit     = 1,
-    can_proc    = 2,
-    can_crit    = 3,
-    allow_stun  = 4,
-    raw_damage  = 5
+local other_callbacks = {
+    "onStatRecalc",
+    "onPostStatRecalc",
+    "onBasicUse",
+    "onAttack",
+    "onAttackAll",
+    "onPostAttack",
+    "onPostAttackAll",
+    "onHit",
+    "onHitAll",
+    "onKill",
+    "onDamaged",
+    "onDamageBlocked",
+    "onHeal",
+    "onShieldBreak",
+    "onInteract",
+    "onEquipmentUse",
+    "onPreStep",
+    "onPostStep",
+    "onDraw"
 }
 
 
 
 -- ========== Static Methods ==========
 
-Actor.add_callback = function(callback, func, skill, all_damage)
+Actor.add_callback = function(callback, id, func, skill, all_damage)
     if all_damage then callback = callback.."All" end
-
-    local other_callbacks = {
-        "onStatRecalc",
-        "onPostStatRecalc",
-        "onBasicUse",
-        "onAttack",
-        "onAttackAll",
-        "onPostAttack",
-        "onPostAttackAll",
-        "onHit",
-        "onHitAll",
-        "onKill",
-        "onDamaged",
-        "onDamageBlocked",
-        "onHeal",
-        "onShieldBreak",
-        "onInteract",
-        "onEquipmentUse",
-        "onPreStep",
-        "onPostStep",
-        "onDraw"
-    }
 
     if callback == "onSkillUse" then
         skill = Wrap.unwrap(skill)
         if not callbacks["onSkillUse"] then callbacks["onSkillUse"] = {} end
         if not callbacks["onSkillUse"][skill] then callbacks["onSkillUse"][skill] = {} end
-        table.insert(callbacks["onSkillUse"][skill], func)
+        callbacks["onSkillUse"][skill][id] = func
 
     elseif Helper.table_has(other_callbacks, callback) then
         if not callbacks[callback] then callbacks[callback] = {} end
-        table.insert(callbacks[callback], func)
+        callbacks[callback][id] = func
 
     else log.error("Invalid callback name", 2)
 
+    end
+end
+
+
+Actor.remove_callback = function(id)
+    local c_table = callbacks["onSkillUse"]
+    if c_table then
+        for s, id_table in pairs(c_table) do
+            for i, __ in pairs(id_table) do
+                if i == id then
+                    id_table[i] = nil
+                end
+            end
+        end
+    end
+
+    for _, c in ipairs(other_callbacks) do
+        local c_table = callbacks[c]        -- callbacks["onAttack"]
+        if c_table then
+            for i, __ in pairs(c_table) do  -- callbacks["onAttack"][i (key)]
+                if i == id then
+                    c_table[i] = nil
+                end
+            end
+        end
     end
 end
 
@@ -92,133 +88,38 @@ methods_actor = {
     end,
 
 
-    fire_bullet = function(self, x, y, range, direction, damage, pierce_multiplier, stun, color, hit_sprite, flags)
-        -- By default: proc, crit, stun
-        local flags = flags or {}
-
+    fire_bullet = function(self, x, y, range, direction, damage, pierce_multiplier, hit_sprite)
+        -- Set whether or not the bullet damager can pierce
         local can_pierce = false
         if pierce_multiplier then can_pierce = true end
 
-        local no_proc = Helper.table_has(flags, Actor.DAMAGER.no_proc)
-        local no_crit = Helper.table_has(flags, Actor.DAMAGER.no_crit)
-        local allow_stun = Helper.table_has(flags, Actor.DAMAGER.allow_stun)
-        local raw_damage = Helper.table_has(flags, Actor.DAMAGER.raw_damage)
+        local damager = gm._mod_attack_fire_bullet(self.value, x, y, range, direction, damage, hit_sprite or -1, can_pierce, true).attack_info
+        damager.damage_color = Color.WHITE_ALMOST
 
-        -- Raw damage
-        if raw_damage then
-            damage = damage / self.value.damage
-        end
-
-        local damager = gm._mod_attack_fire_bullet(self.value, x, y, range, direction, damage, hit_sprite or -1, can_pierce, not no_proc).attack_info
-        if color then damager.damage_color = color
-        else damager.damage_color = Color.WHITE_ALMOST
-        end
-
-        -- Remove crit if no_crit
-        if no_crit and damager.critical then
-            damager.damage = damager.damage / 2.0
-            damager.critical = false
-        end
-
-        -- Set pierce value
+        -- Set pierce multiplier
         if pierce_multiplier then
             damager.damage_degrade = (1.0 - pierce_multiplier)
         end
 
-        -- Set stun value
-        if stun and stun > 0 then
-            allow_stun = true
-            damager.stun = stun
-        end
-
-        -- Allow stun
-        if allow_stun then damager.allow_stun = true end
-
-        return damager
+        return Damager.wrap(damager)
     end,
 
 
-    fire_explosion = function(self, x, y, width, height, damage, stun, color, explosion_sprite, sparks_sprite, flags)
-        -- By default: proc, crit, stun
-        local flags = flags or {}
+    fire_explosion = function(self, x, y, width, height, damage, explosion_sprite, sparks_sprite)
+        local damager = gm._mod_attack_fire_explosion(self.value, x, y, width, height, damage, explosion_sprite or -1, sparks_sprite or -1, true).attack_info
+        damager.damage_color = Color.WHITE_ALMOST
 
-        local no_proc = Helper.table_has(flags, Actor.DAMAGER.no_proc)
-        local no_crit = Helper.table_has(flags, Actor.DAMAGER.no_crit)
-        local allow_stun = Helper.table_has(flags, Actor.DAMAGER.allow_stun)
-        local raw_damage = Helper.table_has(flags, Actor.DAMAGER.raw_damage)
-
-        -- Raw damage
-        if raw_damage then
-            damage = damage / self.value.damage
-        end
-
-        local damager = gm._mod_attack_fire_explosion(self.value, x, y, width, height, damage, explosion_sprite or -1, sparks_sprite or -1, not no_proc).attack_info
-        if color then damager.damage_color = color
-        else damager.damage_color = Color.WHITE_ALMOST
-        end
-
-        -- Remove crit if no_crit
-        if no_crit and damager.critical then
-            damager.damage = damager.damage / 2.0
-            damager.critical = false
-        end
-
-        -- Set stun value
-        if stun and stun > 0 then
-            allow_stun = true
-            damager.stun = stun
-        end
-
-        -- Allow stun
-        if allow_stun then damager.allow_stun = true end
-
-        return damager
+        return Damager.wrap(damager)
     end,
 
 
-    take_damage = function(self, damage, source, color, stun, kb_direction, hit_sprite, flags)
-        -- By default: no proc, no crit, no stun
-        local flags = flags or {}
+    fire_direct = function(self, target, damage, direction, x, y, hit_sprite)
+        target = Wrap.unwrap(target)
+
+        local damager = gm._mod_attack_fire_direct(self.value, target, x or target.x, y or target.y, direction or 0, damage, hit_sprite or -1, true).attack_info
+        damager.damage_color = Color.WHITE_ALMOST
         
-        local source_ = self.value
-        if source then
-            source_ = Wrap.unwrap(source)
-        end
-
-        local can_proc = Helper.table_has(flags, Actor.DAMAGER.can_proc)
-        local can_crit = Helper.table_has(flags, Actor.DAMAGER.can_crit)
-        local allow_stun = Helper.table_has(flags, Actor.DAMAGER.allow_stun)
-        local raw_damage = Helper.table_has(flags, Actor.DAMAGER.raw_damage)
-
-        -- Raw damage
-        if raw_damage then
-            damage = damage / source_.damage
-        end
-
-        local damager = gm._mod_attack_fire_direct(source_, self.value, self.x, self.y, 0, damage, hit_sprite or -1, can_proc).attack_info
-        if color then damager.damage_color = color
-        else damager.damage_color = Color.WHITE_ALMOST
-        end
-
-        -- Remove crit if not can_crit
-        if can_crit == false and damager.critical then
-            damager.damage = damager.damage / 2.0
-            damager.critical = false
-        end
-
-        -- Set stun value
-        if stun and stun > 0 then
-            allow_stun = true
-            damager.stun = stun
-        end
-
-        -- Allow stun
-        if allow_stun then
-            damager.allow_stun = true
-            damager.knockback_direction = kb_direction
-        end
-
-        return damager
+        return Damager.wrap(damager)
     end,
     
 
@@ -270,10 +171,9 @@ methods_actor = {
 
     apply_stun = function(self, kind, direction, duration)
         -- Other types don't completely stun
-        if kind > Actor.KNOCKBACK_KIND.standard then
-            gm.actor_knockback_inflict(self.value, Actor.KNOCKBACK_KIND.standard, direction, duration *60)
+        if kind > Damager.KNOCKBACK_KIND.standard then
+            gm.actor_knockback_inflict(self.value, Damager.KNOCKBACK_KIND.standard, direction, 1)
         end
-        
         gm.actor_knockback_inflict(self.value, kind, direction, duration *60)
     end,
 
@@ -358,23 +258,23 @@ methods_actor = {
 
 methods_actor_callbacks = {
     
-    onStatRecalc        = function(self, func) Actor.add_callback("onStatRecalc", func) end,
-    onPostStatRecalc    = function(self, func) Actor.add_callback("onPostStatRecalc", func) end,
-    onSkillUse          = function(self, func, skill) Actor.add_callback("onSkillUse", func, skill) end,
-    onBasicUse          = function(self, func) Actor.add_callback("onBasicUse", func) end,
-    onAttack            = function(self, func, all_damage) Actor.add_callback("onAttack", func, nil, all_damage) end,
-    onPostAttack        = function(self, func, all_damage) Actor.add_callback("onPostAttack", func, nil, all_damage) end,
-    onHit               = function(self, func, all_damage) Actor.add_callback("onHit", func, nil, all_damage) end,
-    onKill              = function(self, func) Actor.add_callback("onKill", func) end,
-    onDamaged           = function(self, func) Actor.add_callback("onDamaged", func) end,
-    onDamageBlocked     = function(self, func) Actor.add_callback("onDamageBlocked", func) end,
-    onHeal              = function(self, func) Actor.add_callback("onHeal", func) end,
-    onShieldBreak       = function(self, func) Actor.add_callback("onShieldBreak", func) end,
-    onInteract          = function(self, func) Actor.add_callback("onInteract", func) end,
-    onEquipmentUse      = function(self, func) Actor.add_callback("onEquipmentUse", func) end,
-    onPreStep           = function(self, func) Actor.add_callback("onPreStep", func) end,
-    onPostStep          = function(self, func) Actor.add_callback("onPostStep", func) end,
-    onDraw              = function(self, func) Actor.add_callback("onDraw", func) end
+    onStatRecalc        = function(self, id, func) Actor.add_callback("onStatRecalc", id, func) end,
+    onPostStatRecalc    = function(self, id, func) Actor.add_callback("onPostStatRecalc", id, func) end,
+    onSkillUse          = function(self, id, func, skill) Actor.add_callback("onSkillUse", id, func, skill) end,
+    onBasicUse          = function(self, id, func) Actor.add_callback("onBasicUse", id, func) end,
+    onAttack            = function(self, id, func, all_damage) Actor.add_callback("onAttack", id, func, nil, all_damage) end,
+    onPostAttack        = function(self, id, func, all_damage) Actor.add_callback("onPostAttack", id, func, nil, all_damage) end,
+    onHit               = function(self, id, func, all_damage) Actor.add_callback("onHit", id, func, nil, all_damage) end,
+    onKill              = function(self, id, func) Actor.add_callback("onKill", id, func) end,
+    onDamaged           = function(self, id, func) Actor.add_callback("onDamaged", id, func) end,
+    onDamageBlocked     = function(self, id, func) Actor.add_callback("onDamageBlocked", id, func) end,
+    onHeal              = function(self, id, func) Actor.add_callback("onHeal", id, func) end,
+    onShieldBreak       = function(self, id, func) Actor.add_callback("onShieldBreak", id, func) end,
+    onInteract          = function(self, id, func) Actor.add_callback("onInteract", id, func) end,
+    onEquipmentUse      = function(self, id, func) Actor.add_callback("onEquipmentUse", id, func) end,
+    onPreStep           = function(self, id, func) Actor.add_callback("onPreStep", id, func) end,
+    onPostStep          = function(self, id, func) Actor.add_callback("onPostStep", id, func) end,
+    onDraw              = function(self, id, func) Actor.add_callback("onDraw", id, func) end
 
 }
 
@@ -428,7 +328,7 @@ gm.post_script_hook(gm.constants.recalculate_stats, function(self, other, result
     actor.shield = actor_data.current_shield
 
     if callbacks["onStatRecalc"] then
-        for _, fn in ipairs(callbacks["onStatRecalc"]) do
+        for k, fn in pairs(callbacks["onStatRecalc"]) do
             fn(actor)   -- Actor
         end
     end
@@ -441,9 +341,9 @@ gm.post_script_hook(gm.constants.skill_activate, function(self, other, result, a
     local actor = Instance.wrap(self)
 
     if callbacks["onSkillUse"] then
-        for id, skill in ipairs(callbacks["onSkillUse"]) do
+        for id, skill in pairs(callbacks["onSkillUse"]) do
             if gm.array_get(self.skills, args[1].value).active_skill.skill_id == id then
-                for _, fn in pairs(skill) do
+                for k, fn in pairs(skill) do
                     fn(actor)   -- Actor
                 end
             end
@@ -452,7 +352,7 @@ gm.post_script_hook(gm.constants.skill_activate, function(self, other, result, a
 
     if args[1].value ~= 0.0 or gm.array_get(self.skills, 0).active_skill.skill_id == 70.0 then return true end
     if callbacks["onBasicUse"] then
-        for _, fn in ipairs(callbacks["onBasicUse"]) do
+        for k, fn in pairs(callbacks["onBasicUse"]) do
             fn(actor)   -- Actor
         end
     end
@@ -461,7 +361,7 @@ end)
 
 gm.post_script_hook(gm.constants.actor_heal_networked, function(self, other, result, args)
     if callbacks["onHeal"] then
-        for _, fn in ipairs(callbacks["onHeal"]) do
+        for k, fn in pairs(callbacks["onHeal"]) do
             fn(Instance.wrap(args[1].value), args[2].value)   -- Actor, Heal amount
         end
     end
@@ -470,7 +370,7 @@ end)
 
 gm.pre_script_hook(gm.constants.step_actor, function(self, other, result, args)
     if callbacks["onPreStep"] then
-        for _, fn in ipairs(callbacks["onPreStep"]) do
+        for k, fn in pairs(callbacks["onPreStep"]) do
             fn(Instance.wrap(self))   -- Actor
         end
     end
@@ -479,7 +379,7 @@ gm.pre_script_hook(gm.constants.step_actor, function(self, other, result, args)
     if self.RMT_has_shield_actor and self.shield <= 0.0 then
         self.RMT_has_shield_actor = nil
         if callbacks["onShieldBreak"] then
-            for _, fn in ipairs(callbacks["onShieldBreak"]) do
+            for k, fn in pairs(callbacks["onShieldBreak"]) do
                 fn(Instance.wrap(self))   -- Actor
             end
         end
@@ -489,7 +389,7 @@ end)
 
 gm.post_script_hook(gm.constants.step_actor, function(self, other, result, args)
     if callbacks["onPostStep"] then
-        for _, fn in ipairs(callbacks["onPostStep"]) do
+        for k, fn in pairs(callbacks["onPostStep"]) do
             fn(Instance.wrap(self))   -- Actor
         end
     end
@@ -498,7 +398,7 @@ end)
 
 gm.post_script_hook(gm.constants.draw_actor, function(self, other, result, args)
     if callbacks["onDraw"] then
-        for _, fn in ipairs(callbacks["onDraw"]) do
+        for k, fn in pairs(callbacks["onDraw"]) do
             fn(Instance.wrap(self))   -- Actor
         end
     end
@@ -510,7 +410,7 @@ end)
 
 function actor_onPostStatRecalc(actor)
     if callbacks["onPostStatRecalc"] then
-        for _, fn in ipairs(callbacks["onPostStatRecalc"]) do
+        for k, fn in pairs(callbacks["onPostStatRecalc"]) do
             fn(actor)   -- Actor
         end
     end
@@ -520,8 +420,8 @@ end
 local function actor_onAttack(self, other, result, args)
     if not args[2].value.proc then return end
     if callbacks["onAttack"] then
-        for _, fn in ipairs(callbacks["onAttack"]) do
-            fn(Instance.wrap(self), args[2].value)    -- Actor, Damager attack_info
+        for k, fn in pairs(callbacks["onAttack"]) do
+            fn(Instance.wrap(self), Damager.wrap(args[2].value))    -- Actor, Damager attack_info
         end
     end
 end
@@ -529,8 +429,8 @@ end
 
 local function actor_onAttackAll(self, other, result, args)
     if callbacks["onAttackAll"] then
-        for _, fn in ipairs(callbacks["onAttackAll"]) do
-            fn(Instance.wrap(self), args[2].value)    -- Actor, Damager attack_info
+        for k, fn in pairs(callbacks["onAttackAll"]) do
+            fn(Instance.wrap(self), Damager.wrap(args[2].value))    -- Actor, Damager attack_info
         end
     end
 end
@@ -539,8 +439,8 @@ end
 local function actor_onPostAttack(self, other, result, args)
     if not args[2].value.proc or not Instance.exists(args[2].value.parent) then return end
     if callbacks["onPostAttack"] then
-        for _, fn in ipairs(callbacks["onPostAttack"]) do
-            fn(Instance.wrap(args[2].value.parent), args[2].value)    -- Actor, Damager attack_info
+        for k, fn in pairs(callbacks["onPostAttack"]) do
+            fn(Instance.wrap(args[2].value.parent), Damager.wrap(args[2].value))    -- Actor, Damager attack_info
         end
     end
 end
@@ -549,8 +449,8 @@ end
 local function actor_onPostAttackAll(self, other, result, args)
     if not Instance.exists(args[2].value.parent) then return end
     if callbacks["onPostAttackAll"] then
-        for _, fn in ipairs(callbacks["onPostAttackAll"]) do
-            fn(Instance.wrap(args[2].value.parent), args[2].value)    -- Actor, Damager attack_info
+        for k, fn in pairs(callbacks["onPostAttackAll"]) do
+            fn(Instance.wrap(args[2].value.parent), Damager.wrap(args[2].value))    -- Actor, Damager attack_info
         end
     end
 end
@@ -559,8 +459,8 @@ end
 local function actor_onHit(self, other, result, args)
     if not self.attack_info.proc then return end
     if callbacks["onHit"] then
-        for _, fn in ipairs(callbacks["onHit"]) do
-            fn(Instance.wrap(args[2].value), Instance.wrap(args[3].value), self.attack_info) -- Attacker, Victim, Damager attack_info
+        for k, fn in pairs(callbacks["onHit"]) do
+            fn(Instance.wrap(args[2].value), Instance.wrap(args[3].value), Damager.wrap(self.attack_info)) -- Attacker, Victim, Damager attack_info
         end
     end
 end
@@ -570,8 +470,8 @@ local function actor_onHitAll(self, other, result, args)
     local attack = args[2].value
     if not Instance.exists(attack.inflictor) then return end
     if callbacks["onHitAll"] then
-        for _, fn in ipairs(callbacks["onHitAll"]) do
-            fn(Instance.wrap(attack.inflictor), Instance.wrap(attack.target_true), attack.attack_info) -- Attacker, Victim, Damager attack_info
+        for k, fn in pairs(callbacks["onHitAll"]) do
+            fn(Instance.wrap(attack.inflictor), Instance.wrap(attack.target_true), Damager.wrap(attack.attack_info)) -- Attacker, Victim, Damager attack_info
         end
     end
 end
@@ -579,7 +479,7 @@ end
 
 local function actor_onKill(self, other, result, args)
     if callbacks["onKill"] then
-        for _, fn in ipairs(callbacks["onKill"]) do
+        for k, fn in pairs(callbacks["onKill"]) do
             fn(Instance.wrap(args[3].value), Instance.wrap(args[2].value))   -- Attacker, Victim
         end
     end
@@ -589,8 +489,8 @@ end
 local function actor_onDamaged(self, other, result, args)
     if not args[3].value.attack_info then return end
     if callbacks["onDamaged"] then
-        for _, fn in ipairs(callbacks["onDamaged"]) do
-            fn(Instance.wrap(args[2].value), args[3].value.attack_info)   -- Actor, Damager attack_info
+        for k, fn in pairs(callbacks["onDamaged"]) do
+            fn(Instance.wrap(args[2].value), Damager.wrap(args[3].value.attack_info))   -- Actor, Damager attack_info
         end
     end
 end
@@ -598,8 +498,8 @@ end
 
 local function actor_onDamageBlocked(self, other, result, args)
     if callbacks["onDamageBlocked"] then
-        for _, fn in ipairs(callbacks["onDamageBlocked"]) do
-            fn(Instance.wrap(self), other.attack_info)   -- Actor, Damager attack_info
+        for k, fn in pairs(callbacks["onDamageBlocked"]) do
+            fn(Instance.wrap(self), Damager.wrap(other.attack_info))   -- Actor, Damager attack_info
         end
     end
 end
@@ -607,7 +507,7 @@ end
 
 local function actor_onInteract(self, other, result, args)
     if callbacks["onInteract"] then
-        for _, fn in ipairs(callbacks["onInteract"]) do
+        for k, fn in pairs(callbacks["onInteract"]) do
             fn(Instance.wrap(args[3].value), Instance.wrap(args[2].value))   -- Actor, Interactable
         end
     end
@@ -616,7 +516,7 @@ end
 
 local function actor_onEquipmentUse(self, other, result, args)
     if callbacks["onEquipmentUse"] then
-        for _, fn in ipairs(callbacks["onEquipmentUse"]) do
+        for k, fn in pairs(callbacks["onEquipmentUse"]) do
             fn(Instance.wrap(args[2].value), Equipment.wrap(args[3].value))   -- Actor, Equipment ID
         end
     end
@@ -639,14 +539,14 @@ Actor.__initialize = function()
     Callback.add("onInteractableActivate", "RMT.actor_onInteract", actor_onInteract, true)
     Callback.add("onEquipmentUse", "RMT.actor_onEquipmentUse", actor_onEquipmentUse, true)
 
-    Actor:onDamaged(function(actor, damager)
+    Actor:onDamaged("rmt-actorAllowStun", function(actor, damager)
         -- Allow stun application even if damager.proc is false
-        if damager.stun > 0 and (damager.proc == 0.0 or damager.proc == false) and damager.allow_stun == 1.0 then
+        if damager.stun > 0 and (damager.proc == 0.0 or damager.proc == false) and damager.RMT_allow_stun then
             actor:apply_stun(damager.knockback_kind, damager.knockback_direction, damager.stun * 1.5)
         end
     end)
 
-    Actor:onPostStep(function(actor)
+    Actor:onPostStep("rmt-runPostStatRecalc", function(actor)
         actorData = actor:get_data()
 
         -- Run onPostStatRecalc

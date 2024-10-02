@@ -1,3 +1,40 @@
+### v1.1.5
+* Fixed Survivor clear_callbacks removing the automatic onInit callback used for setup.
+
+### v1.1.4
+* Fixed some internal stuff in Actor.
+    * fire_direct now has optional x and y arguments.
+* All `.new()` methods (that didn't already do this) will now return the existing custom content if they already exist, instead of nil.
+
+### v1.1.3
+* Actor class
+    * fire_direct now has an optional direction argument.
+    * Callbacks now require an ID, and can be removed.
+    * Fixed onSkillUse not seeming to work properly (idk if this was an issue previously or not).
+* Added clear_callbacks method to:
+    * Item
+    * Equipment
+    * Buff
+    * Object
+    * Survivor
+    * Skill
+    * State
+* General Callbacks can now be removed.
+
+### v1.1.2
+* Changed RMT's required line of code so that manually updating is no longer required.
+
+### v1.1.1
+* Added Object.PARENT enum
+* Survivor class
+    * Fixed some instances of Survivor get_skill and add_skill not being changed to 0-based.
+    * Fixed callbacks not wrapping return arguments.
+* Actor class
+    * Replaced take_damage with fire_direct.
+    * Reduced argument counts for Actor fire_ methods.
+* Added Damager class
+    * Moved all Actor enums to Damager.
+
 ### v1.1.0
 * Rewrote most of the code base
 * Rewrote the Survivor module

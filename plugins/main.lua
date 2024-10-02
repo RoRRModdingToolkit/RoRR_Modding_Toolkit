@@ -1,35 +1,42 @@
--- RoRR Modding Toolkit v1.1.0
+-- RoRR Modding Toolkit
 
 log.info("Successfully loaded ".._ENV["!guid"]..".")
 
 RoRR_Modding_Toolkit = true
 
-require("./achievement")
-require("./actor")
-require("./alarm")
-require("./array")
-require("./artifact")
-require("./buff")
-require("./callback")
-require("./class")
-require("./color")
-require("./equipment")
-require("./helper")
-require("./initialize")
-require("./instance")
-require("./interactable")
-require("./item")
-require("./language")
-require("./list")
-require("./net")
-require("./object")
-require("./player")
-require("./resources")
-require("./skill")
-require("./state")
-require("./survivor")
-require("./survivor_log")
-require("./wrap")
+Classes = {
+    "Achievement",
+    "Actor",
+    "Alarm",
+    "Array",
+    "Artifact",
+    "Buff",
+    "Callback",
+    "Class",
+    "Color",
+    "Damager",
+    "Equipment",
+    "Helper",
+    "Initialize",
+    "Instance",
+    "Interactable",
+    "Item",
+    "Language",
+    "List",
+    "Net",
+    "Object",
+    "Player",
+    "Resources",
+    "Skill",
+    "State",
+    "Survivor",
+    "Survivor_Log",
+    "Wrap"
+}
+
+for _, c in ipairs(Classes) do
+    require("./"..string.lower(string.sub(c, 1, 1))..string.sub(c, 2, #c))
+end
 
 
 

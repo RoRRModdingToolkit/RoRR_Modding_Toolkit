@@ -135,6 +135,13 @@ methods_state = {
         end
     end,
 
+    clear_callbacks = function(self)
+        callbacks[self.on_enter] = nil
+        callbacks[self.on_exit] = nil
+        callbacks[self.on_step] = nil
+        callbacks[self.on_get_interrupt_priority] = nil
+    end,
+
     -- WIP (typecheck)
     set_callables = function(self, serialize, deserialize)
         self.callable_serialize = serialize

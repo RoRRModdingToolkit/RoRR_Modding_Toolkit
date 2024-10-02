@@ -77,6 +77,56 @@ Survivor.ARRAY = {
     cape_offset                 = 33
 }
 
+
+-- ========== Internal ==========
+
+local function survivor_on_init(survivor)
+    survivor:onInit(function(actor)
+
+        -- Survivor scale
+        actor.image_xscale          = survivors[actor.class].xscale
+        actor.image_yscale          = survivors[actor.class].yscale
+    
+        -- Set sprites
+        actor.sprite_idle           = survivors[actor.class].idle
+        actor.sprite_walk           = survivors[actor.class].walk
+        actor.sprite_walk_last      = survivors[actor.class].walk_last
+        actor.sprite_jump           = survivors[actor.class].jump
+        actor.sprite_jump_peak      = survivors[actor.class].jump_peak
+        actor.sprite_fall           = survivors[actor.class].fall
+        actor.sprite_climb          = survivors[actor.class].climb
+        actor.sprite_death          = survivors[actor.class].death
+        actor.sprite_decoy          = survivors[actor.class].decoy
+        actor.sprite_drone_idle     = survivors[actor.class].drone_idle
+        actor.sprite_drone_shoot    = survivors[actor.class].drone_shoot
+        actor.sprite_climb_hurt     = survivors[actor.class].climb_hurt    
+        actor.sprite_palette        = survivors[actor.class].palette
+    
+        -- Set base stats
+        actor.maxhp_base            = survivors[actor.class].maxhp_base
+        actor.damage_base           = survivors[actor.class].damage_base
+        actor.hp_regen_base         = survivors[actor.class].regen_base
+        actor.attack_speed_base     = survivors[actor.class].attack_speed_base
+        actor.critical_chance_base  = survivors[actor.class].critical_chance_base
+        actor.armor_base            = survivors[actor.class].armor_base
+        actor.maxshield_base        = survivors[actor.class].maxshield_base
+        actor.pHmax_base            = survivors[actor.class].pHmax_base
+        actor.pVmax_base            = survivors[actor.class].pVmax_base
+        actor.pGravity1_base        = survivors[actor.class].pGravity1_base
+        actor.pGravity2_base        = survivors[actor.class].pGravity2_base
+        actor.pAccel_base           = survivors[actor.class].pAccel_base
+    
+        -- Set level stats
+        actor.maxhp_level           = survivors[actor.class].maxhp_level
+        actor.damage_level          = survivors[actor.class].damage_level
+        actor.hp_regen_level        = survivors[actor.class].regen_level
+        actor.attack_speed_level    = survivors[actor.class].attack_speed_level
+        actor.critical_chance_level = survivors[actor.class].critical_chance_level
+        actor.armor_level           = survivors[actor.class].armor_level
+    end)
+end
+
+
 -- ========== Static Methods ==========
 
 Survivor.find = function(namespace, identifier)
@@ -163,49 +213,8 @@ Survivor.new = function(namespace, identifier)
     -- Make survivor abstraction
     local abstraction = Survivor.wrap(survivor)
 
-    abstraction:onInit(function(actor)
-
-        -- Survivor scale
-        actor.image_xscale          = survivors[actor.class].xscale
-        actor.image_yscale          = survivors[actor.class].yscale
-
-        -- Set sprites
-        actor.sprite_idle           = survivors[actor.class].idle
-        actor.sprite_walk           = survivors[actor.class].walk
-        actor.sprite_walk_last      = survivors[actor.class].walk_last
-        actor.sprite_jump           = survivors[actor.class].jump
-        actor.sprite_jump_peak      = survivors[actor.class].jump_peak
-        actor.sprite_fall           = survivors[actor.class].fall
-        actor.sprite_climb          = survivors[actor.class].climb
-        actor.sprite_death          = survivors[actor.class].death
-        actor.sprite_decoy          = survivors[actor.class].decoy
-        actor.sprite_drone_idle     = survivors[actor.class].drone_idle
-        actor.sprite_drone_shoot    = survivors[actor.class].drone_shoot
-        actor.sprite_climb_hurt     = survivors[actor.class].climb_hurt    
-        actor.sprite_palette        = survivors[actor.class].palette
-
-        -- Set base stats
-        actor.maxhp_base            = survivors[actor.class].maxhp_base
-        actor.damage_base           = survivors[actor.class].damage_base
-        actor.hp_regen_base         = survivors[actor.class].regen_base
-        actor.attack_speed_base     = survivors[actor.class].attack_speed_base
-        actor.critical_chance_base  = survivors[actor.class].critical_chance_base
-        actor.armor_base            = survivors[actor.class].armor_base
-        actor.maxshield_base        = survivors[actor.class].maxshield_base
-        actor.pHmax_base            = survivors[actor.class].pHmax_base
-        actor.pVmax_base            = survivors[actor.class].pVmax_base
-        actor.pGravity1_base        = survivors[actor.class].pGravity1_base
-        actor.pGravity2_base        = survivors[actor.class].pGravity2_base
-        actor.pAccel_base           = survivors[actor.class].pAccel_base
-
-        -- Set level stats
-        actor.maxhp_level           = survivors[actor.class].maxhp_level
-        actor.damage_level          = survivors[actor.class].damage_level
-        actor.hp_regen_level        = survivors[actor.class].regen_level
-        actor.attack_speed_level    = survivors[actor.class].attack_speed_level
-        actor.critical_chance_level = survivors[actor.class].critical_chance_level
-        actor.armor_level           = survivors[actor.class].armor_level
-    end)
+    -- Add onInit callback to initialize survivor stuff
+    survivor_on_init(abstraction)
 
     return abstraction
 end
@@ -249,6 +258,19 @@ methods_survivor = {
         return id
     end,
 
+    clear_callbacks = function(self)
+        callbacks[self.on_init] = nil
+        callbacks[self.on_step] = nil
+        callbacks[self.on_remove] = nil
+
+        for id, _ in pairs(instance_callbacks) do
+            instance_callbacks[id] = nil
+        end
+
+        -- Add onInit callback to initialize survivor stuff
+        survivor_on_init(self)
+    end,
+
     add_skill = function(self, skill, skill_family_index, achievement)
 
         local skill_family = nil
@@ -281,19 +303,19 @@ methods_survivor = {
     end,
 
     add_primary = function(self, skill, achievement)
-        self:add_skill(skill, 1, achievement)
+        self:add_skill(skill, 0, achievement)
     end,
     
     add_secondary = function(self, skill, achievement)
-        self:add_skill(skill, 2, achievement)
+        self:add_skill(skill, 1, achievement)
     end,
     
     add_utility = function(self, skill, achievement)
-        self:add_skill(skill, 3, achievement)
+        self:add_skill(skill, 2, achievement)
     end,
     
     add_special = function(self, skill, achievement)
-        self:add_skill(skill, 4, achievement)
+        self:add_skill(skill, 3, achievement)
     end,
 
     get_skill = function(self, skill_family_index, family_index)
@@ -622,7 +644,7 @@ gm.post_script_hook(gm.constants.instance_callback_call, function(self, other, r
 
         -- on Hit
         if #args == 6 and debug.getinfo(fn).nparams == 4 then
-            fn(Instance.wrap(args[3].value), args[4].value, args[5].value, args[6].value) --(object_instance, hit_instance, hit_x, hit_y)
+            fn(Instance.wrap(args[3].value), Instance.wrap(args[4].value), args[5].value, args[6].value) --(object_instance, hit_instance, hit_x, hit_y)
         end
 
         -- on End

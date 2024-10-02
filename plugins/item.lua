@@ -5,6 +5,28 @@ Item = {}
 local abstraction_data = setmetatable({}, {__mode = "k"})
 
 local callbacks = {}
+local other_callbacks = {
+    "onStatRecalc",
+    "onPostStatRecalc",
+    "onBasicUse",
+    "onAttack",
+    "onAttackAll",
+    "onPostAttack",
+    "onPostAttackAll",
+    "onHit",
+    "onHitAll",
+    "onKill",
+    "onDamaged",
+    "onDamageBlocked",
+    "onHeal",
+    "onShieldBreak",
+    "onInteract",
+    "onEquipmentUse",
+    "onNewStage",
+    "onStep",
+    "onDraw"
+}
+
 local has_custom_item = {}
 
 local disabled_loot = {}
@@ -70,10 +92,8 @@ Item.TYPE = {
 -- ========== Static Methods ==========
 
 Item.new = function(namespace, identifier, no_log)
-    if Item.find(namespace, identifier) then
-        log.error("Item already exists", 2)
-        return nil
-    end
+    local item = Item.find(namespace, identifier)
+    if item then return item end
 
     -- Create item
     local item = gm.item_create(
@@ -229,28 +249,6 @@ methods_item = {
     add_callback = function(self, callback, func, all_damage)
         if all_damage then callback = callback.."All" end
 
-        local other_callbacks = {
-            "onStatRecalc",
-            "onPostStatRecalc",
-            "onBasicUse",
-            "onAttack",
-            "onAttackAll",
-            "onPostAttack",
-            "onPostAttackAll",
-            "onHit",
-            "onHitAll",
-            "onKill",
-            "onDamaged",
-            "onDamageBlocked",
-            "onHeal",
-            "onShieldBreak",
-            "onInteract",
-            "onEquipmentUse",
-            "onNewStage",
-            "onStep",
-            "onDraw"
-        }
-
         if callback == "onPickup" then
             local callback_id = self.on_acquired
             if not callbacks[callback_id] then callbacks[callback_id] = {} end
@@ -268,6 +266,30 @@ methods_item = {
         else log.error("Invalid callback name", 2)
 
         end
+    end,
+
+
+    clear_callbacks = function(self)
+        callbacks[self.on_acquired] = nil
+        callbacks[self.on_removed] = nil
+
+        for _, c in ipairs(other_callbacks) do
+            local c_table = callbacks[c]
+            if c_table then
+                for i, v in ipairs(c_table) do
+                    if v[1] == self.value then
+                        table.remove(c_table, i)
+                    end
+                end
+            end
+        end
+
+        -- Add onPickup callback to add actor to has_custom_item table
+        self:add_callback("onPickup", function(actor, stack)
+            if not Helper.table_has(has_custom_item, actor.value) then
+                table.insert(has_custom_item, actor.value)
+            end
+        end)
     end,
 
 
@@ -599,7 +621,7 @@ local function item_onAttack(self, other, result, args)
             local count = actor:item_stack_count(item)
             if count > 0 then
                 local func = c[2]
-                func(actor, args[2].value, count)    -- Actor, Damager attack_info, Stack count
+                func(actor, Damager.wrap(args[2].value), count)    -- Actor, Damager attack_info, Stack count
             end
         end
     end
@@ -615,7 +637,7 @@ local function item_onAttackAll(self, other, result, args)
             local count = actor:item_stack_count(item)
             if count > 0 then
                 local func = c[2]
-                func(actor, args[2].value, count)    -- Actor, Damager attack_info, Stack count
+                func(actor, Damager.wrap(args[2].value), count)    -- Actor, Damager attack_info, Stack count
             end
         end
     end
@@ -631,7 +653,7 @@ local function item_onPostAttack(self, other, result, args)
             local count = actor:item_stack_count(item)
             if count > 0 then
                 local func = c[2]
-                func(actor, args[2].value, count)    -- Actor, Damager attack_info, Stack count
+                func(actor, Damager.wrap(args[2].value), count)    -- Actor, Damager attack_info, Stack count
             end
         end
     end
@@ -647,7 +669,7 @@ local function item_onPostAttackAll(self, other, result, args)
             local count = actor:item_stack_count(item)
             if count > 0 then
                 local func = c[2]
-                func(actor, args[2].value, count)    -- Actor, Damager attack_info, Stack count
+                func(actor, Damager.wrap(args[2].value), count)    -- Actor, Damager attack_info, Stack count
             end
         end
     end
@@ -662,7 +684,7 @@ local function item_onHit(self, other, result, args)
             local count = actor:item_stack_count(item)
             if count > 0 then
                 local func = c[2]
-                func(actor, Instance.wrap(args[3].value), self.attack_info, count) -- Attacker, Victim, Damager attack_info, Stack count
+                func(actor, Instance.wrap(args[3].value), Damager.wrap(self.attack_info), count) -- Attacker, Victim, Damager attack_info, Stack count
             end
         end
     end
@@ -679,7 +701,7 @@ local function item_onHitAll(self, other, result, args)
             local count = actor:item_stack_count(item)
             if count > 0 then
                 local func = c[2]
-                func(actor, Instance.wrap(attack.target_true), attack.attack_info, count) -- Attacker, Victim, Damager attack_info, Stack count
+                func(actor, Instance.wrap(attack.target_true), Damager.wrap(attack.attack_info), count) -- Attacker, Victim, Damager attack_info, Stack count
             end
         end
     end
@@ -710,7 +732,7 @@ local function item_onDamaged(self, other, result, args)
             local count = actor:item_stack_count(item)
             if count > 0 then
                 local func = c[2]
-                func(actor, args[3].value.attack_info, count)   -- Actor, Damager attack_info, Stack count
+                func(actor, Damager.wrap(args[3].value.attack_info), count)   -- Actor, Damager attack_info, Stack count
             end
         end
     end
@@ -725,7 +747,7 @@ local function item_onDamageBlocked(self, other, result, args)
             local count = actor:item_stack_count(item)
             if count > 0 then
                 local func = c[2]
-                func(actor, other.attack_info, count)   -- Actor, Damager attack_info, Stack count
+                func(actor, Damager.wrap(other.attack_info), count)   -- Actor, Damager attack_info, Stack count
             end
         end
     end

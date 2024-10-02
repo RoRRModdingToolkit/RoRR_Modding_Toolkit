@@ -5,6 +5,13 @@ Buff = {}
 local abstraction_data = setmetatable({}, {__mode = "k"})
 
 local callbacks = {}
+local other_callbacks = {
+    "onStatRecalc",
+    "onPostStatRecalc",
+    "onDraw",
+    "onChange"
+}
+
 local has_custom_buff = {}
 
 
@@ -36,10 +43,8 @@ Buff.ARRAY = {
 -- ========== Static Methods ==========
 
 Buff.new = function(namespace, identifier)
-    if Buff.find(namespace, identifier) then
-        log.error("Buff already exists", 2)
-        return nil
-    end
+    local buff = Buff.find(namespace, identifier)
+    if buff then return buff end
 
     -- Create buff
     local buff = gm.buff_create(
@@ -121,18 +126,39 @@ methods_buff = {
             if not callbacks[callback_id] then callbacks[callback_id] = {} end
             table.insert(callbacks[callback_id], {self.value, func})
 
-        elseif callback == "onStatRecalc"
-            or callback == "onPostStatRecalc"
-            or callback == "onDraw"
-            or callback == "onChange"
-            then
-                if not callbacks[callback] then callbacks[callback] = {} end
-                table.insert(callbacks[callback], {self.value, func})
+        elseif Helper.table_has(other_callbacks, callback) then
+            if not callbacks[callback] then callbacks[callback] = {} end
+            table.insert(callbacks[callback], {self.value, func})
 
         else log.error("Invalid callback name", 2)
 
         end
-    end
+    end,
+
+
+    clear_callbacks = function(self)
+        callbacks[self.on_apply] = nil
+        callbacks[self.on_remove] = nil
+        callbacks[self.on_step] = nil
+
+        for _, c in ipairs(other_callbacks) do
+            local c_table = callbacks[c]
+            if c_table then
+                for i, v in ipairs(c_table) do
+                    if v[1] == self.value then
+                        table.remove(c_table, i)
+                    end
+                end
+            end
+        end
+
+        -- Add onApply callback to add actor to has_custom_buff table
+        self:add_callback("onApply", function(actor, stack)
+            if not Helper.table_has(has_custom_buff, actor.value) then
+                table.insert(has_custom_buff, actor.value)
+            end
+        end)
+    end,
 
 }
 

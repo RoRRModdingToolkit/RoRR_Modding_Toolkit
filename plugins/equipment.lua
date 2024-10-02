@@ -3,6 +3,14 @@
 Equipment = {}
 
 local callbacks = {}
+local other_callbacks = {
+    "onPickup",
+    "onDrop",
+    "onStatRecalc",
+    "onPostStatRecalc",
+    "onStep",
+    "onDraw"
+}
 
 local is_passive = {}
 
@@ -35,10 +43,8 @@ Equipment.ARRAY = {
 -- ========== Static Methods ==========
 
 Equipment.new = function(namespace, identifier)
-    if Equipment.find(namespace, identifier) then
-        log.error("Equipment already exists", 2)
-        return nil
-    end
+    local equip = Equipment.find(namespace, identifier)
+    if equip then return equip end
 
     -- Create equipment
     local equipment = gm.equipment_create(
@@ -152,18 +158,28 @@ methods_equipment = {
             if not callbacks[callback_id] then callbacks[callback_id] = {} end
             table.insert(callbacks[callback_id], func)
 
-        elseif callback == "onPickup"
-            or callback == "onDrop"
-            or callback == "onStatRecalc"
-            or callback == "onPostStatRecalc"
-            or callback == "onStep"
-            or callback == "onDraw"
-            then
-                if not callbacks[callback] then callbacks[callback] = {} end
-                table.insert(callbacks[callback], {self.value, func})
+        elseif Helper.table_has(other_callbacks, callback) then
+            if not callbacks[callback] then callbacks[callback] = {} end
+            table.insert(callbacks[callback], {self.value, func})
 
         else log.error("Invalid callback name", 2)
 
+        end
+    end,
+
+
+    clear_callbacks = function(self)
+        callbacks[self.on_use] = nil
+
+        for _, c in ipairs(other_callbacks) do
+            local c_table = callbacks[c]
+            if c_table then
+                for i, v in ipairs(c_table) do
+                    if v[1] == self.value then
+                        table.remove(c_table, i)
+                    end
+                end
+            end
         end
     end,
 
