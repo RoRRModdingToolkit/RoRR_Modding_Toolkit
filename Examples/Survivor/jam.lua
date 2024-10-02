@@ -113,10 +113,19 @@ __initialize = function()
     jam:set_animations(sprites)
     
     -- Set the player's starting stats
-    jam:set_stats_base(120, 14, 0.01)
+    jam:set_stats_base({
+        maxhp = 120,
+        damage = 14,
+        regen = 0.01
+    })
     
     -- Set the player's leveling stats
-    jam:set_stats_level(24, 4, 0.002, 4)
+    jam:set_stats_level({
+        maxhp = 24,
+        damage = 4,
+        regen = 0.002,
+        armor = 4
+    })
     
     -- Get the default survivor skills
     local skill_stab = jam:get_primary()
@@ -129,7 +138,7 @@ __initialize = function()
     jam:add_secondary(skill_spoiled)
 
     -- Create a new skill for the special skill upgrade
-    local skill_spikesScepter = Skill.new("RMT", "jammanV_Upgrade")
+    local skill_spikesScepter = Skill.new("RMT", "jammanVBoosted")
     skill_spikes:set_skill_upgrade(skill_spikesScepter)
     
     -- Set the animation for each skills
