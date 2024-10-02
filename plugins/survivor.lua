@@ -13,6 +13,30 @@ local survivors = {}
 -- Sprites to use for the skins (portrait and select menu)
 local asset_name_overrides = {}
 
+local stats_default = { 
+    -- Default Stats Base
+    maxhp_base              = 110.0,
+    damage_base             = 12.0,
+    regen_base              = 0.01,
+    attack_speed_base       = 1.0,
+    critical_chance_base    = 1.0,
+    armor_base              = 0.0,
+    maxshield_base          = 0.0,
+    pHmax_base              = 2.8,
+    pVmax_base              = 6.0,
+    pGravity1_base          = 0.52,
+    pGravity2_base          = 0.36,
+    pAccel_base             = 0.15,
+
+    -- Default Stats Level
+    maxhp_level             = 32.0,
+    damage_level            = 2.0,
+    regen_level             = 0.002,
+    attack_speed_level      = 0.0,
+    critical_chance_level   = 0.0,
+    armor_level             = 2.0,
+}
+
 
 -- ========== Enums ==========
 
@@ -248,25 +272,12 @@ methods_survivor = {
         gm.array_insert(
             skill_family,
             #skill_family,
-            gm.SurvivorSkillLoadoutUnlockable(
+            gm["@@NewGMLObject@@"](
+                gm.constants.SurvivorSkillLoadoutUnlockable,
                 skill.value,
                 (achievement and achievement.value) or -1
             )
         )
-
-        -- local survivor_loadout_unlockables = gm.variable_global_get("survivor_loadout_unlockables")
-        
-        -- local survivor_loadout = gm.struct_create()
-
-        -- gm.static_set(survivor_loadout, gm.static_get(skill_family[1]))
-
-        -- survivor_loadout.skill_id = skill.value
-        -- survivor_loadout.achievement_id = (achievement and achievement.value) or -1
-        -- survivor_loadout.save_flag_viewed = nil
-        -- survivor_loadout.index = gm.array_length(survivor_loadout_unlockables)
-
-        -- gm.array_push(survivor_loadout_unlockables, survivor_loadout)
-        -- gm.array_push(skill_family, survivor_loadout)
     end,
 
     add_primary = function(self, skill, achievement)
@@ -309,19 +320,19 @@ methods_survivor = {
     end,
     
     get_primary = function(self, family_index)
-        return self:get_skill(1, family_index)
+        return self:get_skill(0, family_index)
     end,
 
     get_secondary = function(self, family_index)
-        return self:get_skill(2, family_index)
+        return self:get_skill(1, family_index)
     end,
 
     get_utility = function(self, family_index)
-        return self:get_skill(3, family_index)
+        return self:get_skill(2, family_index)
     end,
 
     get_special = function(self, family_index)
-        return self:get_skill(4, family_index)
+        return self:get_skill(3, family_index)
     end,
 
     set_animations = function(self, sprites)
@@ -350,52 +361,52 @@ methods_survivor = {
         self.token_end_quote = end_quote
     end,
 
-    set_stats_base = function(self, maxhp, damage, regen, armor, attack_speed, critical_chance, maxshield)
-        if type(maxhp) ~= "number" and type(maxhp) ~= "nil" then log.error("Max HP base should be a number, got a "..type(maxhp), 2) return end
-        if type(damage) ~= "number" and type(damage) ~= "nil" then log.error("Damage base should be a number, got a "..type(damage), 2) return end
-        if type(regen) ~= "number" and type(regen) ~= "nil" then log.error("Regen base should be a number, got a "..type(regen), 2) return end
-        if type(armor) ~= "number" and type(armor) ~= "nil" then log.error("Armor base should be a number, got a "..type(armor), 2) return end
-        if type(attack_speed) ~= "number" and type(attack_speed) ~= "nil" then log.error("Attack Speed base should be a number, got a "..type(attack_speed), 2) return end
-        if type(critical_chance) ~= "number" and type(critical_chance) ~= "nil" then log.error("Critical Chance base should be a number, got a "..type(critical_chance), 2) return end
-        if type(maxshield) ~= "number" and type(maxshield) ~= "nil" then log.error("Max Shield base should be a number, got a "..type(maxshield), 2) return end
+    set_stats_base = function(self, stats)
+        if type(stats.maxhp) ~= "number" and type(stats.maxhp) ~= "nil" then log.error("Max HP base should be a number, got a "..type(stats.maxhp), 2) return end
+        if type(stats.damage) ~= "number" and type(stats.damage) ~= "nil" then log.error("Damage base should be a number, got a "..type(stats.damage), 2) return end
+        if type(stats.regen) ~= "number" and type(stats.regen) ~= "nil" then log.error("Regen base should be a number, got a "..type(stats.regen), 2) return end
+        if type(stats.armor) ~= "number" and type(stats.armor) ~= "nil" then log.error("Armor base should be a number, got a "..type(stats.armor), 2) return end
+        if type(stats.attack_speed) ~= "number" and type(stats.attack_speed) ~= "nil" then log.error("Attack Speed base should be a number, got a "..type(stats.attack_speed), 2) return end
+        if type(stats.critical_chance) ~= "number" and type(stats.critical_chance) ~= "nil" then log.error("Critical Chance base should be a number, got a "..type(stats.critical_chance), 2) return end
+        if type(stats.maxshield) ~= "number" and type(stats.maxshield) ~= "nil" then log.error("Max Shield base should be a number, got a "..type(stats.maxshield), 2) return end
 
-        survivors[self.value].maxhp_base = maxhp or survivors[self.value].maxhp_base
-        survivors[self.value].damage_base = damage or survivors[self.value].damage_base
-        survivors[self.value].regen_base = regen or survivors[self.value].regen_base
-        survivors[self.value].attack_speed_base = attack_speed or survivors[self.value].attack_speed_base
-        survivors[self.value].critical_chance_base = critical_chance or survivors[self.value].critical_chance_base
-        survivors[self.value].armor_base = armor or survivors[self.value].armor_base
-        survivors[self.value].maxshield_base = maxshield or survivors[self.value].maxshield_base
+        survivors[self.value].maxhp_base = stats.maxhp or survivors[self.value].maxhp_base
+        survivors[self.value].damage_base = stats.damage or survivors[self.value].damage_base
+        survivors[self.value].regen_base = stats.regen or survivors[self.value].regen_base
+        survivors[self.value].attack_speed_base = stats.attack_speed or survivors[self.value].attack_speed_base
+        survivors[self.value].critical_chance_base = stats.critical_chance or survivors[self.value].critical_chance_base
+        survivors[self.value].armor_base = stats.armor or survivors[self.value].armor_base
+        survivors[self.value].maxshield_base = stats.maxshield or survivors[self.value].maxshield_base
     end,
     
-    set_physic_base = function(self, hmax, vmax, gravity1, gravity2, accel)
-        if type(hmax) ~= "number" and type(hmax) ~= "nil" then log.error("Hmax base should be a number, got a "..type(hmax), 2) return end
-        if type(vmax) ~= "number" and type(vmax) ~= "nil" then log.error("Vmax base should be a number, got a "..type(vmax), 2) return end
-        if type(gravity1) ~= "number" and type(gravity1) ~= "nil" then log.error("Gravity1 base should be a number, got a "..type(gravity1), 2) return end
-        if type(gravity2) ~= "number" and type(gravity2) ~= "nil" then log.error("Gravity2 base should be a number, got a "..type(gravity2), 2) return end
-        if type(accel) ~= "number" and type(accel) ~= "nil" then log.error("Acceleration base should be a number, got a "..type(accel), 2) return end
+    set_physics_base = function(self, stats)
+        if type(stats.hmax) ~= "number" and type(stats.hmax) ~= "nil" then log.error("Hmax base should be a number, got a "..type(stats.hmax), 2) return end
+        if type(stats.vmax) ~= "number" and type(stats.vmax) ~= "nil" then log.error("Vmax base should be a number, got a "..type(stats.vmax), 2) return end
+        if type(stats.gravity1) ~= "number" and type(stats.gravity1) ~= "nil" then log.error("Gravity1 base should be a number, got a "..type(stats.gravity1), 2) return end
+        if type(stats.gravity2) ~= "number" and type(stats.gravity2) ~= "nil" then log.error("Gravity2 base should be a number, got a "..type(stats.gravity2), 2) return end
+        if type(stats.accel) ~= "number" and type(stats.accel) ~= "nil" then log.error("Acceleration base should be a number, got a "..type(stats.accel), 2) return end
 
-        survivors[self.value].pHmax_base = hmax or survivors[self.value].pHmax_base
-        survivors[self.value].pVmax_base = vmax or survivors[self.value].pVmax_base
-        survivors[self.value].pGravity1_base = gravity1 or survivors[self.value].pGravity1_base
-        survivors[self.value].pGravity2_base = gravity2 or survivors[self.value].pGravity2_base
-        survivors[self.value].pAccel_base = accel or survivors[self.value].pAccel_base
+        survivors[self.value].pHmax_base = stats.hmax or survivors[self.value].pHmax_base
+        survivors[self.value].pVmax_base = stats.vmax or survivors[self.value].pVmax_base
+        survivors[self.value].pGravity1_base = stats.gravity1 or survivors[self.value].pGravity1_base
+        survivors[self.value].pGravity2_base = stats.gravity2 or survivors[self.value].pGravity2_base
+        survivors[self.value].pAccel_base = stats.accel or survivors[self.value].pAccel_base
     end,
 
-    set_stats_level = function(self, maxhp, damage, regen, armor, attack_speed, critical_chance)
-        if type(maxhp) ~= "number" and type(maxhp) ~= "nil" then log.error("Max HP level should be a number, got a "..type(maxhp), 2) return end
-        if type(damage) ~= "number" and type(damage) ~= "nil" then log.error("Damage level should be a number, got a "..type(damage), 2) return end
-        if type(regen) ~= "number" and type(regen) ~= "nil" then log.error("Regen level should be a number, got a "..type(regen), 2) return end
-        if type(armor) ~= "number" and type(armor) ~= "nil" then log.error("Armor level should be a number, got a "..type(armor), 2) return end
-        if type(attack_speed) ~= "number" and type(attack_speed) ~= "nil" then log.error("Attack Speed level should be a number, got a "..type(attack_speed), 2) return end
-        if type(critical_chance) ~= "number" and type(critical_chance) ~= "nil" then log.error("Critical Chance level should be a number, got a "..type(critical_chance), 2) return end
+    set_stats_level = function(self, stats)
+        if type(stats.maxhp) ~= "number" and type(stats.maxhp) ~= "nil" then log.error("Max HP level should be a number, got a "..type(stats.maxhp), 2) return end
+        if type(stats.damage) ~= "number" and type(stats.damage) ~= "nil" then log.error("Damage level should be a number, got a "..type(stats.damage), 2) return end
+        if type(stats.regen) ~= "number" and type(stats.regen) ~= "nil" then log.error("Regen level should be a number, got a "..type(stats.regen), 2) return end
+        if type(stats.armor) ~= "number" and type(stats.armor) ~= "nil" then log.error("Armor level should be a number, got a "..type(stats.armor), 2) return end
+        if type(stats.attack_speed) ~= "number" and type(stats.attack_speed) ~= "nil" then log.error("Attack Speed level should be a number, got a "..type(stats.attack_speed), 2) return end
+        if type(stats.critical_chance) ~= "number" and type(stats.critical_chance) ~= "nil" then log.error("Critical Chance level should be a number, got a "..type(stats.critical_chance), 2) return end
 
-        survivors[self.value].maxhp_level = maxhp or survivors[self.value].maxhp_level
-        survivors[self.value].damage_level = damage or survivors[self.value].damage_level
-        survivors[self.value].regen_level = regen or survivors[self.value].regen_level
-        survivors[self.value].attack_speed_level = attack_speed or survivors[self.value].attack_speed_level
-        survivors[self.value].critical_chance_level = critical_chance or survivors[self.value].critical_chance_level
-        survivors[self.value].armor_level = armor or survivors[self.value].armor_level
+        survivors[self.value].maxhp_level = stats.maxhp or survivors[self.value].maxhp_level
+        survivors[self.value].damage_level = stats.damage or survivors[self.value].damage_level
+        survivors[self.value].regen_level = stats.regen or survivors[self.value].regen_level
+        survivors[self.value].attack_speed_level = stats.attack_speed or survivors[self.value].attack_speed_level
+        survivors[self.value].critical_chance_level = stats.critical_chance or survivors[self.value].critical_chance_level
+        survivors[self.value].armor_level = stats.armor or survivors[self.value].armor_level
     end,
 
     set_palettes = function(self, palette, portrait_palette, loadout_palette)
@@ -444,31 +455,16 @@ methods_survivor = {
         asset_name_overrides["__newsprite"..math.tointeger(self.sprite_portrait).."_PAL"..skin_pal_swap] = skin_portrait or self.sprite_portrait
         asset_name_overrides["__newsprite"..math.tointeger(self.sprite_portrait_small).."_PAL"..skin_pal_swap] = skin_portraitsmall or self.sprite_portrait_small
 
-        -- gm.array_insert(
-        --     self.skin_family.elements,
-        --     #self.skin_family.elements,
-        --     gm["@@NewGMLObject@@"](
-        --         gm.constants.SurvivorSkinLoadoutUnlockable,
-        --         skin_pal_swap,
-        --         (achievement and achievement.value) or -1
-        --     )
-        -- )
-        
         gm.array_insert(
             self.skin_family.elements,
             #self.skin_family.elements,
-            gm.SurvivorSkinLoadoutUnlockable(
+            gm["@@NewGMLObject@@"](
+                gm.constants.SurvivorSkinLoadoutUnlockable,
                 skin_pal_swap,
                 (achievement and achievement.value) or -1
             )
         )
-        -- local artifact_skin = Artifact.new_skin(achievement)
-        -- local skin_alt = gm.struct_create()
-        -- gm.static_set(skin_alt, gm.static_get(self.skin_family.elements[1]))
-        -- skin_alt.skin_id = gm.actor_skin_get_default_palette_swap(skin_index)
-        -- skin_alt.achievement_id = (achievement and achievement.value) or -1
-        -- skin_alt.index = artifact_skin
-        -- gm.array_push(self.skin_family.elements, skin_alt)
+        
         survivors[self.value].skins[#survivors[self.value].skins + 1] = name
     end,
 
@@ -480,7 +476,12 @@ methods_survivor = {
             armor              = survivors[self.value].armor_base,
             attack_speed       = survivors[self.value].attack_speed_base,
             critical_chance    = survivors[self.value].critical_chance_base,
-            maxshield          = survivors[self.value].maxshield_base,
+            maxshield          = survivors[self.value].maxshield_base
+        }
+    end,
+
+    get_physics_base = function(self)
+        return {
             pHmax              = survivors[self.value].pHmax_base,
             pVmax              = survivors[self.value].pVmax_base,
             pGravity1          = survivors[self.value].pGravity1_base,
@@ -497,6 +498,39 @@ methods_survivor = {
             armor              = survivors[self.value].armor_level,
             attack_speed       = survivors[self.value].attack_speed_level,
             critical_chance    = survivors[self.value].critical_chance_level
+        }
+    end,
+
+    get_stats_base_default = function(self)
+        return {
+            maxhp              = stats_default.maxhp_base,
+            damage             = stats_default.damage_base,
+            regen              = stats_default.regen_base,
+            armor              = stats_default.armor_base,
+            attack_speed       = stats_default.attack_speed_base,
+            critical_chance    = stats_default.critical_chance_base,
+            maxshield          = stats_default.maxshield_base
+        }
+    end,
+
+    get_physics_base_default = function(self)
+        return {
+            pHmax              = stats_default.pHmax_base,
+            pVmax              = stats_default.pVmax_base,
+            pGravity1          = stats_default.pGravity1_base,
+            pGravity2          = stats_default.pGravity2_base,
+            pAccel             = stats_default.pAccel_base
+        }
+    end,
+
+    get_stats_level_default = function(self)
+        return {
+            maxhp              = stats_default.maxhp_level,
+            damage             = stats_default.damage_level,
+            regen              = stats_default.regen_level,
+            armor              = stats_default.armor_level,
+            attack_speed       = stats_default.attack_speed_level,
+            critical_chance    = stats_default.critical_chance_level
         }
     end,
 }
@@ -576,7 +610,7 @@ metatable_survivor = {
 gm.post_script_hook(gm.constants.callback_execute, function(self, other, result, args)
     if callbacks[args[1].value] then
         for _, fn in pairs(callbacks[args[1].value]) do
-            fn(args[2].value) --(actor, initial_set)
+            fn(Instance.wrap(args[2].value)) --(actor, initial_set)
         end
     end
 end)
@@ -588,12 +622,12 @@ gm.post_script_hook(gm.constants.instance_callback_call, function(self, other, r
 
         -- on Hit
         if #args == 6 and debug.getinfo(fn).nparams == 4 then
-            fn(args[3].value, args[4].value, args[5].value, args[6].value) --(object_instance, hit_instance, hit_x, hit_y)
+            fn(Instance.wrap(args[3].value), args[4].value, args[5].value, args[6].value) --(object_instance, hit_instance, hit_x, hit_y)
         end
 
         -- on End
         if #args == 3 and debug.getinfo(fn).nparams == 1 then
-            fn(args[3].value) --(object_instance)
+            fn(Instance.wrap(args[3].value)) --(object_instance)
         end
     end
 end)
