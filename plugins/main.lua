@@ -31,11 +31,13 @@ Classes = {
     "State",
     "Survivor",
     "Survivor_Log",
-    "Wrap"
+    "Wrap",
+
+    "Actor_Post"
 }
 
 for _, c in ipairs(Classes) do
-    require("./"..string.lower(string.sub(c, 1, 1))..string.sub(c, 2, #c))
+    require("./"..string.lower(c))
 end
 
 
