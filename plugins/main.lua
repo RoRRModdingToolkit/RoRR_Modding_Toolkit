@@ -33,7 +33,7 @@ Classes = {
     "Survivor_Log",
     "Wrap",
 
-    "Actor_Post"
+    "Actor_Post"    -- Keep this here
 }
 
 for _, c in ipairs(Classes) do
