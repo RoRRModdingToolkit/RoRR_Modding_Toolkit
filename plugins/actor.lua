@@ -546,16 +546,16 @@ Actor.__initialize = function()
         end
     end)
 
-    Actor:onPostStep("rmt-runPostStatRecalc", function(actor)
-        actorData = actor:get_data()
+    -- Actor:onPostStep("rmt-runPostStatRecalc", function(actor)
+    --     actorData = actor:get_data()
 
-        -- Run onPostStatRecalc
-        if actorData.post_stat_recalc then
-            actorData.post_stat_recalc = nil
-            actor_onPostStatRecalc(actor)
-            item_onPostStatRecalc(actor)
-            equipment_onPostStatRecalc(actor)
-            buff_onPostStatRecalc(actor)
-        end
-    end)
+    --     -- Run onPostStatRecalc
+    --     if actorData.post_stat_recalc then
+    --         actorData.post_stat_recalc = nil
+    --         actor_onPostStatRecalc(actor)
+    --         item_onPostStatRecalc(actor)
+    --         equipment_onPostStatRecalc(actor)
+    --         buff_onPostStatRecalc(actor)
+    --     end
+    -- end)
 end

@@ -1,6 +1,9 @@
 ### v1.1.6
 * Fixed Survivor add_skin and add_skill
-* Changed Survivor set_stats_* functions' arguments to a table
+* Changed Survivor set_stats_* functions' arguments to a table.
+* Fixed another sfx issue related to setting maxshield in onPostStatRecalc.
+    * onPostStatRecalc should now run on the same frame as onStatRecalc now instead of the next one.
+* Fixed possible error with internal require and some classes.
 
 ### v1.1.5
 * Fixed Survivor clear_callbacks removing the automatic onInit callback used for setup.
