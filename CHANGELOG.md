@@ -1,6 +1,7 @@
 ### v1.1.7
 * Actor : Added tracer argument to fire_bullet
-* Damager : Added Damager.TRACER
+* Damager : Added TRACER enum
+* Resources : Added namespace and identifier arguments to sfx_load
 
 ### v1.1.6
 * Fixed Survivor add_skin and add_skill

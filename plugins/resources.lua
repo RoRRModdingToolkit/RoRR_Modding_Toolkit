@@ -5,10 +5,10 @@ Resources = {}
 
 -- == Section Sprites == --
 
-Resources.sprite_load = function(namespace, name, path, img_num, x_orig, y_orig, speed, bbox_left, bbox_top, bbox_right, bbox_bottom)
+Resources.sprite_load = function(namespace, identifier, path, img_num, x_orig, y_orig, speed, bbox_left, bbox_top, bbox_right, bbox_bottom)
     local sprite = gm.sprite_add_w(
         namespace,
-        name,
+        identifier,
         path, 
         (img_num ~= nil and {img_num} or {1})[1], 
         (x_orig ~= nil and {x_orig} or {0})[1], 
@@ -49,8 +49,8 @@ Resources.sprite_duplicate = function(id, x_offset, y_offset, speed)
     return sprite
 end
 
-Resources.sfx_load = function(path)
-    local sfx = gm.audio_create_stream(path)
+Resources.sfx_load = function(namespace, identifier, path)
+    local sfx = gm.sound_add_w(namespace, identifier, path)
     if sfx == -1 then 
         log.error("Couldn't load sfx "..path, 2)
     end
