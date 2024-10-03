@@ -16,7 +16,7 @@ Resources.sprite_load = function(namespace, name, path, img_num, x_orig, y_orig,
     )
 
     if sprite == -1 then
-        log.error("Couldn't load sprite "..path..". Loading default sprite instead.")
+        log.error("Couldn't load sprite "..path..". Loading default sprite instead.", 2)
         return 0
     end
 
@@ -35,7 +35,7 @@ Resources.sprite_duplicate = function(id, x_offset, y_offset, speed)
     local sprite = gm.sprite_duplicate(id)
 
     if sprite == -1 then
-        log.error("Error trying to duplicate sprite. Loading default sprite instead.")
+        log.error("Error trying to duplicate sprite. Loading default sprite instead.", 2)
         return 0
     end
 
@@ -52,7 +52,7 @@ end
 Resources.sfx_load = function(path)
     local sfx = gm.audio_create_stream(path)
     if sfx == -1 then 
-        log.error("Couldn't load sfx "..path)
+        log.error("Couldn't load sfx "..path, 2)
     end
     return sfx
 end

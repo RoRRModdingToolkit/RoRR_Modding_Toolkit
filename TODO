@@ -38,3 +38,5 @@ v Add Damager wrapper
 
 v Allow actor:fire_direct to accept x and y pos
 - Add tracer_kind to actor:fire_bullet (and an enum for it)
+
+- Add secondary argument for weights for item:get_random

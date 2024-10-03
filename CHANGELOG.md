@@ -1,3 +1,6 @@
+### v1.1.7
+* 
+
 ### v1.1.6
 * Fixed Survivor add_skin and add_skill
 * Changed Survivor set_stats_* functions' arguments to a table.
