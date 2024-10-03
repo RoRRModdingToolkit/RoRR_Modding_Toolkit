@@ -37,3 +37,4 @@ v Add interactable cards for Interactable
 v Add Damager wrapper
 
 v Allow actor:fire_direct to accept x and y pos
+- Add tracer_kind to actor:fire_bullet (and an enum for it)
