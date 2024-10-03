@@ -88,7 +88,7 @@ methods_actor = {
     end,
 
 
-    fire_bullet = function(self, x, y, range, direction, damage, pierce_multiplier, hit_sprite)
+    fire_bullet = function(self, x, y, range, direction, damage, pierce_multiplier, hit_sprite, tracer)
         -- Set whether or not the bullet damager can pierce
         local can_pierce = false
         if pierce_multiplier then can_pierce = true end
@@ -99,6 +99,11 @@ methods_actor = {
         -- Set pierce multiplier
         if pierce_multiplier then
             damager.damage_degrade = (1.0 - pierce_multiplier)
+        end
+
+        -- Set tracer_kind
+        if tracer then
+            damager.tracer_kind = tracer
         end
 
         return Damager.wrap(damager)

@@ -1,5 +1,6 @@
 ### v1.1.7
-* 
+* Actor : Added tracer argument to fire_bullet
+* Damager : Added Damager.TRACER
 
 ### v1.1.6
 * Fixed Survivor add_skin and add_skill

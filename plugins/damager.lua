@@ -23,6 +23,38 @@ Damager.KNOCKBACK_DIR = {
 }
 
 
+Damager.TRACER = {
+    none                    = 0,
+    wispg                   = 1,
+    wispg2                  = 2,
+    pilot_raid              = 3,
+    pilot_raid_boosted      = 4,
+    pilot_primary           = 5,
+    pilot_primary_strong    = 6,
+    pilot_primary_alt       = 7,
+    commando1               = 8,
+    commando2               = 9,
+    commando3               = 10,
+    commando3_r             = 11,
+    sniper1                 = 12,
+    sniper2                 = 13,
+    engi_turret             = 14,
+    enforcer1               = 15,
+    robomando1              = 16,
+    robomando2              = 17,
+    bandit1                 = 18,
+    bandit2                 = 19,
+    bandit2_r               = 20,
+    bandit3                 = 21,
+    bandit3_r               = 22,
+    acrid                   = 23,
+    no_sparks_on_miss       = 24,
+    end_sparks_on_pierce    = 25,
+    drill                   = 26,
+    player_drone            = 27
+}
+
+
 
 -- ========== Static Methods ==========
 
