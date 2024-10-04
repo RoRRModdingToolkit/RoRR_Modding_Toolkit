@@ -373,3 +373,11 @@ gm.post_script_hook(gm.constants.actor_transform, function(self, other, result, 
         instance_data[args[1].value.id] = nil
     end
 end)
+
+
+
+-- ========== Initialize ==========
+
+Instance.__initialize = function()
+    gm_add_instance_methods(methods_instance)
+end
