@@ -1,3 +1,6 @@
+### v1.1.10
+* 
+
 ### v1.1.9
 * Object : `create` now defaults to position (0, 0) if none is specified.
 * Skill : Now wraps and unwraps when getting/setting properties.
