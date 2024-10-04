@@ -126,7 +126,7 @@ metatable_survivor_log_gs = {
         local index = Survivor_Log.ARRAY[key]
         if index then
             local survivor_log_array = Class.SURVIVOR_LOG:get(table.value)
-            return survivor_log_array:get(index)
+            return Wrap.wrap(survivor_log_array:get(index))
         end
         return nil
     end,
@@ -137,7 +137,7 @@ metatable_survivor_log_gs = {
         local index = Survivor_Log.ARRAY[key]
         if index then
             local survivor_log_array = Class.SURVIVOR_LOG:get(table.value)
-            survivor_log_array:set(index, value)
+            survivor_log_array:set(index, Wrap.unwrap(value))
         end
     end
 }

@@ -1,6 +1,7 @@
 ### v1.1.9
 * Object : `create` now defaults to position (0, 0) if none is specified.
 * Skill : Now wraps and unwraps when getting/setting properties.
+* Survivor_Log : Now wraps and unwraps when getting/setting properties.
 
 ### v1.1.8
 * Return values from GM class are now wrapped when applicable.
