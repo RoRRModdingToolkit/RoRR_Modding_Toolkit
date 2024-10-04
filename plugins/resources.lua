@@ -10,9 +10,9 @@ Resources.sprite_load = function(namespace, identifier, path, img_num, x_orig, y
         namespace,
         identifier,
         path, 
-        (img_num ~= nil and {img_num} or {1})[1], 
-        (x_orig ~= nil and {x_orig} or {0})[1], 
-        (y_orig ~= nil and {y_orig} or {0})[1]
+        img_num or 1, 
+        x_orig or 0, 
+        y_orig or 0
     )
 
     if sprite == -1 then

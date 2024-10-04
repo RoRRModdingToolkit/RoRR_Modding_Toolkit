@@ -40,3 +40,7 @@ v Allow actor:fire_direct to accept x and y pos
 - Add tracer_kind to actor:fire_bullet (and an enum for it)
 
 - Add secondary argument for weights for item:get_random
+
+- Rewrite Interactable class in some way
+    - Add Interactable Card class (since it can spawn whatever you want apparently)
+    - Have Interactable.new() (or Object.new(interactable parent) or whatever) create an Interactable Card on creation
