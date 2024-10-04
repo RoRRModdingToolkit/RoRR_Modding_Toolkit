@@ -2,6 +2,10 @@
 * Actor : Added tracer argument to fire_bullet
 * Damager : Added TRACER enum
 * Resources : Added namespace and identifier arguments to sfx_load
+* Added GM class
+    * Allows for calling gm functions with wrapped arguments, which will automatically unwrap.
+    * Additionally, can call with `:` syntax with wrapped objects (e.g., `actor:skill_util_unlock_cooldown(skill)`, with `actor` being a wrapped Actor object).
+        * Basically there is no longer a need to do `.value`.
 
 ### v1.1.6
 * Fixed Survivor add_skin and add_skill

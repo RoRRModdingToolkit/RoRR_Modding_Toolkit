@@ -1,34 +1,41 @@
--- gm
+-- GM
 
--- For the list of gm functions below, if they are run by a mod,
--- wrapped values will be automatically unwrapped
+local abstraction_data = setmetatable({}, {__mode = "k"})
 
--- gm_functions = {
---     "instance_create",
---     "recalculate_stats",
---     "skill_util_unlock_cooldown",
---     "skill_util_lock_cooldown",
---     "skill_util_facing_direction",
---     "skill_util_apply_friction",
---     "skill_util_exit_state_on_anim_end",
---     "actor_skill_add_stock",
---     "sound_play_at",
---     "",
---     "",
--- }
+GM = {}
+abstraction_data[GM] = {}
+setmetatable(GM, {
+    __index = function(table, key)
+        return abstraction_data[table][key]
+    end,
 
+    __newindex = function(table, key, value)
+        log.error("Cannot overwrite GM functions", 2)
+    end
+})
+
+
+
+-- ========== Functions ==========
+
+for fn, _ in pairs(gm.constants) do
+    local type_ = gm.constant_types[fn]
+    if type_ == "script" or type_ == "gml_script" then
+        abstraction_data[GM][fn] = function(...)
+            local t = {...}
+            for i, arg in ipairs(t) do
+                t[i] = Wrap.unwrap(arg)
+            end
+            return gm.call(fn, nil, nil, table.unpack(t))
+        end
+    end
+end
+
+
+
+-- ========== Internal ==========
 
 gm_add_instance_methods = function(methods_table)
-    -- for fn, _ in pairs(gm) do
-    --     methods_table[fn] = function(self, ...)
-    --         local t = {...}
-    --         for i, arg in ipairs(t) do
-    --             t[i] = Wrap.unwrap(arg)
-    --         end
-    --         return gm.call(fn, self.value, self.value, table.unpack(t))
-    --     end
-    -- end
-
     for fn, _ in pairs(gm.constants) do
         local type_ = gm.constant_types[fn]
         if type_ == "script" or type_ == "gml_script" then
@@ -42,32 +49,3 @@ gm_add_instance_methods = function(methods_table)
         end
     end
 end
-
-
-
--- ========== Hooks ==========
-
--- ok this doesn't work because passed-in lua values get converted into nil before hook
--- adding as instance methods as above works fine though
-
--- maybe make a GM class and populate with gm functions??
-
--- for _, fn in ipairs(gm_functions) do
---     if gm.constants[fn] then
---         gm.pre_script_hook(gm.constants[fn], function(self, other, result, args)
---             -- Check if function was run by a mod
---             -- (This is done by the fact that debug.getinfo(2) will be nil if run by the game)
---             -- If so, do Wrap.unwrap on all arguments
---             log.info(fn)
---             Helper.log_hook(self, other, result, args)
-
---             if debug.getinfo(2, "f") then
---                 self = Wrap.unwrap(self)
---                 other = Wrap.unwrap(other)
---                 for _, a in ipairs(args) do
---                     a.value = Wrap.unwrap(a.value)
---                 end
---             end
---         end)
---     end
--- end

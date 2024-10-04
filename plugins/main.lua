@@ -34,7 +34,7 @@ Classes = {
     "Wrap",
 
     "Actor_Post",   -- Keep this here
-    "gm"
+    "GM"
 }
 
 for _, c in ipairs(Classes) do
