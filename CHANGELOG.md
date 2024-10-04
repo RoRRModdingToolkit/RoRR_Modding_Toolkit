@@ -4,7 +4,7 @@
 * Resources : Added namespace and identifier arguments to sfx_load
 * Added GM class
     * Allows for calling gm functions with wrapped arguments, which will automatically unwrap.
-    * Additionally, can call with `:` syntax with wrapped objects (e.g., `actor:skill_util_unlock_cooldown(skill)`, with `actor` being a wrapped Actor object).
+    * Additionally, can call with `:` syntax using wrapped objects (e.g., `actor:skill_util_unlock_cooldown(skill)`, with `actor` being a wrapped Actor object).
         * Basically there is no longer a need to do `.value`.
     * Removed dedicated actor:recalculate_stats
 
