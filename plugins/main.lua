@@ -46,11 +46,9 @@ end
 -- ========== Initialize ==========
 
 function __initialize()
+    -- Initialize these first
     Class.__initialize()
-    
-    -- Initialize these first (callback population)
     Callback.__initialize()
-    -- Survivor.__initialize()
 
     Actor.__initialize()
     Artifact.__initialize()
@@ -59,8 +57,6 @@ function __initialize()
     Instance.__initialize()
     Interactable.__initialize()
     Item.__initialize()
-    
-    -- Language.__initialize()
 end
 
 
