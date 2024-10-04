@@ -83,11 +83,6 @@ methods_actor = {
     end,
 
 
-    recalculate_stats = function(self)
-        self.value:recalculate_stats()
-    end,
-
-
     fire_bullet = function(self, x, y, range, direction, damage, pierce_multiplier, hit_sprite, tracer)
         -- Set whether or not the bullet damager can pierce
         local can_pierce = false
