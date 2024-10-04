@@ -258,7 +258,7 @@ metatable_skill_gs = {
         local index = Skill.ARRAY[key]
         if index then
             local skill_array = Class.SKILL:get(table.value)
-            return skill_array:get(index)
+            return Wrap.wrap(skill_array:get(index))
         end
         return nil
     end,
@@ -269,7 +269,7 @@ metatable_skill_gs = {
         local index = Skill.ARRAY[key]
         if index then
             local skill_array = Class.SKILL:get(table.value)
-            skill_array:set(index, value)
+            skill_array:set(index, Wrap.unwrap(value))
         end
     end
 }
