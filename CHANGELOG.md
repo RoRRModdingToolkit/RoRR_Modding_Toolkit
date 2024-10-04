@@ -1,3 +1,6 @@
+### v1.1.9
+* 
+
 ### v1.1.8
 * Return values from GM class are now wrapped when applicable.
 
