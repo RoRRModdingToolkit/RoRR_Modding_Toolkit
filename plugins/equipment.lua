@@ -423,7 +423,8 @@ end)
 
 
 gm.pre_script_hook(gm.constants.item_use_equipment, function(self, other, result, args)
-    if is_passive[Instance.wrap(self):get_equipment().value] then
+    local equip = Instance.wrap(self):get_equipment()
+    if equip and is_passive[equip.value] then
         return false
     end
 end)
