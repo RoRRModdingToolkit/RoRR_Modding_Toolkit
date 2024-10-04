@@ -105,7 +105,7 @@ end
 methods_object = {
 
     create = function(self, x, y)
-        local inst = gm.instance_create(x, y, self.value)
+        local inst = gm.instance_create(x or 0, y or 0, self.value)
         return Instance.wrap(inst)
     end,
 
