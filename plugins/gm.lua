@@ -26,7 +26,7 @@ for fn, _ in pairs(gm.constants) do
             for i, arg in ipairs(t) do
                 t[i] = Wrap.unwrap(arg)
             end
-            return gm.call(fn, nil, nil, table.unpack(t))
+            return Wrap.wrap(gm.call(fn, nil, nil, table.unpack(t)))
         end
     end
 end
@@ -45,7 +45,7 @@ gm_add_instance_methods = function(methods_table)
                     for i, arg in ipairs(t) do
                         t[i] = Wrap.unwrap(arg)
                     end
-                    return gm.call(fn, self.value, self.value, table.unpack(t))
+                    return Wrap.wrap(gm.call(fn, self.value, self.value, table.unpack(t)))
                 end
             end
         end

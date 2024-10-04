@@ -1,5 +1,5 @@
 ### v1.1.8
-* 
+* Return values from GM class are now wrapped when applicable.
 
 ### v1.1.7
 * Actor : Added tracer argument to fire_bullet
