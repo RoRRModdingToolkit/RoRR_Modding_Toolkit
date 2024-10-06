@@ -44,3 +44,5 @@ v Allow actor:fire_direct to accept x and y pos
 - Rewrite Interactable class in some way
     - Add Interactable Card class (since it can spawn whatever you want apparently)
     - Have Interactable.new() (or Object.new(interactable parent) or whatever) create an Interactable Card on creation
+
+- Add way to associate achievements to certain Characters
