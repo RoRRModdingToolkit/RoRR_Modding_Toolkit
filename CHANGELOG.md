@@ -29,6 +29,7 @@
     * stage:set_log_icon
     * stage:set_log_view_start
     * stage:set_log_hidden
+    * stage:set_title_screen_properties
 
 ### v1.1.9
 * Object : `create` now defaults to position (0, 0) if none is specified.

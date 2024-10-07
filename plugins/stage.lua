@@ -4,6 +4,8 @@ Stage = {}
 
 local abstraction_data = setmetatable({}, {__mode = "k"})
 
+local populate_biome = {}
+
 
 
 -- ========== Enums ==========
@@ -222,6 +224,17 @@ methods_stage = {
     set_log_hidden = function(self, bool)
         if bool == nil then return end
         Class.ENVIRONMENT_LOG:get(self.log_id):set(14, bool)
+    end,
+
+
+    set_title_screen_properties = function(self, ground_strip, obj_sprites, force_draw_depth)
+        local id = self.namespace.."-"..self.identifier
+        if not populate_biome[id] then populate_biome[id] = {} end
+        populate_biome[id] = {
+            ground_strip = ground_strip,
+            obj_sprites = obj_sprites or nil,
+            force_draw_depth = force_draw_depth or nil
+        }
     end
 
 }
@@ -281,3 +294,36 @@ metatable_stage = {
         metatable_stage_gs.__newindex(table, key, value)
     end
 }
+
+
+
+-- ========== Hooks ==========
+
+gm.post_script_hook(gm.constants.callable_call, function(self, other, result, args)
+    if #args ~= 3 then return end
+
+    for id, t in pairs(populate_biome) do
+        local stage = Stage.find(id)
+        if args[1].value == stage.populate_biome_properties then
+            local struct = args[3].value
+
+            struct.ground_strip = t.ground_strip
+
+            if t.obj_sprites then
+                local array = Array.wrap(struct.obj_sprites)
+                array:clear()
+                for _, spr in ipairs(t.obj_sprites) do
+                    array:push(spr)
+                end
+            end
+
+            if t.force_draw_depth then
+                for _, v in ipairs(t.force_draw_depth) do
+                    struct.force_draw_depth[tostring(math.floor(v))] = true
+                end
+            end
+
+            break
+        end
+    end
+end)
