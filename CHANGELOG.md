@@ -6,7 +6,12 @@
     * Interactable_Card.find
     * Interactable_Card.wrap
 * Added Stage class
-    * 
+    * Stage.new
+    * Stage.find
+    * Stage.wrap
+    * stage:set_index
+    * stage:add_room
+    * stage:add_interactable_card
 
 ### v1.1.9
 * Object : `create` now defaults to position (0, 0) if none is specified.
