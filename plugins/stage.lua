@@ -120,6 +120,45 @@ methods_stage = {
             if type(card) == "string" then card = Interactable_Card.find(card) end
             list:add(Wrap.unwrap(card))
         end
+    end,
+
+
+    add_interactable_card_loop = function(self, ...)
+        local list = List.wrap(self.spawn_interactables_loop)
+
+        local t = {...}
+        if type(t[1]) == "table" and (not t[1].RMT_object) then t = t[1] end
+
+        for _, card in ipairs(t) do
+            if type(card) == "string" then card = Interactable_Card.find(card) end
+            list:add(Wrap.unwrap(card))
+        end
+    end,
+
+
+    add_monster_card = function(self, ...)
+        local list = List.wrap(self.spawn_enemies)
+
+        local t = {...}
+        if type(t[1]) == "table" and (not t[1].RMT_object) then t = t[1] end
+
+        for _, card in ipairs(t) do
+            if type(card) == "string" then card = Monster_Card.find(card) end
+            list:add(Wrap.unwrap(card))
+        end
+    end,
+
+
+    add_monster_card_loop = function(self, ...)
+        local list = List.wrap(self.spawn_enemies_loop)
+
+        local t = {...}
+        if type(t[1]) == "table" and (not t[1].RMT_object) then t = t[1] end
+
+        for _, card in ipairs(t) do
+            if type(card) == "string" then card = Monster_Card.find(card) end
+            list:add(Wrap.unwrap(card))
+        end
     end
 
 }

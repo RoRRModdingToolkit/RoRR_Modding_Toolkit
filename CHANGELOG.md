@@ -17,7 +17,9 @@
     * stage:set_index
     * stage:add_room
     * stage:add_interactable_card
+    * stage:add_interactable_card_loop
     * stage:add_monster_card
+    * stage:add_monster_card_loop
 
 ### v1.1.9
 * Object : `create` now defaults to position (0, 0) if none is specified.
