@@ -17,10 +17,12 @@
     * stage:set_log_icon
     * stage:set_index
     * stage:add_room
-    * stage:add_interactable_card
-    * stage:add_interactable_card_loop
-    * stage:add_monster_card
-    * stage:add_monster_card_loop
+    * stage:add_interactable
+    * stage:add_interactable_loop
+    * stage:clear_interactables
+    * stage:add_monster
+    * stage:add_monster_loop
+    * stage:clear_monsters
 
 ### v1.1.9
 * Object : `create` now defaults to position (0, 0) if none is specified.

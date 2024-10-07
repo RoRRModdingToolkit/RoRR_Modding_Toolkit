@@ -134,7 +134,7 @@ methods_stage = {
     end,
 
 
-    add_interactable_card = function(self, ...)
+    add_interactable = function(self, ...)
         local list = List.wrap(self.spawn_interactables)
 
         local t = {...}
@@ -147,7 +147,7 @@ methods_stage = {
     end,
 
 
-    add_interactable_card_loop = function(self, ...)
+    add_interactable_loop = function(self, ...)
         local list = List.wrap(self.spawn_interactables_loop)
 
         local t = {...}
@@ -160,7 +160,14 @@ methods_stage = {
     end,
 
 
-    add_monster_card = function(self, ...)
+    clear_interactables = function(self, loop)
+        local list = List.wrap(self.spawn_interactables)
+        if loop then list = List.wrap(self.spawn_interactables_loop) end
+        list:clear()
+    end,
+
+
+    add_monster = function(self, ...)
         local list = List.wrap(self.spawn_enemies)
 
         local t = {...}
@@ -173,7 +180,7 @@ methods_stage = {
     end,
 
 
-    add_monster_card_loop = function(self, ...)
+    add_monster_loop = function(self, ...)
         local list = List.wrap(self.spawn_enemies_loop)
 
         local t = {...}
@@ -183,7 +190,14 @@ methods_stage = {
             if type(card) == "string" then card = Monster_Card.find(card) end
             list:add(Wrap.unwrap(card))
         end
-    end
+    end,
+
+
+    clear_monsters = function(self, loop)
+        local list = List.wrap(self.spawn_enemies)
+        if loop then list = List.wrap(self.spawn_enemies_loop) end
+        list:clear()
+    end,
 
 }
 
