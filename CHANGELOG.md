@@ -1,4 +1,5 @@
 ### v1.1.10
+* [!] Interactable class will be changed or deprecated soon.
 * Added Mod class
     * Mod.find
 * Added Interactable_Card class
