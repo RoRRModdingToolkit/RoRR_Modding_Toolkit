@@ -9,6 +9,8 @@ local abstraction_data = setmetatable({}, {__mode = "k"})
 -- ========== Enums ==========
 
 Interactable_Card.ARRAY = {
+    namespace                       = 0,
+    identifier                      = 1,
     spawn_cost                      = 2,
     spawn_weight                    = 3,
     object_id                       = 4,
