@@ -116,6 +116,7 @@ methods_stage = {
         -- Associate environment log
         if self.log_id ~= -1.0 then
             -- TODO
+            -- Also check what happens if a room does not have an envlog object in it
         end
     end,
 
