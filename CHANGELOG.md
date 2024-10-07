@@ -14,8 +14,8 @@
     * Stage.new
     * Stage.find
     * Stage.wrap
-    * stage:set_index
     * stage:set_log_icon
+    * stage:set_index
     * stage:add_room
     * stage:add_interactable_card
     * stage:add_interactable_card_loop

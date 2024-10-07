@@ -75,6 +75,16 @@ end
 
 methods_stage = {
 
+    set_log_icon = function(self, sprite)
+        if self.log_id == -1.0 then
+            log.error("This stage has no environment log", 2)
+            return
+        end
+        
+        Class.ENVIRONMENT_LOG:get(self.log_id):set(15, sprite)
+    end,
+    
+
     set_index = function(self, ...)
         local order = Array.wrap(gm.variable_global_get("stage_progression_order"))
 
@@ -99,16 +109,6 @@ methods_stage = {
             end
             gm._mod_stage_register(index, self.value)
         end
-    end,
-
-
-    set_log_icon = function(self, sprite)
-        if self.log_id == -1.0 then
-            log.error("This stage has no environment log", 2)
-            return
-        end
-        
-        Class.ENVIRONMENT_LOG:get(self.log_id):set(15, sprite)
     end,
 
 
