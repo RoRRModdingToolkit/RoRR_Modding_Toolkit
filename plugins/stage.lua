@@ -41,8 +41,6 @@ Stage.new = function(namespace, identifier)
         gm.stage_create(namespace, identifier)
     )
 
-
-
     return stage
 end
 
@@ -119,6 +117,7 @@ methods_stage = {
         if type(t[1]) == "table" and (not t[1].RMT_object) then t = t[1] end
 
         for _, card in ipairs(t) do
+            if type(card) == "string" then card = Interactable_Card.find(card) end
             list:add(Wrap.unwrap(card))
         end
     end
