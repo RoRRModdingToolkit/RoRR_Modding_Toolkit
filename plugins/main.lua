@@ -30,6 +30,7 @@ Classes = {
     "Player",
     "Resources",
     "Skill",
+    "Stage",
     "State",
     "Survivor",
     "Survivor_Log",
