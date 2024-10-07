@@ -5,6 +5,10 @@
     * Interactable_Card.new
     * Interactable_Card.find
     * Interactable_Card.wrap
+* Added Monster_Card class
+    * Monster_Card.new
+    * Monster_Card.find
+    * Monster_Card.wrap
 * Added Stage class
     * Stage.new
     * Stage.find
@@ -12,6 +16,7 @@
     * stage:set_index
     * stage:add_room
     * stage:add_interactable_card
+    * stage:add_monster_card
 
 ### v1.1.9
 * Object : `create` now defaults to position (0, 0) if none is specified.
