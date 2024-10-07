@@ -73,23 +73,7 @@ end
 
 -- ========== Instance Methods ==========
 
-methods_stage = {
-
-    set_log_icon = function(self, sprite)
-        if self.log_id == -1.0 then
-            log.error("This stage has no environment log", 2)
-            return
-        end
-        
-        Class.ENVIRONMENT_LOG:get(self.log_id):set(15, sprite)
-    end,
-
-
-    set_log_hidden = function(self, bool)
-        if bool == nil then return end
-        Class.ENVIRONMENT_LOG:get(self.log_id):set(14, bool)
-    end,
-    
+methods_stage = {    
 
     set_index = function(self, ...)
         local order = Array.wrap(gm.variable_global_get("stage_progression_order"))
@@ -215,6 +199,29 @@ methods_stage = {
         local list = List.wrap(self.spawn_enemies)
         if loop then list = List.wrap(self.spawn_enemies_loop) end
         list:clear()
+    end,
+
+
+    set_log_icon = function(self, sprite)
+        if self.log_id == -1.0 then
+            log.error("This stage has no environment log", 2)
+            return
+        end
+        
+        Class.ENVIRONMENT_LOG:get(self.log_id):set(15, sprite)
+    end,
+
+
+    set_log_view_start = function(self, x, y)
+        local log = Class.ENVIRONMENT_LOG:get(self.log_id)
+        log[7], log[9] = x, x
+        log[8], log[10] = y, y
+    end,
+
+
+    set_log_hidden = function(self, bool)
+        if bool == nil then return end
+        Class.ENVIRONMENT_LOG:get(self.log_id):set(14, bool)
     end
 
 }
