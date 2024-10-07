@@ -33,13 +33,18 @@ Stage.ARRAY = {
 
 -- ========== Static Methods ==========
 
-Stage.new = function(namespace, identifier)
+Stage.new = function(namespace, identifier, no_log)
     local stage = Stage.find(namespace, identifier)
     if stage then return stage end
 
     local stage = Stage.wrap(
         gm.stage_create(namespace, identifier)
     )
+
+    -- Create environment log
+    if not no_log then
+        stage.log_id = gm.environment_log_create(namespace, identifier)
+    end
 
     return stage
 end
@@ -106,6 +111,11 @@ methods_stage = {
         for _, path in ipairs(t) do
             local room = gm.stage_load_room(self.namespace, self.identifier.."_"..(#list + 1), path)
             list:add(room)
+        end
+
+        -- Associate environment log
+        if self.log_id ~= -1.0 then
+            -- TODO
         end
     end,
 
