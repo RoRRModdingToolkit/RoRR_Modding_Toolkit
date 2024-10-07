@@ -26,6 +26,7 @@
     * stage:add_monster
     * stage:add_monster_loop
     * stage:clear_monsters
+    * stage:get_room
 
 ### v1.1.9
 * Object : `create` now defaults to position (0, 0) if none is specified.
