@@ -23,6 +23,7 @@ Classes = {
     "Item",
     "Language",
     "List",
+    "Mod",
     "Net",
     "Object",
     "Player",

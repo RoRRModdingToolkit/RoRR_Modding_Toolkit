@@ -1,5 +1,6 @@
 ### v1.1.10
-* 
+* Added Mod class
+    * Mod.find
 
 ### v1.1.9
 * Object : `create` now defaults to position (0, 0) if none is specified.
