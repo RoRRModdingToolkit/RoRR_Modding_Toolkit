@@ -19,7 +19,8 @@ Classes = {
     "Helper",
     "Initialize",
     "Instance",
-    "Interactable",
+    -- "Interactable",
+    "Interactable_Card",
     "Item",
     "Language",
     "List",
@@ -56,7 +57,7 @@ function __initialize()
     Buff.__initialize()
     Equipment.__initialize()
     Instance.__initialize()
-    Interactable.__initialize()
+    -- Interactable.__initialize()
     Item.__initialize()
 end
 

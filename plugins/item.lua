@@ -136,10 +136,7 @@ Item.find = function(namespace, identifier)
     if identifier then namespace = namespace.."-"..identifier end
     local item = gm.item_find(namespace)
 
-    if item then
-        return Item.wrap(item)
-    end
-
+    if item then return Item.wrap(item) end
     return nil
 end
 

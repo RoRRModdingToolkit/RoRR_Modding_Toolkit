@@ -1,6 +1,10 @@
 ### v1.1.10
 * Added Mod class
     * Mod.find
+* Added Interactable_Card class
+    * Interactable_Card.new
+    * Interactable_Card.find
+    * Interactable_Card.wrap
 
 ### v1.1.9
 * Object : `create` now defaults to position (0, 0) if none is specified.
