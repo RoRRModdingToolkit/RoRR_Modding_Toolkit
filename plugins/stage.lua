@@ -102,6 +102,16 @@ methods_stage = {
     end,
 
 
+    set_log_icon = function(self, sprite)
+        if self.log_id == -1.0 then
+            log.error("This stage has no environment log", 2)
+            return
+        end
+        
+        Class.ENVIRONMENT_LOG:get(self.log_id):set(15, sprite)
+    end,
+
+
     add_room = function(self, ...)
         local list = List.wrap(self.room_list)
 
