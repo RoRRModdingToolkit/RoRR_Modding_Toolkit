@@ -134,6 +134,18 @@ methods_stage = {
     end,
 
 
+    get_room = function(self, variant)
+        local list = List.wrap(self.room_list)
+
+        if variant < 1 or variant > #list then
+            log.error("Variant must be between 1 and variant count (inclusive)", 2)
+            return
+        end
+
+        return list[variant]
+    end,
+
+
     add_interactable = function(self, ...)
         local list = List.wrap(self.spawn_interactables)
 
@@ -197,18 +209,6 @@ methods_stage = {
         local list = List.wrap(self.spawn_enemies)
         if loop then list = List.wrap(self.spawn_enemies_loop) end
         list:clear()
-    end,
-
-
-    get_room = function(self, variant)
-        local list = List.wrap(self.room_list)
-
-        if variant < 1 or variant > #list then
-            log.error("Variant must be between 1 and variant count (inclusive)", 2)
-            return
-        end
-
-        return list[variant]
     end
 
 }
