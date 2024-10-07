@@ -83,6 +83,12 @@ methods_stage = {
         
         Class.ENVIRONMENT_LOG:get(self.log_id):set(15, sprite)
     end,
+
+
+    set_log_hidden = function(self, bool)
+        if bool == nil then return end
+        Class.ENVIRONMENT_LOG:get(self.log_id):set(14, bool)
+    end,
     
 
     set_index = function(self, ...)

@@ -18,15 +18,16 @@
     * Stage.find
     * Stage.wrap
     * stage:set_log_icon
+    * stage:set_log_hidden
     * stage:set_index
     * stage:add_room
+    * stage:get_room
     * stage:add_interactable
     * stage:add_interactable_loop
     * stage:clear_interactables
     * stage:add_monster
     * stage:add_monster_loop
     * stage:clear_monsters
-    * stage:get_room
 
 ### v1.1.9
 * Object : `create` now defaults to position (0, 0) if none is specified.
