@@ -34,10 +34,11 @@ end
 
 
 Interactable_Card.find = function(namespace, identifier)
+    -- The built-in gm.interactable_card_find does not accept a namespace for some reason
+    
     if identifier then namespace = namespace.."-"..identifier end
     if not string.find(namespace, "-") then namespace = "ror-"..namespace end
     
-    -- The built-in gm.interactable_card_find does not accept a namespace for some reason
     for i, card in ipairs(Class.INTERACTABLE_CARD) do
         local _namespace = card:get(0)
         local _identifier = card:get(1)
