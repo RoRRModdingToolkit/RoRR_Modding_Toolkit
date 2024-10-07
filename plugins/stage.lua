@@ -109,14 +109,16 @@ methods_stage = {
         if type(t[1]) == "table" then t = t[1] end
 
         for _, path in ipairs(t) do
-            local room = gm.stage_load_room(self.namespace, self.identifier.."_"..(#list + 1), path)
-            list:add(room)
-        end
+            local num = #list
 
-        -- Associate environment log
-        if self.log_id ~= -1.0 then
-            -- TODO
-            -- Also check what happens if a room does not have an envlog object in it
+            local room = gm.stage_load_room(self.namespace, self.identifier.."_"..math.floor(num + 1), path)
+            list:add(room)
+
+            -- Associate environment log
+            if self.log_id ~= -1.0 then
+                -- TODO: Check what happens if a room does not have an envlog object in it
+                gm.room_associate_environment_log(room, self.log_id, num)
+            end
         end
     end,
 
