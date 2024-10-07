@@ -116,7 +116,6 @@ methods_stage = {
 
             -- Associate environment log
             if self.log_id ~= -1.0 then
-                -- TODO: Check what happens if a room does not have an envlog object in it
                 gm.room_associate_environment_log(room, self.log_id, num)
             end
         end
