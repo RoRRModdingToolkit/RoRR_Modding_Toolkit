@@ -37,7 +37,13 @@ Stage.new = function(namespace, identifier)
     local stage = Stage.find(namespace, identifier)
     if stage then return stage end
 
-    -- return Interactable_Card.wrap(gm.interactable_card_create(namespace, identifier))
+    local stage = Stage.wrap(
+        gm.stage_create(namespace, identifier)
+    )
+
+
+
+    return stage
 end
 
 
@@ -59,6 +65,60 @@ Stage.wrap = function(stage_id)
     setmetatable(abstraction, metatable_stage)
     return abstraction
 end
+
+
+
+-- ========== Instance Methods ==========
+
+methods_stage = {
+
+    set_index = function(self, index)
+        if (not index) or index < 1 or index > 6 then
+            log.error("Stage index should be between 1 and 6 (inclusive)", 2)
+        end
+
+        local order = Array.wrap(gm.variable_global_get("stage_progression_order"))
+
+        -- Remove from existing list(s)
+        for _, i in ipairs(order) do
+            local list = List.wrap(i)
+            for n, s in ipairs(list) do
+                if s == self.value then
+                    list:delete(n - 1)
+                    break
+                end
+            end
+        end
+        
+        -- Add to target list
+        gm._mod_stage_register(index, self.value)
+    end,
+
+
+    add_room = function(self, ...)
+        local list = List.wrap(self.room_list)
+
+        local t = {...}
+        if type(t[1]) == "table" and (not t[1].RMT_object) then t = t[1] end
+
+        for _, room in ipairs(t) do
+            list:add(Wrap.unwrap(room))
+        end
+    end,
+
+
+    add_interactable_card = function(self, ...)
+        local list = List.wrap(self.spawn_interactables)
+
+        local t = {...}
+        if type(t[1]) == "table" and (not t[1].RMT_object) then t = t[1] end
+
+        for _, card in ipairs(t) do
+            list:add(Wrap.unwrap(card))
+        end
+    end
+
+}
 
 
 
@@ -97,9 +157,9 @@ metatable_stage = {
         if key == "RMT_object" then return abstraction_data[table].RMT_object end
 
         -- Methods
-        -- if methods_stage[key] then
-        --     return methods_stage[key]
-        -- end
+        if methods_stage[key] then
+            return methods_stage[key]
+        end
 
         -- Pass to next metatable
         return metatable_stage_gs.__index(table, key)
