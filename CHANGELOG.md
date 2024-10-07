@@ -3,14 +3,17 @@
 * Added Mod class
     * Mod.find
 * Added Interactable_Card class
+    * Interactable_Card.ARRAY
     * Interactable_Card.new
     * Interactable_Card.find
     * Interactable_Card.wrap
 * Added Monster_Card class
+    * Monster_Card.ARRAY
     * Monster_Card.new
     * Monster_Card.find
     * Monster_Card.wrap
 * Added Stage class
+    * Stage.ARRAY
     * Stage.new
     * Stage.find
     * Stage.wrap

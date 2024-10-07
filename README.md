@@ -18,6 +18,7 @@ mods.on_all_mods_loaded(function() for _, m in pairs(mods) do if type(m) == "tab
     * Items and Equipment
     * Objects
     * Survivors, Skills, and States
+    * Stages
     * etc.
 
 ---
