@@ -116,6 +116,8 @@ methods_stage = {
 
             -- Associate environment log
             if self.log_id ~= -1.0 then
+                local display_room_ids = Class.ENVIRONMENT_LOG:get(self.log_id):get(5)
+                display_room_ids:push(room)
                 gm.room_associate_environment_log(room, self.log_id, num)
             end
         end
