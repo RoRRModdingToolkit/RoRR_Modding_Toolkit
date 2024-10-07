@@ -72,11 +72,7 @@ end
 
 methods_stage = {
 
-    set_index = function(self, index)
-        if (not index) or index < 1 or index > 6 then
-            log.error("Stage index should be between 1 and 6 (inclusive)", 2)
-        end
-
+    set_index = function(self, ...)
         local order = Array.wrap(gm.variable_global_get("stage_progression_order"))
 
         -- Remove from existing list(s)
@@ -90,8 +86,16 @@ methods_stage = {
             end
         end
         
-        -- Add to target list
-        gm._mod_stage_register(index, self.value)
+        -- Add to target list(s)
+        local t = {...}
+        if type(t[1]) == "table" then t = t[1] end
+
+        for _, index in ipairs(t) do
+            if type(index) ~= "number" or index < 1 or index > 6 then
+                log.error("Stage index should be between 1 and 6 (inclusive)", 2)
+            end
+            gm._mod_stage_register(index, self.value)
+        end
     end,
 
 
@@ -99,10 +103,11 @@ methods_stage = {
         local list = List.wrap(self.room_list)
 
         local t = {...}
-        if type(t[1]) == "table" and (not t[1].RMT_object) then t = t[1] end
+        if type(t[1]) == "table" then t = t[1] end
 
-        for _, room in ipairs(t) do
-            list:add(Wrap.unwrap(room))
+        for _, path in ipairs(t) do
+            local room = gm.stage_load_room(self.namespace, self.identifier.."_"..(#list + 1), path)
+            list:add(room)
         end
     end,
 
