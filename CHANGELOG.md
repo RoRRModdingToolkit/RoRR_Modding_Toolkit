@@ -1,3 +1,6 @@
+### v1.1.11
+* 
+
 ### v1.1.10
 * [!] Interactable class will be changed or deprecated soon.
 * Added Mod class
