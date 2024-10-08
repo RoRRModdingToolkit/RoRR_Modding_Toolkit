@@ -6,6 +6,13 @@
     * difficulty:is_active
     * difficulty:add_callback
     * difficulty:clear_callbacks
+    * difficulty:set_text
+    * difficulty:set_sprite
+    * difficulty:set_primary_color
+    * difficulty:set_sound
+    * difficulty:set_scaling
+    * difficulty:set_monsoon_or_higher
+    * difficulty:allow_blight_spawns
 * Stage : Added clear_rooms
 
 ### v1.1.10
