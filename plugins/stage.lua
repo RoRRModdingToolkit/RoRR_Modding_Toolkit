@@ -138,6 +138,12 @@ methods_stage = {
     end,
 
 
+    clear_rooms = function(self)
+        local list = List.wrap(self.room_list)
+        list:clear()
+    end,
+
+
     add_interactable = function(self, ...)
         local list = List.wrap(self.spawn_interactables)
 

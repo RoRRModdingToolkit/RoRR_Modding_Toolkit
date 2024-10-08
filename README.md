@@ -16,6 +16,7 @@ mods.on_all_mods_loaded(function() for _, m in pairs(mods) do if type(m) == "tab
 * Custom content
     * Buffs
     * Items and Equipment
+    * Difficulties
     * Objects
     * Survivors, Skills, and States
     * Stages

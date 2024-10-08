@@ -1,5 +1,12 @@
 ### v1.1.11
-* 
+* Added Difficulty class
+    * Difficulty.new
+    * Difficulty.find
+    * Difficulty.wrap
+    * difficulty:is_active
+    * difficulty:add_callback
+    * difficulty:clear_callbacks
+* Stage : Added clear_rooms
 
 ### v1.1.10
 * [!] Interactable class will be changed or deprecated soon.

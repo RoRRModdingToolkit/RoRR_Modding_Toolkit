@@ -46,3 +46,5 @@ v Allow actor:fire_direct to accept x and y pos
     - Have Interactable.new() (or Object.new(interactable parent) or whatever) create an Interactable Card on creation
 
 - Add way to associate achievements to certain Characters
+
+- Rewrite callback storage to be like Difficulty class (i.e., using the content ID as the first key)
