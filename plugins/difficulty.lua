@@ -6,11 +6,13 @@ local abstraction_data = setmetatable({}, {__mode = "k"})
 
 local callbacks = {}
 local other_callbacks = {
-    "onRunStart",
-    "onRunEnd",
+    "onActive",
+    "onInactive",
     "onStep",
     "onDraw"
 }
+
+local active = -1.0
 
 
 
@@ -151,8 +153,8 @@ methods_difficulty = {
 
 methods_difficulty_callbacks = {
 
-    onRunStart      = function(self, func) self:add_callback("onRunStart", func) end,
-    onRunEnd        = function(self, func) self:add_callback("onRunEnd", func) end,
+    onActive        = function(self, func) self:add_callback("onActive", func) end,
+    onInactive      = function(self, func) self:add_callback("onInactive", func) end,
     onStep          = function(self, func) self:add_callback("onStep", func) end,
     onDraw          = function(self, func) self:add_callback("onDraw", func) end
 
@@ -234,34 +236,30 @@ metatable_difficulty = {
 
 
 
--- ========== Hooks ==========
-
-gm.post_script_hook(gm.constants.run_create, function(self, other, result, args)
-    for id, content in pairs(callbacks) do
-        log.info(content)
-        if content["onRunStart"] and Difficulty.wrap(id):is_active() then
-            for _, fn in ipairs(content["onRunStart"]) do
-                log.info("run")
-                fn()
-            end
-        end
-    end
-end)
-
-
-gm.pre_script_hook(gm.constants.run_destroy, function(self, other, result, args)
-    for id, content in pairs(callbacks) do
-        if content["onRunEnd"] and Difficulty.wrap(id):is_active() then
-            for _, fn in ipairs(content["onRunEnd"]) do
-                fn()
-            end
-        end
-    end
-end)
-
-
-
 -- ========== Callbacks ==========
+
+local function diff_onActive(self, other, result, args)
+    local current = gm._mod_game_getDifficulty()
+
+    if current ~= active then
+        local content = callbacks[active]
+        if content and content["onInactive"] then
+            for _, fn in ipairs(content["onInactive"]) do
+                fn()
+            end
+        end
+
+        content = callbacks[current]
+        if content and content["onActive"] then
+            for _, fn in ipairs(content["onActive"]) do
+                fn()
+            end
+        end
+    end
+
+    active = current
+end
+
 
 local function diff_onStep(self, other, result, args)
     if gm.variable_global_get("pause") then return end
@@ -293,6 +291,7 @@ end
 -- ========== Initialize ==========
 
 Difficulty.__initialize = function()
+    Callback.add("preStep", "RMT.diff_onActive", diff_onActive, true)
     Callback.add("preStep", "RMT.diff_onStep", diff_onStep, true)
     Callback.add("postHUDDraw", "RMT.diff_onDraw", diff_onDraw, true)
 end

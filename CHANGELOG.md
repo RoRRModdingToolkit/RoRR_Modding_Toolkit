@@ -2,6 +2,7 @@
 * Added Difficulty class
 * Added Ending class
 * Added Gamemode class
+* Actor : Added callback_exists
 * Stage : Added clear_rooms
 * Initialize : Other mod __initialize calls will no longer be affected by one failing.
 
