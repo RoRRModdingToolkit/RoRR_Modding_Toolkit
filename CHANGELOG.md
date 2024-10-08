@@ -1,3 +1,6 @@
+### v1.1.12
+* 
+
 ### v1.1.11
 * Added Difficulty class
 * Added Ending class
