@@ -318,8 +318,6 @@ methods_instance = {
 
     add_callback = function(self, callback, id, func, skill, all_damage)
         if all_damage then callback = callback.."All" end
-
-        log.info(callback)
     
         if callback == "onSkillUse" then
             skill = Wrap.unwrap(skill)
@@ -397,6 +395,29 @@ methods_instance = {
 }
 
 
+methods_instance_callbacks = {
+    
+    onStatRecalc        = function(self, id, func) self:add_callback("onStatRecalc", id, func) end,
+    onPostStatRecalc    = function(self, id, func) self:add_callback("onPostStatRecalc", id, func) end,
+    onSkillUse          = function(self, id, func, skill) self:add_callback("onSkillUse", id, func, skill) end,
+    onBasicUse          = function(self, id, func) self:add_callback("onBasicUse", id, func) end,
+    onAttack            = function(self, id, func, all_damage) self:add_callback("onAttack", id, func, nil, all_damage) end,
+    onPostAttack        = function(self, id, func, all_damage) self:add_callback("onPostAttack", id, func, nil, all_damage) end,
+    onHit               = function(self, id, func, all_damage) self:add_callback("onHit", id, func, nil, all_damage) end,
+    onKill              = function(self, id, func) self:add_callback("onKill", id, func) end,
+    onDamaged           = function(self, id, func) self:add_callback("onDamaged", id, func) end,
+    onDamageBlocked     = function(self, id, func) self:add_callback("onDamageBlocked", id, func) end,
+    onHeal              = function(self, id, func) self:add_callback("onHeal", id, func) end,
+    onShieldBreak       = function(self, id, func) self:add_callback("onShieldBreak", id, func) end,
+    onInteract          = function(self, id, func) self:add_callback("onInteract", id, func) end,
+    onEquipmentUse      = function(self, id, func) self:add_callback("onEquipmentUse", id, func) end,
+    onPreStep           = function(self, id, func) self:add_callback("onPreStep", id, func) end,
+    onPostStep          = function(self, id, func) self:add_callback("onPostStep", id, func) end,
+    onDraw              = function(self, id, func) self:add_callback("onDraw", id, func) end
+
+}
+
+
 
 -- ========== Metatables ==========
 
@@ -421,6 +442,28 @@ metatable_instance_gs = {
 }
 
 
+metatable_instance_callbacks = {
+    __index = function(table, key)
+        -- Allow getting but not setting these
+        if key == "value" then return abstraction_data[table].value end
+        if key == "RMT_object" then return abstraction_data[table].RMT_object end
+
+        -- Methods
+        if methods_instance_callbacks[key] then
+            return methods_instance_callbacks[key]
+        end
+
+        -- Pass to next metatable
+        return metatable_instance_gs.__index(table, key)
+    end,
+    
+
+    __newindex = function(table, key, value)
+        metatable_instance_gs.__newindex(table, key, value)
+    end
+}
+
+
 metatable_instance = {
     __index = function(table, key)
         -- Allow getting but not setting these
@@ -433,7 +476,7 @@ metatable_instance = {
         end
 
         -- Pass to next metatable
-        return metatable_instance_gs.__index(table, key)
+        return metatable_instance_callbacks.__index(table, key)
     end,
 
 
