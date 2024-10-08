@@ -8,6 +8,10 @@ local instance_data = {}
 
 local callbacks = {}
 local other_callbacks = {
+    "onPreStep",
+    "onPostStep",
+    "onDraw",
+    
     "onStatRecalc",
     "onPostStatRecalc",
     "onBasicUse",
@@ -23,10 +27,7 @@ local other_callbacks = {
     "onHeal",
     "onShieldBreak",
     "onInteract",
-    "onEquipmentUse",
-    "onPreStep",
-    "onPostStep",
-    "onDraw"
+    "onEquipmentUse"
 }
 
 
@@ -396,6 +397,10 @@ methods_instance = {
 
 
 methods_instance_callbacks = {
+
+    onPreStep           = function(self, id, func) self:add_callback("onPreStep", id, func) end,
+    onPostStep          = function(self, id, func) self:add_callback("onPostStep", id, func) end,
+    onDraw              = function(self, id, func) self:add_callback("onDraw", id, func) end,
     
     onStatRecalc        = function(self, id, func) self:add_callback("onStatRecalc", id, func) end,
     onPostStatRecalc    = function(self, id, func) self:add_callback("onPostStatRecalc", id, func) end,
@@ -410,10 +415,7 @@ methods_instance_callbacks = {
     onHeal              = function(self, id, func) self:add_callback("onHeal", id, func) end,
     onShieldBreak       = function(self, id, func) self:add_callback("onShieldBreak", id, func) end,
     onInteract          = function(self, id, func) self:add_callback("onInteract", id, func) end,
-    onEquipmentUse      = function(self, id, func) self:add_callback("onEquipmentUse", id, func) end,
-    onPreStep           = function(self, id, func) self:add_callback("onPreStep", id, func) end,
-    onPostStep          = function(self, id, func) self:add_callback("onPostStep", id, func) end,
-    onDraw              = function(self, id, func) self:add_callback("onDraw", id, func) end
+    onEquipmentUse      = function(self, id, func) self:add_callback("onEquipmentUse", id, func) end
 
 }
 
