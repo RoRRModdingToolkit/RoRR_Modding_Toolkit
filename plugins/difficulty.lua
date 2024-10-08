@@ -115,6 +115,10 @@ methods_difficulty = {
         self.primary_color = Color.from_rgb(R, G, B)
     end,
 
+    set_primary_colour = function(self, R, G, B)
+        self:set_primary_color(R, G, B)
+    end,
+
     set_sound = function(self, sound_id)
         if type(sound_id) ~= "number" then log.error("Sound ID is not a number, got a "..type(sound_id), 2) return end
         
