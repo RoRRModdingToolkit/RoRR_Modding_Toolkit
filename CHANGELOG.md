@@ -1,52 +1,16 @@
 ### v1.1.11
 * Added Difficulty class
-    * Difficulty.new
-    * Difficulty.find
-    * Difficulty.wrap
-    * difficulty:is_active
-    * difficulty:add_callback
-    * difficulty:clear_callbacks
-    * difficulty:set_text
-    * difficulty:set_sprite
-    * difficulty:set_primary_color
-    * difficulty:set_sound
-    * difficulty:set_scaling
-    * difficulty:set_monsoon_or_higher
-    * difficulty:allow_blight_spawns
+* Added Ending class
+* Added Gamemode class
 * Stage : Added clear_rooms
+* Initialize : Other mod __initialize calls will no longer be affected by one failing.
 
 ### v1.1.10
 * [!] Interactable class will be changed or deprecated soon.
 * Added Mod class
-    * Mod.find
 * Added Interactable_Card class
-    * Interactable_Card.ARRAY
-    * Interactable_Card.new
-    * Interactable_Card.find
-    * Interactable_Card.wrap
 * Added Monster_Card class
-    * Monster_Card.ARRAY
-    * Monster_Card.new
-    * Monster_Card.find
-    * Monster_Card.wrap
 * Added Stage class
-    * Stage.ARRAY
-    * Stage.new
-    * Stage.find
-    * Stage.wrap
-    * stage:set_index
-    * stage:add_room
-    * stage:get_room
-    * stage:add_interactable
-    * stage:add_interactable_loop
-    * stage:clear_interactables
-    * stage:add_monster
-    * stage:add_monster_loop
-    * stage:clear_monsters
-    * stage:set_log_icon
-    * stage:set_log_view_start
-    * stage:set_log_hidden
-    * stage:set_title_screen_properties
 
 ### v1.1.9
 * Object : `create` now defaults to position (0, 0) if none is specified.
