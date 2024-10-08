@@ -255,6 +255,12 @@ local function diff_onActive(self, other, result, args)
                 fn()
             end
         end
+
+        -- Recalculate all actor stats
+        local actors = Instance.find_all(gm.constants.pActor)
+        for _, actor in ipairs(actors) do
+            actor:recalculate_stats()
+        end
     end
 
     active = current
