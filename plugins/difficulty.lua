@@ -37,11 +37,10 @@ Difficulty.ARRAY = {
 -- ========== Static Methods ==========
 
 Difficulty.new = function(namespace, identifier)
-    local diff = Difficulty.find(namespace, identifier)
-    if diff then return diff end
+    local difficulty = Difficulty.find(namespace, identifier)
+    if difficulty then return difficulty end
 
-    local diff = gm.difficulty_create(namespace, identifier)
-    return Difficulty.wrap(diff)
+    return Difficulty.wrap(gm.difficulty_create(namespace, identifier))
 end
 
 
@@ -54,11 +53,11 @@ Difficulty.find = function(namespace, identifier)
 end
 
 
-Difficulty.wrap = function(diff_id)
+Difficulty.wrap = function(difficulty_id)
     local abstraction = {}
     abstraction_data[abstraction] = {
         RMT_object = "Difficulty",
-        value = diff_id
+        value = difficulty_id
     }
     setmetatable(abstraction, metatable_difficulty)
     return abstraction
@@ -88,8 +87,53 @@ methods_difficulty = {
 
     clear_callbacks = function(self)
         callbacks[self.value] = nil
-    end
+    end,
 
+
+    set_text = function(self, name, description)
+        self.token_name = name
+        self.token_description = description
+    end,
+
+    set_sprite = function(self, small, large)
+        if type(small) ~= "number" then log.error("Small Sprite ID is not a number, got a "..type(small), 2) return end
+        if type(large) ~= "number" then log.error("Large Sprite ID is not a number, got a "..type(large), 2) return end
+        
+        self.sprite_id = small
+        self.sprite_loadout_id = large
+    end,
+
+    set_primary_color = function(self, R, G, B)
+        self.primary_color = Color.from_rgb(R, G, B)
+    end,
+
+    set_sound = function(self, sound_id)
+        if type(sound_id) ~= "number" then log.error("Sound ID is not a number, got a "..type(sound_id), 2) return end
+        
+        self.sound_id = sound_id
+    end,
+
+    set_scaling = function(self, difficulty, general, point)
+        if type(difficulty) ~= "number" then log.error("Difficulty Scale is not a number, got a "..type(difficulty), 2) return end
+        if type(general) ~= "number" then log.error("General Scale is not a number, got a "..type(general), 2) return end
+        if type(point) ~= "number" then log.error("Point Scale is not a number, got a "..type(point), 2) return end
+        
+        self.diff_scale = difficulty
+        self.general_scale = general
+        self.point_scale = point
+    end,
+
+    set_monsoon_or_higher = function(self, monsoon_or_higher)
+        if type(monsoon_or_higher) ~= "boolean" then log.error("Monsoon (or Higher) toggle is not a boolean, got a "..type(monsoon_or_higher), 2) return end
+        
+        self.is_monsoon_or_higher = monsoon_or_higher
+    end,
+
+    allow_blight_spawns = function(self, allow_blight_spawns)
+        if type(allow_blight_spawns) ~= "boolean" then log.error("Blight Spawns toggle is not a boolean, got a "..type(allow_blight_spawns), 2) return end
+        
+        self.allow_blight_spawns = allow_blight_spawns
+    end
 }
 
 
