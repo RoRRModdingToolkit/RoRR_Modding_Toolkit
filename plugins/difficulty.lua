@@ -108,6 +108,10 @@ methods_difficulty = {
     end,
 
     set_primary_color = function(self, R, G, B)
+        if not G then
+            self.primary_color = R
+            return
+        end
         self.primary_color = Color.from_rgb(R, G, B)
     end,
 
