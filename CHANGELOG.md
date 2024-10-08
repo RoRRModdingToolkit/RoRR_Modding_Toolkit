@@ -1,5 +1,6 @@
 ### v1.1.12
-* 
+* Instance : Added callback system for individual instances.
+    * Callbacks are removed on the instance's destruction.
 
 ### v1.1.11
 * Added Difficulty class
