@@ -45,11 +45,15 @@ end
 
 
 Difficulty.find = function(namespace, identifier)
-    if identifier then namespace = namespace.."-"..identifier end
-    local diff = gm.difficulty_find(namespace)
+    local id_string = namespace
+    
+    if identifier then id_string = namespace.."-"..identifier end
+    
+    local difficulty_id = gm.difficulty_find(id_string)
 
-    if diff then return Difficulty.wrap(diff) end
-    return nil
+    if not difficulty_id then return nil end
+
+    return Difficulty.wrap(difficulty_id)
 end
 
 
