@@ -1,6 +1,7 @@
 ### v1.1.13
 * Instance : get_data tables and Instance callbacks are no longer instantly deleted for players on-death.
-* Stage : clear_rooms now removed associated environment logs properly.
+* Stage : clear_rooms now removes environment logs properly.
+* Language : translate_token now returns the input if the associated text cannot be found.
 
 ### v1.1.12
 * Instance : Added callback system for an individual instance.

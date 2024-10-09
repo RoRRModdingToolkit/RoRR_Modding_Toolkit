@@ -7,7 +7,9 @@ Language = {}
 -- ========== Static Methods ==========
 
 Language.translate_token = function(token)
-    return gm.ds_map_find_value(gm.variable_global_get("_language_map"), token)
+    local text = gm.ds_map_find_value(gm.variable_global_get("_language_map"), token)
+    if text then return text end
+    return token
 end
 
 
