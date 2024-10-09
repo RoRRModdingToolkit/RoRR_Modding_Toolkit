@@ -1,3 +1,6 @@
+### v1.1.13
+* 
+
 ### v1.1.12
 * Instance : Added callback system for an individual instance.
     * Callbacks are removed on the instance's destruction.
