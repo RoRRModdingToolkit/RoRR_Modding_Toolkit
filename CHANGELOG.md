@@ -1,5 +1,5 @@
 ### v1.1.13
-* 
+* Instance : get_data tables and Instance callbacks are no longer instantly deleted for players on-death.
 
 ### v1.1.12
 * Instance : Added callback system for an individual instance.

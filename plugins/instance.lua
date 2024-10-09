@@ -513,8 +513,10 @@ end)
 
 
 gm.post_script_hook(gm.constants.actor_set_dead, function(self, other, result, args)
-    instance_data[self.id] = nil
-    callbacks[self.id] = nil
+    if self.object_index ~= gm.constants.oP then
+        instance_data[self.id] = nil
+        callbacks[self.id] = nil
+    end
 end)
 
 
