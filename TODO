@@ -27,7 +27,6 @@ v ISSUE: onPostStatRecalc is called immediately after onStatRecalc for each modu
     v Will have to move around onPostStatRecalc to a single function or something
 
 v Add actor:get_active_skill(slot)
-- Add tracers for actor:fire_bullet()
 
 v Add interactable cards for Interactable
 - Add Interactable_Crate class (for custom interactables that use the command crate window)
@@ -37,7 +36,7 @@ v Add interactable cards for Interactable
 v Add Damager wrapper
 
 v Allow actor:fire_direct to accept x and y pos
-- Add tracer_kind to actor:fire_bullet (and an enum for it)
+v Add tracer_kind to actor:fire_bullet (and an enum for it)
 
 - Add secondary argument for weights for item:get_random
 
@@ -48,3 +47,4 @@ v Allow actor:fire_direct to accept x and y pos
 - Add way to associate achievements to certain Characters
 
 - Rewrite callback storage to be like Difficulty class (i.e., using the content ID as the first key)
+    - Actually rewrite a better callback system in general instead of basically reusing code for Item, Buff, etc.
