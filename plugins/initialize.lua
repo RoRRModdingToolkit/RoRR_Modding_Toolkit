@@ -15,7 +15,7 @@ local rmt_class_init = function(m)
             end
         end
     end) then
-        log.info("[!] "..m["!guid"].." : Failed to add RMT class references.")
+        log.warning(m["!guid"].." : Failed to add RMT class references.")
     end
 end
 
@@ -33,7 +33,7 @@ gm.pre_script_hook(gm.constants.__input_system_tick, function()
                 rmt_class_init(m)
 
                 if not pcall(m.__initialize) then
-                    log.info("[!] "..m["!guid"].." : __initialize failed to run.")
+                    log.warning(m["!guid"].." : __initialize failed to run.")
                 end
             end
         end
@@ -44,7 +44,7 @@ gm.pre_script_hook(gm.constants.__input_system_tick, function()
                 rmt_class_init(m)
 
                 if not pcall(m.__post_initialize) then
-                    log.info("[!] "..m["!guid"].." : __post_initialize failed to run.")
+                    log.warning(m["!guid"].." : __post_initialize failed to run.")
                 end
             end
         end
