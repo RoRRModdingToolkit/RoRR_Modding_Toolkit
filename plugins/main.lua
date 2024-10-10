@@ -60,10 +60,12 @@ function __initialize()
     Actor.__initialize()
     Artifact.__initialize()
     Buff.__initialize()
+    Difficulty.__initialize()
     Equipment.__initialize()
     Instance.__initialize()
     Interactable.__initialize()
     Item.__initialize()
+    Player.__initialize()
 end
 
 

@@ -4,24 +4,34 @@ Difficulty = {}
 
 local abstraction_data = setmetatable({}, {__mode = "k"})
 
+local callbacks = {}
+local other_callbacks = {
+    "onActive",
+    "onInactive",
+    "onStep",
+    "onDraw"
+}
+
+local active = -1.0
+
 
 
 -- ========== Enums ==========
 
 Difficulty.ARRAY = {
-    namespace                       = 0,
-    identifier                      = 1,
-    token_name                      = 2,
-    token_description               = 3,
-    sprite_id                       = 4,
-    sprite_loadout_id               = 5,
-    primary_color                   = 6,
-    sound_id                        = 7,
-    diff_scale                      = 8,
-    general_scale                   = 9,
-    point_scale                     = 10,
-    is_monsoon_or_higher            = 11,
-    allow_blight_spawns             = 12
+    namespace               = 0,
+    identifier              = 1,
+    token_name              = 2,
+    token_description       = 3,
+    sprite_id               = 4,
+    sprite_loadout_id       = 5,
+    primary_color           = 6,
+    sound_id                = 7,
+    diff_scale              = 8,
+    general_scale           = 9,
+    point_scale             = 10,
+    is_monsoon_or_higher    = 11,
+    allow_blight_spawns     = 12
 }
 
 
@@ -60,9 +70,32 @@ Difficulty.wrap = function(difficulty_id)
 end
 
 
+
 -- ========== Instance Methods ==========
 
 methods_difficulty = {
+
+    is_active = function(self)
+        return gm._mod_game_getDifficulty() == self.value
+    end,
+
+
+    add_callback = function(self, callback, func)
+        if Helper.table_has(other_callbacks, callback) then
+            if not callbacks[self.value] then callbacks[self.value] = {} end
+            if not callbacks[self.value][callback] then callbacks[self.value][callback] = {} end
+            table.insert(callbacks[self.value][callback], func)
+
+        else log.error("Invalid callback name", 2)
+        end
+    end,
+
+
+    clear_callbacks = function(self)
+        callbacks[self.value] = nil
+    end,
+
+
     set_text = function(self, name, description)
         self.token_name = name
         self.token_description = description
@@ -77,7 +110,15 @@ methods_difficulty = {
     end,
 
     set_primary_color = function(self, R, G, B)
+        if not G then
+            self.primary_color = R
+            return
+        end
         self.primary_color = Color.from_rgb(R, G, B)
+    end,
+
+    set_primary_colour = function(self, R, G, B)
+        self:set_primary_color(R, G, B)
     end,
 
     set_sound = function(self, sound_id)
@@ -106,8 +147,20 @@ methods_difficulty = {
         if type(allow_blight_spawns) ~= "boolean" then log.error("Blight Spawns toggle is not a boolean, got a "..type(allow_blight_spawns), 2) return end
         
         self.allow_blight_spawns = allow_blight_spawns
-    end,
+    end
 }
+
+
+methods_difficulty_callbacks = {
+
+    onActive        = function(self, func) self:add_callback("onActive", func) end,
+    onInactive      = function(self, func) self:add_callback("onInactive", func) end,
+    onStep          = function(self, func) self:add_callback("onStep", func) end,
+    onDraw          = function(self, func) self:add_callback("onDraw", func) end
+
+}
+
+
 
 -- ========== Metatables ==========
 
@@ -137,19 +190,37 @@ metatable_difficulty_gs = {
 }
 
 
-metatable_difficulty = {
+metatable_difficulty_callbacks = {
     __index = function(table, key)
         -- Allow getting but not setting these
         if key == "value" then return abstraction_data[table].value end
         if key == "RMT_object" then return abstraction_data[table].RMT_object end
 
         -- Methods
+        if methods_difficulty_callbacks[key] then
+            return methods_difficulty_callbacks[key]
+        end
+
+        -- Pass to next metatable
+        return metatable_difficulty_gs.__index(table, key)
+    end,
+    
+
+    __newindex = function(table, key, value)
+        metatable_difficulty_gs.__newindex(table, key, value)
+    end
+}
+
+
+metatable_difficulty = {
+    __index = function(table, key)
+        -- Methods
         if methods_difficulty[key] then
             return methods_difficulty[key]
         end
 
         -- Pass to next metatable
-        return metatable_difficulty_gs.__index(table, key)
+        return metatable_difficulty_callbacks.__index(table, key)
     end,
     
 
@@ -162,3 +233,71 @@ metatable_difficulty = {
         metatable_difficulty_gs.__newindex(table, key, value)
     end
 }
+
+
+
+-- ========== Callbacks ==========
+
+local function diff_onActive(self, other, result, args)
+    local current = gm._mod_game_getDifficulty()
+
+    if current ~= active then
+        local content = callbacks[active]
+        if content and content["onInactive"] then
+            for _, fn in ipairs(content["onInactive"]) do
+                fn()
+            end
+        end
+
+        content = callbacks[current]
+        if content and content["onActive"] then
+            for _, fn in ipairs(content["onActive"]) do
+                fn()
+            end
+        end
+
+        -- Recalculate all actor stats
+        local actors = Instance.find_all(gm.constants.pActor)
+        for _, actor in ipairs(actors) do
+            actor:recalculate_stats()
+        end
+    end
+
+    active = current
+end
+
+
+local function diff_onStep(self, other, result, args)
+    if gm.variable_global_get("pause") then return end
+
+    for id, content in pairs(callbacks) do
+        if content["onStep"] and Difficulty.wrap(id):is_active() then
+            for _, fn in ipairs(content["onStep"]) do
+                fn()
+            end
+        end
+    end
+end
+
+
+local function diff_onDraw(self, other, result, args)
+    if gm.variable_global_get("pause") then return end
+
+    for id, content in pairs(callbacks) do
+        if content["onDraw"] and Difficulty.wrap(id):is_active() then
+            for _, fn in ipairs(content["onDraw"]) do
+                fn()
+            end
+        end
+    end
+end
+
+
+
+-- ========== Initialize ==========
+
+Difficulty.__initialize = function()
+    Callback.add("preStep", "RMT.diff_onActive", diff_onActive, true)
+    Callback.add("preStep", "RMT.diff_onStep", diff_onStep, true)
+    Callback.add("postHUDDraw", "RMT.diff_onDraw", diff_onDraw, true)
+end

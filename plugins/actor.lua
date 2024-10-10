@@ -73,6 +73,29 @@ Actor.remove_callback = function(id)
 end
 
 
+Actor.callback_exists = function(id)
+    local c_table = callbacks["onSkillUse"]
+    if c_table then
+        for s, id_table in pairs(c_table) do
+            for i, __ in pairs(id_table) do
+                if i == id then return true end
+            end
+        end
+    end
+
+    for _, c in ipairs(other_callbacks) do
+        local c_table = callbacks[c]        -- callbacks["onAttack"]
+        if c_table then
+            for i, __ in pairs(c_table) do  -- callbacks["onAttack"][i (key)]
+                if i == id then return true end
+            end
+        end
+    end
+
+    return false
+end
+
+
 
 -- ========== Instance Methods ==========
 

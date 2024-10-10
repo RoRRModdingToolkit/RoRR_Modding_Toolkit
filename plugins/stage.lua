@@ -138,6 +138,15 @@ methods_stage = {
     end,
 
 
+    clear_rooms = function(self)
+        local list = List.wrap(self.room_list)
+        list:clear()
+
+        local display_room_ids = Class.ENVIRONMENT_LOG:get(self.log_id):get(5)
+        display_room_ids:clear()
+    end,
+
+
     add_interactable = function(self, ...)
         local list = List.wrap(self.spawn_interactables)
 
