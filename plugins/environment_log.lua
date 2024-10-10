@@ -69,8 +69,11 @@ Environment_Log.new = function(stage)
     -- Make environment_log abstraction
     local abstraction = Environment_Log.wrap(environment_log)
 
-    -- Set the log id of the item
+    -- Set the log id of the stage
     stage.log_id = abstraction.value
+
+    -- Set the room list
+    -- self.display_room_ids = 
 
     -- add room
     -- clear room
