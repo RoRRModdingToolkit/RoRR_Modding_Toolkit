@@ -42,6 +42,12 @@ Skill.ARRAY = {
     upgrade_skill               = 29
 }
 
+Skill.OVERRIDE_PRIORITY = {
+    upgrade     = 0,
+    boosted     = 1,
+    reload      = 2,
+    cancel      = 3
+}
 
 Skill.SLOT = {
     primary     = 0,
