@@ -35,7 +35,7 @@ gm.pre_script_hook(gm.constants.__input_system_tick, function()
 
                 local status, err = pcall(m.__initialize)
                 if not status then
-                    log.warning(m["!guid"].." : __initialize failed to run.\n"..err)
+                    log.warning(m["!guid"].." : __initialize failed to execute fully.\n"..err)
                 end
             end
         end
@@ -47,7 +47,7 @@ gm.pre_script_hook(gm.constants.__input_system_tick, function()
 
                 local status, err = pcall(m.__post_initialize)
                 if not status then
-                    log.warning(m["!guid"].." : __post_initialize failed to run.\n"..err)
+                    log.warning(m["!guid"].." : __post_initialize failed to execute fully.\n"..err)
                 end
             end
         end
