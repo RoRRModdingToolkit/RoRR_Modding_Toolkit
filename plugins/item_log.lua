@@ -22,9 +22,13 @@ Item_Log.ARRAY = {
     achievement_id              = 11
 }
 
--- Item_Log.GROUP = {
-
--- }
+Item_Log.GROUP = {
+    common          = 1,
+    uncommon        = 3,
+    rare            = 5,
+    equipment       = 7,
+    boss            = 8
+}
 
 -- ========== Static Methods ==========
 
@@ -54,14 +58,19 @@ Item_Log.wrap = function(item_log_id)
 end
 
 -- 
-Item_Log.new = function(item, group)
+Item_Log.new = function(item)
     
     if type(item) ~= "table" or (item.RMT_object ~= "Item" and not item.value) then log.error("Item is not a RMT item, got a "..type(item), 2) return end
     
     -- Check if item_log already exist
     local item_log = Item_Log.find(item.namespace, item.identifier)
     if item_log then return item_log end
-    
+
+    -- Decide in which group to put the item log
+    -- NOTE: Each tier of items have 2 groups except boss tier item
+    local group = 2 * item.tier + 1
+    if item.tier == Item.TIER.boss then group = group - 1 end
+
     -- Create item_log
     item_log = gm.item_log_create(item.namespace, item.identifier, group, item.sprite_id, item.object_id)
 
@@ -79,12 +88,11 @@ end
 
 methods_item_log = {
 
-    -- set_text = function(self, story, id, departed, arrival)
-    --     self.token_story = story
-    --     self.token_id  = id
-    --     self.token_departed  = departed
-    --     self.token_arrival  = arrival
-    -- end,
+    set_achievement = function(self, achivement_id)
+        if type(achievement_id) == "number" then log.error("Achievement ID is not a number, got a "..type(achievement_id), 2) return end
+    
+        self.achievement_id = achievement_id
+    end,
 }
 
 

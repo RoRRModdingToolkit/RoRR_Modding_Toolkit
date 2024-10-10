@@ -25,6 +25,7 @@ Classes = {
     "Interactable",
     "Interactable_Card",
     "Item",
+    "Item_Log",
     "Language",
     "List",
     "Mod",
