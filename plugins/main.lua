@@ -65,6 +65,7 @@ function __initialize()
     Instance.__initialize()
     Interactable.__initialize()
     Item.__initialize()
+    Player.__initialize()
 end
 
 
