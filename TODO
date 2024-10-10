@@ -48,3 +48,5 @@ v Add tracer_kind to actor:fire_bullet (and an enum for it)
 
 - Rewrite callback storage to be like Difficulty class (i.e., using the content ID as the first key)
     - Actually rewrite a better callback system in general instead of basically reusing code for Item, Buff, etc.
+
+- Add Player remove_callback and callback_exists
