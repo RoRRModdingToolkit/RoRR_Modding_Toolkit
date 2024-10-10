@@ -99,6 +99,8 @@ Survivor_Log.new = function(survivor, portrait_id, portrait_index)
         stats_base.armor, stats_level.armor
     )
 
+    survivor.log_id = abstraction.value
+
     return abstraction
 end
 
