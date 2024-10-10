@@ -5,10 +5,10 @@ o : implemented differently
 
 v Add Equipment class
     v Modify Actor and Item onEquipmentUse callbacks
-- Add ability for specific (single-instance) Actor callbacks
+v Add ability for specific (single-instance) Actor callbacks
 v Add Item and Equipment toggle_loot
 v Add new custom Object support (based on info from sarn)
-- Add Difficulty class
+v Add Difficulty class
 o Apply Instance wrapper everywhere (on gm.array_get, etc.)
     : Support on GM instance variable get/set; having only this is probably fine
     ! EDIT: See Notes.txt
