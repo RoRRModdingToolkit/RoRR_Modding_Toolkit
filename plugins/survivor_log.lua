@@ -4,8 +4,6 @@ Survivor_Log = {}
 
 local abstraction_data = setmetatable({}, {__mode = "k"})
 
-local callbacks = {}
-
 
 -- ========== Enums ==========
 
@@ -167,14 +165,3 @@ metatable_survivor_log = {
         metatable_survivor_log_gs.__newindex(table, key, value)
     end
 }
-
-
--- ========== Hooks ==========
-
-gm.post_script_hook(gm.constants.callback_execute, function(self, other, result, args)
-    if callbacks[args[1].value] then
-        for _, fn in pairs(callbacks[args[1].value]) do
-            fn(args[2].value) --(is_active)
-        end
-    end
-end)
