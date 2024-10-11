@@ -3,27 +3,27 @@
 Class = Proxy.new()
 
 local class_arrays = {
-    "class_achievement",
-    "class_actor_skin",
-    "class_actor_state",
-    "class_artifact",
-    "class_buff",
-    "class_callback",
-    "class_difficulty",
-    "class_elite",
-    "class_ending_type",
-    "class_environment_log",
-    "class_equipment",
-    "class_game_mode",
-    "class_interactable_card",
-    "class_item",
-    "class_item_log",
-    "class_monster_card",
-    "class_monster_log",
-    "class_skill",
-    "class_stage",
-    "class_survivor",
-    "class_survivor_log"
+    Achievement         = "class_achievement",
+    Skin                = "class_actor_skin",
+    State               = "class_actor_state",
+    Artifact            = "class_artifact",
+    Buff                = "class_buff",
+    Callback            = "class_callback",
+    Difficulty          = "class_difficulty",
+    Elite               = "class_elite",
+    Ending              = "class_ending_type",
+    Environment_Log     = "class_environment_log",
+    Equipment           = "class_equipment",
+    Gamemode            = "class_game_mode",
+    Interactable_Card   = "class_interactable_card",
+    Item                = "class_item",
+    Item_Log            = "class_item_log",
+    Monster_Card        = "class_monster_card",
+    Monster_Log         = "class_monster_log",
+    Skill               = "class_skill",
+    Stage               = "class_stage",
+    Survivor            = "class_survivor",
+    Survivor_Log        = "class_survivor_log"
 }
 
 
@@ -55,12 +55,12 @@ if success then properties = file.Array end
 
 metatable_class_array = {}
 
-for _, class in ipairs(class_arrays) do
-    class = capitalize_class_name(class:sub(7, #class))
+for class, class_arr in pairs(class_arrays) do
+    class_arr = capitalize_class_name(class:sub(7, #class_arr))
 
     local t = Proxy.new()
 
-    t.ARRAY = properties[class]
+    t.ARRAY = properties[class_arr]
     
     t.find = function(namespace, identifier)
         if identifier then namespace = namespace.."-"..identifier
@@ -68,8 +68,8 @@ for _, class in ipairs(class_arrays) do
             if not string.find(namespace, "-") then namespace = "ror-"..namespace end
         end
 
-        for i = 0, #Class[class] - 1 do
-            local element = Class[class]:get(i)
+        for i = 0, #Class[class_arr] - 1 do
+            local element = Class[class_arr]:get(i)
             if gm.is_array(element.value) then
                 local _namespace = element:get(0)
                 local _identifier = element:get(1)
@@ -99,7 +99,7 @@ for _, class in ipairs(class_arrays) do
         __index = function(table, key)
             local index = t.ARRAY[key]
             if index then
-                local array = Class[class]:get(table.value)
+                local array = Class[class_arr]:get(table.value)
                 return array:get(index)
             end
             log.error("Non-existent "..class.." property", 2)
@@ -110,7 +110,7 @@ for _, class in ipairs(class_arrays) do
         __newindex = function(table, key, value)
             local index = t.ARRAY[key]
             if index then
-                local array = Class[class]:get(table.value)
+                local array = Class[class_arr]:get(table.value)
                 array:set(index, value)
                 return
             end
