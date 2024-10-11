@@ -33,12 +33,10 @@ local class_arrays = {
 metatable_class = {
     __index = function(table, key)
         local k = "class_"..key:lower()
-        return k
-        -- if Helper.table_has(class_arrays, k) then
-        --     -- return k
-        --     -- return Array.wrap(gm.variable_global_get(k))
-        -- else log.error("Class does not exist", 2)
-        -- end
+        if Helper.table_has(class_arrays, k) then
+            return Array.wrap(gm.variable_global_get(k))
+        else log.error("Class does not exist", 2)
+        end
     end
 }
 Class:setmetatable(metatable_class)
@@ -65,7 +63,10 @@ for _, class in ipairs(class_arrays) do
     t.ARRAY = properties[class]
     
     t.find = function(namespace, identifier)
-        if identifier then namespace = namespace.."-"..identifier end
+        if identifier then namespace = namespace.."-"..identifier
+        else
+            if not string.find(namespace, "-") then namespace = "ror-"..namespace end
+        end
 
         for i = 0, #Class[class] - 1 do
             local element = Class[class]:get(i)
@@ -77,6 +78,8 @@ for _, class in ipairs(class_arrays) do
                 end
             end
         end
+
+        return nil
     end
 
     t.wrap = function(value)
