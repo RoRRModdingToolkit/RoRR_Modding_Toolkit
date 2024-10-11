@@ -17,10 +17,6 @@ local metatable_proxy = {
                     end
                 end
             end
-        elseif key == "unlock" then     -- May not be needed
-            return function(proxy)
-                if proxy then proxy.proxy_locked = nil end
-            end
         elseif key == "setmetatable" then
             return function(proxy, metatable)
                 if proxy and metatable then
