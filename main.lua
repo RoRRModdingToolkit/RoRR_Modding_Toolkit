@@ -9,7 +9,8 @@ require("./internal/proxy")
 require("./internal/abstraction")
 
 local classes = {
-    "Array"
+    "Array",
+    "Helper",
 }
 
 for _, c in ipairs(classes) do
@@ -41,8 +42,11 @@ gui.add_imgui(function()
             log.info(a.proxy_locked)
             a[3] = 5
             log.info(a[3])
-            a[2] = 4
+            -- a[2] = 4
             log.info(a[2])
+            a:lock()
+            log.info(a.proxy_locked)
+            a[10] = 10
 
         end
     end

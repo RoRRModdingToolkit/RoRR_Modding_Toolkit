@@ -20,16 +20,12 @@ Array.wrap = function(value)
     wrapper.RMT_object = "Array"
     wrapper.value = value
     wrapper:setmetatable(metatable_array)
-    wrapper:lock()
+    wrapper:lock(
+        "RMT_object",
+        "value",
+        table.unpack(Helper.table_get_keys(methods_array))
+    )
     return wrapper
-
-    -- local abstraction = {}
-    -- abstraction_data[abstraction] = {
-    --     RMT_object = "Array",
-    --     value = array
-    -- }
-    -- setmetatable(abstraction, metatable_array)
-    -- return abstraction
 end
 
 
