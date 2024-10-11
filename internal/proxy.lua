@@ -40,7 +40,6 @@ Proxy.new = function()
     Proxy[proxy] = {
         keys_locked = {}
     }
-    proxy.proxy = Proxy[proxy]
     setmetatable(proxy, metatable_proxy)
     return proxy
 end
