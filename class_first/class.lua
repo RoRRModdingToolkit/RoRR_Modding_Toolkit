@@ -56,7 +56,7 @@ if success then properties = file.Array end
 metatable_class_array = {}
 
 for _, class in ipairs(class_arrays) do
-    class = capitalize_class(class:sub(7, #class))
+    class = capitalize_class_name(class:sub(7, #class))
 
     local t = Proxy.new()
 

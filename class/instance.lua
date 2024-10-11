@@ -1,0 +1,3 @@
+-- Instance
+
+Instance = Proxy.new()

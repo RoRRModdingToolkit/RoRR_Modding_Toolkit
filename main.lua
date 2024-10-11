@@ -14,7 +14,7 @@ local names = path.get_files(_ENV["!plugins_mod_folder_path"].."/internal")
 for _, name in ipairs(names) do require(name) end
 
 
-function capitalize_class(class)
+function capitalize_class_name(class)
     local final = ""
     local arr = gm.string_split(class, "_")
     for i = 0, gm.array_length(arr) - 1 do
@@ -30,7 +30,7 @@ end
 -- Require public classes (these first)
 local names = path.get_files(_ENV["!plugins_mod_folder_path"].."/class_first")
 for _, name in ipairs(names) do
-    local class = capitalize_class(path.filename(name):sub(1, -5))
+    local class = capitalize_class_name(path.filename(name):sub(1, -5))
     class_refs[class] = require(name)
 end
 
@@ -38,7 +38,7 @@ end
 -- Require public classes
 local names = path.get_files(_ENV["!plugins_mod_folder_path"].."/class")
 for _, name in ipairs(names) do
-    local class = capitalize_class(path.filename(name):sub(1, -5))
+    local class = capitalize_class_name(path.filename(name):sub(1, -5))
     class_refs[class] = require(name)
 end
 
@@ -57,7 +57,7 @@ require("./envy_setup")
 -- ========== Initialize ==========
 
 function __initialize()
-
+    
 end
 
 
