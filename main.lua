@@ -10,6 +10,7 @@ require("./internal/abstraction")
 
 local classes = {
     "Array",
+    "Class",
     "Helper",
 }
 

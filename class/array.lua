@@ -129,9 +129,3 @@ metatable_array = {
         return gm.array_length(table.value)
     end
 }
-
-
-
--- ========== Lock proxy after setup ==========
-
-Array:lock()
