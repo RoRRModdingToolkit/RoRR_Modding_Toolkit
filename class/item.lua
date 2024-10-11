@@ -82,3 +82,7 @@ Item.new = function(namespace, identifier, no_log)
 
     return item
 end
+
+
+
+return Item
