@@ -13,36 +13,49 @@ gm.pre_script_hook(gm.constants.__input_system_tick, function()
         -- Initialize RMT first
         __initialize()
 
-        -- Loop through all mods and add RMT class references if they have a dependency
-        for _, m in pairs(mods) do
-            if type(m) == "table" and Helper.table_has(m._PLUGIN.dependencies_no_version_number, "RoRRModdingToolkit-RoRR_Modding_Toolkit") then
-                local status, err = pcall(function()
-                    for _, c in ipairs(Classes) do
-                        if _G[c] then m._G[c] = _G[c] end
-                    end
-                end)
+        -- Get list of mods in load order
+        local ms = {}
+        local skip = {
+            "ReturnOfModding-GLOBAL",
+            "RoRRModdingToolkit-RoRR_Modding_Toolkit"
+        }
+        for _, m_id in ipairs(mods.loading_order) do
+            if not Helper.table_has(skip, m_id) then
+                table.insert(ms, {
+                    id      = m_id,
+                    tabl    = mods[m_id]
+                })
+            end
+        end
+
+        -- Loop 1
+        for _, m in ipairs(ms) do
+            -- Add RMT class references if they have a dependency
+            local status, err = pcall(function()
+                for _, c in ipairs(Classes) do
+                    if _G[c] then m.tabl._G[c] = _G[c] end
+                end
+            end)
+            if not status then
+                log.warning(m.id.." : Failed to add RMT class references.\n"..err)
+            end
+
+            -- Call __initialize
+            if m.tabl.__initialize then
+                local status, err = pcall(m.tabl.__initialize)
                 if not status then
-                    log.warning(m["!guid"].." : Failed to add RMT class references.\n"..err)
+                    log.warning(m.id.." : __initialize failed to execute fully.\n"..err)
                 end
             end
         end
 
-        -- Loop through all mods and call their __initialize functions
-        for _, m in pairs(mods) do
-            if type(m) == "table" and m.__initialize and (not m.RoRR_Modding_Toolkit) then
-                local status, err = pcall(m.__initialize)
+        -- Loop 2
+        for _, m in ipairs(ms) do
+            -- Call __post_initialize
+            if m.tabl.__post_initialize then
+                local status, err = pcall(m.tabl.__post_initialize)
                 if not status then
-                    log.warning(m["!guid"].." : __initialize failed to execute fully.\n"..err)
-                end
-            end
-        end
-
-        -- Loop through all mods and call their __post_initialize functions
-        for _, m in pairs(mods) do
-            if type(m) == "table" and m.__post_initialize and (not m.RoRR_Modding_Toolkit) then
-                local status, err = pcall(m.__post_initialize)
-                if not status then
-                    log.warning(m["!guid"].." : __post_initialize failed to execute fully.\n"..err)
+                    log.warning(m.id.." : __post_initialize failed to execute fully.\n"..err)
                 end
             end
         end
