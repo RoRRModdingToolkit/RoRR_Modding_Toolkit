@@ -54,10 +54,9 @@ Environment_Log.wrap = function(environment_log_id)
     return abstraction
 end
 
--- 
 Environment_Log.new = function(stage)
     
-    if type(stage) ~= "table" or (stage.RMT_object ~= "Stage" and not stage.value) then log.error("Stage is not a RMT item, got a "..type(stage), 2) return end
+    if type(stage) ~= "table" or stage.RMT_object ~= "Stage" then log.error("Stage is not a RMT item, got a "..type(stage), 2) return end
     
     -- Check if environment_log already exist
     local environment_log = Environment_Log.find(stage.namespace, stage.identifier)
@@ -102,7 +101,7 @@ metatable_environment_log_gs = {
             local environment_log_array = Class.ENVIRONMENT_LOG:get(table.value)
             return Wrap.wrap(environment_log_array:get(index))
         end
-        log.error("Non-existent environment log property", 2)
+        log.warning("Non-existent environment log property")
         return nil
     end,
 
@@ -114,7 +113,7 @@ metatable_environment_log_gs = {
             local environment_log_array = Class.ENVIRONMENT_LOG:get(table.value)
             environment_log_array:set(index, Wrap.unwrap(value))
         end
-        log.error("Non-existent environment log property", 2)
+        log.warning("Non-existent environment log property")
     end
 }
 
@@ -136,7 +135,7 @@ metatable_environment_log = {
 
     __newindex = function(table, key, value)
         if key == "value" or key == "RMT_object" then
-            log.error("Cannot modify RMT object values", 2)
+            log.warning("Cannot modify RMT object values")
             return
         end
 

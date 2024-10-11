@@ -68,7 +68,6 @@ State.find = function(namespace, identifier)
     return nil
 end
 
-
 State.wrap = function(state_id)
     local abstraction = {}
     abstraction_data[abstraction] = {
@@ -170,6 +169,7 @@ metatable_state_gs = {
             local state_array = Class.ACTOR_STATE:get(table.value)
             return state_array:get(index)
         end
+        log.warning("Non-existent state property")
         return nil
     end,
 
@@ -181,6 +181,7 @@ metatable_state_gs = {
             local state_array = Class.ACTOR_STATE:get(table.value)
             state_array:set(index, value)
         end
+        log.warning("Non-existent state property")
     end
 }
 
@@ -215,7 +216,7 @@ metatable_state = {
 
     __newindex = function(table, key, value)
         if key == "value" or key == "RMT_object" then
-            log.error("Cannot modify RMT object values", 2)
+            log.warning("Cannot modify RMT object values")
             return
         end
         

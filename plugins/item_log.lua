@@ -57,10 +57,9 @@ Item_Log.wrap = function(item_log_id)
     return abstraction
 end
 
--- 
 Item_Log.new = function(item)
     
-    if type(item) ~= "table" or (item.RMT_object ~= "Item" and not item.value) then log.error("Item is not a RMT item, got a "..type(item), 2) return end
+    if type(item) ~= "table" or item.RMT_object ~= "Item" then log.error("Item is not a RMT item, got a "..type(item), 2) return end
     
     -- Check if item_log already exist
     local item_log = Item_Log.find(item.namespace, item.identifier)
@@ -106,7 +105,7 @@ metatable_item_log_gs = {
             local item_log_array = Class.ITEM_LOG:get(table.value)
             return Wrap.wrap(item_log_array:get(index))
         end
-        log.error("Non-existent item log property", 2)
+        log.warning("Non-existent item log property")
         return nil
     end,
 
@@ -118,7 +117,7 @@ metatable_item_log_gs = {
             local item_log_array = Class.ITEM_LOG:get(table.value)
             item_log_array:set(index, Wrap.unwrap(value))
         end
-        log.error("Non-existent item log property", 2)
+        log.warning("Non-existent item log property")
     end
 }
 
@@ -140,7 +139,7 @@ metatable_item_log = {
 
     __newindex = function(table, key, value)
         if key == "value" or key == "RMT_object" then
-            log.error("Cannot modify RMT object values", 2)
+            log.warning("Cannot modify RMT object values")
             return
         end
 
