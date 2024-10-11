@@ -47,7 +47,7 @@ Class:setmetatable(metatable_class)
 
 -- This class will also initialize the base
 -- wrappers for every global "class_" array,
--- containing .ARRAY, .find, and .wrap.
+-- containing ARRAY, find, and wrap.
 
 local file_path = _ENV["!plugins_mod_folder_path"].."/class_first/class_array.txt"
 local success, file = pcall(toml.decodeFromFile, file_path)
