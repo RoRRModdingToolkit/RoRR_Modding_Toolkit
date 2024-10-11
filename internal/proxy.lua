@@ -40,7 +40,9 @@ local metatable_proxy = {
 
     __call = function(table, ...)
         Proxy[table](...)
-    end
+    end,
+
+    __metatable = "proxy"
 }
 
 local metatable_proxy_keys_locked = {

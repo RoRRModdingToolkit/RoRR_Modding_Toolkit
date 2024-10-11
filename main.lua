@@ -100,6 +100,14 @@ gui.add_imgui(function()
             -- log.info(a.proxy_locked)
             -- a[10] = 10
 
+        elseif ImGui.Button("c") then
+            local a = Proxy.new()
+            a:lock()
+            getmetatable(a)
+            -- setmetatable(a, nil)
+            a.value = 127
+            log.info(a.value)
+
         end
     end
     ImGui.End()
