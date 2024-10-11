@@ -2,11 +2,19 @@
 
 log.info("Successfully loaded ".._ENV["!guid"]..".")
 
-local envy = mods["MGReturns-ENVY"]
-envy.auto()
+-- ENVY setup
+mods["MGReturns-ENVY"].auto()
 
 require("./internal/proxy")
 require("./internal/abstraction")
+
+local classes = {
+    "Array"
+}
+
+for _, c in ipairs(classes) do
+    require("./class/"..string.lower(c))
+end
 
 
 
