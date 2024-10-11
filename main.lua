@@ -32,7 +32,7 @@ for _, name in ipairs(names) do
 end
 
 
--- Lock public classes
+-- Lock public classes (after initialization)
 for k, v in pairs(public_refs) do
     v:lock()
 end
