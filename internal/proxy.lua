@@ -32,6 +32,10 @@ local metatable_proxy = {
         if table.proxy_locked then log.error("Cannot modify table", 2) end
         if table.keys_locked[key] then log.error("Cannot modify key", 2) end
         Proxy[table][key] = value
+    end,
+
+    __call = function(table, ...)
+        Proxy[table].__call(table, ...)
     end
 }
 
