@@ -32,6 +32,12 @@ for _, name in ipairs(names) do
 end
 
 
+-- Lock public classes
+for k, v in pairs(public_refs) do
+    v:lock()
+end
+
+
 -- ENVY public setup
 require("./envy_setup")
 
@@ -46,6 +52,8 @@ gui.add_imgui(function()
             for k, v in pairs(public) do
                 log.info(k)
             end
+
+            log.info(Array.new)
 
         elseif ImGui.Button("b") then
             local a = Proxy.new()

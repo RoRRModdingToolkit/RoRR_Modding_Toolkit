@@ -27,7 +27,7 @@ end
 Helper.table_get_keys = function(t)
     local keys = {}
     for k, v in pairs(t) do
-        keys:insert(k)
+        table.insert(keys, k)
     end
 end
 
