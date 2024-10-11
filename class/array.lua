@@ -129,3 +129,7 @@ metatable_array = {
         return gm.array_length(table.value)
     end
 }
+
+
+
+return Array

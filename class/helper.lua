@@ -44,3 +44,7 @@ Helper.table_merge = function(...)
     end
     return new
 end
+
+
+
+return Helper

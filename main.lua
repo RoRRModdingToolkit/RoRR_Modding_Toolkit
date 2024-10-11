@@ -2,21 +2,38 @@
 
 log.info("Successfully loaded ".._ENV["!guid"]..".")
 
--- ENVY setup
+
+-- ENVY initial setup
 mods["MGReturns-ENVY"].auto()
+public_refs = {}
 
-require("./internal/proxy")
-require("./internal/abstraction")
 
-local classes = {
-    "Array",
-    "Class",
-    "Helper",
-}
+-- Require internal files
+local names = path.get_files(_ENV["!plugins_mod_folder_path"].."/internal")
+for _, name in ipairs(names) do require(name) end
 
-for _, c in ipairs(classes) do
-    require("./class/"..string.lower(c))
+
+-- Require public classes
+local names = path.get_files(_ENV["!plugins_mod_folder_path"].."/class")
+for _, name in ipairs(names) do
+    local class = path.filename(name):sub(1, -5)
+
+    -- Capitalize first letter and first after "_"
+    local final = ""
+    local arr = gm.string_split(class, "_")
+    for i = 0, gm.array_length(arr) - 1 do
+        local part = gm.array_get(arr, i)
+        part = part:sub(1, 1):upper()..part:sub(2, #part)
+        if i > 0 then final = final.."_" end
+        final = final..part
+    end
+
+    public_refs[final] = require(name)
 end
+
+
+-- ENVY public setup
+require("./envy_setup")
 
 
 

@@ -41,6 +41,10 @@ metatable_class = {
 }
 
 
+
+return Class
+
+
 -- Class.__initialize = function()
 --     Class.ACHIEVEMENT       = Array.wrap(gm.variable_global_get("class_achievement"))
 --     Class.ACTOR_SKIN        = Array.wrap(gm.variable_global_get("class_actor_skin"))
