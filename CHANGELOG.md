@@ -1,10 +1,8 @@
-### v1.1.14
-* One-line requirement no longer needed to use RMT.
-    * Class references are automatically added if the mod has RMT as a dependency.
+### v1.2.0
+* Rewrote all internal functionality to use ENVY (does not affect end-user functionality listed on the docs).
 * __initialize will now print a message to console if a mod's __initialize/__post_initialize fails to run.
     * They will also now run in mod load order.
-* Added Item_Log class
-* Added Environment_Log class
+* Added wrappers for remaining classes in the global `class_` arrays.
 * Language : Fallback to english.json if the language file in a mod doesn't exist for the current language.
 
 ### v1.1.13
