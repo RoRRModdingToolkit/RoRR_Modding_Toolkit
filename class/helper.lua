@@ -29,6 +29,7 @@ Helper.table_get_keys = function(t)
     for k, v in pairs(t) do
         table.insert(keys, k)
     end
+    return keys
 end
 
 
