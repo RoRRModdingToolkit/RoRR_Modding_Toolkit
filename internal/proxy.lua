@@ -12,7 +12,7 @@ local metatable_proxy = {
                         local keys = {...}
                         if type(keys[1]) == "table" then keys = keys[1] end
                         for _, k in ipairs(keys) do
-                            proxy.keys_locked:insert(k)
+                            proxy.keys_locked[k] = true
                         end
                     end
                 end
