@@ -5,6 +5,7 @@
     * They will also now run in mod load order.
 * Added Item_Log class
 * Added Environment_Log class
+* Language : Fallback to english.json if the language file in a mod doesn't exist for the current language.
 
 ### v1.1.13
 * Instance : get_data tables and Instance callbacks are no longer instantly deleted for players on-death.

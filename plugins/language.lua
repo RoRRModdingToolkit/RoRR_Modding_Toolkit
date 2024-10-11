@@ -19,11 +19,21 @@ end
 local function load_from_folder(folder_path)
     local lang = gm._mod_language_getLanguageName()
 
+    local eng_file = nil
+    local translated = false
+
     local files = path.get_files(folder_path)
     for _, file in ipairs(files) do
-        if string.sub(path.stem(file), -(#lang), -1) == lang then
+        local file_lang = string.sub(path.stem(file), -(#lang), -1)
+        if file_lang == "english" then eng_file = file end
+        if file_lang == lang then
+            translated = true
             gm.translate_load_file(gm.variable_global_get("_language_map"), file)
         end
+    end
+
+    if (not translated) and eng_file then
+        gm.translate_load_file(gm.variable_global_get("_language_map"), eng_file)
     end
 end
 
