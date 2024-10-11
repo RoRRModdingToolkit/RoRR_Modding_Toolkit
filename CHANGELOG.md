@@ -3,6 +3,8 @@
     * Class references are automatically added if the mod has RMT as a dependency.
 * __initialize will now print a message to console if a mod's __initialize/__post_initialize fails to run.
     * They will also now run in mod load order.
+* Added Item_Log class
+* Added Environment_Log class
 
 ### v1.1.13
 * Instance : get_data tables and Instance callbacks are no longer instantly deleted for players on-death.
