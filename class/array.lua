@@ -42,8 +42,7 @@ methods_array = {
 
 
     set = function(self, index, value)
-        index = Wrap.unwrap(index)
-        gm.array_set(self.value, index, Wrap.unwrap(value))
+        gm.array_set(self.value, Wrap.unwrap(index), Wrap.unwrap(value))
     end,
 
 
@@ -53,7 +52,7 @@ methods_array = {
 
 
     resize = function(self, size)
-        gm.array_resize(self.value, size)
+        gm.array_resize(self.value, Wrap.unwrap(size))
     end,
 
 
@@ -71,12 +70,12 @@ methods_array = {
 
 
     insert = function(self, index, value)
-        gm.array_insert(self.value, index, Wrap.unwrap(value))
+        gm.array_insert(self.value, Wrap.unwrap(index), Wrap.unwrap(value))
     end,
     
 
     delete = function(self, index, number)
-        gm.array_delete(self.value, index, number or 1)
+        gm.array_delete(self.value, Wrap.unwrap(index), number or 1)
     end,
 
 
