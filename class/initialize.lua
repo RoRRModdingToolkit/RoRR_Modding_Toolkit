@@ -13,10 +13,13 @@ local post_funcs = {}
 metatable_initialize = {
     __call = function(table, func, post)
         if not post then
-            funcs[envy.getfenv(2)["!guid"]] = func
+            if not funcs[envy.getfenv(2)["!guid"]] then funcs[envy.getfenv(2)["!guid"]] = {} end
+            table.insert(funcs[envy.getfenv(2)["!guid"]], func)
             return
         end
-        post_funcs[envy.getfenv(2)["!guid"]] = func
+
+        if not post_funcs[envy.getfenv(2)["!guid"]] then post_funcs[envy.getfenv(2)["!guid"]] = {} end
+        table.insert(post_funcs[envy.getfenv(2)["!guid"]], func)
     end
 }
 Initialize:setmetatable(metatable_initialize)
@@ -35,14 +38,18 @@ gm.pre_script_hook(gm.constants.__input_system_tick, function()
         -- Run initialize functions in load order
         for _, m_id in ipairs(mods.loading_order) do
             if funcs[m_id] then
-                funcs[m_id]()
+                for _, fn in ipairs(funcs[m_id]) do
+                    fn()
+                end
             end
         end
 
         -- Run post_initialize functions in load order
         for _, m_id in ipairs(mods.loading_order) do
             if post_funcs[m_id] then
-                post_funcs[m_id]()
+                for _, fn in ipairs(post_funcs[m_id]) do
+                    fn()
+                end
             end
         end
     end
