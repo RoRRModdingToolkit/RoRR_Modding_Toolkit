@@ -384,6 +384,8 @@ methods_survivor = {
     end,
 
     set_stats_base = function(self, stats)
+        if type(stats) ~= "table" then log.error("Stats should be a table, got a "..type(stats), 2) return end
+
         if type(stats.maxhp) ~= "number" and type(stats.maxhp) ~= "nil" then log.error("Max HP base should be a number, got a "..type(stats.maxhp), 2) return end
         if type(stats.damage) ~= "number" and type(stats.damage) ~= "nil" then log.error("Damage base should be a number, got a "..type(stats.damage), 2) return end
         if type(stats.regen) ~= "number" and type(stats.regen) ~= "nil" then log.error("Regen base should be a number, got a "..type(stats.regen), 2) return end
@@ -402,6 +404,8 @@ methods_survivor = {
     end,
     
     set_physics_base = function(self, stats)
+        if type(stats) ~= "table" then log.error("Stats should be a table, got a "..type(stats), 2) return end
+
         if type(stats.hmax) ~= "number" and type(stats.hmax) ~= "nil" then log.error("Hmax base should be a number, got a "..type(stats.hmax), 2) return end
         if type(stats.vmax) ~= "number" and type(stats.vmax) ~= "nil" then log.error("Vmax base should be a number, got a "..type(stats.vmax), 2) return end
         if type(stats.gravity1) ~= "number" and type(stats.gravity1) ~= "nil" then log.error("Gravity1 base should be a number, got a "..type(stats.gravity1), 2) return end
@@ -416,6 +420,8 @@ methods_survivor = {
     end,
 
     set_stats_level = function(self, stats)
+        if type(stats) ~= "table" then log.error("Stats should be a table, got a "..type(stats), 2) return end
+        
         if type(stats.maxhp) ~= "number" and type(stats.maxhp) ~= "nil" then log.error("Max HP level should be a number, got a "..type(stats.maxhp), 2) return end
         if type(stats.damage) ~= "number" and type(stats.damage) ~= "nil" then log.error("Damage level should be a number, got a "..type(stats.damage), 2) return end
         if type(stats.regen) ~= "number" and type(stats.regen) ~= "nil" then log.error("Regen level should be a number, got a "..type(stats.regen), 2) return end
