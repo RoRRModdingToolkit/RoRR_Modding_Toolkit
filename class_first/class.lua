@@ -88,6 +88,31 @@ for _, class in ipairs(class_arrays) do
         return wrapper
     end
 
+    metatable_class_array[class] = {
+        -- Getter
+        __index = function(table, key)
+            local index = t.ARRAY[key]
+            if index then
+                local array = Class[class]:get(table.value)
+                return array:get(index)
+            end
+            log.error("Non-existent "..class.." property", 2)
+            return nil
+        end,
+
+
+        -- Setter
+        __newindex = function(table, key, value)
+            local index = t.ARRAY[key]
+            if index then
+                local array = Class[class]:get(table.value)
+                array:set(index, value)
+                return
+            end
+            log.error("Non-existent "..class.." property", 2)
+        end
+    }
+
     class_refs[class] = t
 end
 
