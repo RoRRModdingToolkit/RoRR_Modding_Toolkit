@@ -99,8 +99,7 @@ for _, class in ipairs(class_arrays) do
             log.error("Non-existent "..class.." property", 2)
             return nil
         end,
-
-
+        
         -- Setter
         __newindex = function(table, key, value)
             local index = t.ARRAY[key]
