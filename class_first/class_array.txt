@@ -28,6 +28,11 @@ on_completed                    = 23
 [Array.Actor_Skin]
 namespace                       = 0
 identifier                      = 1
+effect_display                  = 2
+draw_loadout_preview            = 3
+get_skin_sprite                 = 4
+draw_skinnable_instance         = 5
+skin_type_index                 = 6
 
 
 [Array.Actor_State]
@@ -101,6 +106,12 @@ allow_blight_spawns             = 12
 [Array.Elite]
 namespace                       = 0
 identifier                      = 1
+token_name                      = 2
+palette                         = 3
+blend_col                       = 4
+healthbar_icon                  = 5
+effect_display                  = 6
+on_apply                        = 7
 
 
 [Array.Ending_Type]
@@ -215,6 +226,22 @@ can_be_blighted                 = 8
 [Array.Monster_Log]
 namespace                       = 0
 identifier                      = 1
+token_name                      = 2
+token_story                     = 3
+sprite_id                       = 4
+portrait_id                     = 5
+portrait_index                  = 6
+sprite_offset_x                 = 7
+sprite_offset_y                 = 8
+sprite_force_horizontal_align   = 9
+sprite_height_offset            = 10
+stat_hp                         = 11
+stat_damage                     = 12
+stat_speed                      = 13
+log_backdrop_index              = 14
+object_id                       = 15
+enemy_object_ids_kills          = 16
+enemy_object_ids_deaths         = 17
 
 
 [Array.Skill]

@@ -23,9 +23,7 @@ Wrap.wrap = function(value)
     -- end
 
     -- Instance
-    if gm.typeof(value) == "struct"
-    and gm.instance_exists(value) == 1.0
-    and gm.object_exists(value) == 0.0 then
+    if Instance.is(value) then
         return Instance.wrap(value)
     end
 
