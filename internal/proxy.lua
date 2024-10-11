@@ -6,7 +6,7 @@ local metatable_proxy = {
     __index = function(table, key)
         if key == "lock" then
             return function(proxy, ...)
-                if proxy then
+                if proxy and (not proxy.proxy_locked) then
                     if not ... then proxy.proxy_locked = true
                     else
                         local keys = {...}
@@ -30,6 +30,7 @@ local metatable_proxy = {
     
     __newindex = function(table, key, value)
         if table.proxy_locked then log.error("Cannot modify table", 2) end
+        if key == "keys_locked" then log.error("Cannot modify keys_locked table", 2) end
         if table.keys_locked[key] then log.error("Cannot modify key", 2) end
         Proxy[table][key] = value
     end
