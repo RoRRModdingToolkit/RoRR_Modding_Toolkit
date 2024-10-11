@@ -1,7 +1,6 @@
 -- Class
 
 Class = Proxy.new()
-Class:setmetatable(metatable_class)
 
 local class_arrays = {
     "class_achievement",
@@ -34,11 +33,15 @@ local class_arrays = {
 metatable_class = {
     __index = function(table, key)
         local k = "class_"..key:lower()
-        if Helper.table_has(class_arrays, k) then
-            return Array.wrap(gm.variable_global_get(k))
-        end
+        return k
+        -- if Helper.table_has(class_arrays, k) then
+        --     -- return k
+        --     -- return Array.wrap(gm.variable_global_get(k))
+        -- else log.error("Class does not exist", 2)
+        -- end
     end
 }
+Class:setmetatable(metatable_class)
 
 
 
@@ -99,7 +102,7 @@ for _, class in ipairs(class_arrays) do
             log.error("Non-existent "..class.." property", 2)
             return nil
         end,
-        
+
         -- Setter
         __newindex = function(table, key, value)
             local index = t.ARRAY[key]

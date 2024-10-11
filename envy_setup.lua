@@ -1,8 +1,5 @@
 -- ENVY
 
-local envy = mods["MGReturns-ENVY"]
-
-
 function public.setup(env)
     if env == nil then
         env = envy.getfenv(2)

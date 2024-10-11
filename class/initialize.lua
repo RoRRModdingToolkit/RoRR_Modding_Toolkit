@@ -1,7 +1,6 @@
 -- Initialize
 
 Initialize = Proxy.new()
-Initialize:setmetatable(metatable_initialize)
 
 local init = false
 local funcs = {}
@@ -20,6 +19,7 @@ metatable_initialize = {
         post_funcs[envy.getfenv(2)["!guid"]] = func
     end
 }
+Initialize:setmetatable(metatable_initialize)
 
 
 
@@ -47,3 +47,7 @@ gm.pre_script_hook(gm.constants.__input_system_tick, function()
         end
     end
 end)
+
+
+
+return Initialize

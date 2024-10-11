@@ -35,7 +35,7 @@ local metatable_proxy = {
     end,
 
     __call = function(table, ...)
-        Proxy[table].__call(table, ...)
+        Proxy[table](...)
     end
 }
 
