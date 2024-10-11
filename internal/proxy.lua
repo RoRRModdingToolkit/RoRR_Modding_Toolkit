@@ -42,7 +42,7 @@ local metatable_proxy_keys_locked = {
     end,
     
     __newindex = function(table, key, value)
-        if value ~= true then log.error("Cannot unlock key", 2) end
+        if table[key] and value ~= true then log.error("Cannot unlock key", 2) end
         Proxy[table][key] = value
     end
 }
