@@ -16,6 +16,7 @@ Classes = {
     "Color",
     "Damager",
     "Difficulty",
+    "Elite",
     "Ending",
     "Equipment",
     "Gamemode",
