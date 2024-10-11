@@ -8,7 +8,7 @@ function public.setup(env)
         env = envy.getfenv(2)
     end
     local wrapper = {}
-    for k, v in pairs(public_refs) do
+    for k, v in pairs(class_refs) do
         wrapper[k] = v
     end
     return wrapper
@@ -22,6 +22,6 @@ function public.auto()
 end
 
 
-for k, v in pairs(public_refs) do
+for k, v in pairs(class_refs) do
     public[k] = v
 end

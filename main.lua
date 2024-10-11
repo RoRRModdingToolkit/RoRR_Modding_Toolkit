@@ -5,7 +5,7 @@ log.info("Successfully loaded ".._ENV["!guid"]..".")
 
 -- ENVY initial setup
 mods["MGReturns-ENVY"].auto()
-public_refs = {}
+class_refs = {}
 
 
 -- Require internal files
@@ -13,12 +13,7 @@ local names = path.get_files(_ENV["!plugins_mod_folder_path"].."/internal")
 for _, name in ipairs(names) do require(name) end
 
 
--- Require public classes
-local names = path.get_files(_ENV["!plugins_mod_folder_path"].."/class")
-for _, name in ipairs(names) do
-    local class = path.filename(name):sub(1, -5)
-
-    -- Capitalize first letter and first after "_"
+function capitalize_class(class)
     local final = ""
     local arr = gm.string_split(class, "_")
     for i = 0, gm.array_length(arr) - 1 do
@@ -27,19 +22,42 @@ for _, name in ipairs(names) do
         if i > 0 then final = final.."_" end
         final = final..part
     end
+    return final
+end
 
-    public_refs[final] = require(name)
+
+-- Require public classes (these first)
+local names = path.get_files(_ENV["!plugins_mod_folder_path"].."/class_first")
+for _, name in ipairs(names) do
+    local class = capitalize_class(path.filename(name):sub(1, -5))
+    class_refs[class] = require(name)
+end
+
+
+-- Require public classes
+local names = path.get_files(_ENV["!plugins_mod_folder_path"].."/class")
+for _, name in ipairs(names) do
+    local class = capitalize_class(path.filename(name):sub(1, -5))
+    class_refs[class] = require(name)
 end
 
 
 -- Lock public classes (after initialization)
-for k, v in pairs(public_refs) do
-    v:lock()
+for _, ref in pairs(class_refs) do
+    ref:lock()
 end
 
 
 -- ENVY public setup
 require("./envy_setup")
+
+
+
+-- ========== Initialize ==========
+
+function __initialize()
+
+end
 
 
 

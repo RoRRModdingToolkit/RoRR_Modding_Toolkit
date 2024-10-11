@@ -42,6 +42,57 @@ metatable_class = {
 
 
 
+-- ========== Class Array Wrapper Bases ==========
+
+-- This class will also initialize the base
+-- wrappers for every global "class_" array.
+
+local file_path = _ENV["!plugins_mod_folder_path"].."/class_first/class_array.txt"
+local success, file = pcall(toml.decodeFromFile, file_path)
+local properties = {}
+if success then properties = file.Array end
+
+metatable_class_array = {}
+
+for _, class in ipairs(class_arrays) do
+    class = capitalize_class(class:sub(7, #class))
+
+    local t = Proxy.new()
+
+    t.ARRAY = properties[class]
+    
+    t.find = function(namespace, identifier)
+        if identifier then namespace = namespace.."-"..identifier end
+
+        for i = 0, #Class[class] - 1 do
+            local element = Class[class]:get(i)
+            if gm.is_array(element.value) then
+                local _namespace = element:get(0)
+                local _identifier = element:get(1)
+                if namespace == _namespace.."-".._identifier then
+                    return t.wrap(i)
+                end
+            end
+        end
+    end
+
+    t.wrap = function(value)
+        local wrapper = Proxy.new()
+        wrapper.RMT_object = class
+        wrapper.value = value
+        wrapper:setmetatable(metatable_class_array[class])
+        wrapper:lock(
+            "RMT_object",
+            "value"
+        )
+        return wrapper
+    end
+
+    class_refs[class] = t
+end
+
+
+
 return Class
 
 
