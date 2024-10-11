@@ -2,13 +2,14 @@
 
 Proxy = setmetatable({}, {__mode = "k"})
 
-local function lock_proxy(proxy)
-    if proxy then proxy.proxy_locked = true end
-end
-
 local metatable_proxy = {
     __index = function(table, key)
-        if key == "lock" then return lock_proxy end
+        if key == "lock" then
+            return function(proxy)
+                if proxy then proxy.proxy_locked = true end
+            end
+        end
+
         return Proxy[table][key]
     end,
     
