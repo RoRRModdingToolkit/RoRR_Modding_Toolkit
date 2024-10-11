@@ -1,7 +1,8 @@
 ### v1.1.14
 * One-line requirement no longer needed to use RMT.
-    * Class references are automatically added if a mod has __initialize in it.
+    * Class references are automatically added if the mod has RMT as a dependency.
 * __initialize will now print a message to console if a mod's __initialize/__post_initialize fails to run.
+    * They will also now run in mod load order.
 
 ### v1.1.13
 * Instance : get_data tables and Instance callbacks are no longer instantly deleted for players on-death.
