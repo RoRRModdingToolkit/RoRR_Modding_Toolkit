@@ -89,7 +89,7 @@ end
 methods_item_log = {
 
     set_achievement = function(self, achivement_id)
-        if type(achievement_id) == "number" then log.error("Achievement ID is not a number, got a "..type(achievement_id), 2) return end
+        if type(achievement_id) ~= "number" then log.error("Achievement ID is not a number, got a "..type(achievement_id), 2) return end
     
         self.achievement_id = achievement_id
     end,
