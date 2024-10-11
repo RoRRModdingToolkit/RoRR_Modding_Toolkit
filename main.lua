@@ -36,9 +36,10 @@ gui.add_imgui(function()
             log.info(a[2])
             log.info(a.proxy_locked)
             log.info(a.lock)
-            a:lock()
+            a:lock(2)
             log.info(a.proxy_locked)
             a[3] = 5
+            a[2] = 4
 
         end
     end
