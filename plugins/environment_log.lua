@@ -72,13 +72,11 @@ Environment_Log.new = function(stage)
     stage.log_id = abstraction.value
 
     -- Set the room list
-    -- self.display_room_ids = 
-
-    -- add room
-    -- clear room
-    -- set_log_icon
-    -- set_log_view_start
-    -- set_log_hidden
+    local display_room_ids = List.wrap(abstraction.display_room_ids)
+    for num, room in ipairs(stage.room_list) do
+        display_room_ids:add(room)
+        gm.room_associate_environment_log(room, stage.log_id, num)
+    end
 
     return abstraction
 end
@@ -88,6 +86,46 @@ end
 
 methods_environment_log = {
 
+    add_room = function(self, ...)
+        local roomList = List.wrap(self.display_room_ids)
+
+        local t = {...}
+        if type(t[1]) == "table" then t = t[1] end
+
+        for _, path in ipairs(t) do
+            local num = #roomList
+
+            roomList:add(room)
+            gm.room_associate_environment_log(room, self.value, num)
+        end
+    end,
+
+    clear_room = function(self)
+        local roomList = List.wrap(self.display_room_ids)
+        roomList:clear()
+    end,
+
+    set_log_icon = function(self, sprite)
+        if type(sprite) ~= "number" then log.error("Sprite should be a number, got a "..type(sprite), 2) return end
+        
+        self.spr_icon = sprite
+    end,
+
+
+    set_log_view_start = function(self, camx, camy)
+        if type(camx) ~= "number" then log.error("CamX should be a number, got a "..type(camx), 2) return end
+        if type(camy) ~= "number" then log.error("CamY should be a number, got a "..type(camy), 2) return end
+        
+        self.initial_cam_x_1080, self.initial_cam_x_720 = x, x
+        self.initial_cam_y_1080, self.initial_cam_y_720 = y, y
+    end,
+
+
+    set_log_secret = function(self, issecret)
+        if type(issecret) ~= "boolean" then log.error("Is Hidden should be a boolean, got a "..type(issecret), 2) return end
+        
+        self.is_secret = issecret
+    end,
 }
 
 
