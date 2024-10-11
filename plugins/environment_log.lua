@@ -86,17 +86,16 @@ end
 
 methods_environment_log = {
 
-    add_room = function(self, ...)
+    add_room = function(self, stage)
+
+        if type(stage) ~= "table" or item.RMT_object ~= "Stage" then log.error("Stage is not a RMT Stage, got a "..type(stage), 2) return end
+        
         local roomList = List.wrap(self.display_room_ids)
+        local stageRoomList = List.wrap(stage.room_list)
 
-        local t = {...}
-        if type(t[1]) == "table" then t = t[1] end
-
-        for _, path in ipairs(t) do
-            local num = #roomList
-
-            roomList:add(room)
-            gm.room_associate_environment_log(room, self.value, num)
+        for num = #roomList, #stageRoomList do
+            roomList:add(stageRoomList[num+1])
+            gm.room_associate_environment_log(stageRoomList[num+1], self.value, num)
         end
     end,
 
