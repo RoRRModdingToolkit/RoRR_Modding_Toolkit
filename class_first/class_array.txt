@@ -1,54 +1,331 @@
+[Array.Achievement]
+namespace                       = 0
+identifier                      = 1
+token_name                      = 2
+token_desc                      = 3
+token_desc2                     = 4
+token_unlock_name               = 5
+unlock_kind                     = 6
+unlock_id                       = 7
+sprite_id                       = 8
+sprite_subimage                 = 9
+sprite_scale                    = 10
+sprite_scale_ingame             = 11
+is_hidden                       = 12
+is_trial                        = 13
+is_server_authorative           = 14
+milestone_alt_unlock            = 15
+milestone_survivor              = 16
+progress                        = 17
+unlocked                        = 18
+parent_id                       = 19
+progress_needed                 = 20
+death_reset                     = 21
+group                           = 22
+on_completed                    = 23
+
+
+[Array.Actor_Skin]
+namespace                       = 0
+identifier                      = 1
+
+
+[Array.Actor_State]
+namespace                       = 0
+identifier                      = 1
+on_enter                        = 2
+on_exit                         = 3
+on_step                         = 4
+on_get_interrupt_priority       = 5
+callable_serialize              = 6
+callable_deserialize            = 7
+is_skill_state                  = 8
+is_climb_state                  = 9
+activity_flags                  = 10
+
+
+[Array.Artifact]
+namespace                       = 0
+identifier                      = 1
+token_name                      = 2
+token_pickup_name               = 3
+token_description               = 4
+loadout_sprite_id               = 5
+pickup_sprite_id                = 6
+on_set_active                   = 7
+active                          = 8
+achievement_id                  = 9
+
+
 [Array.Buff]
-namespace               = 0
-identifier              = 1
-show_icon               = 2
-icon_sprite             = 3
-icon_subimage           = 4
-icon_frame_speed        = 5
-icon_stack_subimage     = 6
-draw_stack_number       = 7
-stack_number_col        = 8
-max_stack               = 9
-on_apply                = 10
-on_remove               = 11
-on_step                 = 12
-is_timed                = 13
-is_debuff               = 14
-client_handles_removal  = 15
-effect_display          = 16
+namespace                       = 0
+identifier                      = 1
+show_icon                       = 2
+icon_sprite                     = 3
+icon_subimage                   = 4
+icon_frame_speed                = 5
+icon_stack_subimage             = 6
+draw_stack_number               = 7
+stack_number_col                = 8
+max_stack                       = 9
+on_apply                        = 10
+on_remove                       = 11
+on_step                         = 12
+is_timed                        = 13
+is_debuff                       = 14
+client_handles_removal          = 15
+effect_display                  = 16
+
+
+[Array.Callback]
+namespace                       = 0
+identifier                      = 1
+
+
+[Array.Difficulty]
+namespace                       = 0
+identifier                      = 1
+token_name                      = 2
+token_description               = 3
+sprite_id                       = 4
+sprite_loadout_id               = 5
+primary_color                   = 6
+sound_id                        = 7
+diff_scale                      = 8
+general_scale                   = 9
+point_scale                     = 10
+is_monsoon_or_higher            = 11
+allow_blight_spawns             = 12
+
+
+[Array.Elite]
+namespace                       = 0
+identifier                      = 1
+
+
+[Array.Ending_Type]
+namespace                       = 0
+identifier                      = 1
+primary_color                   = 2
+is_victory                      = 3
+
+
+[Array.Environment_Log]
+namespace                       = 0
+identifier                      = 1
+token_name                      = 2
+token_story                     = 3
+stage_id                        = 4
+display_room_ids                = 5
+initial_cam_x_1080              = 6
+initial_cam_y_1080              = 7
+initial_cam_x_720               = 8
+initial_cam_y_720               = 9
+initial_cam_alt_x_1080          = 10
+initial_cam_alt_y_1080          = 11
+initial_cam_alt_x_720           = 12
+initial_cam_alt_y_720           = 13
+is_secret                       = 14
+spr_icon                        = 15
 
 
 [Array.Equipment]
-namespace           = 0
-identifier          = 1
-token_name          = 2
-token_text          = 3
-on_use              = 4
-cooldown            = 5
-tier                = 6
-sprite_id           = 7
-object_id           = 8
-item_log_id         = 9
-achievement_id      = 10
-effect_display      = 11
-loot_tags           = 12
-is_new_equipment    = 13
+namespace                       = 0
+identifier                      = 1
+token_name                      = 2
+token_text                      = 3
+on_use                          = 4
+cooldown                        = 5
+tier                            = 6
+sprite_id                       = 7
+object_id                       = 8
+item_log_id                     = 9
+achievement_id                  = 10
+effect_display                  = 11
+loot_tags                       = 12
+is_new_equipment                = 13
+
+
+[Array.Game_Mode]
+namespace                       = 0
+identifier                      = 1
+count_normal_unlocks            = 2
+count_towards_games_played      = 3
+
+
+[Array.Interactable_Card]
+namespace                       = 0
+identifier                      = 1
+spawn_cost                      = 2
+spawn_weight                    = 3
+object_id                       = 4
+required_tile_space             = 5
+spawn_with_sacrifice            = 6
+is_new_interactable             = 7
+default_spawn_rarity_override   = 8
+decrease_weight_on_spawn        = 9
 
 
 [Array.Item]
-namespace       = 0
-identifier      = 1
-token_name      = 2
-token_text      = 3
-on_acquired     = 4
-on_removed      = 5
-tier            = 6
-sprite_id       = 7
-object_id       = 8
-item_log_id     = 9
-achievement_id  = 10
-is_hidden       = 11
-effect_display  = 12
-actor_component = 13
-loot_tags       = 14
-is_new_item     = 15
+namespace                       = 0
+identifier                      = 1
+token_name                      = 2
+token_text                      = 3
+on_acquired                     = 4
+on_removed                      = 5
+tier                            = 6
+sprite_id                       = 7
+object_id                       = 8
+item_log_id                     = 9
+achievement_id                  = 10
+is_hidden                       = 11
+effect_display                  = 12
+actor_component                 = 13
+loot_tags                       = 14
+is_new_item                     = 15
+
+
+[Array.Item_Log]
+namespace                       = 0
+identifier                      = 1
+token_name                      = 2
+token_description               = 3
+token_story                     = 4
+token_date                      = 5
+token_destination               = 6
+token_priority                  = 7
+pickup_object_id                = 8
+sprite_id                       = 9
+group                           = 10
+achievement_id                  = 11
+
+
+[Array.Monster_Card]
+namespace                       = 0
+identifier                      = 1
+spawn_type                      = 2
+spawn_cost                      = 3
+object_id                       = 4
+is_boss                         = 5
+is_new_enemy                    = 6
+elite_list                      = 7
+can_be_blighted                 = 8
+
+
+[Array.Monster_Log]
+namespace                       = 0
+identifier                      = 1
+
+
+[Array.Skill]
+namespace                       = 0
+identifier                      = 1
+token_name                      = 2
+token_description               = 3
+sprite                          = 4
+subimage                        = 5
+cooldown                        = 6
+damage                          = 7
+max_stock                       = 8
+start_with_stock                = 9
+auto_restock                    = 10
+required_stock                  = 11
+require_key_press               = 12
+allow_buffered_input            = 13
+use_delay                       = 14
+animation                       = 15
+is_utility                      = 16
+is_primary                      = 17
+required_interrupt_priority     = 18
+hold_facing_direction           = 19
+override_strafe_direction       = 20
+ignore_aim_direction            = 21
+disable_aim_stall               = 22
+does_change_activity_state      = 23
+on_can_activate                 = 24
+on_activate                     = 25
+on_step                         = 26
+on_equipped                     = 27
+on_unequipped                   = 28
+upgrade_skill                   = 29
+
+
+[Array.Stage]
+namespace                       = 0
+identifier                      = 1
+token_name                      = 2
+token_subname                   = 3
+spawn_enemies                   = 4
+spawn_enemies_loop              = 5
+spawn_interactables             = 6
+spawn_interactables_loop        = 7
+spawn_interactable_rarity       = 8
+interactable_spawn_points       = 9
+allow_mountain_shrine_spawn     = 10
+classic_variant_count           = 11
+is_new_stage                    = 12
+room_list                       = 13
+music_id                        = 14
+teleporter_index                = 15
+populate_biome_properties       = 16
+log_id                          = 17
+
+
+[Array.Survivor]
+namespace                       = 0
+identifier                      = 1
+token_name                      = 2
+token_name_upper                = 3
+token_description               = 4
+token_end_quote                 = 5
+skill_family_z                  = 6
+skill_family_x                  = 7
+skill_family_c                  = 8
+skill_family_v                  = 9
+skin_family                     = 10
+all_loadout_families            = 11
+all_skill_families              = 12
+sprite_loadout                  = 13
+sprite_title                    = 14
+sprite_idle                     = 15
+sprite_portrait                 = 16
+sprite_portrait_small           = 17
+sprite_palette                  = 18
+sprite_portrait_palette         = 19
+sprite_loadout_palette          = 20
+sprite_credits                  = 21
+primary_color                   = 22
+select_sound_id                 = 23
+log_id                          = 24
+achievement_id                  = 25
+milestone_kills_1               = 26
+milestone_items_1               = 27
+milestone_stages_1              = 28
+on_init                         = 29
+on_step                         = 30
+on_remove                       = 31
+is_secret                       = 32
+cape_offset                     = 33
+
+
+[Array.Survivor_Log]
+namespace                       = 0
+identifier                      = 1
+token_name                      = 2
+token_story                     = 3
+token_id                        = 4
+token_departed                  = 5
+token_arrival                   = 6
+sprite_icon_id                  = 7
+sprite_id                       = 8
+portrait_id                     = 9
+portrait_index                  = 10
+stat_hp_base                    = 11
+stat_hp_level                   = 12
+stat_damage_base                = 13
+stat_damage_level               = 14
+stat_regen_base                 = 15
+stat_regen_level                = 16
+stat_armor_base                 = 17
+stat_armor_level                = 18
+survivor_id                     = 19
