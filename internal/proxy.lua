@@ -29,8 +29,8 @@ local metatable_proxy = {
     end,
     
     __newindex = function(table, key, value)
-        if table.proxy_locked then log.error("Cannot modify table", 2) end
-        if table.keys_locked[key] then log.error("Cannot modify key", 2) end
+        if table.proxy_locked then log.error("Table is read-only", 2) end
+        if table.keys_locked[key] then log.error("Key is read-only", 2) end
         Proxy[table][key] = value
     end,
 
@@ -49,7 +49,7 @@ local metatable_proxy_keys_locked = {
     end,
     
     __newindex = function(table, key, value)
-        if table[key] and value ~= true then log.error("Cannot unlock key", 2) end
+        if table[key] and value ~= true then log.error("Key is read-only", 2) end
         Proxy[table][key] = value
     end
 }
