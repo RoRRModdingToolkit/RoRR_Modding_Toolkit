@@ -6,6 +6,9 @@
 Wrap = Proxy.new()
 
 
+
+-- ========== Static Methods ==========
+
 Wrap.wrap = function(value)
     -- Array
     if gm.is_array(value) then
