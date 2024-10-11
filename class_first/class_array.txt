@@ -17,6 +17,7 @@ is_debuff               = 14
 client_handles_removal  = 15
 effect_display          = 16
 
+
 [Array.Equipment]
 namespace           = 0
 identifier          = 1
@@ -32,6 +33,7 @@ achievement_id      = 10
 effect_display      = 11
 loot_tags           = 12
 is_new_equipment    = 13
+
 
 [Array.Item]
 namespace       = 0
