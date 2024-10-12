@@ -1,6 +1,6 @@
 -- Net
 
-Net = {}
+Net = Proxy.new()
 
 local registered = {}
 local received = false
@@ -9,18 +9,18 @@ local received = false
 
 -- ========== Enums ==========
 
-Net.TYPE = {
+Net.TYPE = Proxy.new({
     single      = 0,
     host        = 1,
     client      = 2
-}
+}):lock()
 
 
-Net.TARGET = {
+Net.TARGET = Proxy.new({
     all         = 0,
     only        = 1,
     exclude     = 2
-}
+}):lock()
 
 
 
@@ -105,3 +105,7 @@ gm.pre_script_hook(gm.constants.chat_add_user_message, function(self, other, res
         end
     end
 end)
+
+
+
+return Net

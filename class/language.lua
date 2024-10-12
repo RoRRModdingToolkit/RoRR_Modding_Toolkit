@@ -1,6 +1,6 @@
 -- Language
 
-Language = {}
+Language = Proxy.new()
 
 
 
@@ -73,3 +73,7 @@ gm.post_script_hook(gm.constants.translate_load_active_language, function(self, 
     -- Load on language change
     load_from_mods()
 end)
+
+
+
+return Language

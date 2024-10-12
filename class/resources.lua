@@ -1,7 +1,8 @@
 -- Resources
 -- SmoothSpatula
 
-Resources = {}
+Resources = Proxy.new()
+
 
 -- == Section Sprites == --
 
@@ -56,5 +57,6 @@ Resources.sfx_load = function(namespace, identifier, path)
     end
     return sfx
 end
+
 
 return Resources

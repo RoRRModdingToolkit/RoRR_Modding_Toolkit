@@ -1,8 +1,6 @@
 -- Survivor
 
-Survivor = {}
-
-local abstraction_data = setmetatable({}, {__mode = "k"})
+Survivor = class_refs["Survivor"]
 
 local callbacks = {}
 local instance_callbacks = {}
@@ -37,45 +35,6 @@ local stats_default = {
     armor_level             = 2.0,
 }
 
-
--- ========== Enums ==========
-
-Survivor.ARRAY = {
-    namespace                   = 0,
-    identifier                  = 1,
-    token_name                  = 2,
-    token_name_upper            = 3,
-    token_description           = 4,
-    token_end_quote             = 5,
-    skill_family_z              = 6,
-    skill_family_x              = 7,
-    skill_family_c              = 8,
-    skill_family_v              = 9,
-    skin_family                 = 10,
-    all_loadout_families        = 11,
-    all_skill_families          = 12,
-    sprite_loadout              = 13,
-    sprite_title                = 14,
-    sprite_idle                 = 15,
-    sprite_portrait             = 16,
-    sprite_portrait_small       = 17,
-    sprite_palette              = 18,
-    sprite_portrait_palette     = 19,
-    sprite_loadout_palette      = 20,
-    sprite_credits              = 21,
-    primary_color               = 22,
-    select_sound_id             = 23,
-    log_id                      = 24,
-    achievement_id              = 25,
-    milestone_kills_1           = 26,
-    milestone_items_1           = 27,
-    milestone_stages_1          = 28,
-    on_init                     = 29,
-    on_step                     = 30,
-    on_remove                   = 31,
-    is_secret                   = 32,
-    cape_offset                 = 33
-}
 
 
 -- ========== Internal ==========
@@ -128,31 +87,6 @@ end
 
 
 -- ========== Static Methods ==========
-
-Survivor.find = function(namespace, identifier)
-    if identifier then namespace = namespace.."-"..identifier end
-    
-    for i, survivor in ipairs(Class.SURVIVOR) do
-        local _namespace = survivor:get(0)
-        local _identifier = survivor:get(1)
-        if namespace == _namespace.."-".._identifier then
-            return Survivor.wrap(i - 1)
-        end
-    end
-    
-    return nil
-end
-
-Survivor.wrap = function(survivor_id)
-    local abstraction = {}
-    abstraction_data[abstraction] = {
-        RMT_object = "Survivor",
-        value = survivor_id
-    }
-    setmetatable(abstraction, metatable_survivor)
-    
-    return abstraction
-end
 
 Survivor.new = function(namespace, identifier)
     -- Check if survivor already exist
@@ -219,13 +153,6 @@ Survivor.new = function(namespace, identifier)
     return abstraction
 end
 
-Survivor.get_callback_count = function()
-    local count = 0
-    for k, v in pairs(callbacks) do
-        count = count + #v
-    end
-    return count
-end
 
 
 -- ========== Instance Methods ==========
@@ -561,77 +488,38 @@ methods_survivor = {
             critical_chance    = stats_default.critical_chance_level
         }
     end,
-}
 
-methods_survivor_callbacks = {
+
+    -- Callbacks
     onInit      = function(self, func) self:add_callback("onInit", func) end,
     onStep      = function(self, func) self:add_callback("onStep", func) end,
     onRemove    = function(self, func) self:add_callback("onRemove", func) end
+
 }
+methods_class_lock["Survivor"] = Helper.table_get_keys(methods_survivor)
+
 
 
 -- ========== Metatables ==========
 
-metatable_survivor_gs = {
-    -- Getter
+metatable_class["Survivor"] = {
     __index = function(table, key)
-        local index = Survivor.ARRAY[key]
-        if index then
-            local survivor_array = Class.SURVIVOR:get(table.value)
-            return survivor_array:get(index)
-        end
-        log.warning("Non-existent survivor property")
-        return nil
-    end,
-
-
-    -- Setter
-    __newindex = function(table, key, value)
-        local index = Survivor.ARRAY[key]
-        if index then
-            local survivor_array = Class.SURVIVOR:get(table.value)
-            survivor_array:set(index, value)
-        end
-        log.warning("Non-existent survivor property")
-    end
-}
-
-metatable_survivor_callbacks = {
-    __index = function(table, key)
-        -- Methods
-        if methods_survivor_callbacks[key] then
-            return methods_survivor_callbacks[key]
-        end
-
-        -- Pass to next metatable
-        return metatable_survivor_gs.__index(table, key)
-    end
-}
-
-metatable_survivor = {
-    __index = function(table, key)
-        -- Allow getting but not setting these
-        if key == "value" then return abstraction_data[table].value end
-        if key == "RMT_object" then return abstraction_data[table].RMT_object end
-
         -- Methods
         if methods_survivor[key] then
             return methods_survivor[key]
         end
 
         -- Pass to next metatable
-        return metatable_survivor_callbacks.__index(table, key)
+        return metatable_class_gs["Survivor"].__index(table, key)
     end,
     
 
     __newindex = function(table, key, value)
-        if key == "value" or key == "RMT_object" then
-            log.warning("Cannot modify RMT object values")
-            return
-        end
+        metatable_class_gs["Survivor"].__newindex(table, key, value)
+    end,
 
-        metatable_survivor_gs.__newindex(table, key, value)
-    end
+
+    __metatable = "survivor"
 }
 
 
@@ -669,3 +557,7 @@ gm.post_script_hook(gm.constants.asset_get_index, function(self, other, result, 
         result.value = asset_name_overrides[asset_name]
     end
 end)
+
+
+
+return Survivor

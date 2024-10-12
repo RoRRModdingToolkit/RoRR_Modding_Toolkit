@@ -99,7 +99,7 @@ Item.new = function(namespace, identifier, no_log)
     end
 
     -- Add onPickup callback to add actor to has_custom_item table
-    item:add_callback("onPickup", function(actor, stack)
+    item:onPickup(function(actor, stack)
         if not Helper.table_has(has_custom_item, actor.value) then
             table.insert(has_custom_item, actor.value)
         end
@@ -230,7 +230,7 @@ methods_item = {
         end
 
         -- Add onPickup callback to add actor to has_custom_item table
-        self:add_callback("onPickup", function(actor, stack)
+        self:onPickup(function(actor, stack)
             if not Helper.table_has(has_custom_item, actor.value) then
                 table.insert(has_custom_item, actor.value)
             end

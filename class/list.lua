@@ -1,8 +1,6 @@
 -- List
 
-List = {}
-
-local abstraction_data = setmetatable({}, {__mode = "k"})
+List = Proxy.new()
 
 
 
@@ -13,14 +11,17 @@ List.new = function()
 end
 
 
-List.wrap = function(list)
-    local abstraction = {}
-    abstraction_data[abstraction] = {
-        RMT_object = "List",
-        value = list
-    }
-    setmetatable(abstraction, metatable_list)
-    return abstraction
+List.wrap = function(value)
+    local wrapper = Proxy.new()
+    wrapper.RMT_object = "List"
+    wrapper.value = value
+    wrapper:setmetatable(metatable_list)
+    wrapper:lock(
+        "RMT_object",
+        "value",
+        table.unpack(methods_list_lock)
+    )
+    return wrapper
 end
 
 
@@ -97,59 +98,45 @@ methods_list = {
     end
 
 }
+methods_list_lock = Helper.table_get_keys(methods_list)
 
 
 
 -- ========== Metatables ==========
 
-metatable_list_gs = {
-    -- Getter
+metatable_list = {
     __index = function(table, key)
+        -- Methods
+        if methods_list[key] then
+            return methods_list[key]
+        end
+
+        -- Getter
         key = tonumber(Wrap.unwrap(key))
         if key and key >= 1 and key <= table:size() then
             return Wrap.wrap(gm.ds_list_find_value(table.value, key - 1))
         end
         return nil
     end,
+    
 
-
-    -- Setter
     __newindex = function(table, key, value)
+        -- Setter
         key = tonumber(Wrap.unwrap(key))
         if key then
             gm.ds_list_set(table.value, key - 1, Wrap.unwrap(value))
         end
-    end
-}
-
-
-metatable_list = {
-    __index = function(table, key)
-        -- Allow getting but not setting these
-        if key == "value" then return abstraction_data[table].value end
-        if key == "RMT_object" then return abstraction_data[table].RMT_object end
-
-        -- Methods
-        if methods_list[key] then
-            return methods_list[key]
-        end
-
-        -- Pass to next metatable
-        return metatable_list_gs.__index(table, key)
-    end,
-    
-
-    __newindex = function(table, key, value)
-        if key == "value" or key == "RMT_object" then
-            log.error("Cannot modify RMT object values", 2)
-            return
-        end
-        
-        metatable_list_gs.__newindex(table, key, value)
     end,
     
     
     __len = function(table)
         return gm.ds_list_size(table.value)
-    end
+    end,
+
+    
+    __metatable = "list"
 }
+
+
+
+return List

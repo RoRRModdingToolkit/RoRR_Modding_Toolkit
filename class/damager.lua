@@ -1,29 +1,27 @@
 -- Damager
 
-Damager = {}
-
-local abstraction_data = setmetatable({}, {__mode = "k"})
+Damager = Proxy.new()
 
 
 
 -- ========== Enums ==========
 
-Damager.KNOCKBACK_KIND = {
+Damager.KNOCKBACK_KIND = Proxy.new({
     none        = 0,
     standard    = 1,
     freeze      = 2,
     deepfreeze  = 3,
     pull        = 4
-}
+}):lock()
 
 
-Damager.KNOCKBACK_DIR = {
+Damager.KNOCKBACK_DIR = Proxy.new({
     left    = -1,
     right   = 1
-}
+}):lock()
 
 
-Damager.TRACER = {
+Damager.TRACER = Proxy.new({
     none                    = 0,
     wispg                   = 1,
     wispg2                  = 2,
@@ -52,20 +50,23 @@ Damager.TRACER = {
     end_sparks_on_pierce    = 25,
     drill                   = 26,
     player_drone            = 27
-}
+}):lock()
 
 
 
 -- ========== Static Methods ==========
 
-Damager.wrap = function(damager)
-    local abstraction = {}
-    abstraction_data[abstraction] = {
-        RMT_object = "Damager",
-        value = damager
-    }
-    setmetatable(abstraction, metatable_damager)
-    return abstraction
+Damager.wrap = function(value)
+    local wrapper = Proxy.new()
+    wrapper.RMT_object = "Damager"
+    wrapper.value = value
+    wrapper:setmetatable(metatable_damager)
+    wrapper:lock(
+        "RMT_object",
+        "value",
+        table.unpack(methods_damager_lock)
+    )
+    return wrapper
 end
 
 
@@ -140,6 +141,7 @@ methods_damager = {
     end,
 
 }
+methods_damager_lock = Helper.table_get_keys(methods_damager)
 
 
 
@@ -164,10 +166,6 @@ metatable_damager_gs = {
 
 metatable_damager = {
     __index = function(table, key)
-        -- Allow getting but not setting these
-        if key == "value" then return abstraction_data[table].value end
-        if key == "RMT_object" then return abstraction_data[table].RMT_object end
-
         -- Methods
         if methods_damager[key] then
             return methods_damager[key]
@@ -178,12 +176,14 @@ metatable_damager = {
     end,
 
 
-    __newindex = function(table, key, value)
-        if key == "value" or key == "RMT_object" then
-            log.error("Cannot modify RMT object values", 2)
-            return
-        end
-        
+    __newindex = function(table, key, value) 
         metatable_damager_gs.__newindex(table, key, value)
-    end
+    end,
+
+
+    __metatable = "damager"
 }
+
+
+
+return Damager

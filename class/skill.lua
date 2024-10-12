@@ -1,8 +1,6 @@
 -- Skill
 
-Skill = {}
-
-local abstraction_data = setmetatable({}, {__mode = "k"})
+Skill = class_refs["Skill"]
 
 local callbacks = {}
 
@@ -10,84 +8,24 @@ local callbacks = {}
 
 -- ========== Enums ==========
 
-Skill.ARRAY = {
-    namespace                   = 0,
-    identifier                  = 1,
-    token_name                  = 2,
-    token_description           = 3,
-    sprite                      = 4,
-    subimage                    = 5,
-    cooldown                    = 6,
-    damage                      = 7,
-    max_stock                   = 8,
-    start_with_stock            = 9,
-    auto_restock                = 10,
-    required_stock              = 11,
-    require_key_press           = 12,
-    allow_buffered_input        = 13,
-    use_delay                   = 14,
-    animation                   = 15,
-    is_utility                  = 16,
-    is_primary                  = 17,
-    required_interrupt_priority = 18,
-    hold_facing_direction       = 19,
-    override_strafe_direction   = 20,
-    ignore_aim_direction        = 21,
-    disable_aim_stall           = 22,
-    does_change_activity_state  = 23,
-    on_can_activate             = 24,
-    on_activate                 = 25,
-    on_step                     = 26,
-    on_equipped                 = 27,
-    on_unequipped               = 28,
-    upgrade_skill               = 29
-}
-
-Skill.OVERRIDE_PRIORITY = {
+Skill.OVERRIDE_PRIORITY = Proxy.new({
     upgrade     = 0,
     boosted     = 1,
     reload      = 2,
     cancel      = 3
-}
+}):lock()
 
-Skill.SLOT = {
+
+Skill.SLOT = Proxy.new({
     primary     = 0,
     secondary   = 1,
     utility     = 2,
     special     = 3
-}
+}):lock()
 
 
 
 -- ========== Static Methods ==========
-
-Skill.find = function(namespace, identifier)
-    if identifier then namespace = namespace.."-"..identifier end
-    
-    for i, skill in ipairs(Class.SKILL) do
-        if skill ~= 0 then    -- There is a random nil(?) value at 186(?) for some reason
-            local _namespace = skill:get(0)
-            local _identifier = skill:get(1)
-            if namespace == _namespace.."-".._identifier then
-                return Skill.wrap(i - 1)
-            end
-        end
-    end
-
-    return nil
-end
-
-
-Skill.wrap = function(skill_id)
-    local abstraction = {}
-    abstraction_data[abstraction] = {
-        RMT_object = "Skill",
-        value = skill_id
-    }
-    setmetatable(abstraction, metatable_skill)
-
-    return abstraction
-end
 
 Skill.new = function(namespace, identifier, cooldown, damage, sprite_id, sprite_subimage, animation, is_primary, is_utility)
     -- Check if skill already exist
@@ -140,14 +78,6 @@ Skill.newEmpty = function(namespace, identifier)
     abstraction.max_stock = 0
 
     return abstraction
-end
-
-Skill.get_callback_count = function()
-    local count = 0
-    for k, v in pairs(callbacks) do
-        count = count + #v
-    end
-    return count
 end
 
 
@@ -248,79 +178,42 @@ methods_skill = {
         
         self.upgrade_skill = upgraded_skill.value
     end,
-}
 
-methods_skill_callbacks = {
+
+    -- Callbacks
     onCanActivate   = function(self, func) self:add_callback("onCanActivate", func) end,
     onActivate      = function(self, func) self:add_callback("onActivate", func) end,
     onStep          = function(self, func) self:add_callback("onStep", func) end,
     onEquipped      = function(self, func) self:add_callback("onEquipped", func) end,
     onUnequipped    = function(self, func) self:add_callback("onUnequipped", func) end
 }
+methods_class_lock["Skill"] = Helper.table_get_keys(methods_skill)
+
+
 
 -- ========== Metatables ==========
 
-metatable_skill_gs = {
-    -- Getter
+metatable_class["Skill"] = {
     __index = function(table, key)
-        local index = Skill.ARRAY[key]
-        if index then
-            local skill_array = Class.SKILL:get(table.value)
-            return Wrap.wrap(skill_array:get(index))
-        end
-        log.warning("Non-existent skill property")
-        return nil
-    end,
-
-
-    -- Setter
-    __newindex = function(table, key, value)
-        local index = Skill.ARRAY[key]
-        if index then
-            local skill_array = Class.SKILL:get(table.value)
-            skill_array:set(index, Wrap.unwrap(value))
-        end
-        log.warning("Non-existent skill property")
-    end
-}
-
-metatable_skill_callbacks = {
-    __index = function(table, key)
-        -- Methods
-        if methods_skill_callbacks[key] then
-            return methods_skill_callbacks[key]
-        end
-
-        -- Pass to next metatable
-        return metatable_skill_gs.__index(table, key)
-    end
-}
-
-metatable_skill = {
-    __index = function(table, key)
-        -- Allow getting but not setting these
-        if key == "value" then return abstraction_data[table].value end
-        if key == "RMT_object" then return abstraction_data[table].RMT_object end
-        
         -- Methods
         if methods_skill[key] then
             return methods_skill[key]
         end
 
         -- Pass to next metatable
-        return metatable_skill_callbacks.__index(table, key)
+        return metatable_class_gs["Skill"].__index(table, key)
     end,
     
 
     __newindex = function(table, key, value)
-        if key == "value" or key == "RMT_object" then
-            log.warning("Cannot modify RMT object values")
-            return
-        end
+        metatable_class_gs["Skill"].__newindex(table, key, value)
+    end,
 
-        metatable_skill_gs.__newindex(table, key, value)
-    end
+
+    __metatable = "skill"
 }
+
+
 
 -- ========== Hooks ==========
 
@@ -331,3 +224,7 @@ gm.post_script_hook(gm.constants.callback_execute, function(self, other, result,
         end
     end
 end)
+
+
+
+return Skill

@@ -23,7 +23,7 @@ Array.wrap = function(value)
     wrapper:lock(
         "RMT_object",
         "value",
-        table.unpack(Helper.table_get_keys(methods_array))
+        table.unpack(methods_array_lock)
     )
     return wrapper
 end
@@ -94,6 +94,7 @@ methods_array = {
     end
     
 }
+methods_array_lock = Helper.table_get_keys(methods_array)
 
 
 

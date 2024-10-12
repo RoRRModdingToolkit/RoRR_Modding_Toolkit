@@ -1,6 +1,6 @@
 -- Equipment
 
-Equipment = {}
+Equipment = class_refs["Equipment"]
 
 local callbacks = {}
 local other_callbacks = {
@@ -19,27 +19,6 @@ local loot_toggled = {}     -- Loot pools that have been added to this frame
 
 
 
--- ========== Enums ==========
-
-Equipment.ARRAY = {
-    namespace           = 0,
-    identifier          = 1,
-    token_name          = 2,
-    token_text          = 3,
-    on_use              = 4,
-    cooldown            = 5,
-    tier                = 6,
-    sprite_id           = 7,
-    object_id           = 8,
-    item_log_id         = 9,
-    achievement_id      = 10,
-    effect_display      = 11,
-    loot_tags           = 12,
-    is_new_equipment    = 13
-}
-
-
-
 -- ========== Static Methods ==========
 
 Equipment.new = function(namespace, identifier)
@@ -47,23 +26,22 @@ Equipment.new = function(namespace, identifier)
     if equip then return equip end
 
     -- Create equipment
-    local equipment = gm.equipment_create(
-        namespace,
-        identifier,
-        Class.EQUIPMENT:size(),   -- class_equipment index
-        Item.TIER.equipment,    -- tier
-        gm.object_add_w(namespace, identifier, gm.constants.pPickupEquipment),  -- pickup object
-        0.0,    -- loot tags
-        nil,    -- not sure; might be an anon function call
-        45.0,   -- cooldown
-        true,   -- ? (most have this)
-        6.0,    -- ? (most have this)
-        nil,    -- ? (most have this)
-        nil     -- ? (most have this)
+    local equipment = Equipment.wrap(
+        gm.equipment_create(
+            namespace,
+            identifier,
+            Class.EQUIPMENT:size(),   -- class_equipment index
+            Item.TIER.equipment,    -- tier
+            gm.object_add_w(namespace, identifier, gm.constants.pPickupEquipment),  -- pickup object
+            0.0,    -- loot tags
+            nil,    -- not sure; might be an anon function call
+            45.0,   -- cooldown
+            true,   -- ? (most have this)
+            6.0,    -- ? (most have this)
+            nil,    -- ? (most have this)
+            nil     -- ? (most have this)
+        )
     )
-
-    -- Make equipment abstraction
-    local abstraction = Equipment.wrap(equipment)
 
     -- Have to manually increase this variable for some reason (class_equipment array length)
     gm.variable_global_set("count_equipment", gm.variable_global_get("count_equipment") + 1.0)
@@ -71,7 +49,7 @@ Equipment.new = function(namespace, identifier)
 
     -- Remove previous item log position (if found)
     local item_log_order = List.wrap(gm.variable_global_get("item_log_display_list"))
-    local pos = item_log_order:find(abstraction.item_log_id)
+    local pos = item_log_order:find(equipment.item_log_id)
     if pos then item_log_order:delete(pos) end
 
     -- Set item log position
@@ -81,22 +59,10 @@ Equipment.new = function(namespace, identifier)
         local iter_item = Equipment.find(log_:get(0), log_:get(1))
         if iter_item and iter_item.tier == 3.0 then pos = i end
     end
-    item_log_order:insert(pos, abstraction.item_log_id)
+    item_log_order:insert(pos, equipment.item_log_id)
 
 
-    return abstraction
-end
-
-
-Equipment.find = function(namespace, identifier)
-    if identifier then namespace = namespace.."-"..identifier end
-    local equip = gm.equipment_find(namespace)
-
-    if equip then
-        return Equipment.wrap(equip)
-    end
-
-    return nil
+    return equipment
 end
 
 
@@ -111,16 +77,6 @@ Equipment.get_random = function()
 
     -- Pick random equipment from table
     return equips[gm.irandom_range(1, #equips)]
-end
-
-
-Equipment.wrap = function(equipment_id)
-    local abstraction = {
-        RMT_object = "Equipment",
-        value = equipment_id
-    }
-    setmetatable(abstraction, metatable_equipment)
-    return abstraction
 end
 
 
@@ -283,13 +239,11 @@ methods_equipment = {
             end
 
         end
-    end
-
-}
+    end,
 
 
-methods_equipment_callbacks = {
 
+    -- Callbacks
     onPickup            = function(self, func) self:add_callback("onPickup", func) end,
     onDrop              = function(self, func) self:add_callback("onDrop", func) end,
     onUse               = function(self, func) self:add_callback("onUse", func) end,
@@ -299,56 +253,13 @@ methods_equipment_callbacks = {
     onDraw              = function(self, func) self:add_callback("onDraw", func) end
 
 }
+methods_class_lock["Equipment"] = Helper.table_get_keys(methods_equipment)
 
 
 
 -- ========== Metatables ==========
 
-metatable_equipment_gs = {
-    -- Getter
-    __index = function(table, key)
-        local index = Equipment.ARRAY[key]
-        if index then
-            local equipment_array = Class.EQUIPMENT:get(table.value)
-            return equipment_array:get(index)
-        end
-        log.error("Non-existent equipment property", 2)
-        return nil
-    end,
-
-
-    -- Setter
-    __newindex = function(table, key, value)
-        local index = Equipment.ARRAY[key]
-        if index then
-            local equipment_array = Class.EQUIPMENT:get(table.value)
-            equipment_array:set(index, value)
-            return
-        end
-        log.error("Non-existent equipment property", 2)
-    end
-}
-
-
-metatable_equipment_callbacks = {
-    __index = function(table, key)
-        -- Methods
-        if methods_equipment_callbacks[key] then
-            return methods_equipment_callbacks[key]
-        end
-
-        -- Pass to next metatable
-        return metatable_equipment_gs.__index(table, key)
-    end,
-    
-
-    __newindex = function(table, key, value)
-        metatable_equipment_gs.__newindex(table, key, value)
-    end
-}
-
-
-metatable_equipment = {
+metatable_class["Equipment"] = {
     __index = function(table, key)
         -- Methods
         if methods_equipment[key] then
@@ -356,13 +267,16 @@ metatable_equipment = {
         end
 
         -- Pass to next metatable
-        return metatable_equipment_callbacks.__index(table, key)
+        return metatable_class_gs["Equipment"].__index(table, key)
     end,
     
 
     __newindex = function(table, key, value)
-        metatable_equipment_gs.__newindex(table, key, value)
-    end
+        metatable_class_gs["Equipment"].__newindex(table, key, value)
+    end,
+
+
+    __metatable = "equipment"
 }
 
 
@@ -510,7 +424,11 @@ end
 
 -- ========== Initialize ==========
 
-Equipment.__initialize = function()
-    Callback.add("preStep", "RMT.equipment_onStep", equipment_onStep, true)
-    Callback.add("postHUDDraw", "RMT.equipment_onDraw", equipment_onDraw, true)
+initialize_equipment = function()
+    Callback.add("preStep", "RMT-equipment_onStep", equipment_onStep)
+    Callback.add("postHUDDraw", "RMT-equipment_onDraw", equipment_onDraw)
 end
+
+
+
+return Equipment

@@ -1,8 +1,6 @@
 -- Object
 
-Object = {}
-
-local abstraction_data = setmetatable({}, {__mode = "k"})
+Object = Proxy.new()
 
 local callbacks = {}
 local other_callbacks = {
@@ -16,7 +14,7 @@ local other_callbacks = {
 
 -- ========== Enums ==========
 
-Object.ARRAY = {
+Object.ARRAY = Proxy.new({
     base        = 0,
     obj_depth   = 1,
     obj_sprite  = 2,
@@ -26,10 +24,10 @@ Object.ARRAY = {
     on_destroy  = 6,
     on_step     = 7,
     on_draw     = 8
-}
+}):lock()
 
 
-Object.PARENT = {
+Object.PARENT = Proxy.new({
     actor               = gm.constants.pActor,
     enemyClassic        = gm.constants.pEnemyClassic,
     enemyFlying         = gm.constants.pEnemyFlying,
@@ -43,7 +41,7 @@ Object.PARENT = {
     interactableChest   = gm.constants.pInteractableChest,
     interactableCrate   = gm.constants.pInteractableCrate,
     interactableDrone   = gm.constants.pInteractableDrone
-}
+}):lock()
 
 
 Object.CUSTOM_START = 800
@@ -88,14 +86,17 @@ Object.find = function(namespace, identifier)
 end
 
 
-Object.wrap = function(object_id)
-    local abstraction = {}
-    abstraction_data[abstraction] = {
-        RMT_object = "Object",
-        value = object_id
-    }
-    setmetatable(abstraction, metatable_object)
-    return abstraction
+Object.wrap = function(value)
+    local wrapper = Proxy.new()
+    wrapper.RMT_object = "Object"
+    wrapper.value = value
+    wrapper:setmetatable(metatable_object)
+    wrapper:lock(
+        "RMT_object",
+        "value",
+        table.unpack(methods_object_keys)
+    )
+    return wrapper
 end
 
 
@@ -157,19 +158,17 @@ methods_object = {
         -- Does not apply retroactively to existing instances
         local depths = Array.wrap(gm.variable_global_get("object_depths"))
         depths:set(self.value, depth)
-    end
-
-}
+    end,
 
 
-methods_object_callbacks = {
-
+    -- Callbacks
     onCreate        = function(self, func) self:add_callback("onCreate", func) end,
     onDestroy       = function(self, func) self:add_callback("onDestroy", func) end,
     onStep          = function(self, func) self:add_callback("onStep", func) end,
     onDraw          = function(self, func) self:add_callback("onDraw", func) end
 
 }
+methods_object_keys = Helper.table_get_keys(methods_object)
 
 
 
@@ -211,15 +210,11 @@ metatable_object_gs = {
 }
 
 
-metatable_object_callbacks = {
+metatable_object = {
     __index = function(table, key)
-        -- Allow getting but not setting these
-        if key == "value" then return abstraction_data[table].value end
-        if key == "RMT_object" then return abstraction_data[table].RMT_object end
-
         -- Methods
-        if methods_object_callbacks[key] then
-            return methods_object_callbacks[key]
+        if methods_object[key] then
+            return methods_object[key]
         end
 
         -- Pass to next metatable
@@ -229,30 +224,10 @@ metatable_object_callbacks = {
 
     __newindex = function(table, key, value)
         metatable_object_gs.__newindex(table, key, value)
-    end
-}
-
-
-metatable_object = {
-    __index = function(table, key)
-        -- Methods
-        if methods_object[key] then
-            return methods_object[key]
-        end
-
-        -- Pass to next metatable
-        return metatable_object_callbacks.__index(table, key)
     end,
-    
 
-    __newindex = function(table, key, value)
-        if key == "value" or key == "RMT_object" then
-            log.error("Cannot modify RMT object values", 2)
-            return
-        end
-        
-        metatable_object_gs.__newindex(table, key, value)
-    end
+
+    __metatable = "object"
 }
 
 
@@ -267,3 +242,7 @@ gm.post_script_hook(gm.constants.callback_execute, function(self, other, result,
         end
     end
 end)
+
+
+
+return Object

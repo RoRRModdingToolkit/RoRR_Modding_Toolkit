@@ -1,8 +1,8 @@
 -- Interactable
 
-Interactable = {}
+-- This class will be changed or deprecated in the future.
 
-local abstraction_data = setmetatable({}, {__mode = "k"})
+Interactable = Proxy.new()
 
 local callbacks = {}
 
@@ -10,7 +10,7 @@ local callbacks = {}
 
 -- ========== Enums ==========
 
-Interactable.ARRAY = {
+Interactable.ARRAY = Proxy.new({
     spawn_cost                      = 2,
     spawn_weight                    = 3,
     object_id                       = 4,
@@ -19,7 +19,7 @@ Interactable.ARRAY = {
     is_new_interactable             = 7,
     default_spawn_rarity_override   = 8,
     decrease_weight_on_spawn        = 9
-}
+}):lock()
 
 
 
@@ -41,14 +41,17 @@ Interactable.new = function(namespace, identifier)
 end
 
 
-Interactable.wrap = function(interactable_id)
-    local abstraction = {}
-    abstraction_data[abstraction] = {
-        RMT_object = "Interactable",
-        value = interactable_id
-    }
-    setmetatable(abstraction, metatable_interactable)
-    return abstraction
+Interactable.wrap = function(value)
+    local wrapper = Proxy.new()
+    wrapper.RMT_object = "Interactable"
+    wrapper.value = value
+    wrapper:setmetatable(metatable_interactable)
+    wrapper:lock(
+        "RMT_object",
+        "value",
+        table.unpack(methods_interactable_lock)
+    )
+    return wrapper
 end
 
 
@@ -91,18 +94,16 @@ methods_interactable = {
         local card_array, id = self:get_card()
         local list = List.wrap(Class.STAGE:get(gm.stage_find(namespace)):get(6))
         list:add(id)
-    end
-
-}
+    end,
 
 
-methods_interactable_callbacks = {
-
+    -- Callbacks
     onActivate          = function(self, func) self:add_callback("onActivate", func) end,
     onStateStep         = function(self, func, state) self:add_callback("onStateStep", func, state) end,
     onStateDraw         = function(self, func, state) self:add_callback("onStateDraw", func, state) end
 
 }
+methods_interactable_lock = Helper.table_get_keys(methods_interactable)
 
 
 methods_interactable_instance = {
@@ -120,6 +121,7 @@ methods_interactable_instance = {
     end
 
 }
+methods_interactable_instance_keys = Helper.table_get_keys(methods_interactable_instance)
 
 
 
@@ -139,15 +141,6 @@ metatable_interactable = {
             return methods_interactable[key]
         end
 
-        -- Pass to callback methods
-        if methods_interactable_callbacks[key] then
-            return methods_interactable_callbacks[key]
-        end
-
-        -- Allow getting but not setting these
-        if key == "value" then return abstraction_data[table].value end
-        if key == "RMT_object" then return abstraction_data[table].RMT_object end
-
         -- Pass to next metatable
         return metatable_object.__index(table, key)
     end,
@@ -164,7 +157,10 @@ metatable_interactable = {
 
         -- Pass to Object setter
         metatable_object_gs.__newindex(table, key, value)
-    end
+    end,
+
+
+    __metatable = "interactable"
 }
 
 
@@ -182,7 +178,10 @@ metatable_interactable_instance = {
 
     __newindex = function(table, key, value)
         metatable_instance_gs.__newindex(table, key, value)
-    end
+    end,
+
+
+    __metatable = "interactable instance"
 }
 
 
@@ -248,7 +247,11 @@ end
 
 -- ========== Initialize ==========
 
-Interactable.__initialize = function()
-    Callback.add("preStep", "RMT.interactable_instance_onStep", interactable_instance_onStep, true)
-    Callback.add("postHUDDraw", "RMT.interactable_instance_onDraw", interactable_instance_onDraw, true)
+initialize_interactable = function()
+    Callback.add("preStep", "RMT.interactable_instance_onStep", interactable_instance_onStep)
+    Callback.add("postHUDDraw", "RMT.interactable_instance_onDraw", interactable_instance_onDraw)
 end
+
+
+
+return Interactable

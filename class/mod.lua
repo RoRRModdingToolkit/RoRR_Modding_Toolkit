@@ -1,6 +1,6 @@
 -- Mod
 
-Mod = {}
+Mod = Proxy.new()
 
 
 

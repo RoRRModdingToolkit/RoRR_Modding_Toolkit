@@ -1,6 +1,6 @@
 -- Player
 
-Player = {}
+Player = Proxy.new()
 
 local auto_callbacks = {}
 
@@ -103,6 +103,7 @@ methods_player = {
     end
 
 }
+methods_player_keys = Helper.table_get_keys(methods_player)
 
 
 methods_player_callbacks = {
@@ -145,7 +146,10 @@ metatable_player = {
 
     __newindex = function(table, key, value)
         metatable_instance_gs.__newindex(table, key, value)
-    end
+    end,
+
+
+    __metatable = "player"
 }
 
 
@@ -155,15 +159,17 @@ metatable_player_callbacks = {
         if methods_player_callbacks[key] then
             return methods_player_callbacks[key]
         end
-    end
+    end,
+
+    __metatable = "player_callbacks"
 }
-setmetatable(Player, metatable_player_callbacks)
+Player:setmetatable(metatable_player_callbacks)
 
 
 
 -- ========== Initialize ==========
 
-Player.__initialize = function()
+initialize_player = function()
     Callback.add("onGameStart", "RMT.player_addAutoCallbacks", function(self, other, result, args)
         Alarm.create(function()
             local player = Player.get_client()
@@ -173,5 +179,9 @@ Player.__initialize = function()
                 end
             end
         end, 1)
-    end, true)
+    end)
 end
+
+
+
+return Player
