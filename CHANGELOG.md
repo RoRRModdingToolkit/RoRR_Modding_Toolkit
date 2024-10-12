@@ -6,6 +6,7 @@
 * Initialize : Will now print a message to console if a mod's initialize/post_initialize fails to run.
     * They will also now run in mod load order.
 * Added wrappers for remaining classes in the global `class_` arrays.
+* Added `Proxy.new()`
 * Language : Fallback to english.json if the language file in a mod doesn't exist for the current language.
 
 ### v1.1.13
