@@ -50,6 +50,8 @@ function __initialize()
     
     initialize_instance()
     initialize_actor()
+    
+    initialize_item()
 end
 
 
@@ -71,7 +73,8 @@ gui.add_imgui(function()
             a[1] = 3
             a[2] = 4
             a:lock(2)
-            log.info(a[2])
+            a.lock = "abc"
+            -- log.info(a[2])
             a[2] = 5
             -- a.keys_locked = "Abc"
 

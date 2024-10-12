@@ -53,8 +53,13 @@ local success, file = pcall(toml.decodeFromFile, file_path)
 local properties = {}
 if success then properties = file.Array end
 
+-- These are to be used by other files
+-- that extend these wrapper bases
 metatable_class_array = {}
+methods_class_lock = {}
+-- Also "class_refs"
 
+-- Loop and create wrapper bases
 for class, class_arr in pairs(class_arrays) do
     class_arr = capitalize_class_name(class_arr:sub(7, #class_arr))
 
@@ -89,7 +94,8 @@ for class, class_arr in pairs(class_arrays) do
         wrapper:setmetatable(metatable_class_array[class])
         wrapper:lock(
             "RMT_object",
-            "value"
+            "value",
+            table.unpack(methods_class_lock[class])
         )
         return wrapper
     end
