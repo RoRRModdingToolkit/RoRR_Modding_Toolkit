@@ -16,6 +16,8 @@ function public.auto()
     local env = envy.getfenv(2)
     local wrapper = public.setup(env)
     envy.import_all(env, wrapper)
+
+    Language.register_autoload(env)
 end
 
 
