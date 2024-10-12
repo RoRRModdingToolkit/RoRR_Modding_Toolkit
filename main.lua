@@ -13,6 +13,8 @@ class_refs = {}
 local names = path.get_files(_ENV["!plugins_mod_folder_path"].."/internal")
 for _, name in ipairs(names) do require(name) end
 
+class_refs["Proxy"] = Proxy     -- Making this public too; might be useful to someone
+
 
 -- Require public classes (these first)
 local names = path.get_files(_ENV["!plugins_mod_folder_path"].."/class_first")
