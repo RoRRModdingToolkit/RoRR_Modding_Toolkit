@@ -199,20 +199,20 @@ Instance.wrap = function(value)
     local wrapper = Proxy.new()
     wrapper.RMT_object = "Instance"
     wrapper.value = value
-    wrapper.setmetatable(metatable_instance)
+    wrapper:setmetatable(metatable_instance)
 
     -- if value.object_index == gm.constants.oCustomObject_pInteractable then
     --     wrapper.RMT_object = "Interactable Instance"
-    --     wrapper.setmetatable(metatable_interactable_instance)
+    --     wrapper:setmetatable(metatable_interactable_instance)
     -- elseif value.object_index == gm.constants.oP then
     --     wrapper.RMT_object = "Player"
-    --     wrapper.setmetatable(metatable_player)
+    --     wrapper:setmetatable(metatable_player)
     if gm.object_is_ancestor(value.object_index, gm.constants.pActor) == 1.0 then
         wrapper.RMT_object = "Actor"
-        wrapper.setmetatable(metatable_actor)
+        wrapper:setmetatable(metatable_actor)
     end
 
-    wrapper.lock(
+    wrapper:lock(
         "RMT_object",
         "value",
         table.unpack(methods_instance_keys)
@@ -225,8 +225,8 @@ Instance.wrap_invalid = function()
     local wrapper = Proxy.new()
     wrapper.RMT_object = "Instance"
     wrapper.value = -4
-    wrapper.setmetatable(metatable_instance)
-    wrapper.lock(
+    wrapper:setmetatable(metatable_instance)
+    wrapper:lock(
         "RMT_object",
         "value",
         table.unpack(methods_instance_keys)
