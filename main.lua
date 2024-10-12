@@ -14,21 +14,6 @@ local names = path.get_files(_ENV["!plugins_mod_folder_path"].."/internal")
 for _, name in ipairs(names) do require(name) end
 
 
-function capitalize_class_name(class)
-    if class == "gm" then return "GM" end   -- Edge case
-
-    local final = ""
-    local arr = gm.string_split(class, "_")
-    for i = 0, gm.array_length(arr) - 1 do
-        local part = gm.array_get(arr, i)
-        part = part:sub(1, 1):upper()..part:sub(2, #part)
-        if i > 0 then final = final.."_" end
-        final = final..part
-    end
-    return final
-end
-
-
 -- Require public classes (these first)
 local names = path.get_files(_ENV["!plugins_mod_folder_path"].."/class_first")
 for _, name in ipairs(names) do
