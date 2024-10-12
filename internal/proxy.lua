@@ -39,7 +39,7 @@ local metatable_proxy = {
     end,
 
     __call = function(table, ...)
-        _proxy[table](...)
+        return _proxy[table](...)
     end,
 
     __metatable = "proxy"
@@ -65,7 +65,9 @@ local new = function()
 
     local keys_locked = {}
     _proxy[keys_locked] = {
-        keys_locked = true
+        keys_locked = true,
+        lock = true,
+        setmetatable = true
     }
     setmetatable(keys_locked, metatable_proxy_keys_locked)
     _proxy[proxy].keys_locked = keys_locked
