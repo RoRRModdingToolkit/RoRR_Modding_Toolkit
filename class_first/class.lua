@@ -31,7 +31,7 @@ local class_arrays = {
 
 metatable_class = {
     __index = function(table, key)
-        if not key then return end
+        if type(key) ~= "string" then return end
         
         local k = "class_"..key:lower()
         if Helper.table_has(class_arrays, k) then
