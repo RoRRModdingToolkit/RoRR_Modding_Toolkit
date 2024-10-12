@@ -1,6 +1,6 @@
 -- Proxy
 
-_proxy = setmetatable({}, {__mode = "k"})
+local _proxy = setmetatable({}, {__mode = "k"})
 
 local methods_proxy = {
     lock = function(proxy, ...)
