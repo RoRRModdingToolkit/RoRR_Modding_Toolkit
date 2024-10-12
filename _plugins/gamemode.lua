@@ -70,7 +70,7 @@ metatable_gamemode_gs = {
             local array = Class.GAMEMODE:get(table.value)
             return array:get(index)
         end
-        log.error("Non-existent gamemode property", 2)
+        log.warning("Non-existent gamemode property")
         return nil
     end,
 
@@ -83,7 +83,7 @@ metatable_gamemode_gs = {
             array:set(index, value)
             return
         end
-        log.error("Non-existent gamemode property", 2)
+        log.warning("Non-existent gamemode property")
     end
 }
 
@@ -106,7 +106,7 @@ metatable_gamemode = {
 
     __newindex = function(table, key, value)
         if key == "value" or key == "RMT_object" then
-            log.error("Cannot modify RMT object values", 2)
+            log.warning("Cannot modify RMT object values")
             return
         end
         

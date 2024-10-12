@@ -57,10 +57,9 @@ Survivor_Log.wrap = function(survivor_log_id)
     return abstraction
 end
 
--- 
 Survivor_Log.new = function(survivor, portrait_id, portrait_index)
     
-    if type(survivor) ~= "table" or (survivor.RMT_object ~= "Survivor" and not survivor.value) then log.error("Survivor is not a RMT survivor, got a "..type(survivor), 2) return end
+    if type(survivor) ~= "table" or survivor.RMT_object ~= "Survivor" then log.error("Survivor is not a RMT survivor, got a "..type(survivor), 2) return end
     if type(portrait_id) ~= "number" and type(portrait_id) ~= "nil" then log.error("Portrait ID is not a number, got a "..type(portrait_id), 2) return end
     if type(portrait_index) ~= "number" and type(portrait_index) ~= "nil" then log.error("Portrait Index is not a number, got a "..type(portrait_index), 2) return end
     
@@ -128,6 +127,7 @@ metatable_survivor_log_gs = {
             local survivor_log_array = Class.SURVIVOR_LOG:get(table.value)
             return Wrap.wrap(survivor_log_array:get(index))
         end
+        log.warning("Non-existent survivor log property")
         return nil
     end,
 
@@ -139,6 +139,7 @@ metatable_survivor_log_gs = {
             local survivor_log_array = Class.SURVIVOR_LOG:get(table.value)
             survivor_log_array:set(index, Wrap.unwrap(value))
         end
+        log.warning("Non-existent survivor log property")
     end
 }
 
@@ -160,7 +161,7 @@ metatable_survivor_log = {
 
     __newindex = function(table, key, value)
         if key == "value" or key == "RMT_object" then
-            log.error("Cannot modify RMT object values", 2)
+            log.warning("Cannot modify RMT object values")
             return
         end
 

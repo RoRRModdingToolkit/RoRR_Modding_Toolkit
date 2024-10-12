@@ -75,7 +75,7 @@ metatable_ending_gs = {
             local array = Class.ENDING:get(table.value)
             return array:get(index)
         end
-        log.error("Non-existent ending property", 2)
+        log.warning("Non-existent ending property")
         return nil
     end,
 
@@ -88,7 +88,7 @@ metatable_ending_gs = {
             array:set(index, value)
             return
         end
-        log.error("Non-existent ending property", 2)
+        log.warning("Non-existent ending property")
     end
 }
 
@@ -111,7 +111,7 @@ metatable_ending = {
 
     __newindex = function(table, key, value)
         if key == "value" or key == "RMT_object" then
-            log.error("Cannot modify RMT object values", 2)
+            log.warning("Cannot modify RMT object values")
             return
         end
         

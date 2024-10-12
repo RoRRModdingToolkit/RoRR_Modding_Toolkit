@@ -6,6 +6,7 @@ local abstraction_data = setmetatable({}, {__mode = "k"})
 
 local callbacks = {}
 
+-- TODO add checks for instance methods
 
 -- ========== Enums ==========
 
@@ -243,7 +244,8 @@ methods_skill = {
     end,
 
     set_skill_upgrade = function(self, upgraded_skill)
-        if upgraded_skill.RMT_object ~= "Skill" then log.error("The upgraded skill provided is not a Skill", 2) return end
+        if type(upgraded_skill) ~= "table" or upgraded_skill.RMT_object ~= "Skill" then log.error("Upgraded Skill is not a RMT Skill, got a "..type(upgrade_skill), 2) return end
+        
         self.upgrade_skill = upgraded_skill.value
     end,
 }
@@ -266,6 +268,7 @@ metatable_skill_gs = {
             local skill_array = Class.SKILL:get(table.value)
             return Wrap.wrap(skill_array:get(index))
         end
+        log.warning("Non-existent skill property")
         return nil
     end,
 
@@ -277,6 +280,7 @@ metatable_skill_gs = {
             local skill_array = Class.SKILL:get(table.value)
             skill_array:set(index, Wrap.unwrap(value))
         end
+        log.warning("Non-existent skill property")
     end
 }
 
@@ -310,7 +314,7 @@ metatable_skill = {
 
     __newindex = function(table, key, value)
         if key == "value" or key == "RMT_object" then
-            log.error("Cannot modify RMT object values", 2)
+            log.warning("Cannot modify RMT object values")
             return
         end
 

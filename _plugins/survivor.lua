@@ -580,6 +580,7 @@ metatable_survivor_gs = {
             local survivor_array = Class.SURVIVOR:get(table.value)
             return survivor_array:get(index)
         end
+        log.warning("Non-existent survivor property")
         return nil
     end,
 
@@ -591,6 +592,7 @@ metatable_survivor_gs = {
             local survivor_array = Class.SURVIVOR:get(table.value)
             survivor_array:set(index, value)
         end
+        log.warning("Non-existent survivor property")
     end
 }
 
@@ -624,7 +626,7 @@ metatable_survivor = {
 
     __newindex = function(table, key, value)
         if key == "value" or key == "RMT_object" then
-            log.error("Cannot modify RMT object values", 2)
+            log.warning("Cannot modify RMT object values")
             return
         end
 
