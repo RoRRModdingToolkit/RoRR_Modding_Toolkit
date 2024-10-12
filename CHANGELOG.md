@@ -1,5 +1,5 @@
 ### v1.1.14
-* Now using ENVY.
+* Now using ENVY to avoid polluting _G.
 * Internal restructuring to make all classes read-only (does not affect end-user functionality as listed on the docs).
     * The only things different are the one-liner and initialize call.
     * Previously, a user could write `Item.new = "abc"` and brick every item mod for example.
