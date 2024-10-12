@@ -48,7 +48,7 @@ Class:setmetatable(metatable_class)
 -- wrappers for every global "class_" array,
 -- containing ARRAY, find, and wrap.
 
-local file_path = _ENV["!plugins_mod_folder_path"].."/class_first/class_array.txt"
+local file_path = _ENV["!plugins_mod_folder_path"].."/internal/class_array.txt"
 local success, file = pcall(toml.decodeFromFile, file_path)
 local properties = {}
 if success then properties = file.Array end
