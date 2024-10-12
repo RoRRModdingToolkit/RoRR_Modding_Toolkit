@@ -22,7 +22,7 @@ local metatable_proxy = {
             return function(proxy, metatable)
                 if not proxy then log.error("No proxy reference provided", 2) end
                 if not metatable then log.error("No metatable provided", 2) end
-                setmetatable(_proxy[t], metatable)
+                setmetatable(_proxy[proxy], metatable)
             end
         end
 
