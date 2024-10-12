@@ -59,11 +59,10 @@ local metatable_proxy_keys_locked = {
     __metatable = "proxy keys_locked"
 }
 
-local new = function()
+local new = function(t)
     local proxy = {}
-    _proxy[proxy] = {
-        proxy_locked = false
-    }
+    _proxy[proxy] = t or {}
+    _proxy[proxy]["proxy_locked"] = false
     setmetatable(proxy, metatable_proxy)
 
     local keys_locked = {}
