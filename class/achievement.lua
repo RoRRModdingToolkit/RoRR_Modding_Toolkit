@@ -163,9 +163,9 @@ methods_achievement = {
     end,
 
 
-
     -- Callbacks
     onCompleted = function(self, func) self:add_callback("onCompleted", func) end
+    
 }
 methods_class_lock["Achievement"] = Helper.table_get_keys(methods_achievement)
 
@@ -204,3 +204,7 @@ gm.post_script_hook(gm.constants.callback_execute, function(self, other, result,
         end
     end
 end)
+
+
+
+return Achievement
