@@ -71,7 +71,7 @@ for class, class_arr in pairs(class_arrays) do
 
     local t = Proxy.new()
 
-    t.ARRAY = properties[class_arr]
+    t.ARRAY = Proxy.new(properties[class_arr]):lock()
     
     t.find = function(namespace, identifier)
         if identifier then namespace = namespace.."-"..identifier
