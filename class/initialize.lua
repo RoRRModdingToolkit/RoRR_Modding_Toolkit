@@ -22,7 +22,7 @@ metatable_initialize = {
         table.insert(post_funcs[envy.getfenv(2)["!guid"]], func)
     end
 }
-Initialize:setmetatable(metatable_initialize)
+Initialize.setmetatable(metatable_initialize)
 
 
 

@@ -19,8 +19,8 @@ Array.wrap = function(value)
     local wrapper = Proxy.new()
     wrapper.RMT_object = "Array"
     wrapper.value = value
-    wrapper:setmetatable(metatable_array)
-    wrapper:lock(
+    wrapper.setmetatable(metatable_array)
+    wrapper.lock(
         "RMT_object",
         "value",
         table.unpack(Helper.table_get_keys(methods_array))

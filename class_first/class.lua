@@ -38,7 +38,7 @@ metatable_class = {
         end
     end
 }
-Class:setmetatable(metatable_class)
+Class.setmetatable(metatable_class)
 
 
 
@@ -86,8 +86,8 @@ for class, class_arr in pairs(class_arrays) do
         local wrapper = Proxy.new()
         wrapper.RMT_object = class
         wrapper.value = value
-        wrapper:setmetatable(metatable_class_array[class])
-        wrapper:lock(
+        wrapper.setmetatable(metatable_class_array[class])
+        wrapper.lock(
             "RMT_object",
             "value"
         )

@@ -339,7 +339,7 @@ metatable_actor_callbacks = {
 
     __metatable = "actor_callbacks"
 }
-Actor:setmetatable(metatable_actor_callbacks)
+Actor.setmetatable(metatable_actor_callbacks)
 
 
 

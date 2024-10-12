@@ -34,7 +34,7 @@ end
 
 -- Lock public classes after finalization
 for _, ref in pairs(class_refs) do
-    ref:lock()
+    ref.lock()
 end
 
 
@@ -70,7 +70,7 @@ gui.add_imgui(function()
             local a = Proxy.new()
             a[1] = 3
             a[2] = 4
-            a:lock(2)
+            a.lock(2)
             log.info(a[2])
             a[2] = 5
             -- a.keys_locked = "Abc"
@@ -82,19 +82,19 @@ gui.add_imgui(function()
             -- log.info(a.proxy_locked)
             -- log.info(a.lock)
             -- log.info(a.keys_locked)
-            -- a:lock(2)
+            -- a.lock(2)
             -- log.info(a.proxy_locked)
             -- a[3] = 5
             -- log.info(a[3])
             -- -- a[2] = 4
             -- log.info(a[2])
-            -- a:lock()
+            -- a.lock()
             -- log.info(a.proxy_locked)
             -- a[10] = 10
 
         elseif ImGui.Button("c") then
             local a = Proxy.new()
-            a:lock()
+            a.lock()
             getmetatable(a)
             -- setmetatable(a, nil)
             a.value = 127
