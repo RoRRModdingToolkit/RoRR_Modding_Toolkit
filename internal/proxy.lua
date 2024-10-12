@@ -53,7 +53,9 @@ local metatable_proxy_keys_locked = {
     __newindex = function(table, key, value)
         if table[key] and value ~= true then log.error("Key cannot be unlocked", 2) end
         _proxy[table][key] = value
-    end
+    end,
+
+    __metatable = "proxy keys_locked"
 }
 
 local new = function()
