@@ -46,12 +46,64 @@ gm.pre_script_hook(gm.constants.__input_system_tick, function()
             end
         end
 
+        -- Run legacy __initialize
+        for _, m_id in ipairs(mods.loading_order) do
+            local m = mods[m_id]
+
+            -- Check if mod has RMT as a dependency
+            if Helper.table_has(
+                m._PLUGIN.dependencies_no_version_number,
+                "RoRRModdingToolkit-RoRR_Modding_Toolkit"
+            ) then
+
+                if m.__initialize then
+                    -- Add RMT class references
+                    local status, err = pcall(function()
+                        for _, c in ipairs(class_refs) do
+                            m._G[c] = c
+                        end
+                    end)
+                    if not status then
+                        log.warning(m.id.." : Failed to add RMT class references.\n"..err)
+                    end
+
+                    -- Call __initialize
+                    local status, err = pcall(m.__initialize)
+                    if not status then
+                        log.warning(m.id.." : __initialize failed to execute fully.\n"..err)
+                    end
+                end
+
+            end
+        end
+
         -- Run post_initialize functions in load order
         for _, m_id in ipairs(mods.loading_order) do
             if post_funcs[m_id] then
                 for _, fn in ipairs(post_funcs[m_id]) do
                     fn()
                 end
+            end
+        end
+
+        -- Run legacy __post_initialize
+        for _, m_id in ipairs(mods.loading_order) do
+            local m = mods[m_id]
+
+            -- Check if mod has RMT as a dependency
+            if Helper.table_has(
+                m._PLUGIN.dependencies_no_version_number,
+                "RoRRModdingToolkit-RoRR_Modding_Toolkit"
+            ) then
+
+                if m.__post_initialize then
+                    -- Call __post_initialize
+                    local status, err = pcall(m.__post_initialize)
+                    if not status then
+                        log.warning(m.id.." : __post_initialize failed to execute fully.\n"..err)
+                    end
+                end
+
             end
         end
     end
