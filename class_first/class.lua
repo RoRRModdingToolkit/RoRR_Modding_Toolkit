@@ -62,6 +62,9 @@ metatable_class = {}                        -- First metatable for each class (g
 methods_class_lock = {}                     -- Instance methods to lock in the wrapper (populate with instance method keys)
 -- Also "class_refs"                        -- Get existing class table, containing this base setup
 
+-- NOTE: You can override "find" and "wrap" if you want to
+-- (e.g., special edge case for the class)
+
 -- Loop and create wrapper bases
 for class, class_arr in pairs(class_arrays) do
     class_arr = capitalize_class_name(class_arr:sub(7, #class_arr))
