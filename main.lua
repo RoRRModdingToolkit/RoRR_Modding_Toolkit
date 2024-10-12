@@ -30,7 +30,7 @@ for _, name in ipairs(names) do
 end
 
 
--- Extras
+-- Extra public refs
 class_refs["Proxy"] = Proxy     -- Making this public too; might be useful to someone
 class_refs["Colour"] = Color
 
