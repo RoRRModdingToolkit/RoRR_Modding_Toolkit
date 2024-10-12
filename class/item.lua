@@ -34,7 +34,7 @@ local loot_toggled = {}     -- Loot pools that have been added to this frame
 
 -- ========== Enums ==========
 
-Item.TIER = {
+Item.TIER = Proxy.new({
     common      = 0,
     uncommon    = 1,
     rare        = 2,
@@ -43,10 +43,10 @@ Item.TIER = {
     special     = 5,
     food        = 6,
     notier      = 7
-}
+}):lock()
 
 
-Item.LOOT_TAG = {
+Item.LOOT_TAG = Proxy.new({
     category_damage                 = 1 << 0,
     category_healing                = 1 << 1,
     category_utility                = 1 << 2,
@@ -56,14 +56,14 @@ Item.LOOT_TAG = {
     item_blacklist_engi_turrets     = 1 << 6,
     item_blacklist_vendor           = 1 << 7,
     item_blacklist_infuser          = 1 << 8
-}
+}):lock()
 
 
-Item.TYPE = {
+Item.TYPE = Proxy.new({
     all         = 0,
     real        = 1,
     temporary   = 2
-}
+}):lock()
 
 
 

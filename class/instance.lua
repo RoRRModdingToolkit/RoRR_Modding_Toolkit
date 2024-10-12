@@ -32,25 +32,25 @@ local other_callbacks = {
 
 -- ========== Tables ==========
 
-Instance.chests = {
+Instance.chests = Proxy.new({
     gm.constants.oChest1, gm.constants.oChest2, gm.constants.oChest5,
     gm.constants.oChestHealing1, gm.constants.oChestDamage1, gm.constants.oChestUtility1,
     gm.constants.oChestHealing2, gm.constants.oChestDamage2, gm.constants.oChestUtility2,
     gm.constants.oGunchest
-}
+}):lock()
 
 
-Instance.shops = {
+Instance.shops = Proxy.new({
     gm.constants.oShop1, gm.constants.oShop2
-}
+}):lock()
 
 
-Instance.teleporters = {
+Instance.teleporters = Proxy.new({
     gm.constants.oTeleporter, gm.constants.oTeleporterEpic
-}
+}):lock()
 
 
-Instance.projectiles = {
+Instance.projectiles = Proxy.new({
     gm.constants.oJellyMissile,
     gm.constants.oWurmMissile,
     gm.constants.oShamBMissile,
@@ -62,13 +62,13 @@ Instance.projectiles = {
     gm.constants.oGuardBulletNoSync, gm.constants.oGuardBullet,
     gm.constants.oBugBulletNoSync, gm.constants.oBugBullet,
     gm.constants.oScavengerBulletNoSync, gm.constants.oScavengerBullet
-}
+}):lock()
 
 
-Instance.worm_bodies = {
+Instance.worm_bodies = Proxy.new({
     gm.constants.oWormBody,
     gm.constants.oWurmBody
-}
+}):lock()
 
 
 

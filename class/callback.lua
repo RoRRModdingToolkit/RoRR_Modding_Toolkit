@@ -8,7 +8,7 @@ local callbacks = {}
 
 -- ========== Enums ==========
 
-Callback.TYPE = {}
+Callback.TYPE = Proxy.new()
 
 
 
@@ -60,6 +60,8 @@ initialize_callback = function()
     for i = 0, size - 1 do
         Callback.TYPE[gm.array_get(callback_names, i)] = i
     end
+
+    Callback.TYPE:lock()
 end
 
 
