@@ -82,11 +82,6 @@ client_handles_removal          = 15
 effect_display                  = 16
 
 
-[Array.Callback]
-namespace                       = 0
-identifier                      = 1
-
-
 [Array.Difficulty]
 namespace                       = 0
 identifier                      = 1

@@ -8,7 +8,6 @@ local class_arrays = {
     State               = "class_actor_state",
     Artifact            = "class_artifact",
     Buff                = "class_buff",
-    Callback            = "class_callback",
     Difficulty          = "class_difficulty",
     Elite               = "class_elite",
     Ending              = "class_ending_type",
