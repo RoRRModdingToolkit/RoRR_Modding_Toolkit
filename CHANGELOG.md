@@ -1,6 +1,8 @@
-### v1.2.0
-* Rewrote all internal functionality to use ENVY (does not affect end-user functionality listed on the docs).
-* __initialize will now print a message to console if a mod's __initialize/__post_initialize fails to run.
+### v1.1.14
+* Now using ENVY
+* Internal restructuring to make all classes read-only (does not affect end-user functionality as listed on the docs).
+    * The only things different are the one-liner and initialize call.
+* Initialize : Will now print a message to console if a mod's initialize/post_initialize fails to run.
     * They will also now run in mod load order.
 * Added wrappers for remaining classes in the global `class_` arrays.
 * Language : Fallback to english.json if the language file in a mod doesn't exist for the current language.
