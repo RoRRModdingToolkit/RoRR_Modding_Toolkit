@@ -215,7 +215,7 @@ Instance.wrap = function(value)
     wrapper:lock(
         "RMT_object",
         "value",
-        table.unpack(Helper.table_get_keys(methods_instance))
+        table.unpack(methods_instance_keys)
     )
     return wrapper
 end
@@ -229,7 +229,7 @@ Instance.wrap_invalid = function()
     wrapper:lock(
         "RMT_object",
         "value",
-        table.unpack(Helper.table_get_keys(methods_instance))
+        table.unpack(methods_instance_keys)
     )
     return wrapper
 end
@@ -325,7 +325,10 @@ methods_instance = {
             end
             if not callbacks[self.value.id][callback] then callbacks[self.value.id][callback] = {} end
             if not callbacks[self.value.id][callback][skill] then callbacks[self.value.id][callback][skill] = {} end
-            callbacks[self.value.id][callback][skill][id] = func
+            if not callbacks[self.value.id][callback][skill][id] then
+                callbacks[self.value.id][callback][skill][id] = func
+            else log.error("Callback ID already exists", 2)
+            end
     
         elseif Helper.table_has(other_callbacks, callback) then
             if not callbacks[self.value.id] then
@@ -333,7 +336,10 @@ methods_instance = {
                 callbacks[self.value.id]["CInstance"] = self.value
             end
             if not callbacks[self.value.id][callback] then callbacks[self.value.id][callback] = {} end
-            callbacks[self.value.id][callback][id] = func
+            if not callbacks[self.value.id][callback][id] then
+                callbacks[self.value.id][callback][id] = func
+            else log.error("Callback ID already exists", 2)
+            end
     
         else log.error("Invalid callback name", 2)
     
@@ -412,6 +418,7 @@ methods_instance = {
     onEquipmentUse      = function(self, id, func) self:add_callback("onEquipmentUse", id, func) end
 
 }
+methods_instance_keys = Helper.table_get_keys(methods_instance)
 
 
 
