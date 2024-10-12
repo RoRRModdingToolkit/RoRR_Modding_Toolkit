@@ -60,7 +60,9 @@ require("./envy_setup")
 
 function __initialize()
     initialize_callback()
+    
     initialize_instance()
+    initialize_actor()
 end
 
 

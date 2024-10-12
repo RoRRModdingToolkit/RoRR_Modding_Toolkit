@@ -60,7 +60,6 @@ Item.new = function(namespace, identifier, no_log)
     )
 
     -- Create item log
-    -- Switch over to Item_Log.new when it's ready
     if not no_log then
         local log = gm.item_log_create(
             namespace,

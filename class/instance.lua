@@ -202,15 +202,15 @@ Instance.wrap = function(value)
     wrapper:setmetatable(metatable_instance)
 
     -- if value.object_index == gm.constants.oCustomObject_pInteractable then
-    --     wrapper:setmetatable(metatable_interactable_instance)
     --     wrapper.RMT_object = "Interactable Instance"
+    --     wrapper:setmetatable(metatable_interactable_instance)
     -- elseif value.object_index == gm.constants.oP then
-    --     wrapper:setmetatable(metatable_player)
     --     wrapper.RMT_object = "Player"
-    -- elseif gm.object_is_ancestor(value.object_index, gm.constants.pActor) == 1.0 then
-    --     wrapper:setmetatable(metatable_actor)
-    --     wrapper.RMT_object = "Actor"
-    -- end
+    --     wrapper:setmetatable(metatable_player)
+    if gm.object_is_ancestor(value.object_index, gm.constants.pActor) == 1.0 then
+        wrapper.RMT_object = "Actor"
+        wrapper:setmetatable(metatable_actor)
+    end
 
     wrapper:lock(
         "RMT_object",
