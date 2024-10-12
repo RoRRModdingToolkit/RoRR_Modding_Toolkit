@@ -402,12 +402,12 @@ metatable_class["Item"] = {
         end
 
         -- Pass to next metatable
-        return metatable_class_properties["Item"].__index(table, key)
+        return metatable_class_gs["Item"].__index(table, key)
     end,
     
 
     __newindex = function(table, key, value)
-        metatable_class_properties["Item"].__newindex(table, key, value)
+        metatable_class_gs["Item"].__newindex(table, key, value)
     end,
 
 

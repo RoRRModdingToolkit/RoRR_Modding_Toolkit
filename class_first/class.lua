@@ -57,10 +57,10 @@ if success then properties = file.Array end
 -- These are to be used by other
 -- files that extend these bases
 -- See "item.lua" for example (and [Ctrl + F] search for these tables)
-metatable_class_properties = Proxy.new()    -- Base getter/setter (immutable)
-metatable_class = {}                        -- First metatable for each class (goes straight to getter/setter if nil)
-methods_class_lock = {}                     -- Instance methods to lock in the wrapper (populate with instance method keys)
--- Also "class_refs"                        -- Get existing class table, containing this base setup
+metatable_class_gs = Proxy.new()    -- Base getter/setter (immutable)
+metatable_class = {}                -- First metatable for each class (goes straight to getter/setter if nil)
+methods_class_lock = {}             -- Instance methods to lock in the wrapper (populate with instance method keys)
+-- Also "class_refs"                -- Get existing class table, containing this base setup
 
 -- NOTE: You can override "find" and "wrap" if you want to
 -- (e.g., special edge case for the class)
@@ -98,7 +98,7 @@ for class, class_arr in pairs(class_arrays) do
         wrapper.RMT_object = class
         wrapper.value = value
         if metatable_class[class] then wrapper:setmetatable(metatable_class[class])
-        else wrapper:setmetatable(metatable_class_properties[class])
+        else wrapper:setmetatable(metatable_class_gs[class])
         end
         wrapper:lock(
             "RMT_object",
@@ -108,7 +108,7 @@ for class, class_arr in pairs(class_arrays) do
         return wrapper
     end
 
-    metatable_class_properties[class] = {
+    metatable_class_gs[class] = {
         -- Getter
         __index = function(table, key)
             local index = t.ARRAY[key]
@@ -137,7 +137,7 @@ for class, class_arr in pairs(class_arrays) do
     class_refs[class] = t
 end
 
-metatable_class_properties:lock()
+metatable_class_gs:lock()
 
 
 
