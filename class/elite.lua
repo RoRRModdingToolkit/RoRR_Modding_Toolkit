@@ -46,9 +46,9 @@ methods_elite = {
     end,
 
 
-
     -- Callbacks
     onApply     = function(self, func) self:add_callback("onApply", func) end
+    
 }
 methods_class_lock["Elite"] = Helper.table_get_keys(methods_elite)
 
