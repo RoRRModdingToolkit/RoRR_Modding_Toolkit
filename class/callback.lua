@@ -8,7 +8,7 @@ local callbacks = {}
 
 -- ========== Enums ==========
 
-Callback.TYPE = Proxy.new()
+Callback.TYPE = {}  -- dummy table
 
 
 
@@ -54,6 +54,8 @@ end)
 -- ========== Initialize ==========
 
 initialize_callback = function()
+    Callback.TYPE = Proxy.new()
+
     -- Populate Callback.TYPE
     local callback_names = gm.variable_global_get("callback_names")
     local size = gm.array_length(callback_names)
