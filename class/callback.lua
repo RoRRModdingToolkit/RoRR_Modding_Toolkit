@@ -19,10 +19,7 @@ Callback.add = function(callback, id, func)
     if not callback_id then log.error("Invalid callback name", 2) end
 
     if not callbacks[callback_id] then callbacks[callback_id] = {} end
-    if not callbacks[callback_id][id] then
-        callbacks[callback_id][id] = func
-    else log.error("Callback ID already exists", 2)
-    end
+    callbacks[callback_id][id] = func
 end
 
 
