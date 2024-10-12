@@ -35,13 +35,6 @@ end
 -- Lock public classes after finalization
 for _, ref in pairs(class_refs) do
     ref:lock()
-
-    -- Lock enums and stuff
-    for k, v in ipairs(ref) do
-        if type(v) == "table" and getmetatable(v) == "proxy" then
-            v:lock()
-        end
-    end
 end
 
 

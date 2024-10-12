@@ -43,7 +43,7 @@ Item.TIER = Proxy.new({
     special     = 5,
     food        = 6,
     notier      = 7
-})
+}):lock()
 
 
 Item.LOOT_TAG = Proxy.new({
@@ -56,14 +56,14 @@ Item.LOOT_TAG = Proxy.new({
     item_blacklist_engi_turrets     = 1 << 6,
     item_blacklist_vendor           = 1 << 7,
     item_blacklist_infuser          = 1 << 8
-})
+}):lock()
 
 
 Item.TYPE = Proxy.new({
     all         = 0,
     real        = 1,
     temporary   = 2
-})
+}):lock()
 
 
 

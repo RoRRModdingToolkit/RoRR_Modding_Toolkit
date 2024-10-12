@@ -8,7 +8,8 @@ local metatable_proxy = {
             return function(proxy, ...)
                 if not proxy then log.error("No proxy reference provided", 2) end
                 if not proxy.proxy_locked then
-                    if not ... then proxy.proxy_locked = true
+                    if not ... then
+                        proxy.proxy_locked = true
                     else
                         local keys = {...}
                         if type(keys[1]) == "table" then keys = keys[1] end
@@ -16,6 +17,7 @@ local metatable_proxy = {
                             proxy.keys_locked[k] = true
                         end
                     end
+                    return proxy
                 end
             end
         elseif key == "setmetatable" then
