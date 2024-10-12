@@ -210,7 +210,7 @@ Instance.wrap = function(value)
         wrapper:setmetatable(metatable_player)
         wrapper:lock(methods_actor_keys)
         wrapper:lock(methods_player_keys)
-    if gm.object_is_ancestor(value.object_index, gm.constants.pActor) == 1.0 then
+    elseif gm.object_is_ancestor(value.object_index, gm.constants.pActor) == 1.0 then
         wrapper.RMT_object = "Actor"
         wrapper:setmetatable(metatable_actor)
         wrapper:lock(methods_actor_keys)
