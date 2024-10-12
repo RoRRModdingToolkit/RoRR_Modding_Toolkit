@@ -29,7 +29,7 @@ local class_arrays = {
 
 -- ========== Metatable ==========
 
-metatable_class = {
+Class:setmetatable({
     __index = function(table, key)
         if type(key) ~= "string" then return nil end
         
@@ -39,8 +39,7 @@ metatable_class = {
         else log.error("Class does not exist", 2)
         end
     end
-}
-Class:setmetatable(metatable_class)
+})
 
 
 
@@ -57,9 +56,10 @@ if success then properties = file.Array end
 
 -- These are to be used by other files
 -- that extend these wrapper bases
-metatable_class_array = {}
-methods_class_lock = {}
--- Also "class_refs"
+metatable_class_properties = Proxy.new()    -- Base getter/setter (immutable)
+metatable_class = {}                        -- First metatable for each class (goes straight to getter/setter if nil)
+methods_class_lock = {}                     -- Instance methods to lock in the wrapper (populate with instance method keys)
+-- Also "class_refs"                        -- Get existing class table, containing this base setup
 
 -- Loop and create wrapper bases
 for class, class_arr in pairs(class_arrays) do
@@ -93,7 +93,9 @@ for class, class_arr in pairs(class_arrays) do
         local wrapper = Proxy.new()
         wrapper.RMT_object = class
         wrapper.value = value
-        wrapper:setmetatable(metatable_class_array[class])
+        if metatable_class[class] then wrapper:setmetatable(metatable_class[class])
+        else wrapper:setmetatable(metatable_class_properties[class])
+        end
         wrapper:lock(
             "RMT_object",
             "value",
@@ -102,7 +104,7 @@ for class, class_arr in pairs(class_arrays) do
         return wrapper
     end
 
-    metatable_class_array[class] = {
+    metatable_class_properties[class] = {
         -- Getter
         __index = function(table, key)
             local index = t.ARRAY[key]
@@ -123,11 +125,15 @@ for class, class_arr in pairs(class_arrays) do
                 return
             end
             log.error("Non-existent "..class.." property", 2)
-        end
+        end,
+        
+        __metatable = "class getter/setter"
     }
 
     class_refs[class] = t
 end
+
+metatable_class_properties:lock()
 
 
 

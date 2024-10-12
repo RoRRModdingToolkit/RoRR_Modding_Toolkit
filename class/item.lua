@@ -394,7 +394,7 @@ methods_class_lock["Item"] = Helper.table_get_keys(methods_item)
 
 -- ========== Metatables ==========
 
-metatable_item = {
+metatable_class["Item"] = {
     __index = function(table, key)
         -- Methods
         if methods_item[key] then
@@ -402,12 +402,12 @@ metatable_item = {
         end
 
         -- Pass to next metatable
-        return metatable_class_array["Item"].__index(table, key)
+        return metatable_class_properties["Item"].__index(table, key)
     end,
     
 
     __newindex = function(table, key, value)
-        metatable_class_array["Item"].__newindex(table, key, value)
+        metatable_class_properties["Item"].__newindex(table, key, value)
     end
 }
 

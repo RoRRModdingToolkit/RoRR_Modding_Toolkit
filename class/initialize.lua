@@ -20,7 +20,9 @@ metatable_initialize = {
 
         if not post_funcs[envy.getfenv(2)["!guid"]] then post_funcs[envy.getfenv(2)["!guid"]] = {} end
         table.insert(post_funcs[envy.getfenv(2)["!guid"]], func)
-    end
+    end,
+    
+    __metatable = "initialize"
 }
 Initialize:setmetatable(metatable_initialize)
 

@@ -126,7 +126,10 @@ metatable_array = {
     
     __len = function(table)
         return gm.array_length(table.value)
-    end
+    end,
+
+
+    __metatable = "array"
 }
 
 

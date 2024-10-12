@@ -459,7 +459,10 @@ metatable_instance = {
 
     __newindex = function(table, key, value)
         metatable_instance_gs.__newindex(table, key, value)
-    end
+    end,
+
+    
+    __metatable = "instance"
 }
 
 
