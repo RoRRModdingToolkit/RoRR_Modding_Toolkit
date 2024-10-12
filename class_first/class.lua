@@ -43,7 +43,7 @@ Class:setmetatable({
 
 
 
--- ========== Class Array Implementation ==========
+-- ========== Class Array Base Implementations ==========
 
 -- This class will also create the base
 -- implementations for every global "class_"
