@@ -1,7 +1,8 @@
 ### v1.1.14
-* Now using ENVY
+* Now using ENVY.
 * Internal restructuring to make all classes read-only (does not affect end-user functionality as listed on the docs).
     * The only things different are the one-liner and initialize call.
+    * Previously, a user could theoretically write `Item.new = "abc"` and brick every item mod for example.
 * Initialize : Will now print a message to console if a mod's initialize/post_initialize fails to run.
     * They will also now run in mod load order.
 * Added wrappers for remaining classes in the global `class_` arrays.
