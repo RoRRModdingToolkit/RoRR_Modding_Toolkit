@@ -59,7 +59,8 @@ require("./envy_setup")
 -- ========== Initialize ==========
 
 function __initialize()
-    
+    initialize_callback()
+    initialize_instance()
 end
 
 

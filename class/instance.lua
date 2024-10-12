@@ -744,22 +744,22 @@ end
 
 -- ========== Initialize ==========
 
-Instance.__initialize = function()
+initialize_instance = function()
     gm_add_instance_methods(methods_instance)
-    Callback.add("onAttackCreate", "RMT.inst_onAttack", inst_onAttack, true)
-    Callback.add("onAttackCreate", "RMT.inst_onAttackAll", inst_onAttackAll, true)
-    Callback.add("onAttackHandleEnd", "RMT.inst_onPostAttack", inst_onPostAttack, true)
-    Callback.add("onAttackHandleEnd", "RMT.inst_onPostAttackAll", inst_onPostAttackAll, true)
-    Callback.add("onHitProc", "RMT.inst_onHit", inst_onHit, true)
-    Callback.add("onAttackHit", "RMT.inst_onHitAll", inst_onHitAll, true)
-    Callback.add("onKillProc", "RMT.inst_onKill", inst_onKill, true)
-    Callback.add("onDamagedProc", "RMT.inst_onDamaged", inst_onDamaged, true)
-    Callback.add("onDamageBlocked", "RMT.inst_onDamageBlocked", inst_onDamageBlocked, true)
-    Callback.add("onInteractableActivate", "RMT.inst_onInteract", inst_onInteract, true)
-    Callback.add("onEquipmentUse", "RMT.inst_onEquipmentUse", inst_onEquipmentUse, true)
-    Callback.add("preStep", "RMT.inst_onPreStep", inst_onPreStep, true)
-    Callback.add("postStep", "RMT.inst_onPostStep", inst_onPostStep, true)
-    Callback.add("postHUDDraw", "RMT.inst_onDraw", inst_onDraw, true)
+    Callback.add("onAttackCreate", "RMT-inst_onAttack", inst_onAttack)
+    Callback.add("onAttackCreate", "RMT-inst_onAttackAll", inst_onAttackAll)
+    Callback.add("onAttackHandleEnd", "RMT-inst_onPostAttack", inst_onPostAttack)
+    Callback.add("onAttackHandleEnd", "RMT-inst_onPostAttackAll", inst_onPostAttackAll)
+    Callback.add("onHitProc", "RMT-inst_onHit", inst_onHit)
+    Callback.add("onAttackHit", "RMT-inst_onHitAll", inst_onHitAll)
+    Callback.add("onKillProc", "RMT-inst_onKill", inst_onKill)
+    Callback.add("onDamagedProc", "RMT-inst_onDamaged", inst_onDamaged)
+    Callback.add("onDamageBlocked", "RMT-inst_onDamageBlocked", inst_onDamageBlocked)
+    Callback.add("onInteractableActivate", "RMT-inst_onInteract", inst_onInteract)
+    Callback.add("onEquipmentUse", "RMT-inst_onEquipmentUse", inst_onEquipmentUse)
+    Callback.add("preStep", "RMT-inst_onPreStep", inst_onPreStep)
+    Callback.add("postStep", "RMT-inst_onPostStep", inst_onPostStep)
+    Callback.add("postHUDDraw", "RMT-inst_onDraw", inst_onDraw)
 end
 
 
