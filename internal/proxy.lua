@@ -2,33 +2,30 @@
 
 local _proxy = setmetatable({}, {__mode = "k"})
 
-local methods_proxy = {
-    lock = function(proxy, ...)
-        if not proxy then log.error("No proxy reference provided", 2) end
-        if not proxy.proxy_locked then
-            if not ... then proxy.proxy_locked = true
-            else
-                local keys = {...}
-                if type(keys[1]) == "table" then keys = keys[1] end
-                for _, k in ipairs(keys) do
-                    proxy.keys_locked[k] = true
-                end
-            end
-        end
-    end,
-
-    setmetatable = function(proxy, metatable)
-        if not proxy then log.error("No proxy reference provided", 2) end
-        if not metatable then log.error("No metatable provided", 2) end
-        setmetatable(_proxy[t], metatable)
-    end
-}
-
 local metatable_proxy = {
     __index = function(t, key)
-        if methods_proxy[key] then
-            return methods_proxy[key]
+        if key == "lock" then
+            return function(proxy, ...)
+                if not proxy then log.error("No proxy reference provided", 2) end
+                if not proxy.proxy_locked then
+                    if not ... then proxy.proxy_locked = true
+                    else
+                        local keys = {...}
+                        if type(keys[1]) == "table" then keys = keys[1] end
+                        for _, k in ipairs(keys) do
+                            proxy.keys_locked[k] = true
+                        end
+                    end
+                end
+            end
+        elseif key == "setmetatable" then
+            return function(proxy, metatable)
+                if not proxy then log.error("No proxy reference provided", 2) end
+                if not metatable then log.error("No metatable provided", 2) end
+                setmetatable(_proxy[t], metatable)
+            end
         end
+
         return _proxy[t][key]
     end,
     
