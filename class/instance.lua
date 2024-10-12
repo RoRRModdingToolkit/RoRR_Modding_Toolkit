@@ -199,7 +199,6 @@ Instance.wrap = function(value)
     local wrapper = Proxy.new()
     wrapper.RMT_object = "Instance"
     wrapper.value = value
-    wrapper:setmetatable(metatable_instance)
 
     -- if value.object_index == gm.constants.oCustomObject_pInteractable then
     --     wrapper.RMT_object = "Interactable Instance"
@@ -210,6 +209,7 @@ Instance.wrap = function(value)
     if gm.object_is_ancestor(value.object_index, gm.constants.pActor) == 1.0 then
         wrapper.RMT_object = "Actor"
         wrapper:setmetatable(metatable_actor)
+    else wrapper:setmetatable(metatable_instance)
     end
 
     wrapper:lock(
