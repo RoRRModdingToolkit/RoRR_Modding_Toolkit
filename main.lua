@@ -30,7 +30,7 @@ for _, name in ipairs(names) do
 end
 
 
--- Lock public classes (after initialization)
+-- Lock public classes after finalization
 for _, ref in pairs(class_refs) do
     ref:lock()
 end
