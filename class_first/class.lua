@@ -31,13 +31,13 @@ local class_arrays = {
 
 metatable_class = {
     __index = function(table, key)
-        if type(key) ~= "string" then return nil end
-        
-        local k = "class_"..key:lower()
-        if Helper.table_has(class_arrays, k) then
-            return Array.wrap(gm.variable_global_get(k))
-        else log.error("Class does not exist", 2)
+        if type(key) == "string" then
+            local k = "class_"..key:lower()
+            if Helper.table_has(class_arrays, k) then
+                return Array.wrap(gm.variable_global_get(k))
+            end
         end
+        return nil
     end
 }
 Class:setmetatable(metatable_class)
