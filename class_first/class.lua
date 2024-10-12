@@ -100,11 +100,10 @@ for class, class_arr in pairs(class_arrays) do
         if metatable_class[class] then wrapper:setmetatable(metatable_class[class])
         else wrapper:setmetatable(metatable_class_gs[class])
         end
-        wrapper:lock(
-            "RMT_object",
-            "value",
-            table.unpack(methods_class_lock[class])
-        )
+        wrapper:lock("RMT_object", "value")
+        if methods_class_lock[class] then
+            wrapper:lock(table.unpack(methods_class_lock[class]))
+        end
         return wrapper
     end
 
