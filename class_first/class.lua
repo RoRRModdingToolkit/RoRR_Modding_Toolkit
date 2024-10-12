@@ -56,6 +56,7 @@ if success then properties = file.Array end
 
 -- These are to be used by other files
 -- that extend these wrapper bases
+-- See "item.lua" for example (and [Ctrl + F] search for these tables)
 metatable_class_properties = Proxy.new()    -- Base getter/setter (immutable)
 metatable_class = {}                        -- First metatable for each class (goes straight to getter/setter if nil)
 methods_class_lock = {}                     -- Instance methods to lock in the wrapper (populate with instance method keys)
