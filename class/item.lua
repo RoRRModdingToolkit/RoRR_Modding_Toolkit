@@ -408,7 +408,10 @@ metatable_class["Item"] = {
 
     __newindex = function(table, key, value)
         metatable_class_properties["Item"].__newindex(table, key, value)
-    end
+    end,
+
+
+    __metatable = "item"
 }
 
 
