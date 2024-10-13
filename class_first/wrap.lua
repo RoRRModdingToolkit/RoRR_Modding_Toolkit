@@ -35,3 +35,21 @@ Wrap.unwrap = function(value)
     if type(value) == "table" and value.RMT_object then return value.value end
     return value
 end
+
+
+
+-- ========== Internal ==========
+
+make_wrapper = function(value, RMT_object, metatable)
+    local wrapper = Proxy.new({
+        value = value,
+        RMT_object = RMT_object
+    })
+    wrapper:setmetatable(metatable)
+    wrapper.keys_locked = {
+        keys_locked = true,
+        value       = true,
+        RMT_object  = true
+    }
+    return wrapper
+end

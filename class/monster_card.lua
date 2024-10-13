@@ -22,7 +22,6 @@ methods_monster_card = {
     
 
 }
-methods_class_lock["Monster_Card"] = Helper.table_get_keys(methods_monster_card)
 
 
 

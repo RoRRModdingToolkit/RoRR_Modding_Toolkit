@@ -16,16 +16,7 @@ Array.wrap = function(value)
         log.error("value is not an array", 2)
     end
 
-    local wrapper = Proxy.new()
-    wrapper.RMT_object = "Array"
-    wrapper.value = value
-    wrapper:setmetatable(metatable_array)
-    wrapper:lock(
-        "RMT_object",
-        "value",
-        table.unpack(methods_array_lock)
-    )
-    return wrapper
+    return make_wrapper(value, "Array", metatable_array)
 end
 
 
@@ -94,7 +85,6 @@ methods_array = {
     end
     
 }
-methods_array_lock = Helper.table_get_keys(methods_array)
 
 
 

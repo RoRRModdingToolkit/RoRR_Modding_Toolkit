@@ -118,7 +118,6 @@ methods_difficulty = {
     onDraw          = function(self, func) self:add_callback("onDraw", func) end
     
 }
-methods_class_lock["Difficulty"] = Helper.table_get_keys(methods_difficulty)
 
 
 

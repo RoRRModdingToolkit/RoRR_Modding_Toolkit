@@ -109,7 +109,6 @@ methods_buff = {
     onChange            = function(self, func) self:add_callback("onChange", func) end
 
 }
-methods_class_lock["Buff"] = Helper.table_get_keys(methods_buff)
 
 
 

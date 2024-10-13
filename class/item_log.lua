@@ -54,7 +54,6 @@ methods_item_log = {
         self.achievement_id = achievement_id
     end,
 }
-methods_class_lock["Item_Log"] = Helper.table_get_keys(methods_item_log)
 
 
 

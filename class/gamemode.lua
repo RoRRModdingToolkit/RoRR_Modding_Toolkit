@@ -25,7 +25,6 @@ methods_gamemode = {
 
 
 }
-methods_class_lock["Gamemode"] = Helper.table_get_keys(methods_gamemode)
 
 
 

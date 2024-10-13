@@ -167,7 +167,6 @@ methods_achievement = {
     onCompleted = function(self, func) self:add_callback("onCompleted", func) end
     
 }
-methods_class_lock["Achievement"] = Helper.table_get_keys(methods_achievement)
 
 
 

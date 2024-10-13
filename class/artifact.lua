@@ -130,7 +130,6 @@ methods_artifact = {
     onKillProc                      = function(self, func) self:add_callback("onKillProc", func) end
     
 }
-methods_class_lock["Artifact"] = Helper.table_get_keys(methods_artifact)
 
 
 

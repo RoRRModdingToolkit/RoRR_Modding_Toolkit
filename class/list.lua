@@ -12,16 +12,7 @@ end
 
 
 List.wrap = function(value)
-    local wrapper = Proxy.new()
-    wrapper.RMT_object = "List"
-    wrapper.value = value
-    wrapper:setmetatable(metatable_list)
-    wrapper:lock(
-        "RMT_object",
-        "value",
-        table.unpack(methods_list_lock)
-    )
-    return wrapper
+    return make_wrapper(value, "List", metatable_list)
 end
 
 
@@ -97,7 +88,6 @@ methods_list = {
     end
 
 }
-methods_list_lock = Helper.table_get_keys(methods_list)
 
 
 

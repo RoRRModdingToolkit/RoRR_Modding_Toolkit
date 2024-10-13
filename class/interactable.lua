@@ -42,16 +42,7 @@ end
 
 
 Interactable.wrap = function(value)
-    local wrapper = Proxy.new()
-    wrapper.RMT_object = "Interactable"
-    wrapper.value = value
-    wrapper:setmetatable(metatable_interactable)
-    wrapper:lock(
-        "RMT_object",
-        "value",
-        table.unpack(methods_interactable_lock)
-    )
-    return wrapper
+    return make_wrapper(value, "Interactable", metatable_interactable)
 end
 
 
@@ -103,7 +94,6 @@ methods_interactable = {
     onStateDraw         = function(self, func, state) self:add_callback("onStateDraw", func, state) end
 
 }
-methods_interactable_lock = Helper.table_get_keys(methods_interactable)
 
 
 methods_interactable_instance = {
@@ -121,7 +111,6 @@ methods_interactable_instance = {
     end
 
 }
-methods_interactable_instance_keys = Helper.table_get_keys(methods_interactable_instance)
 
 
 

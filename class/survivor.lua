@@ -496,7 +496,6 @@ methods_survivor = {
     onRemove    = function(self, func) self:add_callback("onRemove", func) end
 
 }
-methods_class_lock["Survivor"] = Helper.table_get_keys(methods_survivor)
 
 
 

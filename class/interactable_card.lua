@@ -22,7 +22,6 @@ methods_interactable_card = {
 
 
 }
-methods_class_lock["Interactable_Card"] = Helper.table_get_keys(methods_interactable_card)
 
 
 

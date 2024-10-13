@@ -103,7 +103,6 @@ methods_player = {
     end
 
 }
-methods_player_keys = Helper.table_get_keys(methods_player)
 
 
 methods_player_callbacks = {

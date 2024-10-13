@@ -65,7 +65,6 @@ methods_survivor_log = {
     --     self.token_arrival  = arrival
     -- end,
 }
-methods_class_lock["Survivor_Log"] = Helper.table_get_keys(methods_survivor_log)
 
 
 

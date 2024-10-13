@@ -283,7 +283,6 @@ methods_actor = {
     end
 
 }
-methods_actor_keys = Helper.table_get_keys(methods_actor)
 
 
 methods_actor_callbacks = {

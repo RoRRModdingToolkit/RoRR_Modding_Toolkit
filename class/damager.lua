@@ -61,11 +61,7 @@ Damager.wrap = function(value)
     wrapper.RMT_object = "Damager"
     wrapper.value = value
     wrapper:setmetatable(metatable_damager)
-    wrapper:lock(
-        "RMT_object",
-        "value",
-        table.unpack(methods_damager_lock)
-    )
+    wrapper:lock(methods_damager_lock)
     return wrapper
 end
 
@@ -141,7 +137,6 @@ methods_damager = {
     end,
 
 }
-methods_damager_lock = Helper.table_get_keys(methods_damager)
 
 
 

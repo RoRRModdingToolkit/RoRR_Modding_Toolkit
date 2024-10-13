@@ -2,6 +2,8 @@
 
 Instance = Proxy.new()
 
+local methods_instance_lock = {}
+
 local instance_data = {}
 
 local callbacks = {}
@@ -192,47 +194,26 @@ end
 
 
 Instance.wrap = function(value)
-    local wrapper = Proxy.new()
-    wrapper.RMT_object = "Instance"
-    wrapper.value = value
+    local RMT_object = "Instance"
+    local mt = metatable_instance
 
-    -- TODO: Tidy up a bit
     if value.object_index == gm.constants.oCustomObject_pInteractable then
-        wrapper.RMT_object = "Interactable Instance"
-        wrapper:setmetatable(metatable_interactable_instance)
-        wrapper:lock(methods_interactable_instance_keys)
+        RMT_object = "Interactable Instance"
+        mt = metatable_interactable_instance
     elseif value.object_index == gm.constants.oP then
-        wrapper.RMT_object = "Player"
-        wrapper:setmetatable(metatable_player)
-        wrapper:lock(methods_actor_keys)
-        wrapper:lock(methods_player_keys)
+        RMT_object = "Player"
+        mt = metatable_player
     elseif gm.object_is_ancestor(value.object_index, gm.constants.pActor) == 1.0 then
-        wrapper.RMT_object = "Actor"
-        wrapper:setmetatable(metatable_actor)
-        wrapper:lock(methods_actor_keys)
-    else wrapper:setmetatable(metatable_instance)
+        RMT_object = "Actor"
+        mt = metatable_actor
     end
 
-    wrapper:lock(
-        "RMT_object",
-        "value",
-        table.unpack(methods_instance_keys)
-    )
-    return wrapper
+    return make_wrapper(value, RMT_object, mt)
 end
 
 
 Instance.wrap_invalid = function()
-    local wrapper = Proxy.new()
-    wrapper.RMT_object = "Instance"
-    wrapper.value = -4
-    wrapper:setmetatable(metatable_instance)
-    wrapper:lock(
-        "RMT_object",
-        "value",
-        table.unpack(methods_instance_keys)
-    )
-    return wrapper
+    return make_wrapper(-4, "Instance", metatable_instance)
 end
 
 
@@ -428,7 +409,6 @@ methods_instance = {
     onEquipmentUse      = function(self, id, func) self:add_callback("onEquipmentUse", id, func) end
 
 }
-methods_instance_keys = Helper.table_get_keys(methods_instance)
 
 
 

@@ -200,7 +200,6 @@ methods_stage = {
     end
 
 }
-methods_class_lock["Stage"] = Helper.table_get_keys(methods_stage)
 
 
 

@@ -91,11 +91,7 @@ Object.wrap = function(value)
     wrapper.RMT_object = "Object"
     wrapper.value = value
     wrapper:setmetatable(metatable_object)
-    wrapper:lock(
-        "RMT_object",
-        "value",
-        table.unpack(methods_object_keys)
-    )
+    wrapper:lock(methods_object_lock)
     return wrapper
 end
 
@@ -168,7 +164,6 @@ methods_object = {
     onDraw          = function(self, func) self:add_callback("onDraw", func) end
 
 }
-methods_object_keys = Helper.table_get_keys(methods_object)
 
 
 

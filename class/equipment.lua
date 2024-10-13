@@ -252,7 +252,6 @@ methods_equipment = {
     onDraw              = function(self, func) self:add_callback("onDraw", func) end
 
 }
-methods_class_lock["Equipment"] = Helper.table_get_keys(methods_equipment)
 
 
 

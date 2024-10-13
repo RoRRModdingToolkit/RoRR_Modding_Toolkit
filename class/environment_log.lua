@@ -78,7 +78,6 @@ methods_environment_log = {
         self.is_secret = issecret
     end,
 }
-methods_class_lock["Environment_Log"] = Helper.table_get_keys(methods_environment_log)
 
 
 

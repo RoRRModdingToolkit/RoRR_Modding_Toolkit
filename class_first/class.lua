@@ -59,7 +59,6 @@ if success then properties = file.Array end
 -- See "item.lua" for example (and [Ctrl + F] search for these tables)
 metatable_class_gs = Proxy.new()    -- Base getter/setter (immutable)
 metatable_class = {}                -- First metatable for each class (goes straight to getter/setter if nil)
-methods_class_lock = {}             -- Instance methods to lock in the wrapper (populate with instance method keys)
 -- Also "class_refs"                -- Get existing class table, containing this base setup
 
 -- NOTE: You can override "find" and "wrap" if you want to
@@ -79,32 +78,38 @@ for class, class_arr in pairs(class_arrays) do
             if not string.find(namespace, "-") then namespace = "ror-"..namespace end
         end
 
-        for i = 0, #Class[class_arr] - 1 do
-            local element = Class[class_arr]:get(i)
-            if gm.is_array(element.value) then
-                local _namespace = element:get(0)
-                local _identifier = element:get(1)
+        -- This is way faster since it doesn't have to wrap every array in the class_array
+        local class_raw = Class[class_arr].value
+        local size = gm.array_length(class_raw)
+        for i = 0, size - 1 do
+            local element = gm.array_get(class_raw, i)
+            if gm.is_array(element) then
+                local _namespace = gm.array_get(element, 0)
+                local _identifier = gm.array_get(element, 1)
                 if namespace == _namespace.."-".._identifier then
                     return t.wrap(i)
                 end
             end
         end
 
+        -- for i = 0, #Class[class_arr] - 1 do
+        --     local element = Class[class_arr]:get(i)
+        --     if gm.is_array(element.value) then
+        --         local _namespace = element:get(0)
+        --         local _identifier = element:get(1)
+        --         if namespace == _namespace.."-".._identifier then
+        --             return t.wrap(i)
+        --         end
+        --     end
+        -- end
+
         return nil
     end
 
     t.wrap = function(value)
-        local wrapper = Proxy.new()
-        wrapper.RMT_object = class
-        wrapper.value = value
-        if metatable_class[class] then wrapper:setmetatable(metatable_class[class])
-        else wrapper:setmetatable(metatable_class_gs[class])
-        end
-        wrapper:lock("RMT_object", "value")
-        if methods_class_lock[class] then
-            wrapper:lock(methods_class_lock[class])
-        end
-        return wrapper
+        local mt = metatable_class_gs[class]
+        if metatable_class[class] then mt = metatable_class[class] end
+        return make_wrapper(value, class, mt)
     end
 
     metatable_class_gs[class] = {

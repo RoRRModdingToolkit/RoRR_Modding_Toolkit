@@ -186,8 +186,8 @@ methods_skill = {
     onStep          = function(self, func) self:add_callback("onStep", func) end,
     onEquipped      = function(self, func) self:add_callback("onEquipped", func) end,
     onUnequipped    = function(self, func) self:add_callback("onUnequipped", func) end
+    
 }
-methods_class_lock["Skill"] = Helper.table_get_keys(methods_skill)
 
 
 

@@ -29,7 +29,6 @@ methods_ending = {
         self.is_victory = is_victory
     end,
 }
-methods_class_lock["Ending"] = Helper.table_get_keys(methods_ending)
 
 
 
