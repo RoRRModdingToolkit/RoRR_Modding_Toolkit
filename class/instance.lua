@@ -192,10 +192,6 @@ end
 
 
 Instance.wrap = function(value)
-    if not Instance.is(value) then
-        log.error("value is not an instance", 2)
-    end
-
     local wrapper = Proxy.new()
     wrapper.RMT_object = "Instance"
     wrapper.value = value
