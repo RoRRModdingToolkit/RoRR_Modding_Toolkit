@@ -116,8 +116,8 @@ Item.find_all = function(filter)
     if type(filter) == "number" then ind = 7 end    -- tier
 
     local array = Class.ITEM
-    local size = #array - 1
-    for i = 0, #size do
+    local size = #array
+    for i = 0, size - 1 do
         local item = array:get(i)
         if item[ind] == filter then
             table.insert(items, Item.wrap(i))
