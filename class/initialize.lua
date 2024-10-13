@@ -6,6 +6,8 @@ local init = false
 local funcs = {}
 local post_funcs = {}
 
+local legacy_load = {}
+
 
 
 -- ========== Metatable ==========
@@ -47,23 +49,12 @@ gm.pre_script_hook(gm.constants.__input_system_tick, function()
         end
 
         -- Run legacy __initialize
-        for _, m_id in ipairs(mods.loading_order) do
-            local m = mods[m_id]
-
-            -- Check if mod has RMT as a dependency
-            if Helper.table_has(
-                m._PLUGIN.dependencies_no_version_number,
-                "RoRRModdingToolkit-RoRR_Modding_Toolkit"
-            ) then
-
-                if m.__initialize then
-                    -- Call __initialize
-                    local status, err = pcall(m.__initialize)
-                    if not status then
-                        log.warning(m.id.." : __initialize failed to execute fully.\n"..err)
-                    end
+        for _, m in ipairs(legacy_load) do
+            if m.__initialize then
+                local status, err = pcall(m.__initialize)
+                if not status then
+                    log.warning(m.id.." : __initialize failed to execute fully.\n"..err)
                 end
-
             end
         end
 
@@ -77,23 +68,12 @@ gm.pre_script_hook(gm.constants.__input_system_tick, function()
         end
 
         -- Run legacy __post_initialize
-        for _, m_id in ipairs(mods.loading_order) do
-            local m = mods[m_id]
-
-            -- Check if mod has RMT as a dependency
-            if Helper.table_has(
-                m._PLUGIN.dependencies_no_version_number,
-                "RoRRModdingToolkit-RoRR_Modding_Toolkit"
-            ) then
-
-                if m.__post_initialize then
-                    -- Call __post_initialize
-                    local status, err = pcall(m.__post_initialize)
-                    if not status then
-                        log.warning(m.id.." : __post_initialize failed to execute fully.\n"..err)
-                    end
+        for _, m in ipairs(legacy_load) do
+            if m.__post_initialize then
+                local status, err = pcall(m.__post_initialize)
+                if not status then
+                    log.warning(m.id.." : __post_initialize failed to execute fully.\n"..err)
                 end
-
             end
         end
     end
@@ -126,6 +106,8 @@ mods.on_all_mods_loaded(function()
 
                 -- Add to language autoload
                 Language.register_autoload(m)
+
+                table.insert(legacy_load, m)
             end
 
         end
