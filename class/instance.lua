@@ -268,7 +268,16 @@ methods_instance = {
         subtable = subtable or "main"
 
         if not mod_id then
-            mod_id = envy.getfenv(2)["!guid"]
+            -- Find ID of mod that called this method
+            mod_id = "main"
+            local src = debug.getinfo(2, "S").source
+            local split = Array.wrap(gm.string_split(src, "\\"))
+            for i = 1, #split do
+                if split[i] == "plugins" and i < #split then
+                    mod_id = split[i + 1]
+                    break
+                end
+            end
         end
 
         -- Create data table if it doesn't already exist and return it
