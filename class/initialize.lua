@@ -57,16 +57,6 @@ gm.pre_script_hook(gm.constants.__input_system_tick, function()
             ) then
 
                 if m.__initialize then
-                    -- Add RMT class references
-                    local status, err = pcall(function()
-                        for _, c in ipairs(class_refs) do
-                            m._G[c] = c
-                        end
-                    end)
-                    if not status then
-                        log.warning(m.id.." : Failed to add RMT class references.\n"..err)
-                    end
-
                     -- Call __initialize
                     local status, err = pcall(m.__initialize)
                     if not status then
@@ -105,6 +95,39 @@ gm.pre_script_hook(gm.constants.__input_system_tick, function()
                 end
 
             end
+        end
+    end
+end)
+
+
+
+-- ========== Legacy RMT autoload ==========
+
+mods.on_all_mods_loaded(function()
+    for _, m_id in ipairs(mods.loading_order) do
+        local m = mods[m_id]
+
+        -- Check if mod has RMT as a dependency
+        if Helper.table_has(
+            m._PLUGIN.dependencies_no_version_number,
+            "RoRRModdingToolkit-RoRR_Modding_Toolkit"
+        ) then
+
+            if m.__initialize or m.__post_initialize then
+                -- Add RMT class references
+                local status, err = pcall(function()
+                    for k, v in pairs(class_refs) do
+                        m._G[k] = v
+                    end
+                end)
+                if not status then
+                    log.warning(m.id.." : Failed to add RMT class references.\n"..err)
+                end
+
+                -- Add to language autoload
+                Language.register_autoload(m)
+            end
+
         end
     end
 end)

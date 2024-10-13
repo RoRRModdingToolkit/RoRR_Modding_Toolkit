@@ -37,7 +37,6 @@ methods_list = {
 
     destroy = function(self)
         gm.ds_list_destroy(self.value)
-        abstraction_data[self].value = -1
     end,
 
 
