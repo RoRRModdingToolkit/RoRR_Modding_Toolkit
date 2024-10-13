@@ -104,7 +104,7 @@ methods_difficulty = {
     end,
 
 
-    allow_blight_spawns = function(self, allow_blight_spawns)
+    set_allow_blight_spawns = function(self, allow_blight_spawns)
         if type(allow_blight_spawns) ~= "boolean" then log.error("Blight Spawns toggle is not a boolean, got a "..type(allow_blight_spawns), 2) return end
         
         self.allow_blight_spawns = allow_blight_spawns
