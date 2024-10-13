@@ -12,8 +12,8 @@ local metatable_proxy = {
                     else
                         local keys = {...}
                         if type(keys[1]) == "table" then keys = keys[1] end
-                        for _, k in ipairs(keys) do
-                            proxy.keys_locked[k] = true
+                        for i = 1, #keys do
+                            proxy.keys_locked[keys[i]] = true
                         end
                     end
                     return proxy
