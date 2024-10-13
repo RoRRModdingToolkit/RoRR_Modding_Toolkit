@@ -34,6 +34,8 @@ end
 class_refs["Proxy"] = Proxy     -- Making this public too; might be useful to someone
 class_refs["Colour"] = Color
 
+class_refs["Z_Actor_Post"] = nil    -- Hacky solution but I'm too tired to find another way rn
+
 
 -- Lock public classes after finalization
 for _, ref in pairs(class_refs) do

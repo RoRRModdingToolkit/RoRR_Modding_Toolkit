@@ -8,6 +8,7 @@
 * Added wrappers for remaining classes in the global `class_` arrays.
 * Added `Proxy.new()`
 * Language : Fallback to english.json if the language file in a mod doesn't exist for the current language.
+* Difficulty : allow_blight_spawns renamed to set_allow_blight_spawns to avoid name conflict.
 
 ### v1.1.13
 * Instance : get_data tables and Instance callbacks are no longer instantly deleted for players on-death.
