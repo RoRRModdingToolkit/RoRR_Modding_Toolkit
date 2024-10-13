@@ -242,7 +242,6 @@ methods_equipment = {
     end,
 
 
-
     -- Callbacks
     onPickup            = function(self, func) self:add_callback("onPickup", func) end,
     onDrop              = function(self, func) self:add_callback("onDrop", func) end,

@@ -111,12 +111,12 @@ methods_difficulty = {
     end,
 
 
-
     -- Callbacks
     onActive        = function(self, func) self:add_callback("onActive", func) end,
     onInactive      = function(self, func) self:add_callback("onInactive", func) end,
     onStep          = function(self, func) self:add_callback("onStep", func) end,
     onDraw          = function(self, func) self:add_callback("onDraw", func) end
+    
 }
 methods_class_lock["Difficulty"] = Helper.table_get_keys(methods_difficulty)
 

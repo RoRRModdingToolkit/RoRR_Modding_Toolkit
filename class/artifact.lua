@@ -96,7 +96,6 @@ methods_artifact = {
     end,
 
 
-
     -- Callbacks
     onSetActive                     = function(self, func) self:add_callback("onSetActive", func) end,
     onStep                          = function(self, func) self:add_callback("onStep", func) end,
@@ -129,6 +128,7 @@ methods_artifact = {
     onHitProc                       = function(self, func) self:add_callback("onHitProc", func) end,
     onDamagedProc                   = function(self, func) self:add_callback("onDamagedProc", func) end,
     onKillProc                      = function(self, func) self:add_callback("onKillProc", func) end
+    
 }
 methods_class_lock["Artifact"] = Helper.table_get_keys(methods_artifact)
 

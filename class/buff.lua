@@ -99,7 +99,6 @@ methods_buff = {
     end,
 
 
-
     -- Callbacks
     onApply             = function(self, func) self:add_callback("onApply", func) end,
     onRemove            = function(self, func) self:add_callback("onRemove", func) end,
