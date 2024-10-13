@@ -53,7 +53,7 @@ gm.pre_script_hook(gm.constants.__input_system_tick, function()
             if m.__initialize then
                 local status, err = pcall(m.__initialize)
                 if not status then
-                    log.warning(m.id.." : __initialize failed to execute fully.\n"..err)
+                    log.warning(m["!guid"].." : __initialize failed to execute fully.\n"..err)
                 end
             end
         end
@@ -72,7 +72,7 @@ gm.pre_script_hook(gm.constants.__input_system_tick, function()
             if m.__post_initialize then
                 local status, err = pcall(m.__post_initialize)
                 if not status then
-                    log.warning(m.id.." : __post_initialize failed to execute fully.\n"..err)
+                    log.warning(m["!guid"].." : __post_initialize failed to execute fully.\n"..err)
                 end
             end
         end
@@ -101,7 +101,7 @@ mods.on_all_mods_loaded(function()
                     end
                 end)
                 if not status then
-                    log.warning(m.id.." : Failed to add RMT class references.\n"..err)
+                    log.warning(m["!guid"].." : Failed to add RMT class references.\n"..err)
                 end
 
                 -- Add to language autoload
