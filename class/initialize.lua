@@ -14,6 +14,8 @@ local legacy_load = {}
 
 metatable_initialize = {
     __call = function(t, func, post)
+        if init then return end
+
         if not post then
             if not funcs[envy.getfenv(2)["!guid"]] then funcs[envy.getfenv(2)["!guid"]] = {} end
             table.insert(funcs[envy.getfenv(2)["!guid"]], func)
