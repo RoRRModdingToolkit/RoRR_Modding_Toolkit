@@ -192,7 +192,6 @@ initialize_player = function()
             local player = Player.get_client()
             if player:exists() then
                 for _, c in ipairs(auto_callbacks) do
-                    player:remove_callback(c[2])
                     player:add_callback(c[1], c[2], c[3], c[4], c[5])
                 end
             end
