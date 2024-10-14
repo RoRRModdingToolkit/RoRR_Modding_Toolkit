@@ -196,19 +196,23 @@ end
 Instance.wrap = function(value)
     local RMT_object = "Instance"
     local mt = metatable_instance
+    local lt = lock_table_instance
 
     if value.object_index == gm.constants.oCustomObject_pInteractable then
         RMT_object = "Interactable Instance"
         mt = metatable_interactable_instance
+        lt = lock_table_interactable_instance
     elseif value.object_index == gm.constants.oP then
         RMT_object = "Player"
         mt = metatable_player
+        lt = lock_table_player
     elseif gm.object_is_ancestor(value.object_index, gm.constants.pActor) == 1.0 then
         RMT_object = "Actor"
         mt = metatable_actor
+        lt = lock_table_actor
     end
 
-    return make_wrapper(value, RMT_object, mt, lock_table_instance)
+    return make_wrapper(value, RMT_object, mt, lt)
 end
 
 

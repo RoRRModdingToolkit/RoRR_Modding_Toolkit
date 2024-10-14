@@ -103,6 +103,7 @@ methods_player = {
     end
 
 }
+lock_table_player = Proxy.make_lock_table({"value", "RMT_object", table.unpack(methods_instance), table.unpack(methods_actor), table.unpack(methods_player)})
 
 
 methods_player_callbacks = {
