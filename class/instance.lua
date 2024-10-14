@@ -217,7 +217,7 @@ end
 
 
 Instance.wrap_invalid = function()
-    return make_wrapper(-4, "Instance", metatable_instance)
+    return make_wrapper(-4, "Instance", metatable_instance, lock_table_instance)
 end
 
 
