@@ -124,7 +124,6 @@ if success then properties = file.Array end
 -- See "item.lua" for example (and [Ctrl + F] search for these tables)
 metatable_class_gs = Proxy.new()    -- Base getter/setter (immutable)
 metatable_class = {}                -- First metatable for each class (goes straight to getter/setter if nil)
-class_lock_tables = {}              -- keys_locked table for the class wrapper
 -- Also "class_refs"                -- Get existing class table, containing this base setup
 
 -- NOTE: You can override "find" and "wrap" if you want to
@@ -181,11 +180,7 @@ for class, class_array_id in pairs(class_arrays) do
     t.wrap = function(value)
         local mt = metatable_class_gs[class]
         if metatable_class[class] then mt = metatable_class[class] end
-
-        local class_lt = nil
-        if class_lock_tables[class] then class_lt = class_lock_tables[class] end
-
-        return make_wrapper(value, class, mt, class_lt)
+        return make_wrapper(value, class, mt)
     end
 
     metatable_class_gs[class] = {

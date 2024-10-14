@@ -81,7 +81,6 @@ methods_environment_log = {
         self.is_secret = issecret
     end,
 }
-class_lock_tables["Environment_Log"] = Proxy.make_lock_table({"value", "RMT_object", table.unpack(methods_environment_log)})
 
 
 

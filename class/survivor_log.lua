@@ -71,7 +71,6 @@ methods_survivor_log = {
     --     self.token_arrival  = arrival
     -- end,
 }
-class_lock_tables["Survivor_Log"] = Proxy.make_lock_table({"value", "RMT_object", table.unpack(methods_survivor_log)})
 
 
 

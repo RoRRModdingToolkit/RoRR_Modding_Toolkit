@@ -27,7 +27,6 @@ methods_interactable_card = {
 
 
 }
-class_lock_tables["Interactable_Card"] = Proxy.make_lock_table({"value", "RMT_object", table.unpack(methods_interactable_card)})
 
 
 

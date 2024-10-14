@@ -35,7 +35,6 @@ methods_gamemode = {
 
 
 }
-class_lock_tables["Gamemode"] = Proxy.make_lock_table({"value", "RMT_object", table.unpack(methods_gamemode)})
 
 
 

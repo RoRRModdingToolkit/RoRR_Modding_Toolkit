@@ -204,7 +204,6 @@ methods_stage = {
     end
 
 }
-class_lock_tables["Stage"] = Proxy.make_lock_table({"value", "RMT_object", table.unpack(methods_stage)})
 
 
 

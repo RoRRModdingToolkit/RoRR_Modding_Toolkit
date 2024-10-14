@@ -27,7 +27,6 @@ methods_monster_card = {
     
 
 }
-class_lock_tables["Monster_Card"] = Proxy.make_lock_table({"value", "RMT_object", table.unpack(methods_monster_card)})
 
 
 

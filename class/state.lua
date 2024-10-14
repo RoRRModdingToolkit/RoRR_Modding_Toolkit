@@ -96,7 +96,6 @@ methods_state = {
     onStep                      = function(self, func) self:add_callback("onStep", func) end,
     on_get_interrupt_priority   = function(self, func) self:add_callback("onGetInterruptPriority", func) end
 }
-class_lock_tables["State"] = Proxy.make_lock_table({"value", "RMT_object", table.unpack(methods_state)})
 
 
 

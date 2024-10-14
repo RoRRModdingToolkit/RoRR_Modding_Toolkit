@@ -188,7 +188,6 @@ methods_skill = {
     onUnequipped    = function(self, func) self:add_callback("onUnequipped", func) end
     
 }
-class_lock_tables["Skill"] = Proxy.make_lock_table({"value", "RMT_object", table.unpack(methods_skill)})
 
 
 
