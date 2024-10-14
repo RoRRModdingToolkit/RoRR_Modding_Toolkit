@@ -1,8 +1,9 @@
 ### v1.1.14
 * Now using ENVY to make own global variables private to self, and for new `.auto()` import call.
 * Internal restructuring to make all classes read-only (does not affect end-user functionality as listed on the docs).
-    * The only things different are the one-liner and initialize call.
     * Previously, a user could write `Item.new = "abc"` and brick every item mod for example.
+* Changed required one-liner and initialize call.
+    * Legacy support : If `__initialize` or `__post_initialize` are detected, then the classes will be automatically added to the mod's `_G`.
 * Initialize : Will now print a message to console if a mod's initialize/post_initialize fails to run.
     * They will also now run in mod load order.
 * Added wrappers for remaining classes in the global `class_` arrays.
