@@ -88,7 +88,7 @@ methods_list = {
     end
 
 }
-lock_table_list = Proxy.make_lock_table({"value", "RMT_object", table.unpack(methods_list)})
+lock_table_list = Proxy.make_lock_table({"value", "RMT_object", table.unpack(Helper.table_get_keys(methods_list))})
 
 
 

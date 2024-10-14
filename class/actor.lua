@@ -283,7 +283,7 @@ methods_actor = {
     end
 
 }
-lock_table_actor = Proxy.make_lock_table({"value", "RMT_object", table.unpack(methods_instance), table.unpack(methods_actor)})
+lock_table_actor = Proxy.make_lock_table({"value", "RMT_object", table.unpack(Helper.table_get_keys(methods_instance)), table.unpack(Helper.table_get_keys(methods_actor))})
 
 
 methods_actor_callbacks = {

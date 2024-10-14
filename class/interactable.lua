@@ -94,7 +94,7 @@ methods_interactable = {
     onStateDraw         = function(self, func, state) self:add_callback("onStateDraw", func, state) end
 
 }
-lock_table_interactable = Proxy.make_lock_table({"value", "RMT_object", table.unpack(methods_interactable)})
+lock_table_interactable = Proxy.make_lock_table({"value", "RMT_object", table.unpack(Helper.table_get_keys(methods_interactable))})
 
 
 methods_interactable_instance = {
@@ -112,7 +112,7 @@ methods_interactable_instance = {
     end
 
 }
-lock_table_interactable_instance = Proxy.make_lock_table({"value", "RMT_object", table.unpack(methods_instance), table.unpack(methods_interactable_instance)})
+lock_table_interactable_instance = Proxy.make_lock_table({"value", "RMT_object", table.unpack(Helper.table_get_keys(methods_instance)), table.unpack(Helper.table_get_keys(methods_interactable_instance))})
 
 
 

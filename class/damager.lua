@@ -132,7 +132,7 @@ methods_damager = {
     end,
 
 }
-lock_table_damager = Proxy.make_lock_table({"value", "RMT_object", table.unpack(methods_damager)})
+lock_table_damager = Proxy.make_lock_table({"value", "RMT_object", table.unpack(Helper.table_get_keys(methods_damager))})
 
 
 

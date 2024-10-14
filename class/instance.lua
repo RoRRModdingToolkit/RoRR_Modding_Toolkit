@@ -413,7 +413,7 @@ methods_instance = {
     onEquipmentUse      = function(self, id, func) self:add_callback("onEquipmentUse", id, func) end
 
 }
-lock_table_instance = Proxy.make_lock_table({"value", "RMT_object", table.unpack(methods_instance)})
+lock_table_instance = Proxy.make_lock_table({"value", "RMT_object", table.unpack(Helper.table_get_keys(methods_instance))})
 
 
 
