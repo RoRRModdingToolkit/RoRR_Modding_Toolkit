@@ -42,7 +42,7 @@ Class:setmetatable({
 
 initialize_class = function()
     for k, v in pairs(class_arrays) do
-        class_wrappers[k:upper()] = Array.wrap(gm.variable_global_get(v))
+        class_wrappers[v:sub(7, #v):upper()] = Array.wrap(gm.variable_global_get(v))
     end
 end
 
