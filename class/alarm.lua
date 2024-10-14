@@ -23,7 +23,7 @@ gm.post_script_hook(gm.constants.__input_system_tick, function()
     current_frame = gm.variable_global_get("_current_frame")
     if not alarms[current_frame] then return end
     for i=1, #alarms[current_frame] do
-        local status, err = pcall(alarms[current_frame][i].fn(alarms[current_frame][i].args))
+        local status, err = pcall(alarms[current_frame][i].fn, alarms[current_frame][i].args)
         if not status then
             log.error("Alarm error from "..alarms[current_frame][i].src.."\n"..err)
         end
