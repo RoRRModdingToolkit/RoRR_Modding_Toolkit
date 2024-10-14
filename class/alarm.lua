@@ -4,7 +4,7 @@
 Alarm = Proxy.new()
 
 local alarms = {}
-local current_frame = nil
+local current_frame = 0
 
 --
 
