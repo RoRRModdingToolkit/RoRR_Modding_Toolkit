@@ -42,7 +42,6 @@ methods_ending = {
         self.is_victory = is_victory
     end,
 }
-class_lock_tables["Ending"] = Proxy.make_lock_table({"value", "RMT_object", table.unpack(methods_ending)})
 
 
 

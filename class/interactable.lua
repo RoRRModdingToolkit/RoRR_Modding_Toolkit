@@ -112,7 +112,6 @@ methods_interactable_instance = {
     end
 
 }
-lock_table_interactable_instance = Proxy.make_lock_table({"value", "RMT_object", table.unpack(Helper.table_get_keys(methods_instance)), table.unpack(Helper.table_get_keys(methods_interactable_instance))})
 
 
 
