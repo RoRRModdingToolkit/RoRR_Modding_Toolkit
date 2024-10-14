@@ -9,8 +9,8 @@ local class_arrays = {
     Artifact            = "class_artifact",
     Buff                = "class_buff",
     Difficulty          = "class_difficulty",
-    Elite               = "class_elite",
-    Ending              = "class_ending_type",
+    Elite               = "class_elite_type",
+    Ending              = "class_ending",
     Environment_Log     = "class_environment_log",
     Equipment           = "class_equipment",
     Gamemode            = "class_game_mode",
@@ -51,7 +51,7 @@ Class:setmetatable({
 initialize_class = function()
     for k, v in pairs(class_arrays) do
         class_wrappers[v:sub(7, #v):upper()] = Array.wrap(gm.variable_global_get(v))
-        class_find_repopulate(k)
+        class_find_repopulate(v)
     end
 end
 
@@ -59,35 +59,7 @@ end
 
 -- ========== Internal ==========
 
--- gm.pre_script_hook(gm.constants.__input_system_tick, function(self, other, result, args)
---     -- Repopulate class_find_table whenever the size is changed
---     for k, v in pairs(class_arrays) do
---         class_find_repopulate(k)
-
---         -- local arr = gm.variable_global_get(v)
---         -- local size = gm.array_length(arr)
---         -- if size ~= class_array_sizes[v] then
---         --     class_array_sizes[v] = size
---         --     local t = class_find_table[v]
-
---         --     for i = 0, size - 1 do
---         --         local element = gm.array_get(arr, i)
---         --         if gm.is_array(element) then
---         --             local namespace = gm.array_get(element, 0)
---         --             local identifier = gm.array_get(element, 1)
---         --             local full = namespace.."-"..identifier
---         --             t[full] = i
---         --         end
---         --     end
---         -- end
---     end
--- end)
-
-
 class_find_repopulate = function(class)
-    if not class_arrays[class] then log.error("Class does not exist", 2) end
-    class = class_arrays[class]
-
     local arr = gm.variable_global_get(class)
     local size = gm.array_length(arr)
     if size ~= class_array_sizes[class] then
@@ -105,6 +77,27 @@ class_find_repopulate = function(class)
         end
     end
 end
+
+gm.post_script_hook(gm.constants.achievement_create,        function() class_find_repopulate("class_achievement") end)
+gm.post_script_hook(gm.constants.actor_skin_create,         function() class_find_repopulate("class_actor_skin") end)
+gm.post_script_hook(gm.constants.actor_state_create,        function() class_find_repopulate("class_actor_state") end)
+gm.post_script_hook(gm.constants.artifact_create,           function() class_find_repopulate("class_artifact") end)
+gm.post_script_hook(gm.constants.buff_create,               function() class_find_repopulate("class_buff") end)
+gm.post_script_hook(gm.constants.difficulty_create,         function() class_find_repopulate("class_difficulty") end)
+gm.post_script_hook(gm.constants.elite_type_create,         function() class_find_repopulate("class_elite_type") end)
+gm.post_script_hook(gm.constants.ending_create,             function() class_find_repopulate("class_ending") end)
+gm.post_script_hook(gm.constants.environment_log_create,    function() class_find_repopulate("class_environment_log") end)
+gm.post_script_hook(gm.constants.equipment_create,          function() class_find_repopulate("class_equipment") end)
+gm.post_script_hook(gm.constants.gamemode_create,           function() class_find_repopulate("class_game_mode") end)
+gm.post_script_hook(gm.constants.interactable_card_create,  function() class_find_repopulate("class_interactable_card") end)
+gm.post_script_hook(gm.constants.item_create,               function() class_find_repopulate("class_item") end)
+gm.post_script_hook(gm.constants.item_log_create,           function() class_find_repopulate("class_item_log") end)
+gm.post_script_hook(gm.constants.monster_card_create,       function() class_find_repopulate("class_monster_card") end)
+gm.post_script_hook(gm.constants.monster_log_create,        function() class_find_repopulate("class_monster_log") end)
+gm.post_script_hook(gm.constants.skill_create,              function() class_find_repopulate("class_skill") end)
+gm.post_script_hook(gm.constants.stage_create,              function() class_find_repopulate("class_stage") end)
+gm.post_script_hook(gm.constants.survivor_create,           function() class_find_repopulate("class_survivor") end)
+gm.post_script_hook(gm.constants.survivor_log_create,       function() class_find_repopulate("class_survivor_log") end)
 
 
 
@@ -145,35 +138,7 @@ for class, class_array_id in pairs(class_arrays) do
         end
 
         local element = class_find_table[class_array_id_og][namespace]
-        if element then
-            return t.wrap(element)
-        end
-
-        -- -- This is way faster since it doesn't have to wrap every array in the class_array
-        -- local class_raw = Class[class_array_id].value
-        -- local size = gm.array_length(class_raw)
-        -- for i = 0, size - 1 do
-        --     local element = gm.array_get(class_raw, i)
-        --     if gm.is_array(element) then
-        --         local _namespace = gm.array_get(element, 0)
-        --         local _identifier = gm.array_get(element, 1)
-        --         if namespace == _namespace.."-".._identifier then
-        --             return t.wrap(i)
-        --         end
-        --     end
-        -- end
-
-        -- for i = 0, #Class[class_array_id] - 1 do
-        --     local element = Class[class_array_id]:get(i)
-        --     if gm.is_array(element.value) then
-        --         local _namespace = element:get(0)
-        --         local _identifier = element:get(1)
-        --         if namespace == _namespace.."-".._identifier then
-        --             return t.wrap(i)
-        --         end
-        --     end
-        -- end
-
+        if element then return t.wrap(element) end
         return nil
     end
 

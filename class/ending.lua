@@ -17,7 +17,6 @@ Ending.new = function(namespace, identifier)
         )
     )
 
-    class_find_repopulate("Ending")
     return ending
 end
 

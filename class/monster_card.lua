@@ -14,7 +14,6 @@ Monster_Card.new = function(namespace, identifier)
         gm.monster_card_create(namespace, identifier)
     )
 
-    class_find_repopulate("Monster_Card")
     return mc
 end
 

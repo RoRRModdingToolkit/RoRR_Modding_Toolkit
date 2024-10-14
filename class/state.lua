@@ -47,7 +47,6 @@ State.new = function(namespace, identifier)
         )
     )
 
-    class_find_repopulate("State")
     return state
 end
 

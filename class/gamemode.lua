@@ -22,7 +22,6 @@ Gamemode.new = function(namespace, identifier, count_normal_unlocks, count_towar
         )
     )
 
-    class_find_repopulate("Gamemode")
     return gamemode
 end
 

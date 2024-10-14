@@ -28,7 +28,6 @@ Difficulty.new = function(namespace, identifier)
         )
     )
 
-    class_find_repopulate("Difficulty")
     return difficulty
 end
 

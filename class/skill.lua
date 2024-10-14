@@ -48,7 +48,6 @@ Skill.new = function(namespace, identifier, cooldown, damage, sprite_id, sprite_
         )
     )
 
-    class_find_repopulate("Skill")
     return skill
 end
 

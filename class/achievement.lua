@@ -42,7 +42,6 @@ Achievement.new = function(namespace, identifier)
         )
     )
 
-    class_find_repopulate("Achievement")
     return achievement
 end
 

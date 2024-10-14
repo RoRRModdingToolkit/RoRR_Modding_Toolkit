@@ -24,7 +24,6 @@ Stage.new = function(namespace, identifier, no_log)
         stage.log_id = gm.environment_log_create(namespace, identifier)
     end
 
-    class_find_repopulate("Stage")
     return stage
 end
 

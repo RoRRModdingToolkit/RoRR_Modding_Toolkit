@@ -38,7 +38,6 @@ Buff.new = function(namespace, identifier)
         end
     end)
 
-    class_find_repopulate("Buff")
     return buff
 end
 

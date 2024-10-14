@@ -32,7 +32,6 @@ Environment_Log.new = function(stage)
         gm.room_associate_environment_log(room, stage.log_id, num)
     end
 
-    class_find_repopulate("Environment_Log")
     return environment_log
 end
 

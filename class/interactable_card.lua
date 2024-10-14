@@ -14,7 +14,6 @@ Interactable_Card.new = function(namespace, identifier)
         gm.interactable_card_create(namespace, identifier)
     )
 
-    class_find_repopulate("Interactable_Card")
     return ic
 end
 

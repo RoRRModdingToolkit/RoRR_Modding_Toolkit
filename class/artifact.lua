@@ -54,7 +54,6 @@ Artifact.new = function(namespace, identifier)
         )
     )
 
-    class_find_repopulate("Artifact")
     return artifact
 end
 
