@@ -20,7 +20,8 @@ end
 
 gm.post_script_hook(gm.constants.__input_system_tick, function()
     -- "_current_frame" resets on run start, so using own counter now
-    current_frame = current_frame + 1
+    -- Also only increments when not paused in a run, just like before
+    if not gm.variable_global_get("pause") then current_frame = current_frame + 1 end
     if not alarms[current_frame] then return end
     for i=1, #alarms[current_frame] do
         local status, err = pcall(alarms[current_frame][i].fn, alarms[current_frame][i].args)
