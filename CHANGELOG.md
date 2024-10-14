@@ -1,3 +1,6 @@
+### v1.1.15
+* 
+
 ### v1.1.14
 * Now using ENVY to make own global variables private to self, and for new class ref import methods.
 * Internal restructuring to make all classes read-only (does not affect end-user functionality as listed on the docs).

@@ -1,7 +1,7 @@
 Friendly abstractions of the game's internal functions for easier modding.  
 Documentation can be found [here](https://github.com/RoRRModdingToolkit/RoRR_Modding_Toolkit/wiki).  
 
-Include `RoRRModdingToolkit-RoRR_Modding_Toolkit-1.1.14` as a dependency in `manifest.json`.
+Include `RoRRModdingToolkit-RoRR_Modding_Toolkit-1.1.15` as a dependency in `manifest.json`.
 
 To auto-add RMT class references directly to your workspace, place the following line in your code:  
 ```lua
