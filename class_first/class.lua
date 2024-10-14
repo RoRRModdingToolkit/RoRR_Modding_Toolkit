@@ -165,7 +165,7 @@ for class, class_array_id in pairs(class_arrays) do
             local index = t.ARRAY[key]
             if index then
                 local array = Class[class_array_id]:get(table.value)
-                return array:get(index)
+                return Wrap.wrap(array:get(index))
             end
             log.error("Non-existent "..class.." property", 2)
             return nil
@@ -176,7 +176,7 @@ for class, class_array_id in pairs(class_arrays) do
             local index = t.ARRAY[key]
             if index then
                 local array = Class[class_array_id]:get(table.value)
-                array:set(index, value)
+                array:set(index, Wrap.unwrap(value))
                 return
             end
             log.error("Non-existent "..class.." property", 2)
