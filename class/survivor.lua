@@ -94,7 +94,10 @@ Survivor.new = function(namespace, identifier)
     if survivor then return survivor end
     
     -- Create survivor
-    survivor = gm.survivor_create(namespace, identifier)
+    survivor = gm.survivor_create(
+        namespace,      -- Namespace
+        identifier      -- Identifier
+    )
     
     -- TODO maybe find a better way to do this?
     -- Create default variable for the survivor

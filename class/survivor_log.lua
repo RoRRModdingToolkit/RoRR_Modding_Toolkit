@@ -17,7 +17,12 @@ Survivor_Log.new = function(survivor, portrait_id, portrait_index)
     if survivor_log then return survivor_log end
     
     -- Create survivor_log
-    survivor_log = gm.survivor_log_create(survivor.namespace, survivor.identifier, survivor.value, portrait_index or 0)
+    survivor_log = gm.survivor_log_create(
+        survivor.namespace,         -- Namespace
+        survivor.identifier,        -- Identifier
+        survivor.value,             -- Survivor ID
+        portrait_index or 0         -- Survivor Portrait Index
+    )
 
     -- Make survivor_log abstraction
     local abstraction = Survivor_Log.wrap(survivor_log)

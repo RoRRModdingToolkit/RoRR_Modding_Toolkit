@@ -15,7 +15,10 @@ Environment_Log.new = function(stage)
     if environment_log then return environment_log end
 
     -- Create environment_log
-    environment_log = gm.environment_log_create(stage.namespace, stage.identifier)
+    environment_log = gm.environment_log_create(
+        stage.namespace,      -- Namespace
+        stage.identifier      -- Identifier
+    )
 
     -- Make environment_log abstraction
     local abstraction = Environment_Log.wrap(environment_log)

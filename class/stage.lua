@@ -13,7 +13,10 @@ Stage.new = function(namespace, identifier, no_log)
     if stage then return stage end
 
     local stage = Stage.wrap(
-        gm.stage_create(namespace, identifier)
+        gm.stage_create(
+            namespace,      -- Namespace
+            identifier      -- Identifier
+        )
     )
 
     -- Create environment log

@@ -47,7 +47,10 @@ Artifact.new = function(namespace, identifier)
     if artifact then return artifact end
     
     -- Create artifact
-    artifact = gm.artifact_create(namespace, identifier)
+    artifact = gm.artifact_create(
+        namespace,      -- Namespace
+        identifier      -- Identifier
+    )
 
     -- Make artifact abstraction
     local abstraction = Artifact.wrap(artifact)
@@ -91,6 +94,9 @@ methods_artifact = {
     end,
 
     set_sprites = function(self, loadout, pickup)
+        if type(loadout) ~= "number" then log.error("Loadout Sprite ID is not a number, got a "..type(loadout), 2) return end
+        if type(pickup) ~= "number" then log.error("Pickup Sprite ID is not a number, got a "..type(pickup), 2) return end
+
         self.loadout_sprite_id = loadout
         self.pickup_sprite_id = pickup
     end,

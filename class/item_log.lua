@@ -32,7 +32,13 @@ Item_Log.new = function(item)
     if item.tier == Item.TIER.boss then group = group - 1 end
 
     -- Create item_log
-    item_log = gm.item_log_create(item.namespace, item.identifier, group, item.sprite_id, item.object_id)
+    item_log = gm.item_log_create(
+        item.namespace,         -- Namespace
+        item.identifier,        -- Identifier
+        group,                  -- Item Group in the Log page
+        item.sprite_id,         -- Sprite of the Item
+        item.object_id          -- Item Pickup Object
+    )
 
     -- Make item_log abstraction
     local abstraction = Item_Log.wrap(item_log)

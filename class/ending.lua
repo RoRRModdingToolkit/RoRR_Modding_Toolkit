@@ -10,7 +10,12 @@ Ending.new = function(namespace, identifier)
     local ending = Ending.find(namespace, identifier)
     if ending then return ending end
 
-    return Ending.wrap(gm.ending_create(namespace, identifier))
+    return Ending.wrap(
+        gm.ending_create(
+            namespace,      -- Namespace
+            identifier      -- Identifier
+        )
+    )
 end
 
 
@@ -18,8 +23,13 @@ end
 -- ========== Instance Methods ==========
 
 methods_ending = {
-    set_primary_color = function(self, R, G, B)
-        self.primary_color = Color.from_rgb(R, G, B)
+    set_primary_color = function(self, color)
+        -- Find a way to check if it is an RMT colour
+        self.primary_color = color
+    end,
+
+    set_primary_colour = function(self, colour)
+        self:set_primary_color(colour)
     end,
 
 

@@ -35,7 +35,10 @@ Achievement.new = function(namespace, identifier)
     if achievement then return achievement end
     
     -- Create Achievement
-    achievement = gm.achievement_create(namespace, identifier)
+    achievement = gm.achievement_create(
+        namespace,      -- Namespace
+        identifier      -- Identifier
+    )
 
     -- Make Achievement abstraction
     local abstraction = Achievement.wrap(achievement)
