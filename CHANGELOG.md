@@ -11,6 +11,7 @@
 * Language : Fallback to english.json if the language file in a mod doesn't exist for the current language.
     * Added `register_autoload` (automatically called if importing with `.auto()`).
 * Difficulty : `allow_blight_spawns` renamed to `set_allow_blight_spawns` to avoid name conflict with class_array property.
+* Stage : `set_index` cap is now equal to the size of `stage_progression_order`.
 
 ### v1.1.13
 * Instance : get_data tables and Instance callbacks are no longer instantly deleted for players on-death.
