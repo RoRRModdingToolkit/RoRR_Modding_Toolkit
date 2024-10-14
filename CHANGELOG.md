@@ -13,7 +13,9 @@
 * Difficulty : `allow_blight_spawns` renamed to `set_allow_blight_spawns` to avoid name conflict with class_array property.
 * Stage : `set_index` cap is now equal to the size of `stage_progression_order`.
 * Player : Added `remove_callback` and `callback_exists`.
-* Alarm : If an error is thrown from an alarm function, the source of the alarm will now be logged.
+* Alarm
+    * If an error is thrown from an alarm function, the source of the alarm will now be logged.
+    * Fixed errors arising from starting a new run before previously added alarms were executed.
 
 ### v1.1.13
 * Instance : get_data tables and Instance callbacks are no longer instantly deleted for players on-death.
