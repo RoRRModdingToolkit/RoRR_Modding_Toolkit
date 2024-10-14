@@ -17,10 +17,16 @@ local active = -1.0
 -- ========== Static Methods ==========
 
 Difficulty.new = function(namespace, identifier)
+    -- Check if difficulty already exist
     local difficulty = Difficulty.find(namespace, identifier)
     if difficulty then return difficulty end
 
-    return Difficulty.wrap(gm.difficulty_create(namespace, identifier))
+    return Difficulty.wrap(
+        gm.difficulty_create(
+            namespace,      -- Namespace
+            identifier      -- Identifier
+        )
+    )
 end
 
 
@@ -65,17 +71,13 @@ methods_difficulty = {
     end,
 
 
-    set_primary_color = function(self, R, G, B)
-        if not G then
-            self.primary_color = R
-            return
-        end
-        self.primary_color = Color.from_rgb(R, G, B)
+    set_primary_color = function(self, color)
+        -- Find a way to check if it is an RMT colour
+        self.primary_color = color
     end,
 
-
-    set_primary_colour = function(self, R, G, B)
-        self:set_primary_color(R, G, B)
+    set_primary_colour = function(self, colour)
+        self:set_primary_color(colour)
     end,
 
 
