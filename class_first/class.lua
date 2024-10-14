@@ -25,21 +25,26 @@ local class_arrays = {
     Survivor_Log        = "class_survivor_log"
 }
 
+local class_wrappers = {}
+
 
 
 -- ========== Metatable ==========
 
 Class:setmetatable({
     __index = function(table, key)
-        if type(key) ~= "string" then return nil end
-        
-        local k = "class_"..key:lower()
-        if Helper.table_has(class_arrays, k) then
-            return Array.wrap(gm.variable_global_get(k))
-        else log.error("Class does not exist", 2)
-        end
+        k = key:upper()
+        if class_wrappers[k] then return class_wrappers[k] end
+        log.error("Class does not exist", 2)
     end
 })
+
+
+initialize_class = function()
+    for k, v in pairs(class_arrays) do
+        class_wrappers[k:upper()] = Array.wrap(gm.variable_global_get(v))
+    end
+end
 
 
 
