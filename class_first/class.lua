@@ -33,8 +33,8 @@ local class_wrappers = {}
 
 Class:setmetatable({
     __index = function(table, key)
-        k = key:upper()
-        if class_wrappers[k] then return class_wrappers[k] end
+        key = key:upper()
+        if class_wrappers[key] then return class_wrappers[key] end
         log.error("Class does not exist", 2)
     end
 })
