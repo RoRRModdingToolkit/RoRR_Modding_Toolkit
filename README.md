@@ -9,7 +9,7 @@ mods["RoRRModdingToolkit-RoRR_Modding_Toolkit"].auto()
 
 ```
 
-Alternatively you can store these references in a variable
+Alternatively, you can store these references in a variable:
 ```lua
 local RMT = mods["RoRRModdingToolkit-RoRR_Modding_Toolkit"].setup()
 
