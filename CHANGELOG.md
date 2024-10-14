@@ -12,6 +12,7 @@
     * Added `register_autoload` (automatically called if importing with `.auto()`).
 * Difficulty : `allow_blight_spawns` renamed to `set_allow_blight_spawns` to avoid name conflict with class_array property.
 * Stage : `set_index` cap is now equal to the size of `stage_progression_order`.
+* Player : Added `remove_callback` and `callback_exists`.
 
 ### v1.1.13
 * Instance : get_data tables and Instance callbacks are no longer instantly deleted for players on-death.
