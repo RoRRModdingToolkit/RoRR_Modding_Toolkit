@@ -9,8 +9,8 @@ local class_arrays = {
     Artifact            = "class_artifact",
     Buff                = "class_buff",
     Difficulty          = "class_difficulty",
-    Elite               = "class_elite_type",
-    Ending              = "class_ending",
+    Elite               = "class_elite",
+    Ending              = "class_ending_type",
     Environment_Log     = "class_environment_log",
     Equipment           = "class_equipment",
     Gamemode            = "class_game_mode",
@@ -50,8 +50,30 @@ Class:setmetatable({
 
 initialize_class = function()
     for k, v in pairs(class_arrays) do
+        log.info(v.." : "..tostring(gm.variable_global_get(v)))
         class_wrappers[v:sub(7, #v):upper()] = Array.wrap(gm.variable_global_get(v))
+
         class_find_repopulate(v)
+        gm.post_script_hook(gm.constants.achievement_create,        function() class_find_repopulate("class_achievement") end)
+        gm.post_script_hook(gm.constants.actor_skin_create,         function() class_find_repopulate("class_actor_skin") end)
+        gm.post_script_hook(gm.constants.actor_state_create,        function() class_find_repopulate("class_actor_state") end)
+        gm.post_script_hook(gm.constants.artifact_create,           function() class_find_repopulate("class_artifact") end)
+        gm.post_script_hook(gm.constants.buff_create,               function() class_find_repopulate("class_buff") end)
+        gm.post_script_hook(gm.constants.difficulty_create,         function() class_find_repopulate("class_difficulty") end)
+        gm.post_script_hook(gm.constants.elite_type_create,         function() class_find_repopulate("class_elite") end)
+        gm.post_script_hook(gm.constants.ending_create,             function() class_find_repopulate("class_ending_type") end)
+        gm.post_script_hook(gm.constants.environment_log_create,    function() class_find_repopulate("class_environment_log") end)
+        gm.post_script_hook(gm.constants.equipment_create,          function() class_find_repopulate("class_equipment") end)
+        gm.post_script_hook(gm.constants.gamemode_create,           function() class_find_repopulate("class_game_mode") end)
+        gm.post_script_hook(gm.constants.interactable_card_create,  function() class_find_repopulate("class_interactable_card") end)
+        gm.post_script_hook(gm.constants.item_create,               function() class_find_repopulate("class_item") end)
+        gm.post_script_hook(gm.constants.item_log_create,           function() class_find_repopulate("class_item_log") end)
+        gm.post_script_hook(gm.constants.monster_card_create,       function() class_find_repopulate("class_monster_card") end)
+        gm.post_script_hook(gm.constants.monster_log_create,        function() class_find_repopulate("class_monster_log") end)
+        gm.post_script_hook(gm.constants.skill_create,              function() class_find_repopulate("class_skill") end)
+        gm.post_script_hook(gm.constants.stage_create,              function() class_find_repopulate("class_stage") end)
+        gm.post_script_hook(gm.constants.survivor_create,           function() class_find_repopulate("class_survivor") end)
+        gm.post_script_hook(gm.constants.survivor_log_create,       function() class_find_repopulate("class_survivor_log") end)
     end
 end
 
@@ -77,27 +99,6 @@ class_find_repopulate = function(class)
         end
     end
 end
-
-gm.post_script_hook(gm.constants.achievement_create,        function() class_find_repopulate("class_achievement") end)
-gm.post_script_hook(gm.constants.actor_skin_create,         function() class_find_repopulate("class_actor_skin") end)
-gm.post_script_hook(gm.constants.actor_state_create,        function() class_find_repopulate("class_actor_state") end)
-gm.post_script_hook(gm.constants.artifact_create,           function() class_find_repopulate("class_artifact") end)
-gm.post_script_hook(gm.constants.buff_create,               function() class_find_repopulate("class_buff") end)
-gm.post_script_hook(gm.constants.difficulty_create,         function() class_find_repopulate("class_difficulty") end)
-gm.post_script_hook(gm.constants.elite_type_create,         function() class_find_repopulate("class_elite_type") end)
-gm.post_script_hook(gm.constants.ending_create,             function() class_find_repopulate("class_ending") end)
-gm.post_script_hook(gm.constants.environment_log_create,    function() class_find_repopulate("class_environment_log") end)
-gm.post_script_hook(gm.constants.equipment_create,          function() class_find_repopulate("class_equipment") end)
-gm.post_script_hook(gm.constants.gamemode_create,           function() class_find_repopulate("class_game_mode") end)
-gm.post_script_hook(gm.constants.interactable_card_create,  function() class_find_repopulate("class_interactable_card") end)
-gm.post_script_hook(gm.constants.item_create,               function() class_find_repopulate("class_item") end)
-gm.post_script_hook(gm.constants.item_log_create,           function() class_find_repopulate("class_item_log") end)
-gm.post_script_hook(gm.constants.monster_card_create,       function() class_find_repopulate("class_monster_card") end)
-gm.post_script_hook(gm.constants.monster_log_create,        function() class_find_repopulate("class_monster_log") end)
-gm.post_script_hook(gm.constants.skill_create,              function() class_find_repopulate("class_skill") end)
-gm.post_script_hook(gm.constants.stage_create,              function() class_find_repopulate("class_stage") end)
-gm.post_script_hook(gm.constants.survivor_create,           function() class_find_repopulate("class_survivor") end)
-gm.post_script_hook(gm.constants.survivor_log_create,       function() class_find_repopulate("class_survivor_log") end)
 
 
 
