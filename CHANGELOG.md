@@ -1,5 +1,5 @@
 ### v1.1.15
-* 
+* Initialize : Forgot to add the error catching to new initialize calling lmao (only the legacy support had it).
 
 ### v1.1.14
 * Now using ENVY to make own global variables private to self, and for new class ref import methods.
