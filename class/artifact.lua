@@ -136,6 +136,7 @@ methods_artifact = {
     onKillProc                      = function(self, func) self:add_callback("onKillProc", func) end
     
 }
+class_lock_tables["Artifact"] = Proxy.make_lock_table({"value", "RMT_object", table.unpack(methods_artifact)})
 
 
 

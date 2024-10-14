@@ -110,6 +110,7 @@ methods_buff = {
     onChange            = function(self, func) self:add_callback("onChange", func) end
 
 }
+class_lock_tables["Buff"] = Proxy.make_lock_table({"value", "RMT_object", table.unpack(methods_buff)})
 
 
 

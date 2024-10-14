@@ -500,6 +500,7 @@ methods_survivor = {
     onRemove    = function(self, func) self:add_callback("onRemove", func) end
 
 }
+class_lock_tables["Survivor"] = Proxy.make_lock_table({"value", "RMT_object", table.unpack(methods_survivor)})
 
 
 

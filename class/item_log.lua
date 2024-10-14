@@ -61,6 +61,7 @@ methods_item_log = {
         self.achievement_id = achievement_id
     end,
 }
+class_lock_tables["Item_Log"] = Proxy.make_lock_table({"value", "RMT_object", table.unpack(methods_item_log)})
 
 
 

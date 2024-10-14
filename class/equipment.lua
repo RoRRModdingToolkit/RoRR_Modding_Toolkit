@@ -252,6 +252,7 @@ methods_equipment = {
     onDraw              = function(self, func) self:add_callback("onDraw", func) end
 
 }
+class_lock_tables["Equipment"] = Proxy.make_lock_table({"value", "RMT_object", table.unpack(methods_equipment)})
 
 
 
