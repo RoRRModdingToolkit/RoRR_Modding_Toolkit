@@ -52,10 +52,9 @@ Class:setmetatable({
 initialize_class = function()
     for k, v in pairs(class_arrays) do
         class_wrappers[v:sub(7, #v):upper()] = Array.wrap(gm.variable_global_get(v))
-
         class_find_repopulate(v)
-        allow_find_repopulate = true
     end
+    allow_find_repopulate = true
 end
 
 
