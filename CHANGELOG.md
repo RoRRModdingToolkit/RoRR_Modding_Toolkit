@@ -1,5 +1,5 @@
 ### v1.1.14
-* Now using ENVY to make own global variables private to self, and for new `.auto()` import call.
+* Now using ENVY to make own global variables private to self, and for new class ref import methods.
 * Internal restructuring to make all classes read-only (does not affect end-user functionality as listed on the docs).
     * Previously, a user could write `Item.new = "abc"` and brick every item mod for example.
 * Changed required one-line and initialize call.
