@@ -27,6 +27,14 @@ local class_arrays = {
 
 local class_wrappers = {}
 
+local class_find_table = {}     -- Hash table for quick lookup for <class>.find()
+local class_array_sizes = {}
+
+for k, v in pairs(class_arrays) do
+    class_find_table[v] = {}
+    class_array_sizes[v] = 0
+end
+
 
 
 -- ========== Metatable ==========
@@ -43,6 +51,57 @@ Class:setmetatable({
 initialize_class = function()
     for k, v in pairs(class_arrays) do
         class_wrappers[v:sub(7, #v):upper()] = Array.wrap(gm.variable_global_get(v))
+    end
+end
+
+
+
+-- ========== Internal ==========
+
+gm.pre_script_hook(gm.constants.__input_system_tick, function(self, other, result, args)
+    -- Repopulate class_find_table whenever the size is changed
+    for k, v in pairs(class_arrays) do
+        class_find_repopulate(k)
+
+        -- local arr = gm.variable_global_get(v)
+        -- local size = gm.array_length(arr)
+        -- if size ~= class_array_sizes[v] then
+        --     class_array_sizes[v] = size
+        --     local t = class_find_table[v]
+
+        --     for i = 0, size - 1 do
+        --         local element = gm.array_get(arr, i)
+        --         if gm.is_array(element) then
+        --             local namespace = gm.array_get(element, 0)
+        --             local identifier = gm.array_get(element, 1)
+        --             local full = namespace.."-"..identifier
+        --             t[full] = i
+        --         end
+        --     end
+        -- end
+    end
+end)
+
+
+class_find_repopulate = function(class)
+    if not class_arrays[class] then log.error("Class does not exist", 2) end
+    class = class_arrays[class]
+
+    local arr = gm.variable_global_get(class)
+    local size = gm.array_length(arr)
+    if size ~= class_array_sizes[class] then
+        class_array_sizes[class] = size
+        local t = class_find_table[class]
+
+        for i = 0, size - 1 do
+            local element = gm.array_get(arr, i)
+            if gm.is_array(element) then
+                local namespace = gm.array_get(element, 0)
+                local identifier = gm.array_get(element, 1)
+                local full = namespace.."-"..identifier
+                t[full] = i
+            end
+        end
     end
 end
 
@@ -70,12 +129,13 @@ metatable_class = {}                -- First metatable for each class (goes stra
 -- (e.g., special edge case for the class)
 
 -- Loop and create class bases
-for class, class_arr in pairs(class_arrays) do
-    class_arr = capitalize_class_name(class_arr:sub(7, #class_arr))
+for class, class_array_id in pairs(class_arrays) do
+    local class_array_id_og = class_array_id
+    class_array_id = capitalize_class_name(class_array_id:sub(7, #class_array_id))
 
     local t = Proxy.new()
 
-    t.ARRAY = Proxy.new(properties[class_arr]):lock()
+    t.ARRAY = Proxy.new(properties[class_array_id]):lock()
     
     t.find = function(namespace, identifier)
         if identifier then namespace = namespace.."-"..identifier
@@ -83,22 +143,27 @@ for class, class_arr in pairs(class_arrays) do
             if not string.find(namespace, "-") then namespace = "ror-"..namespace end
         end
 
-        -- This is way faster since it doesn't have to wrap every array in the class_array
-        local class_raw = Class[class_arr].value
-        local size = gm.array_length(class_raw)
-        for i = 0, size - 1 do
-            local element = gm.array_get(class_raw, i)
-            if gm.is_array(element) then
-                local _namespace = gm.array_get(element, 0)
-                local _identifier = gm.array_get(element, 1)
-                if namespace == _namespace.."-".._identifier then
-                    return t.wrap(i)
-                end
-            end
+        local element = class_find_table[class_array_id_og][namespace]
+        if element then
+            return t.wrap(element)
         end
 
-        -- for i = 0, #Class[class_arr] - 1 do
-        --     local element = Class[class_arr]:get(i)
+        -- -- This is way faster since it doesn't have to wrap every array in the class_array
+        -- local class_raw = Class[class_array_id].value
+        -- local size = gm.array_length(class_raw)
+        -- for i = 0, size - 1 do
+        --     local element = gm.array_get(class_raw, i)
+        --     if gm.is_array(element) then
+        --         local _namespace = gm.array_get(element, 0)
+        --         local _identifier = gm.array_get(element, 1)
+        --         if namespace == _namespace.."-".._identifier then
+        --             return t.wrap(i)
+        --         end
+        --     end
+        -- end
+
+        -- for i = 0, #Class[class_array_id] - 1 do
+        --     local element = Class[class_array_id]:get(i)
         --     if gm.is_array(element.value) then
         --         local _namespace = element:get(0)
         --         local _identifier = element:get(1)
@@ -122,7 +187,7 @@ for class, class_arr in pairs(class_arrays) do
         __index = function(table, key)
             local index = t.ARRAY[key]
             if index then
-                local array = Class[class_arr]:get(table.value)
+                local array = Class[class_array_id]:get(table.value)
                 return array:get(index)
             end
             log.error("Non-existent "..class.." property", 2)
@@ -133,7 +198,7 @@ for class, class_arr in pairs(class_arrays) do
         __newindex = function(table, key, value)
             local index = t.ARRAY[key]
             if index then
-                local array = Class[class_arr]:get(table.value)
+                local array = Class[class_array_id]:get(table.value)
                 array:set(index, value)
                 return
             end

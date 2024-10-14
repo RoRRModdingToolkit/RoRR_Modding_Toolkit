@@ -40,16 +40,15 @@ State.new = function(namespace, identifier)
     if state then return state end
 
     -- Create state
-    state = gm.actor_state_create(
-        namespace,      -- Namespace
-        identifier      -- Identifier
+    state = State.wrap(
+        gm.actor_state_create(
+            namespace,      -- Namespace
+            identifier      -- Identifier
+        )
     )
 
-    -- Make state abstraction
-    local abstraction = State.wrap(state)
-
-    return abstraction
-
+    class_find_repopulate("State")
+    return state
 end
 
 

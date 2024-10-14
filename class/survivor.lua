@@ -153,6 +153,7 @@ Survivor.new = function(namespace, identifier)
     -- Add onInit callback to initialize survivor stuff
     survivor_on_init(abstraction)
 
+    class_find_repopulate("Survivor")
     return abstraction
 end
 

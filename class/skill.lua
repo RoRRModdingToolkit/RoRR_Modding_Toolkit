@@ -33,23 +33,23 @@ Skill.new = function(namespace, identifier, cooldown, damage, sprite_id, sprite_
     if skill then return skill end
 
     -- Create skill
-    skill = gm.skill_create(
-        namespace,                      -- Namespace
-        identifier,                     -- Identifier
-        nil,                            -- Skill ID
-        cooldown,                       -- Cooldown
-        sprite_id,                      -- Sprite ID
-        sprite_subimage,                -- Sprite Subimage
-        damage,                         -- Damage
-        animation,                      -- Animation
-        is_primary,                     -- Is Primary
-        is_utility                      -- Is Utility
+    skill = Skill.wrap(
+        gm.skill_create(
+            namespace,                      -- Namespace
+            identifier,                     -- Identifier
+            nil,                            -- Skill ID
+            cooldown,                       -- Cooldown
+            sprite_id,                      -- Sprite ID
+            sprite_subimage,                -- Sprite Subimage
+            damage,                         -- Damage
+            animation,                      -- Animation
+            is_primary,                     -- Is Primary
+            is_utility                      -- Is Utility
+        )
     )
 
-    -- Make skill abstraction
-    local abstraction = Skill.wrap(skill)
-
-    return abstraction
+    class_find_repopulate("Skill")
+    return skill
 end
 
 Skill.newEmpty = function(namespace, identifier)

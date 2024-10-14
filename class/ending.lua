@@ -10,12 +10,15 @@ Ending.new = function(namespace, identifier)
     local ending = Ending.find(namespace, identifier)
     if ending then return ending end
 
-    return Ending.wrap(
+    local ending = Ending.wrap(
         gm.ending_create(
             namespace,      -- Namespace
             identifier      -- Identifier
         )
     )
+
+    class_find_repopulate("Ending")
+    return ending
 end
 
 

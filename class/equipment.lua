@@ -61,7 +61,7 @@ Equipment.new = function(namespace, identifier)
     end
     item_log_order:insert(pos, equipment.item_log_id)
 
-
+    class_find_repopulate("Equipment")
     return equipment
 end
 

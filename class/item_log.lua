@@ -46,6 +46,7 @@ Item_Log.new = function(item)
     -- Set the log id of the item
     item.item_log_id = abstraction.value
 
+    class_find_repopulate("Item_Log")
     return abstraction
 end
 

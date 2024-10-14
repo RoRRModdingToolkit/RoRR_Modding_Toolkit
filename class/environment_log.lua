@@ -15,25 +15,25 @@ Environment_Log.new = function(stage)
     if environment_log then return environment_log end
 
     -- Create environment_log
-    environment_log = gm.environment_log_create(
-        stage.namespace,      -- Namespace
-        stage.identifier      -- Identifier
+    environment_log = Environment_Log.wrap(
+        gm.environment_log_create(
+            stage.namespace,      -- Namespace
+            stage.identifier      -- Identifier
+        )
     )
 
-    -- Make environment_log abstraction
-    local abstraction = Environment_Log.wrap(environment_log)
-
     -- Set the log id of the stage
-    stage.log_id = abstraction.value
+    stage.log_id = environment_log.value
 
     -- Set the room list
-    local display_room_ids = List.wrap(abstraction.display_room_ids)
+    local display_room_ids = List.wrap(environment_log.display_room_ids)
     for num, room in ipairs(stage.room_list) do
         display_room_ids:add(room)
         gm.room_associate_environment_log(room, stage.log_id, num)
     end
 
-    return abstraction
+    class_find_repopulate("Environment_Log")
+    return environment_log
 end
 
 

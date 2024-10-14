@@ -105,6 +105,7 @@ Item.new = function(namespace, identifier, no_log)
         end
     end)
 
+    class_find_repopulate("Item")
     return item
 end
 

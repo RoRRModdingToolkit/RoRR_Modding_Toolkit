@@ -54,6 +54,7 @@ Survivor_Log.new = function(survivor, portrait_id, portrait_index)
 
     survivor.log_id = abstraction.value
 
+    class_find_repopulate("Survivor_Log")
     return abstraction
 end
 

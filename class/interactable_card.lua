@@ -10,7 +10,12 @@ Interactable_Card.new = function(namespace, identifier)
     local card = Interactable_Card.find(namespace, identifier)
     if card then return card end
 
-    return Interactable_Card.wrap(gm.interactable_card_create(namespace, identifier))
+    local ic = Interactable_Card.wrap(
+        gm.interactable_card_create(namespace, identifier)
+    )
+
+    class_find_repopulate("Interactable_Card")
+    return ic
 end
 
 

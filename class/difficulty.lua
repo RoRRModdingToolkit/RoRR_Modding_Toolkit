@@ -21,12 +21,15 @@ Difficulty.new = function(namespace, identifier)
     local difficulty = Difficulty.find(namespace, identifier)
     if difficulty then return difficulty end
 
-    return Difficulty.wrap(
+    local difficulty = Difficulty.wrap(
         gm.difficulty_create(
             namespace,      -- Namespace
             identifier      -- Identifier
         )
     )
+
+    class_find_repopulate("Difficulty")
+    return difficulty
 end
 
 

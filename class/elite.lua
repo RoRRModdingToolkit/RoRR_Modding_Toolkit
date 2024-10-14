@@ -21,6 +21,7 @@ Elite.new = function(namespace, identifier)
         )
     )
 
+    class_find_repopulate("Elite")
     return elite
 end
 
