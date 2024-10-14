@@ -208,7 +208,7 @@ Instance.wrap = function(value)
         mt = metatable_actor
     end
 
-    return make_wrapper(value, RMT_object, mt)
+    return make_wrapper(value, RMT_object, mt, lock_table_instance)
 end
 
 
@@ -409,6 +409,7 @@ methods_instance = {
     onEquipmentUse      = function(self, id, func) self:add_callback("onEquipmentUse", id, func) end
 
 }
+lock_table_instance = Proxy.make_lock_table({"value", "RMT_object", table.unpack(methods_instance)})
 
 
 

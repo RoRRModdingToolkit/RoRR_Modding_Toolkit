@@ -57,12 +57,7 @@ Damager.TRACER = Proxy.new({
 -- ========== Static Methods ==========
 
 Damager.wrap = function(value)
-    local wrapper = Proxy.new()
-    wrapper.RMT_object = "Damager"
-    wrapper.value = value
-    wrapper:setmetatable(metatable_damager)
-    wrapper:lock(methods_damager_lock)
-    return wrapper
+    return make_wrapper(value, "Damager", metatable_damager, lock_table_damager)
 end
 
 
@@ -137,6 +132,7 @@ methods_damager = {
     end,
 
 }
+lock_table_damager = Proxy.make_lock_table({"value", "RMT_object", table.unpack(methods_damager)})
 
 
 

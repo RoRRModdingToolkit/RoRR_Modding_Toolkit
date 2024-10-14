@@ -12,7 +12,7 @@ end
 
 
 List.wrap = function(value)
-    return make_wrapper(value, "List", metatable_list)
+    return make_wrapper(value, "List", metatable_list, lock_table_list)
 end
 
 
@@ -88,6 +88,7 @@ methods_list = {
     end
 
 }
+lock_table_list = Proxy.make_lock_table({"value", "RMT_object", table.unpack(methods_list)})
 
 
 

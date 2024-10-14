@@ -87,12 +87,7 @@ end
 
 
 Object.wrap = function(value)
-    local wrapper = Proxy.new()
-    wrapper.RMT_object = "Object"
-    wrapper.value = value
-    wrapper:setmetatable(metatable_object)
-    wrapper:lock(methods_object_lock)
-    return wrapper
+    return make_wrapper(value, "Object", metatable_object, lock_table_object)
 end
 
 
@@ -164,6 +159,7 @@ methods_object = {
     onDraw          = function(self, func) self:add_callback("onDraw", func) end
 
 }
+lock_table_object = Proxy.make_lock_table({"value", "RMT_object", table.unpack(methods_object)})
 
 
 
