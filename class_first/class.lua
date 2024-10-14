@@ -51,6 +51,7 @@ Class:setmetatable({
 initialize_class = function()
     for k, v in pairs(class_arrays) do
         class_wrappers[v:sub(7, #v):upper()] = Array.wrap(gm.variable_global_get(v))
+        class_find_repopulate(k)
     end
 end
 
@@ -58,29 +59,29 @@ end
 
 -- ========== Internal ==========
 
-gm.pre_script_hook(gm.constants.__input_system_tick, function(self, other, result, args)
-    -- Repopulate class_find_table whenever the size is changed
-    for k, v in pairs(class_arrays) do
-        class_find_repopulate(k)
+-- gm.pre_script_hook(gm.constants.__input_system_tick, function(self, other, result, args)
+--     -- Repopulate class_find_table whenever the size is changed
+--     for k, v in pairs(class_arrays) do
+--         class_find_repopulate(k)
 
-        -- local arr = gm.variable_global_get(v)
-        -- local size = gm.array_length(arr)
-        -- if size ~= class_array_sizes[v] then
-        --     class_array_sizes[v] = size
-        --     local t = class_find_table[v]
+--         -- local arr = gm.variable_global_get(v)
+--         -- local size = gm.array_length(arr)
+--         -- if size ~= class_array_sizes[v] then
+--         --     class_array_sizes[v] = size
+--         --     local t = class_find_table[v]
 
-        --     for i = 0, size - 1 do
-        --         local element = gm.array_get(arr, i)
-        --         if gm.is_array(element) then
-        --             local namespace = gm.array_get(element, 0)
-        --             local identifier = gm.array_get(element, 1)
-        --             local full = namespace.."-"..identifier
-        --             t[full] = i
-        --         end
-        --     end
-        -- end
-    end
-end)
+--         --     for i = 0, size - 1 do
+--         --         local element = gm.array_get(arr, i)
+--         --         if gm.is_array(element) then
+--         --             local namespace = gm.array_get(element, 0)
+--         --             local identifier = gm.array_get(element, 1)
+--         --             local full = namespace.."-"..identifier
+--         --             t[full] = i
+--         --         end
+--         --     end
+--         -- end
+--     end
+-- end)
 
 
 class_find_repopulate = function(class)
