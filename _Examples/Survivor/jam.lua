@@ -2,31 +2,12 @@
 -- RoRRModdingToolkit
 
 log.info("Successfully loaded ".._ENV["!guid"]..".")
-
-mods.on_all_mods_loaded(function()
-    for _, m in pairs(mods) do
-        if type(m) == "table" and m.RoRR_Modding_Toolkit then
-            Buff = m.Buff
-            Class = m.Class
-            Color = m.Color
-            Helper = m.Helper
-            Skill = m.Skill
-            State = m.State
-            Survivor = m.Survivor
-            Resources = m.Resources
-            break
-        end
-    end
-end)
-
-if hot_reloading then
-    __initialize()
-end
-hot_reloading = true
+mods["RoRRModdingToolkit-RoRR_Modding_Toolkit"].auto()
 
 local PATH = _ENV["!plugins_mod_folder_path"]
 
-__initialize = function()
+
+local initialize = function()
 
     local jam = Survivor.new("RMT", "jamman")
     
@@ -485,3 +466,10 @@ __initialize = function()
         actorAc:skill_util_exit_state_on_anim_end()
     end)
 end
+Initialize(initialize)
+
+
+if hot_reloading then
+    initialize()
+end
+hot_reloading = true
