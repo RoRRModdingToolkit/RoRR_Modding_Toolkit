@@ -7,7 +7,7 @@
 * Initialize : Will now print a message to console if a mod's initialize/post_initialize fails to run.
     * They will also now run in mod load order.
 * Added wrappers for remaining classes in the global `class_` arrays.
-* Added `Proxy.new()`
+* Added Proxy class.
 * Language : Fallback to english.json if the language file in a mod doesn't exist for the current language.
 * Difficulty : allow_blight_spawns renamed to set_allow_blight_spawns to avoid name conflict.
 
