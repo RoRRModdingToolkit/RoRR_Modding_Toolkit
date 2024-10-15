@@ -1,14 +1,21 @@
 ### v1.1.14
-* Now using ENVY to avoid polluting _G.
+* Now using ENVY to make own global variables private to self, and for new class ref import methods.
 * Internal restructuring to make all classes read-only (does not affect end-user functionality as listed on the docs).
-    * The only things different are the one-liner and initialize call.
     * Previously, a user could write `Item.new = "abc"` and brick every item mod for example.
+* Changed required one-line (for auto-adding class refs) and initialize call.
+    * Legacy support : If `__initialize` or `__post_initialize` are detected, then the classes will be automatically added to the mod's `_G`.
 * Initialize : Will now print a message to console if a mod's initialize/post_initialize fails to run.
     * They will also now run in mod load order.
 * Added wrappers for remaining classes in the global `class_` arrays.
-* Added `Proxy.new()`
+* Added Proxy class.
 * Language : Fallback to english.json if the language file in a mod doesn't exist for the current language.
-* Difficulty : allow_blight_spawns renamed to set_allow_blight_spawns to avoid name conflict.
+    * Added `register_autoload` (automatically called if importing with `.auto()`).
+* Difficulty : `allow_blight_spawns` renamed to `set_allow_blight_spawns` to avoid name conflict with class_array property.
+* Stage : `set_index` cap is now equal to the size of `stage_progression_order`.
+* Player : Added `remove_callback` and `callback_exists`.
+* Alarm
+    * If an error is thrown from an alarm function, the source of the alarm will now be logged.
+    * Fixed errors arising from starting a new run before previously added alarms were executed.
 
 ### v1.1.13
 * Instance : get_data tables and Instance callbacks are no longer instantly deleted for players on-death.

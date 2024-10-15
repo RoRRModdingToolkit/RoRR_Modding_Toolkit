@@ -52,8 +52,9 @@ methods_stage = {
         if type(t[1]) == "table" then t = t[1] end
 
         for _, index in ipairs(t) do
-            if type(index) ~= "number" or index < 1 or index > 6 then
-                log.error("Stage index should be between 1 and 6 (inclusive)", 2)
+            local cap = #order
+            if type(index) ~= "number" or index < 1 or index > cap then
+                log.error("Stage index should be between 1 and "..cap.." (inclusive)", 2)
             end
             gm._mod_stage_register(index, self.value)
         end

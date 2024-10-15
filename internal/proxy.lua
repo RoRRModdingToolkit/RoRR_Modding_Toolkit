@@ -5,9 +5,13 @@ local _proxy = setmetatable({}, {__mode = "k"})
 local setmt = setmetatable
 
 local methods_proxy = {
-    lock = function(proxy)
+    lock = function(proxy, lock_table)
         if not proxy then log.error("No proxy reference provided", 2) end
-        if not proxy.proxy_locked then proxy.proxy_locked = true end
+        if lock_table then
+            proxy.keys_locked = lock_table
+        else
+            if not proxy.proxy_locked then proxy.proxy_locked = true end
+        end
         return proxy
     end,
 
@@ -52,4 +56,9 @@ end
 
 Proxy = new()
 Proxy.new = new
+Proxy.make_lock_table = function(t)
+    local lt = {keys_locked = true}
+    for i = 1, #t do lt[t[i]] = true end
+    return new(lt):lock()
+end
 Proxy:lock()

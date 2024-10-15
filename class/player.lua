@@ -64,6 +64,24 @@ Player.add_callback = function(callback, id, func, skill, all_damage)
 end
 
 
+Player.remove_callback = function(id)
+    for n, c in ipairs(auto_callbacks) do
+        if c[2] == id then
+            table.remove(auto_callbacks, n)
+            return
+        end
+    end
+end
+
+
+Player.callback_exists = function(id)
+    for n, c in ipairs(auto_callbacks) do
+        if c[2] == id then return true end
+    end
+    return false
+end
+
+
 
 -- ========== Instance Methods ==========
 

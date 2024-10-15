@@ -47,15 +47,14 @@ Artifact.new = function(namespace, identifier)
     if artifact then return artifact end
     
     -- Create artifact
-    artifact = gm.artifact_create(
-        namespace,      -- Namespace
-        identifier      -- Identifier
+    artifact = Artifact.wrap(
+        gm.artifact_create(
+            namespace,      -- Namespace
+            identifier      -- Identifier
+        )
     )
 
-    -- Make artifact abstraction
-    local abstraction = Artifact.wrap(artifact)
-
-    return abstraction
+    return artifact
 end
 
 Artifact.new_skin = function(achievement)

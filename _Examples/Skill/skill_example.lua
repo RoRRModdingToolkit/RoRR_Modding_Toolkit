@@ -2,23 +2,10 @@
 -- RoRRModdingToolkit
 
 log.info("Successfully loaded ".._ENV["!guid"]..".")
+mods["RoRRModdingToolkit-RoRR_Modding_Toolkit"].auto()
 
-mods.on_all_mods_loaded(function()
-    for _, m in pairs(mods) do
-        if type(m) == "table" and m.RoRR_Modding_Toolkit then
-            Skill = m.Skill
-            State = m.State
-            break
-        end
-    end
-end)
 
-if hot_reloading then
-    __initialize()
-end
-hot_reloading = true
-
-__initialize = function()
+local initialize = function()
     
     -- Create a new skill       (namespace, identifier, cooldown, damage, sprite_id, sprite_subimage, animation, is_primary, is_utility)
     local new_skill = Skill.new("RMT", "skilltest", 4, 5.0, gm.constants.sCommandoSkills, 0, gm.constants.sRobomandoShoot1, true, false)
@@ -76,3 +63,10 @@ __initialize = function()
         actorAc:skill_util_exit_state_on_anim_end()
     end)
 end
+Initialize(initialize)
+
+
+if hot_reloading then
+    initialize()
+end
+hot_reloading = true

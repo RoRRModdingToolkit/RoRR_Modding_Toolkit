@@ -13,7 +13,7 @@ Gamemode.new = function(namespace, identifier, count_normal_unlocks, count_towar
     if type(count_normal_unlocks) ~= "boolean" or type(count_normal_unlocks) ~= "nil" then log.error("Count Normal Unlocks toggle is not a boolean, got a "..type(count_normal_unlocks), 2) return end
     if type(count_towards_games_played) ~= "boolean" or type(count_towards_games_played) ~= "nil" then log.error("Count Towards Games Played toggle is not a boolean, got a "..type(count_towards_games_played), 2) return end
 
-    return Gamemode.wrap(
+    local gamemode = Gamemode.wrap(
         gm.gamemode_create(
             namespace,                              -- Namespace
             identifier,                             -- Identifier
@@ -21,6 +21,8 @@ Gamemode.new = function(namespace, identifier, count_normal_unlocks, count_towar
             count_towards_games_played or true      -- Count Towards Games Played
         )
     )
+
+    return gamemode
 end
 
 

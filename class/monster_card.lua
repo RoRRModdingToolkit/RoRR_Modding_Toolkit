@@ -10,7 +10,11 @@ Monster_Card.new = function(namespace, identifier)
     local card = Monster_Card.find(namespace, identifier)
     if card then return card end
 
-    return Monster_Card.wrap(gm.monster_card_create(namespace, identifier))
+    local mc = Monster_Card.wrap(
+        gm.monster_card_create(namespace, identifier)
+    )
+
+    return mc
 end
 
 

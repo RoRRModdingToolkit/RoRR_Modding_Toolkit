@@ -25,21 +25,90 @@ local class_arrays = {
     Survivor_Log        = "class_survivor_log"
 }
 
+local class_wrappers = {}
+
+local class_find_table = {}     -- Hash table for quick lookup for <class>.find()
+local class_array_sizes = {}
+local allow_find_repopulate = false
+
+for k, v in pairs(class_arrays) do
+    class_find_table[v] = {}
+    class_array_sizes[v] = 0
+end
+
 
 
 -- ========== Metatable ==========
 
 Class:setmetatable({
     __index = function(table, key)
-        if type(key) ~= "string" then return nil end
-        
-        local k = "class_"..key:lower()
-        if Helper.table_has(class_arrays, k) then
-            return Array.wrap(gm.variable_global_get(k))
-        else log.error("Class does not exist", 2)
-        end
+        key = key:upper()
+        if class_wrappers[key] then return class_wrappers[key] end
+        log.error("Class does not exist", 2)
     end
 })
+
+
+initialize_class = function()
+    for k, v in pairs(class_arrays) do
+        class_wrappers[v:sub(7, #v):upper()] = Array.wrap(gm.variable_global_get(v))
+        class_find_repopulate(v)
+    end
+    allow_find_repopulate = true
+end
+
+
+
+-- ========== Internal ==========
+
+class_find_repopulate = function(class)
+    local arr = gm.variable_global_get(class)
+    local size = gm.array_length(arr)
+    if size ~= class_array_sizes[class] then
+        class_array_sizes[class] = size
+        local t = class_find_table[class]
+
+        for i = 0, size - 1 do
+            local element = gm.array_get(arr, i)
+            if gm.is_array(element) then
+                local namespace = gm.array_get(element, 0)
+                local identifier = gm.array_get(element, 1)
+                local full = namespace.."-"..identifier
+                t[full] = i
+            end
+        end
+    end
+end
+
+
+local hooks = {
+    {gm.constants.achievement_create,       "class_achievement"},
+    {gm.constants.actor_skin_create,        "class_actor_skin"},
+    {gm.constants.actor_state_create,       "class_actor_state"},
+    {gm.constants.artifact_create,          "class_artifact"},
+    {gm.constants.buff_create,              "class_buff"},
+    {gm.constants.difficulty_create,        "class_difficulty"},
+    {gm.constants.elite_type_create,        "class_elite"},
+    {gm.constants.ending_create,            "class_ending_type"},
+    {gm.constants.environment_log_create,   "class_environment_log"},
+    {gm.constants.equipment_create,         "class_equipment"},
+    {gm.constants.gamemode_create,          "class_game_mode"},
+    {gm.constants.interactable_card_create, "class_interactable_card"},
+    {gm.constants.item_create,              "class_item"},
+    {gm.constants.item_log_create,          "class_item_log"},
+    {gm.constants.monster_card_create,      "class_monster_card"},
+    {gm.constants.monster_log_create,       "class_monster_log"},
+    {gm.constants.skill_create,             "class_skill"},
+    {gm.constants.stage_create,             "class_stage"},
+    {gm.constants.survivor_create,          "class_survivor"},
+    {gm.constants.survivor_log_create,      "class_survivor_log"}
+}
+for _, hook in ipairs(hooks) do
+    gm.post_script_hook(hook[1], function(self, other, result, args)
+        if not allow_find_repopulate then return end
+        class_find_repopulate(hook[2])
+    end)
+end
 
 
 
@@ -65,12 +134,13 @@ metatable_class = {}                -- First metatable for each class (goes stra
 -- (e.g., special edge case for the class)
 
 -- Loop and create class bases
-for class, class_arr in pairs(class_arrays) do
-    class_arr = capitalize_class_name(class_arr:sub(7, #class_arr))
+for class, class_array_id in pairs(class_arrays) do
+    local class_array_id_og = class_array_id
+    class_array_id = capitalize_class_name(class_array_id:sub(7, #class_array_id))
 
     local t = Proxy.new()
 
-    t.ARRAY = Proxy.new(properties[class_arr]):lock()
+    t.ARRAY = Proxy.new(properties[class_array_id]):lock()
     
     t.find = function(namespace, identifier)
         if identifier then namespace = namespace.."-"..identifier
@@ -78,31 +148,8 @@ for class, class_arr in pairs(class_arrays) do
             if not string.find(namespace, "-") then namespace = "ror-"..namespace end
         end
 
-        -- This is way faster since it doesn't have to wrap every array in the class_array
-        local class_raw = Class[class_arr].value
-        local size = gm.array_length(class_raw)
-        for i = 0, size - 1 do
-            local element = gm.array_get(class_raw, i)
-            if gm.is_array(element) then
-                local _namespace = gm.array_get(element, 0)
-                local _identifier = gm.array_get(element, 1)
-                if namespace == _namespace.."-".._identifier then
-                    return t.wrap(i)
-                end
-            end
-        end
-
-        -- for i = 0, #Class[class_arr] - 1 do
-        --     local element = Class[class_arr]:get(i)
-        --     if gm.is_array(element.value) then
-        --         local _namespace = element:get(0)
-        --         local _identifier = element:get(1)
-        --         if namespace == _namespace.."-".._identifier then
-        --             return t.wrap(i)
-        --         end
-        --     end
-        -- end
-
+        local element = class_find_table[class_array_id_og][namespace]
+        if element then return t.wrap(element) end
         return nil
     end
 
@@ -117,8 +164,8 @@ for class, class_arr in pairs(class_arrays) do
         __index = function(table, key)
             local index = t.ARRAY[key]
             if index then
-                local array = Class[class_arr]:get(table.value)
-                return array:get(index)
+                local array = Class[class_array_id]:get(table.value)
+                return Wrap.wrap(array:get(index))
             end
             log.error("Non-existent "..class.." property", 2)
             return nil
@@ -128,8 +175,8 @@ for class, class_arr in pairs(class_arrays) do
         __newindex = function(table, key, value)
             local index = t.ARRAY[key]
             if index then
-                local array = Class[class_arr]:get(table.value)
-                array:set(index, value)
+                local array = Class[class_array_id]:get(table.value)
+                array:set(index, Wrap.unwrap(value))
                 return
             end
             log.error("Non-existent "..class.." property", 2)

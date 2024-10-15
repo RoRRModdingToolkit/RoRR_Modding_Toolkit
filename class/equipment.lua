@@ -61,7 +61,6 @@ Equipment.new = function(namespace, identifier)
     end
     item_log_order:insert(pos, equipment.item_log_id)
 
-
     return equipment
 end
 

@@ -40,16 +40,16 @@ end
 
 -- ========== Internal ==========
 
-make_wrapper = function(value, RMT_object, metatable)
+make_wrapper = function(value, RMT_object, metatable, lock_table)
     local wrapper = Proxy.new({
         value = value,
         RMT_object = RMT_object
     })
     wrapper:setmetatable(metatable)
-    wrapper.keys_locked = {
-        keys_locked = true,
-        value       = true,
-        RMT_object  = true
-    }
+
+    if lock_table then wrapper:lock(lock_table)
+    else wrapper:lock(Proxy.new({keys_locked = true, value = true, RMT_object = true}):lock())
+    end
+    
     return wrapper
 end

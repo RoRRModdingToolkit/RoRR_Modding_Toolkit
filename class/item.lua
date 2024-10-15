@@ -104,7 +104,7 @@ Item.new = function(namespace, identifier, no_log)
             table.insert(has_custom_item, actor.value)
         end
     end)
-
+    
     return item
 end
 

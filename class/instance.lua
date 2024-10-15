@@ -196,24 +196,28 @@ end
 Instance.wrap = function(value)
     local RMT_object = "Instance"
     local mt = metatable_instance
+    local lt = lock_table_instance
 
     if value.object_index == gm.constants.oCustomObject_pInteractable then
         RMT_object = "Interactable Instance"
         mt = metatable_interactable_instance
+        lt = lock_table_interactable_instance
     elseif value.object_index == gm.constants.oP then
         RMT_object = "Player"
         mt = metatable_player
+        lt = lock_table_player
     elseif gm.object_is_ancestor(value.object_index, gm.constants.pActor) == 1.0 then
         RMT_object = "Actor"
         mt = metatable_actor
+        lt = lock_table_actor
     end
 
-    return make_wrapper(value, RMT_object, mt)
+    return make_wrapper(value, RMT_object, mt, lt)
 end
 
 
 Instance.wrap_invalid = function()
-    return make_wrapper(-4, "Instance", metatable_instance)
+    return make_wrapper(-4, "Instance", metatable_instance, lock_table_instance)
 end
 
 
@@ -409,6 +413,7 @@ methods_instance = {
     onEquipmentUse      = function(self, id, func) self:add_callback("onEquipmentUse", id, func) end
 
 }
+lock_table_instance = Proxy.make_lock_table({"value", "RMT_object", table.unpack(Helper.table_get_keys(methods_instance))})
 
 
 
@@ -745,7 +750,12 @@ end
 -- ========== Initialize ==========
 
 initialize_instance = function()
+    lock_table_actor = Proxy.make_lock_table({"value", "RMT_object", table.unpack(Helper.table_get_keys(methods_instance)), table.unpack(Helper.table_get_keys(methods_actor))})
+    lock_table_player = Proxy.make_lock_table({"value", "RMT_object", table.unpack(Helper.table_get_keys(methods_instance)), table.unpack(Helper.table_get_keys(methods_actor)), table.unpack(Helper.table_get_keys(methods_player))})
+    lock_table_interactable_instance = Proxy.make_lock_table({"value", "RMT_object", table.unpack(Helper.table_get_keys(methods_instance)), table.unpack(Helper.table_get_keys(methods_interactable_instance))})
+
     gm_add_instance_methods(methods_instance)
+
     Callback.add("onAttackCreate", "RMT-inst_onAttack", inst_onAttack)
     Callback.add("onAttackCreate", "RMT-inst_onAttackAll", inst_onAttackAll)
     Callback.add("onAttackHandleEnd", "RMT-inst_onPostAttack", inst_onPostAttack)
