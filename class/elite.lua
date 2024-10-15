@@ -57,6 +57,8 @@ methods_elite = {
         self.healthbar_icon = healthbar
     end,
 
+    -- effect_display setup?
+
 
     -- Callbacks
     onApply     = function(self, func) self:add_callback("onApply", func) end
