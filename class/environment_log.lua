@@ -6,9 +6,11 @@ Environment_Log = class_refs["Environment_Log"]
 
 -- ========== Static Methods ==========
 
-Environment_Log.new = function(stage)
+Environment_Log.new = function(stage, sprite_icon, is_secret)
     
     if type(stage) ~= "table" or stage.RMT_object ~= "Stage" then log.error("Stage is not a RMT item, got a "..type(stage), 2) return end
+    if type(sprite_icon) ~= "number" or type(sprite_icon) ~= "nil" then log.error("Sprite should be a number, got a "..type(sprite_icon), 2) return end
+    if type(is_secret) ~= "boolean" or type(is_secret) ~= "nil" then log.error("Is Secret should be a boolean, got a "..type(is_secret), 2) return end
     
     -- Check if environment_log already exist
     local environment_log = Environment_Log.find(stage.namespace, stage.identifier)
@@ -22,6 +24,12 @@ Environment_Log.new = function(stage)
 
     -- Make environment_log abstraction
     local abstraction = Environment_Log.wrap(environment_log)
+
+    -- Set the log sprite icon
+    abstraction.spr_icon = sprite_icon or gm.constants.sEnvironmentDesolateForest
+
+    -- Set if the log is secret
+    abstraction.is_secret = is_secret or false
 
     -- Set the log id of the stage
     stage.log_id = abstraction.value
@@ -59,10 +67,10 @@ methods_environment_log = {
         roomList:clear()
     end,
 
-    set_log_icon = function(self, sprite)
-        if type(sprite) ~= "number" then log.error("Sprite should be a number, got a "..type(sprite), 2) return end
+    set_log_icon = function(self, sprite_icon)
+        if type(sprite_icon) ~= "number" then log.error("Sprite Icon should be a number, got a "..type(sprite_icon), 2) return end
         
-        self.spr_icon = sprite
+        self.spr_icon = sprite_icon
     end,
 
 
@@ -75,10 +83,10 @@ methods_environment_log = {
     end,
 
 
-    set_log_secret = function(self, issecret)
-        if type(issecret) ~= "boolean" then log.error("Is Hidden should be a boolean, got a "..type(issecret), 2) return end
+    set_log_secret = function(self, is_secret)
+        if type(is_secret) ~= "boolean" then log.error("Is Secret should be a boolean, got a "..type(is_secret), 2) return end
         
-        self.is_secret = issecret
+        self.is_secret = is_secret
     end,
 }
 

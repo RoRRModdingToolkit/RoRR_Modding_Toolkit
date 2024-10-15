@@ -40,9 +40,21 @@ methods_elite = {
 
     end,
 
-
     clear_callbacks = function(self)
         callbacks[self.on_apply] = nil
+    end,
+
+    set_palette = function(self, palette, blend_col)
+        if type(palette) ~= "number" then log.error("Palette should be a number, got a "..type(palette), 2) return end
+    
+        self.palette = palette
+        self.blend_col = blend_col
+    end,
+
+    set_healthbar_icon = function(self, healthbar)
+        if type(healthbar) ~= "number" then log.error("Healthbar should be a number, got a "..type(healthbar), 2) return end
+    
+        self.healthbar_icon = healthbar
     end,
 
 

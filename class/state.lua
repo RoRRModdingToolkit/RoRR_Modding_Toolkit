@@ -90,6 +90,8 @@ methods_state = {
 
     -- end,
 
+    -- actor_state_system_clear_state?
+
 
     -- Callbacks
     onEnter                     = function(self, func) self:add_callback("onEnter", func) end,
