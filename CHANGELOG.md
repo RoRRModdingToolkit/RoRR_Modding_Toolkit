@@ -1,5 +1,5 @@
 ### v1.1.16
-* 
+* Resources : `sprite_load` now returns the existing sprite of a given namespace-identifier if it already exists.
 
 ### v1.1.15
 * Initialize : Forgot to add the error catching to new initialize calling lmao (only the legacy support had it).
