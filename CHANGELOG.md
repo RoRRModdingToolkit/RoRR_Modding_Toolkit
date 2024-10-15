@@ -1,3 +1,6 @@
+### v1.1.17
+* 
+
 ### v1.1.16
 * Resources : `sprite_load` now returns the existing sprite of a given namespace-identifier if it already exists.
 * `pairs` now works properly when iterating over proxy tables.
