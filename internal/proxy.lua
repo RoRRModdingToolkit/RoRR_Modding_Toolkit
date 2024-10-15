@@ -42,6 +42,10 @@ local metatable_proxy = {
         return _proxy[t](...)
     end,
 
+    __pairs = function(t)
+        return next, _proxy[t], nil
+    end,
+
     __metatable = "proxy"
 }
 
