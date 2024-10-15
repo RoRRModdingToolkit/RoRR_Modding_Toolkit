@@ -164,21 +164,16 @@ methods_survivor = {
 
     add_callback = function(self, callback, func)
 
-        if callback == "onInit" then
-            local callback_id = self.on_init
+        local callback_id = nil
+        if callback == "onInit" then callback_id = self.on_init
+        elseif callback == "onStep" then callback_id = self.on_step
+        elseif callback == "onRemove" then callback_id = self.on_remove
+        end
+            
+        if callback_id then
             if not callbacks[callback_id] then callbacks[callback_id] = {} end
             table.insert(callbacks[callback_id], func)
-        end
-        if callback == "onStep" then
-            local callback_id = self.on_step
-            if not callbacks[callback_id] then callbacks[callback_id] = {} end
-            table.insert(callbacks[callback_id], func)
-        end
-        if callback == "onRemove" then
-            local callback_id = self.on_remove
-            if not callbacks[callback_id] then callbacks[callback_id] = {} end
-            table.insert(callbacks[callback_id], func)
-        end
+        else log.error("Invalid callback name", 2) end
     end,
     
     -- Put that somewhere else
@@ -302,8 +297,13 @@ methods_survivor = {
         survivors[self.value].climb_hurt    = sprites.climb_hurt or survivors[self.value].climb_hurt
     end,
 
-    set_primary_color = function(self, R, G, B)
-        self.primary_color = Color.from_rgb(R, G, B)
+    set_primary_color = function(self, color)
+        -- Find a way to check if it is an RMT colour
+        self.primary_color = color
+    end,
+
+    set_primary_colour = function(self, colour)
+        self:set_primary_color(colour)
     end,
 
     set_text = function(self, name, description, end_quote)
@@ -373,6 +373,28 @@ methods_survivor = {
 
         self.sprite_portrait_palette = portrait_palette
         self.sprite_loadout_palette = loadout_palette
+    end,
+
+    set_survivor_achievement = function(self, achievement)
+        if type(achievement) ~= "table" or achievement.RMT_object ~= "Achievement" then log.error("Achievement should be an RMT Achievement, got a "..type(achievement), 2) return end
+
+        self.achievement_id = achievement.value
+    end,
+
+    set_milestone_achievement = function(self, kills, items, stages)
+        if type(kills) ~= "nil" and (type(kills) ~= "table" or kills.RMT_object ~= "Achievement") then log.error("Milestone Kills Achievement should be an RMT Achievement, got a "..type(kills), 2) return end
+        if type(items) ~= "nil" and (type(items) ~= "table" or kills.RMT_object ~= "Achievement") then log.error("Milestone Items Achievement should be an RMT Achievement, got a "..type(items), 2) return end
+        if type(stages) ~= "nil" and (type(stages) ~= "table" or kills.RMT_object ~= "Achievement") then log.error("Milestone Stages Achievement should be an RMT Achievement, got a "..type(stages), 2) return end
+    
+        self.milestone_kills_1 = kills.value or -1
+        self.milestone_items_1 = items.value or -1
+        self.milestone_stages_1 = stages.value or -1
+    end,
+
+    set_is_secret = function(self, is_secret)
+        if type(is_secret) ~= "boolean" then log.error("Is Secret should be a boolean, got a "..type(is_secret), 2) return end
+    
+        self.is_secret = is_secret
     end,
 
     set_cape_offset = function(self, xoffset, yoffset, xoffset_rope, yoffset_rope)
