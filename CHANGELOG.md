@@ -1,5 +1,7 @@
 ### v1.1.17
-* Helper : `log_hook` now logs struct variables if self and other are structs.
+* Helper
+    * `log_hook` now logs struct variables if self and other are structs.
+    * `log_struct` now adds borders above and below it.
 
 ### v1.1.16
 * Resources : `sprite_load` now returns the existing sprite of a given namespace-identifier if it already exists.

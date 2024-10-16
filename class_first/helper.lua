@@ -21,7 +21,7 @@ Helper.log_hook = function(self, other, result, args)
         log.info("[self]  "..value)
     else
         log.info("[self]  struct")
-        Helper.log_struct(self, "    ")
+        Helper.log_struct(self, "    ", true)
     end
 
     local value = tostring(other)
@@ -31,7 +31,7 @@ Helper.log_hook = function(self, other, result, args)
         log.info("[other]  "..value)
     else
         log.info("[other]  struct")
-        Helper.log_struct(other, "    ")
+        Helper.log_struct(other, "    ", true)
     end
 
     -- TODO: Tidy up the below at some point
@@ -57,7 +57,7 @@ Helper.log_hook = function(self, other, result, args)
 
     -- If value is Struct, print all variables
     if gm.is_struct(result.value) then
-        Helper.log_struct(result.value, "    ")
+        Helper.log_struct(result.value, "    ", true)
     end
 
     log.info("")
@@ -82,7 +82,7 @@ Helper.log_hook = function(self, other, result, args)
 
         -- If value is Struct, print all variables
         if gm.is_struct(a.value) then
-            Helper.log_struct(a.value, "    ")
+            Helper.log_struct(a.value, "    ", true)
         end
     end
 
@@ -90,12 +90,14 @@ Helper.log_hook = function(self, other, result, args)
 end
 
 
-Helper.log_struct = function(struct, indent)
+Helper.log_struct = function(struct, indent, no_borders)
+    if not no_borders then log.info("----------") end
     indent = indent or ""
     local names = gm.struct_get_names(struct)
     for _, name in ipairs(names) do
         log.info(indent..name.." = "..tostring(gm.variable_struct_get(struct, name)))
     end
+    if not no_borders then log.info("----------") end
 end
 
 
