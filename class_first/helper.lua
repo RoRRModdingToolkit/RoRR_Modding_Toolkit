@@ -20,7 +20,7 @@ Helper.log_hook = function(self, other, result, args)
         if bool then value = val end
         log.info("[self]  "..value)
     else
-        log.info("[self]  "..value)
+        log.info("[self]  struct")
         Helper.log_struct(self, "    ")
     end
 
@@ -30,7 +30,7 @@ Helper.log_hook = function(self, other, result, args)
         if bool then value = val end
         log.info("[other]  "..value)
     else
-        log.info("[other]  "..value)
+        log.info("[other]  struct")
         Helper.log_struct(other, "    ")
     end
 
