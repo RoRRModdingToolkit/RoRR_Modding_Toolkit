@@ -67,6 +67,12 @@ methods_achievement = {
         self.token_unlock_name = unlock_name
     end,
 
+    is_unlocked = function(self)
+        return gm.achievement_is_unlocked(self.value)
+    end,
+
+
+
     -- achievement_set_alt_milestone_unlock
     -- achievement_get_unlocked_string
     -- achievement_is_skin_unlock
