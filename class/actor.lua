@@ -264,17 +264,36 @@ methods_actor = {
 
 
     get_skill = function(self, slot)
+        if type(slot) ~= "number" or slot < 0 or slot > 3 then log.error("Skill slot must be between 0 and 3 (inclusive)", 2) end
         return Skill.wrap(self.skills:get(slot).active_skill.skill_id)
     end,
 
 
+    get_default_skill = function(self, slot)
+        if type(slot) ~= "number" or slot < 0 or slot > 3 then log.error("Skill slot must be between 0 and 3 (inclusive)", 2) end
+        return self.skills:get(slot).default_skill
+    end,
+
+
     get_active_skill = function(self, slot)
+        if type(slot) ~= "number" or slot < 0 or slot > 3 then log.error("Skill slot must be between 0 and 3 (inclusive)", 2) end
         return self.skills:get(slot).active_skill
     end,
 
 
-    get_default_skill = function(self, slot)
-        return self.skills:get(slot).default_skill
+    set_default_skill = function(self, slot)
+        if type(slot) ~= "number" or slot < 0 or slot > 3 then log.error("Skill slot must be between 0 and 3 (inclusive)", 2) end
+        GM.actor_skill_set(self, slot, skill)
+    end,
+
+
+    set_skill_override = function(self, slot, skill)
+        
+    end,
+
+
+    remove_skill_override = function(self, slot, skill)
+        
     end,
 
 

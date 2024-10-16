@@ -1,10 +1,10 @@
 ### v1.1.17
-* 
+* Helper : `log_hook` now logs struct variables if self and other are structs.
 
 ### v1.1.16
 * Resources : `sprite_load` now returns the existing sprite of a given namespace-identifier if it already exists.
 * `pairs` now works properly when iterating over proxy tables.
-* Skill : Added `is_unlocked`, `add_achievement`, `progress_achievement`.
+* Skill : Added `is_unlocked`, `add_achievement`, and `progress_achievement`.
 
 ### v1.1.15
 * Initialize : Forgot to add the error catching to new initialize calling lmao (only the legacy support had it).

@@ -15,14 +15,24 @@ Helper.log_hook = function(self, other, result, args)
     end
 
     local value = tostring(self)
-    local bool, val = pcall(obj_ind, self)
-    if bool then value = val end
-    log.info("[self]  "..value)
+    if not gm.is_struct(self) then
+        local bool, val = pcall(obj_ind, self)
+        if bool then value = val end
+        log.info("[self]  "..value)
+    else
+        log.info("[self]  "..value)
+        Helper.log_struct(self, "    ")
+    end
 
     local value = tostring(other)
-    local bool, val = pcall(obj_ind, other)
-    if bool then value = val end
-    log.info("[other]  "..value)
+    if not gm.is_struct(other) then
+        local bool, val = pcall(obj_ind, other)
+        if bool then value = val end
+        log.info("[other]  "..value)
+    else
+        log.info("[other]  "..value)
+        Helper.log_struct(other, "    ")
+    end
 
     -- TODO: Tidy up the below at some point
 
@@ -47,10 +57,7 @@ Helper.log_hook = function(self, other, result, args)
 
     -- If value is Struct, print all variables
     if gm.is_struct(result.value) then
-        local names = gm.struct_get_names(result.value)
-        for j, name in ipairs(names) do
-            log.info("    "..name.." = "..tostring(gm.variable_struct_get(result.value, name)))
-        end
+        Helper.log_struct(result.value, "    ")
     end
 
     log.info("")
@@ -75,10 +82,7 @@ Helper.log_hook = function(self, other, result, args)
 
         -- If value is Struct, print all variables
         if gm.is_struct(a.value) then
-            local names = gm.struct_get_names(a.value)
-            for j, name in ipairs(names) do
-                log.info("    "..name.." = "..tostring(gm.variable_struct_get(a.value, name)))
-            end
+            Helper.log_struct(a.value, "    ")
         end
     end
 
@@ -86,10 +90,11 @@ Helper.log_hook = function(self, other, result, args)
 end
 
 
-Helper.log_struct = function(struct)
+Helper.log_struct = function(struct, indent)
+    indent = indent or ""
     local names = gm.struct_get_names(struct)
     for _, name in ipairs(names) do
-        log.info(name.." = "..tostring(gm.variable_struct_get(struct, name)))
+        log.info(indent..name.." = "..tostring(gm.variable_struct_get(struct, name)))
     end
 end
 
