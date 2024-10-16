@@ -1,3 +1,15 @@
+### v1.1.17
+* 
+
+### v1.1.16
+* Resources : `sprite_load` now returns the existing sprite of a given namespace-identifier if it already exists.
+* `pairs` now works properly when iterating over proxy tables.
+* Skill : Added `is_unlocked`, `add_achievement`, `progress_achievement`.
+
+### v1.1.15
+* Initialize : Forgot to add the error catching to new initialize calling lmao (only the legacy support had it).
+* ReturnOfModding version number change in manifest.
+
 ### v1.1.14
 * Now using ENVY to make own global variables private to self, and for new class ref import methods.
 * Internal restructuring to make all classes read-only (does not affect end-user functionality as listed on the docs).

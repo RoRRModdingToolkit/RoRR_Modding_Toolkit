@@ -7,7 +7,10 @@ Resources = Proxy.new()
 -- == Section Sprites == --
 
 Resources.sprite_load = function(namespace, identifier, path, img_num, x_orig, y_orig, speed, bbox_left, bbox_top, bbox_right, bbox_bottom)
-    local sprite = gm.sprite_add_w(
+    local sprite = gm.sprite_find(namespace.."-"..identifier)
+    if sprite then return sprite end
+    
+    sprite = gm.sprite_add_w(
         namespace,
         identifier,
         path, 

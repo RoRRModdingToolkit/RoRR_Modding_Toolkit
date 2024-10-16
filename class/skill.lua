@@ -4,6 +4,8 @@ Skill = class_refs["Skill"]
 
 local callbacks = {}
 
+local achievement_map = {}
+
 -- TODO add checks for instance methods
 
 -- ========== Enums ==========
@@ -176,6 +178,41 @@ methods_skill = {
         if type(upgraded_skill) ~= "table" or upgraded_skill.RMT_object ~= "Skill" then log.error("Upgraded Skill is not a RMT Skill, got a "..type(upgrade_skill), 2) return end
         
         self.upgrade_skill = upgraded_skill.value
+    end,
+
+
+    is_unlocked = function(self)
+        local ach = achievement_map[self.value]
+        return (not ach) or gm.achievement_is_unlocked(ach)
+    end,
+
+    add_achievement = function(self, progress_req, single_run)
+        local loadout_unlockable = nil
+        local lu_array = GM.variable_global_get("survivor_loadout_unlockables")
+        for i, lu in ipairs(lu_array) do
+            if lu.skill_id == self.value then
+                loadout_unlockable = i - 1
+                break
+            end
+        end
+
+        if not loadout_unlockable then log.error("Loadout unlockable does not exist", 2) end
+
+        local ach = gm.achievement_create(self.namespace, self.identifier)
+        gm.achievement_set_unlock_survivor_loadout_unlockable(ach, loadout_unlockable)
+        gm.achievement_set_requirement(ach, progress_req or 1)
+    
+        if single_run then
+            local ach_array = Class.ACHIEVEMENT:get(ach)
+            ach_array:set(21, single_run)
+        end
+
+        achievement_map[self.value] = ach
+    end,
+
+    progress_achievement = function(self, amount)
+        if self:is_unlocked() then return end
+        gm.achievement_add_progress(achievement_map[self.value], amount or 1)
     end,
 
 

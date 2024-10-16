@@ -45,7 +45,10 @@ gm.pre_script_hook(gm.constants.__input_system_tick, function()
         for _, m_id in ipairs(mods.loading_order) do
             if funcs[m_id] then
                 for _, fn in ipairs(funcs[m_id]) do
-                    fn()
+                    local status, err = pcall(fn)
+                    if not status then
+                        log.warning(m_id.." : Initialize failed to execute fully.\n"..err)
+                    end
                 end
             end
         end
@@ -64,7 +67,10 @@ gm.pre_script_hook(gm.constants.__input_system_tick, function()
         for _, m_id in ipairs(mods.loading_order) do
             if post_funcs[m_id] then
                 for _, fn in ipairs(post_funcs[m_id]) do
-                    fn()
+                    local status, err = pcall(fn)
+                    if not status then
+                        log.warning(m_id.." : Post initialize failed to execute fully.\n"..err)
+                    end
                 end
             end
         end
