@@ -4,7 +4,7 @@
     * `log_struct` now adds borders above and below it.
 * Actor : Added `set_default_skill`.
 * Skill
-    * Fixed onStep callback (by making a custom one; now replaced with onPreStep and onPostStep).
+    * Fixed onStep callback (by making custom ones; now replaced with onPreStep and onPostStep).
     * Fixed callback `args[3]` being incorrectly wrapped as a Skill object when it is a struct.
 
 ### v1.1.16
