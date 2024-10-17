@@ -281,13 +281,13 @@ methods_actor = {
     end,
 
 
-    set_default_skill = function(self, slot)
+    set_default_skill = function(self, slot, skill)
         if type(slot) ~= "number" or slot < 0 or slot > 3 then log.error("Skill slot must be between 0 and 3 (inclusive)", 2) end
         GM.actor_skill_set(self, slot, skill)
     end,
 
 
-    set_skill_override = function(self, slot, skill)
+    add_skill_override = function(self, slot, skill)
         
     end,
 
