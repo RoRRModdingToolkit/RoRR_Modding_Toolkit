@@ -53,3 +53,7 @@ make_wrapper = function(value, RMT_object, metatable, lock_table)
     
     return wrapper
 end
+
+
+
+return Wrap

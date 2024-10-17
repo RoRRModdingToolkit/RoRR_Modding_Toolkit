@@ -4,6 +4,7 @@
     * `remove_skill_override`
     * `refresh_skill`
 * Instance : Fixed reported error in onHit callback.
+* Wrap : Is now a public reference again (whoops).
 * Removed accidentally-left debug logging from last patch.
 
 ### v1.1.17
