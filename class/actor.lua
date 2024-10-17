@@ -288,12 +288,12 @@ methods_actor = {
 
 
     add_skill_override = function(self, slot, skill)
-        
+        -- TODO
     end,
 
 
     remove_skill_override = function(self, slot, skill)
-        
+        -- TODO
     end,
 
 
