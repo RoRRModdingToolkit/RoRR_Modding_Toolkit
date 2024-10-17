@@ -1,3 +1,6 @@
+### v1.1.18
+* 
+
 ### v1.1.17
 * Helper
     * `log_hook` now logs struct variables if self and other are structs.
