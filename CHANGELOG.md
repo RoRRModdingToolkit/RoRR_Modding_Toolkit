@@ -2,8 +2,7 @@
 * Helper
     * `log_hook` now logs struct variables if self and other are structs.
     * `log_struct` now adds borders above and below it.
-* Actor
-    * Added `set_default_skill`.
+* Actor : Added `set_default_skill`.
 * Skill
     * Fixed onStep callback (by making a custom one; now replaced with onPreStep and onPostStep).
     * Fixed arg2 being incorrectly wrapped as a Skill object when it is a struct.
