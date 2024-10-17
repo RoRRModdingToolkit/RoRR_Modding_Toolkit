@@ -1,0 +1,42 @@
+{
+	"skill" : {
+		"jammanZ" : {
+			"name" : "Stab",
+			"description" : "Stab for <y>90% damage</c> hitting <y>up to 5</c> enemies."
+		},
+		"jammanX" : {
+			"name" : "Raspberry Bullet",
+			"description" : "Fire a projectile from your rod for <y>60% damage.</c>\n<y>Pierces enemies</c> and causes bleeding for <y>4x60% damage</c> over time."
+        },
+        "jammanX2" : {
+			"name" : "Spoiled Bullet",
+			"description" : "Fire a projectile from your rod for <y>80% damage.</c>\n<y>Pierces enemies</c> and <b>poison</c> them."
+		},
+		"jammanC" : {
+			"name" : "Roll",
+			"description" : "<y>Roll forward</c> a small distance.\nYou <b>cannot be hit</c> while rolling."
+		},
+		"jammanV" : {
+			"name" : "Spikes of Death",
+			"description" : "Form spikes in front of yourself dealing up to <y>3x240% damage</c>."
+		},
+		"jammanVBoosted" : {
+			"name" : "Spikes of Super Death",
+			"description" : "Form spikes in both directions dealing up to <y>2x3x240% damage</c>."
+		}
+	},
+
+	"survivor" : {
+		"jamman" : {
+			"endQuote" : "..and so it left, still not knowing how it got here to begin with.",
+			"description" : "The <y>Jam Man</c> is an <y>example character</c> intended to serve as a base for other characters.\n<y>Stab</c> can hit more enemies at a time compared to other melee attacks.\n<y>Raspberry Bullet</c> can be used as an opener to deal extra damage as you use other skills.\n<y>Spikes of Death</c> is very effective against large groups.",
+			"name" :  "Jam Man",
+			"nameUpper" : "JAM MAN",
+
+			"story" : "<ul>Passenger Details:\n<y>[Civilian Class]\n\n<ul>Luggage & Equipment:</c>\nPassenger equipped with modified FR-Moray amour, built for pressure resistance and aquatic travel capabilities. Advanced robotic augmentations underneath the ribcage as well as synthetic sensory organs on the helmet were noted. Passenger was questioned and cleared for boarding. Passenger boarded with self-provided Lighting Rod with combat augmentations and several Quantum Containers, all of which were stored in automated lockboxes until arrival at destination. Passenger requested to keep spool of the rod, this was denied by security personnel. Additional luggage included oil used to maintain prosthetics, books written in braille and tackle box filled with exponentially larger hooks. The latter were placed in another automated lockbox for security reasons. \n\n<b>[SECURITY RECALL]</c>\n<ul>[Event F1]</c> Passenger noted conversing on security cameras in the cargo bay with seemingly nobody present.\n<ul>[Event F2]</c> Passenger attempted to flirt with female security personnel, complied when asked to stop.\n<ul>[Event F3]</c> Unexpected EMP signal scrambled the passengers equipment. Passenger walked into a wall. No sign of injury noted by medical drone.",
+            "id" : "Travel ID: 53C1992745627123502",
+            "departure"  : "<y>Departure:</c>\nInfinite Seaport,\nSpirestone,\nJupiter",
+            "arrival" : "<y>Destination:</c>\nPlatform Terra,\nCrater Station,\nPlanet 4546B"
+		}
+	}
+}
