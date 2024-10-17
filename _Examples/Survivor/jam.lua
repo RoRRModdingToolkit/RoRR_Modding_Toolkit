@@ -215,7 +215,7 @@ local initialize = function()
             if actor:is_authority() then
                 local buff_shadow_clone = Buff.find("ror", "shadowClone")
                 for i=0, GM.get_buff_stack(actor, buff_shadow_clone) do
-                    local attack = GM._mod_attack_fire_bullet(actor, actor.x, actor.y, 500, actor:skill_util_facing_direction(), damage, gm.constants.sSparks7, true, true)
+                    local attack = GM._mod_attack_fire_bullet(actor, actor.x, actor.y, 500, actor:skill_util_facing_direction(), damage, sprSparksJam, true, true)
                     attack.jamdot = true
                     attack.attack_info.climb = i * 8
                 end
@@ -273,7 +273,7 @@ local initialize = function()
             if actor:is_authority() then
                 local buff_shadow_clone = Buff.find("ror", "shadowClone")
                 for i=0, GM.get_buff_stack(actor, buff_shadow_clone) do
-                    local attack = GM._mod_attack_fire_bullet(actor, actor.x, actor.y, 500, actor:skill_util_facing_direction(), damage, gm.constants.sSparks7, true, true)
+                    local attack = GM._mod_attack_fire_bullet(actor, actor.x, actor.y, 500, actor:skill_util_facing_direction(), damage, sprSparksJam, true, true)
                     attack.attack_info.attack_flags = 1 << 1
                     attack.attack_info.climb = i * 8
                 end
