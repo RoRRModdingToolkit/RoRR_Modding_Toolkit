@@ -261,8 +261,6 @@ metatable_class["Skill"] = {
 
 gm.post_script_hook(gm.constants.callback_execute, function(self, other, result, args)
     if callbacks[args[1].value] then
-        Helper.log_hook(self, other, result, args)
-
         for _, fn in pairs(callbacks[args[1].value]) do
             fn(Instance.wrap(args[2].value), args[3].value, args[4].value) --(actor, ActorSkill struct, index)
         end

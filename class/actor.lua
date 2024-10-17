@@ -287,18 +287,36 @@ methods_actor = {
     end,
 
 
-    add_skill_override = function(self, slot, skill)
-        -- TODO
+    add_skill_override = function(self, slot, skill, priority)
+        if type(slot) ~= "number" or slot < 0 or slot > 3 then log.error("Skill slot must be between 0 and 3 (inclusive)", 2) end
+        local struct = self.skills:get(slot)
+        struct.add_override(struct, struct.active_skill, Wrap.unwrap(skill), priority or 0)
     end,
 
 
-    remove_skill_override = function(self, slot, skill)
-        -- TODO
+    remove_skill_override = function(self, slot, skill, priority)
+        if type(slot) ~= "number" or slot < 0 or slot > 3 then log.error("Skill slot must be between 0 and 3 (inclusive)", 2) end
+        local struct = self.skills:get(slot)
+        struct.remove_override(struct, struct.active_skill, Wrap.unwrap(skill), priority or 0)
     end,
+
+
+    refresh_skill = function(self, slot)
+        if type(slot) ~= "number" or slot < 0 or slot > 3 then log.error("Skill slot must be between 0 and 3 (inclusive)", 2) end
+        local struct = self.skills:get(slot).active_skill
+        struct.reset_cooldown(struct, struct)
+    end,
+
+
+    -- reduce_skill_cooldown = function(self, slot, amount)
+    --     if type(slot) ~= "number" or slot < 0 or slot > 3 then log.error("Skill slot must be between 0 and 3 (inclusive)", 2) end
+    --     local struct = self.skills:get(slot).active_skill
+    --     -- struct.cooldown_reset_frame = struct.cooldown_reset_frame - amount
+    -- end,
 
 
     enter_state = function(self, state)
-        gm.actor_set_state(self.value, Wrap.unwrap(state))
+        GM.actor_set_state(self.value, state)
     end
 
 }
@@ -510,6 +528,7 @@ end
 
 
 local function actor_onHit(self, other, result, args)
+    if not self.attack_info then return end
     if not self.attack_info.proc then return end
     if callbacks["onHit"] then
         for k, fn in pairs(callbacks["onHit"]) do

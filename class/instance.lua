@@ -607,6 +607,7 @@ end
 
 
 local function inst_onHit(self, other, result, args)
+    if not self.attack_info then return end
     if not self.attack_info.proc then return end
     local actor = args[2].value
     if callbacks[actor.id] and callbacks[actor.id]["onHit"] then
