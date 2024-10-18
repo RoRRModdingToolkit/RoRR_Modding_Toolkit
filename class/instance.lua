@@ -370,6 +370,8 @@ methods_instance = {
     
     
     callback_exists = function(self, id)
+        if not callbacks[self.value.id] then return false end
+
         local c_table = callbacks[self.value.id]["onSkillUse"]
         if c_table then
             for s, id_table in pairs(c_table) do

@@ -21,7 +21,7 @@ local loot_toggled = {}     -- Loot pools that have been added to this frame
 
 -- ========== Static Methods ==========
 
-Equipment.new = function(namespace, identifier)
+Equipment.new = function(namespace, identifier, no_log)
     local equip = Equipment.find(namespace, identifier)
     if equip then return equip end
 
@@ -46,20 +46,24 @@ Equipment.new = function(namespace, identifier)
     -- Have to manually increase this variable for some reason (class_equipment array length)
     gm.variable_global_set("count_equipment", gm.variable_global_get("count_equipment") + 1.0)
 
+    -- Equipment log
+    if not no_log then
+        -- Remove previous item log position (if found)
+        local item_log_order = List.wrap(gm.variable_global_get("item_log_display_list"))
+        local pos = item_log_order:find(equipment.item_log_id)
+        if pos then item_log_order:delete(pos) end
 
-    -- Remove previous item log position (if found)
-    local item_log_order = List.wrap(gm.variable_global_get("item_log_display_list"))
-    local pos = item_log_order:find(equipment.item_log_id)
-    if pos then item_log_order:delete(pos) end
-
-    -- Set item log position
-    local pos = 0
-    for i, log_id in ipairs(item_log_order) do
-        local log_ = Class.ITEM_LOG:get(log_id)
-        local iter_item = Equipment.find(log_:get(0), log_:get(1))
-        if iter_item and iter_item.tier == 3.0 then pos = i end
+        -- Set item log position
+        local pos = 0
+        for i, log_id in ipairs(item_log_order) do
+            local log_ = Class.ITEM_LOG:get(log_id)
+            local iter_item = Equipment.find(log_:get(0), log_:get(1))
+            if iter_item and iter_item.tier == 3.0 then pos = i end
+        end
+        item_log_order:insert(pos, equipment.item_log_id)
+    
+    else equipment.item_log_id = nil
     end
-    item_log_order:insert(pos, equipment.item_log_id)
 
     return equipment
 end
