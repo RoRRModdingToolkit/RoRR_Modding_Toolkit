@@ -1,3 +1,6 @@
+### v1.1.20
+* 
+
 ### v1.1.19
 * Equipment : `new` now has a `[no_log]` parameter.
 * Instance : Fixed error when using `callback_exists` before any callbacks are added.
