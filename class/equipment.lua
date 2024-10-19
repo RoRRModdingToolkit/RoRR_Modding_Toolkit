@@ -62,7 +62,11 @@ Equipment.new = function(namespace, identifier, no_log)
         end
         item_log_order:insert(pos, equipment.item_log_id)
     
-    else equipment.item_log_id = nil
+    else
+        local item_log_order = List.wrap(gm.variable_global_get("item_log_display_list"))
+        local pos = item_log_order:find(equipment.item_log_id)
+        if pos then item_log_order:delete(pos) end
+        equipment.item_log_id = nil
     end
 
     return equipment
