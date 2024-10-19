@@ -2,7 +2,7 @@
 * Helper : Fixed specific error in `log_struct`.
 * State
     * Fixed bad instance method callback name.
-    * 
+    * Now writes to callback_execute `return` value if the function returns a value.
 
 ### v1.1.19
 * Equipment : `new` now has a `[no_log]` parameter.
