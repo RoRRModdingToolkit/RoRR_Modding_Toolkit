@@ -5,14 +5,15 @@ State = class_refs["State"]
 local callbacks = {}
 
 
--- ========== Enums ==========
 
+-- ========== Enums ==========
 
 State.ACTIVITY_FLAG = Proxy.new({
     none                = 0,
     allow_rope_cancel   = 1,
     allow_aim_turn      = 2
 }):lock()
+
 
 State.ACTOR_STATE_INTERRUPT_PRIORITY = Proxy.new({
     any                     = 0,
@@ -95,7 +96,7 @@ methods_state = {
     onEnter                     = function(self, func) self:add_callback("onEnter", func) end,
     onExit                      = function(self, func) self:add_callback("onExit", func) end,
     onStep                      = function(self, func) self:add_callback("onStep", func) end,
-    on_get_interrupt_priority   = function(self, func) self:add_callback("onGetInterruptPriority", func) end
+    onGetInterruptPriority      = function(self, func) self:add_callback("onGetInterruptPriority", func) end
 }
 
 
@@ -122,6 +123,8 @@ metatable_class["State"] = {
 
     __metatable = "state"
 }
+
+
 
 -- ========== Hooks ==========
 

@@ -1,5 +1,8 @@
 ### v1.1.20
-* 
+* Helper : Fixed specific error in `log_struct`.
+* State
+    * Fixed bad instance method callback name.
+    * 
 
 ### v1.1.19
 * Equipment : `new` now has a `[no_log]` parameter.

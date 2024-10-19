@@ -93,7 +93,7 @@ end
 Helper.log_struct = function(struct, indent, no_borders)
     if not no_borders then log.info("----------") end
     indent = indent or ""
-    local names = gm.struct_get_names(struct)
+    local names = GM.struct_get_names(struct)
     for _, name in ipairs(names) do
         log.info(indent..name.." = "..tostring(gm.variable_struct_get(struct, name)))
     end
