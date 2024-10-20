@@ -1,5 +1,5 @@
 ### v1.1.21
-* 
+* Damager : Added `add_offset`.
 
 ### v1.1.20
 * Helper : Fixed specific error in `log_struct`.

@@ -131,6 +131,19 @@ methods_damager = {
         if knockback_kind then self.knockback_kind = knockback_kind end
     end,
 
+
+    add_offset = function(self, damager, offset)
+        -- Overload 1
+        if type(damager) == "number" then
+            self.value.climb = self.value.climb + damager
+            return
+        end
+
+        -- Overload 2
+        if not gm.is_struct(damager) then log.error("Argument 1 is not a struct", 2) end
+        self.value.climb = damager.climb + (offset or 8.0)
+    end
+
 }
 lock_table_damager = Proxy.make_lock_table({"value", "RMT_object", table.unpack(Helper.table_get_keys(methods_damager))})
 
