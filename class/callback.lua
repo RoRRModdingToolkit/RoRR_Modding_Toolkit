@@ -8,7 +8,52 @@ local callbacks = {}
 
 -- ========== Enums ==========
 
-Callback.TYPE = Proxy.new()
+-- Manual population due to at least one report of "callback_names" being empty at runtime
+Callback.TYPE = Proxy.new({
+    onLoad                          = 0,
+    postLoad                        = 1,
+    onStep                          = 2,
+    preStep                         = 3,
+    postStep                        = 4,
+    onDraw                          = 5,
+    preHUDDraw                      = 6,
+    onHUDDraw                       = 7,
+    postHUDDraw                     = 8,
+    camera_onViewCameraUpdate       = 9,
+    onScreenRefresh                 = 10,
+    onGameStart                     = 11,
+    onGameEnd                       = 12,
+    onDirectorPopulateSpawnArrays   = 13,
+    onStageStart                    = 14,
+    onSecond                        = 15,
+    onMinute                        = 16,
+    onAttackCreate                  = 17,
+    onAttackHit                     = 18,
+    onAttackHandleStart             = 19,
+    onAttackHandleEnd               = 20,
+    onDamageBlocked                 = 21,
+    onEnemyInit                     = 22,
+    onEliteInit                     = 23,
+    onDeath                         = 24,
+    onPlayerInit                    = 25,
+    onPlayerStep                    = 26,
+    prePlayerHUDDraw                = 27,
+    onPlayerHUDDraw                 = 28,
+    onPlayerInventoryUpdate         = 29,
+    onPlayerDeath                   = 30,
+    onCheckpointRespawn             = 31,
+    onInputPlayerDeviceUpdate       = 32,
+    onPickupCollected               = 33,
+    onPickupRoll                    = 34,
+    onEquipmentUse                  = 35,
+    postEquipmentUse                = 36,
+    onInteractableActivate          = 37,
+    onHitProc                       = 38,
+    onDamagedProc                   = 39,
+    onKillProc                      = 40,
+    net_message_onReceived          = 41,
+    console_onCommand               = 42
+}):lock()
 
 
 
@@ -46,21 +91,6 @@ gm.post_script_hook(gm.constants.callback_execute, function(self, other, result,
         end
     end
 end)
-
-
-
--- ========== Initialize ==========
-
-initialize_callback = function()
-    -- Populate Callback.TYPE
-    local callback_names = gm.variable_global_get("callback_names")
-    local size = gm.array_length(callback_names)
-    for i = 0, size - 1 do
-        Callback.TYPE[gm.array_get(callback_names, i)] = i
-    end
-
-    Callback.TYPE:lock()
-end
 
 
 

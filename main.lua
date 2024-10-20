@@ -52,7 +52,6 @@ require("./envy_setup")
 
 function __initialize()
     initialize_class()
-    initialize_callback()
     
     initialize_instance()
     initialize_actor()

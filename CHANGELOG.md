@@ -1,6 +1,7 @@
 ### v1.1.21
 * Damager : Added `add_offset`.
 * Mod : Class reference is now public (whoops again).
+* Callback : `TYPE` is now populated on mod load and not during Initialize.
 
 ### v1.1.20
 * Helper : Fixed specific error in `log_struct`.
