@@ -87,7 +87,7 @@ methods_damager = {
 
         -- Overload 2
         if not gm.is_struct(damager) then log.error("Argument 1 is not a struct", 2) end
-        self.value.climb = damager.climb + (offset or 8.0)
+        self.value.climb = damager.climb + (offset or 10.0)
     end,
 
 
