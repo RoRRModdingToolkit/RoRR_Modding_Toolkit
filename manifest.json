@@ -1,10 +1,10 @@
 ﻿{
 	"name": "RoRR_Modding_Toolkit",
-	"version_number": "1.1.20",
+	"version_number": "1.1.21",
 	"website_url": "https://github.com/RoRRModdingToolkit/RoRR_Modding_Toolkit/wiki",
 	"description": "Friendly abstractions of the game's internal functions for easier modding.",
 	"dependencies": [
-		"ReturnOfModding-ReturnOfModding-1.0.43",
+		"ReturnOfModding-ReturnOfModding-1.0.45",
 		"MGReturns-ENVY-1.1.1"
 	]
 }
