@@ -77,6 +77,8 @@ methods_damager = {
 
 
     add_offset = function(self, damager, offset)
+        damager = Wrap.unwrap(damager)
+
         -- Overload 1
         if type(damager) == "number" then
             self.value.climb = self.value.climb + damager
