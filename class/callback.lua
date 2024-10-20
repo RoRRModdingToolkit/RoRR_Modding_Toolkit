@@ -19,6 +19,7 @@ Callback.add = function(callback, id, func)
     if not callback_id then log.error("Invalid callback name", 2) end
 
     if not callbacks[callback_id] then callbacks[callback_id] = {} end
+    if callbacks[callback_id][id] and id:sub(1, 3) == "RMT" then log.error("Cannot overwrite RMT callbacks", 2) end
     callbacks[callback_id][id] = func
 end
 
