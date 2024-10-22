@@ -1,7 +1,9 @@
 -- RMTtest v1.0.0
 -- RoRRModdingToolkit
 
-
+-- TODO 
+-- finish comments
+-- change GM._mod_attack_fire_explosion etc to actor:fire_explosion()
 
 log.info("Successfully loaded ".._ENV["!guid"]..".")
 mods["RoRRModdingToolkit-RoRR_Modding_Toolkit"].auto() -- Loading the toolkit 
