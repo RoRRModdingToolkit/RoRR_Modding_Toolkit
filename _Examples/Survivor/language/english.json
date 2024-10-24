@@ -33,10 +33,10 @@
 			"name" :  "Jam Man",
 			"nameUpper" : "JAM MAN",
 
-			"story" : "<ul>Passenger Details:\n<y>[Civilian Class]\n\n<ul>Luggage & Equipment:</c>\nPassenger equipped with modified FR-Moray amour, built for pressure resistance and aquatic travel capabilities. Advanced robotic augmentations underneath the ribcage as well as synthetic sensory organs on the helmet were noted. Passenger was questioned and cleared for boarding. Passenger boarded with self-provided Lighting Rod with combat augmentations and several Quantum Containers, all of which were stored in automated lockboxes until arrival at destination. Passenger requested to keep spool of the rod, this was denied by security personnel. Additional luggage included oil used to maintain prosthetics, books written in braille and tackle box filled with exponentially larger hooks. The latter were placed in another automated lockbox for security reasons. \n\n<b>[SECURITY RECALL]</c>\n<ul>[Event F1]</c> Passenger noted conversing on security cameras in the cargo bay with seemingly nobody present.\n<ul>[Event F2]</c> Passenger attempted to flirt with female security personnel, complied when asked to stop.\n<ul>[Event F3]</c> Unexpected EMP signal scrambled the passengers equipment. Passenger walked into a wall. No sign of injury noted by medical drone.",
+			"story" : "<ul>Passenger Details:\n<y>[Merchandise Class] \n\n<ul>This pot of jam seems expired.",
             "id" : "Travel ID: 53C1992745627123502",
-            "departure"  : "<y>Departure:</c>\nInfinite Seaport,\nSpirestone,\nJupiter",
-            "arrival" : "<y>Destination:</c>\nPlatform Terra,\nCrater Station,\nPlanet 4546B"
+            "departure"  : "<y>Departure:</c>\nFridge,\nGrandma's House,\nEarth",
+            "arrival" : "<y>Destination:</c>\nBread,\nPlate,\nEarth"
 		}
 	}
 }

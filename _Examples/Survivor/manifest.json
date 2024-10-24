@@ -1,0 +1,9 @@
+{
+	"name": "Jam",
+	"version_number": "1.0.0",
+	"website_url": "https://github.com/RoRRModdingToolkit/RoRR_Modding_Toolkit/wiki",
+	"description": "Example character for the RoRR Modding toolkit.",
+	"dependencies": [
+		"RoRRModdingToolkit-RoRR_Modding_Toolkit-1.1.21"
+	]
+}
