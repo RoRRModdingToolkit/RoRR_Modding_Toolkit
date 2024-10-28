@@ -29,12 +29,14 @@ end
 methods_message = {
 
     write_byte = function(self, value)
+        value = Wrap.unwrap(value)
         local m = message_proxy[self.value]
         if m.locked then log.error("Cannot modify message", 2) end
         GM.writebyte_direct(m.buffer, value)
     end,
     
     write_short = function(self, value)
+        value = Wrap.unwrap(value)
         if type(value) ~= "number" then log.error("Argument is not a number", 2) end
         local m = message_proxy[self.value]
         if m.locked then log.error("Cannot modify message", 2) end
@@ -42,6 +44,7 @@ methods_message = {
     end,
 
     write_ushort = function(self, value)
+        value = Wrap.unwrap(value)
         if type(value) ~= "number" then log.error("Argument is not a number", 2) end
         local m = message_proxy[self.value]
         if m.locked then log.error("Cannot modify message", 2) end
@@ -49,6 +52,7 @@ methods_message = {
     end,
 
     write_half = function(self, value)
+        value = Wrap.unwrap(value)
         if type(value) ~= "number" then log.error("Argument is not a number", 2) end
         local m = message_proxy[self.value]
         if m.locked then log.error("Cannot modify message", 2) end
@@ -56,6 +60,7 @@ methods_message = {
     end,
 
     write_uhalf = function(self, value)
+        value = Wrap.unwrap(value)
         if type(value) ~= "number" then log.error("Argument is not a number", 2) end
         local m = message_proxy[self.value]
         if m.locked then log.error("Cannot modify message", 2) end
@@ -63,6 +68,7 @@ methods_message = {
     end,
 
     write_int = function(self, value)
+        value = Wrap.unwrap(value)
         if type(value) ~= "number" then log.error("Argument is not a number", 2) end
         local m = message_proxy[self.value]
         if m.locked then log.error("Cannot modify message", 2) end
@@ -70,6 +76,7 @@ methods_message = {
     end,
 
     write_uint = function(self, value)
+        value = Wrap.unwrap(value)
         if type(value) ~= "number" then log.error("Argument is not a number", 2) end
         local m = message_proxy[self.value]
         if m.locked then log.error("Cannot modify message", 2) end
@@ -77,6 +84,7 @@ methods_message = {
     end,
 
     write_float = function(self, value)
+        value = Wrap.unwrap(value)
         if type(value) ~= "number" then log.error("Argument is not a number", 2) end
         local m = message_proxy[self.value]
         if m.locked then log.error("Cannot modify message", 2) end
@@ -84,6 +92,7 @@ methods_message = {
     end,
 
     write_string = function(self, value)
+        value = Wrap.unwrap(value)
         if type(value) ~= "string" then log.error("Argument is not a string", 2) end
         local m = message_proxy[self.value]
         if m.locked then log.error("Cannot modify message", 2) end
@@ -91,6 +100,7 @@ methods_message = {
     end,
 
     write_instance = function(self, value)
+        value = Wrap.unwrap(value)
         if not GM.instance_exists(value) then log.error("Argument is not an instance", 2) end
         local m = message_proxy[self.value]
         if m.locked then log.error("Cannot modify message", 2) end
