@@ -4,6 +4,17 @@ Monster_Card = class_refs["Monster_Card"]
 
 
 
+-- ========== Enums ==========
+
+Monster_Card.SPAWN_TYPE = Proxy.new({
+    classic     = 0,
+    nearby      = 1,
+    offscreen   = 2,
+    origin      = 3
+}):lock()
+
+
+
 -- ========== Static Methods ==========
 
 Monster_Card.new = function(namespace, identifier)
