@@ -1,3 +1,6 @@
+### v1.1.22
+* Monster_Card : Added `SPAWN_TYPE` enum.
+
 ### v1.1.21
 * Damager : Added `add_offset`.
 * Mod : Class reference is now public (whoops again).
