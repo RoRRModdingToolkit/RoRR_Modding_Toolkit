@@ -8,12 +8,6 @@ callbacks = {
 
 
 
--- ========== Enums ==========
-
-
-
-
-
 -- ========== Static Methods ==========
 
 Packet.new = function()
@@ -33,14 +27,13 @@ end
 methods_packet = {
 
     message_begin = function(self)
-        return Message.wrap(GM._mod_net_message_begin())
+        return Message.new(self.value)
     end,
 
 
     -- Callbacks
     onReceived = function(self, func)
-        if not callbacks["onReceived"][self.value] then callbacks["onReceived"][self.value] = {}
-        table.insert(callbacks["onReceived"][self.value], func)
+        callbacks["onReceived"][self.value] = func
     end
 
 }
@@ -50,20 +43,6 @@ lock_table_packet = Proxy.make_lock_table({"value", "RMT_object", table.unpack(H
 
 -- ========== Metatables ==========
 
-metatable_packet_gs = {
-    -- Getter
-    __index = function(table, key)
-        
-    end,
-
-
-    -- Setter
-    __newindex = function(table, key, value)            
-        
-    end
-}
-
-
 metatable_packet = {
     __index = function(table, key)
         -- Methods
@@ -71,13 +50,12 @@ metatable_packet = {
             return methods_packet[key]
         end
 
-        -- Pass to next metatable
-        return metatable_packet_gs.__index(table, key)
+        return nil
     end,
 
 
     __newindex = function(table, key, value)
-        metatable_packet_gs.__newindex(table, key, value)
+
     end,
 
     
@@ -90,13 +68,8 @@ metatable_packet = {
 
 local function packet_onReceived(self, other, result, args)
     local id = args[2].value
-    local funcs = callbacks["onReceived"][id]
-    if funcs then
-        for _, fn in ipairs(funcs) do
-            local buffer = args[3].value
-            -- Move this inside user-defined function actually
-        end
-    end
+    local fn = callbacks["onReceived"][id]
+    if fn then fn(Message.new(args[3].value, true), args[5].value) end     -- buffer, Player instance (host only)
 end
 
 
