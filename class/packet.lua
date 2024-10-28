@@ -25,7 +25,7 @@ end
 methods_packet = {
 
     message_begin = function(self)
-        return Message.new(self.value)
+        return Message.new()
     end,
 
 
