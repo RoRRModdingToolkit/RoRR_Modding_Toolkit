@@ -52,3 +52,5 @@ v Add tracer_kind to actor:fire_bullet (and an enum for it)
 - Add Player remove_callback and callback_exists
 
 v When .auto, store _ENV for Language loading
+
+- Lock ALL instance methods for all classes (only some are rn)

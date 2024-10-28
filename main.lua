@@ -53,6 +53,8 @@ require("./envy_setup")
 function __initialize()
     initialize_class()
     
+    initialize_packet()
+    
     initialize_instance()
     initialize_actor()
     initialize_player()

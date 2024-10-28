@@ -2,6 +2,9 @@
 * Monster_Card : Added `SPAWN_TYPE` enum.
 * Actor
     * `fire_` methods now return the actual attack instance as a second unpacked return value.
+* Net : Removed most of the class except `TYPE` and `get_type()`.
+* Added Packet
+* Added Message
 
 ### v1.1.21
 * Damager : Added `add_offset`.
