@@ -89,7 +89,14 @@ metatable_packet = {
 -- ========== Callbacks ==========
 
 local function packet_onReceived(self, other, result, args)
-    
+    local id = args[2].value
+    local funcs = callbacks["onReceived"][id]
+    if funcs then
+        for _, fn in ipairs(funcs) do
+            local buffer = args[3].value
+            -- Move this inside user-defined function actually
+        end
+    end
 end
 
 
