@@ -2,9 +2,7 @@
 
 Packet = Proxy.new()
 
-callbacks = {
-    onReceived = {}
-}
+local callbacks_onReceived = {}
 
 
 
@@ -33,7 +31,7 @@ methods_packet = {
 
     -- Callbacks
     onReceived = function(self, func)
-        callbacks["onReceived"][self.value] = func
+        callbacks_onReceived[self.value] = func
     end
 
 }
@@ -50,12 +48,13 @@ metatable_packet = {
             return methods_packet[key]
         end
 
+        log.warning("No properties to get in Packet", 2)
         return nil
     end,
 
 
     __newindex = function(table, key, value)
-
+        log.warning("No properties to set in Packet", 2)
     end,
 
     
@@ -68,7 +67,7 @@ metatable_packet = {
 
 local function packet_onReceived(self, other, result, args)
     local id = args[2].value
-    local fn = callbacks["onReceived"][id]
+    local fn = callbacks_onReceived[id]
     if fn then fn(Message.new(args[3].value, true), args[5].value) end     -- buffer, Player instance (host only)
 end
 

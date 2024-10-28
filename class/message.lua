@@ -198,12 +198,13 @@ metatable_message = {
             return methods_message[key]
         end
 
+        log.warning("No properties to get in Message", 2)
         return nil
     end,
 
 
     __newindex = function(table, key, value)
-        
+        log.warning("No properties to set in Message", 2)
     end,
 
     
