@@ -2,6 +2,7 @@
 * Monster_Card : Added `SPAWN_TYPE` enum.
 * Actor
     * `fire_` methods now return the actual attack instance as a second unpacked return value.
+    * Added `fire_explosion_local`
 * Instance : `wrap` now returns an invalid wrapped instance (value of -4) if the argument doesn't exist.
 * Net : Removed most of the class except `TYPE` and `get_type()`.
 * Added Packet

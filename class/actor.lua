@@ -117,7 +117,7 @@ methods_actor = {
         local can_pierce = false
         if pierce_multiplier then can_pierce = true end
 
-        local inst = gm._mod_attack_fire_bullet(self.value, x, y, range, direction, damage, hit_sprite or -1, can_pierce, true)
+        local inst = GM._mod_attack_fire_bullet(self.value, x, y, range, direction, damage, hit_sprite or -1, can_pierce, true)
         local damager = inst.attack_info
         damager.damage_color = Color.WHITE_ALMOST
 
@@ -136,7 +136,18 @@ methods_actor = {
 
 
     fire_explosion = function(self, x, y, width, height, damage, explosion_sprite, sparks_sprite)
-        local inst = gm._mod_attack_fire_explosion(self.value, x, y, width, height, damage, explosion_sprite or -1, sparks_sprite or -1, true)
+        local inst = GM._mod_attack_fire_explosion(self.value, x, y, width, height, damage, explosion_sprite or -1, sparks_sprite or -1, true)
+        local damager = inst.attack_info
+        damager.damage_color = Color.WHITE_ALMOST
+
+        return Damager.wrap(damager), Instance.wrap(inst)
+    end,
+
+
+    fire_explosion_local = function(self, x, y, width, height, damage, explosion_sprite, sparks_sprite)
+        local mask = gm.constants.sBite1Mask
+        self.value:fire_explosion_local(0, x, y, damage, sparks_sprite or -1, 2, explosion_sprite or -1, width / GM.sprite_get_width(mask), height / GM.sprite_get_height(mask))
+        local inst = gm.variable_global_get("attack_bullet")
         local damager = inst.attack_info
         damager.damage_color = Color.WHITE_ALMOST
 
@@ -147,7 +158,7 @@ methods_actor = {
     fire_direct = function(self, target, damage, direction, x, y, hit_sprite)
         target = Wrap.unwrap(target)
 
-        local inst = gm._mod_attack_fire_direct(self.value, target, x or target.x, y or target.y, direction or 0, damage, hit_sprite or -1, true)
+        local inst = GM._mod_attack_fire_direct(self.value, target, x or target.x, y or target.y, direction or 0, damage, hit_sprite or -1, true)
         local damager = inst.attack_info
         damager.damage_color = Color.WHITE_ALMOST
         
