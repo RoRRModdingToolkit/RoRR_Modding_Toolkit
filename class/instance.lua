@@ -194,7 +194,7 @@ end
 
 
 Instance.wrap = function(value)
-    if not Instance.exists(value) return Instance.wrap_invalid() end
+    if not Instance.exists(value) then return Instance.wrap_invalid() end
 
     local RMT_object = "Instance"
     local mt = metatable_instance
