@@ -34,62 +34,6 @@ methods_message = {
         if m.locked then log.error("Cannot modify message", 2) end
         GM.writebyte_direct(m.buffer, value)
     end,
-    
-    write_short = function(self, value)
-        value = Wrap.unwrap(value)
-        if type(value) ~= "number" then log.error("Argument is not a number", 2) end
-        local m = message_proxy[self.value]
-        if m.locked then log.error("Cannot modify message", 2) end
-        GM.writeshort_direct(m.buffer, value)
-    end,
-
-    write_ushort = function(self, value)
-        value = Wrap.unwrap(value)
-        if type(value) ~= "number" then log.error("Argument is not a number", 2) end
-        local m = message_proxy[self.value]
-        if m.locked then log.error("Cannot modify message", 2) end
-        GM.writeushort_direct(m.buffer, value)
-    end,
-
-    write_half = function(self, value)
-        value = Wrap.unwrap(value)
-        if type(value) ~= "number" then log.error("Argument is not a number", 2) end
-        local m = message_proxy[self.value]
-        if m.locked then log.error("Cannot modify message", 2) end
-        GM.writehalf_direct(m.buffer, value)
-    end,
-
-    write_uhalf = function(self, value)
-        value = Wrap.unwrap(value)
-        if type(value) ~= "number" then log.error("Argument is not a number", 2) end
-        local m = message_proxy[self.value]
-        if m.locked then log.error("Cannot modify message", 2) end
-        GM.writeuhalf_direct(m.buffer, value)
-    end,
-
-    write_int = function(self, value)
-        value = Wrap.unwrap(value)
-        if type(value) ~= "number" then log.error("Argument is not a number", 2) end
-        local m = message_proxy[self.value]
-        if m.locked then log.error("Cannot modify message", 2) end
-        GM.writeint_direct(m.buffer, value)
-    end,
-
-    write_uint = function(self, value)
-        value = Wrap.unwrap(value)
-        if type(value) ~= "number" then log.error("Argument is not a number", 2) end
-        local m = message_proxy[self.value]
-        if m.locked then log.error("Cannot modify message", 2) end
-        GM.writeuint_direct(m.buffer, value)
-    end,
-
-    write_float = function(self, value)
-        value = Wrap.unwrap(value)
-        if type(value) ~= "number" then log.error("Argument is not a number", 2) end
-        local m = message_proxy[self.value]
-        if m.locked then log.error("Cannot modify message", 2) end
-        GM.writefloat_direct(m.buffer, value)
-    end,
 
     write_string = function(self, value)
         value = Wrap.unwrap(value)
@@ -111,41 +55,6 @@ methods_message = {
     read_byte = function(self)
         local m = message_proxy[self.value]
         return GM.readbyte_direct(m.buffer)
-    end,
-    
-    read_short = function(self)
-        local m = message_proxy[self.value]
-        return GM.readshort_direct(m.buffer)
-    end,
-
-    read_ushort = function(self)
-        local m = message_proxy[self.value]
-        return GM.readushort_direct(m.buffer)
-    end,
-
-    read_half = function(self)
-        local m = message_proxy[self.value]
-        return GM.readhalf_direct(m.buffer)
-    end,
-
-    read_uhalf = function(self)
-        local m = message_proxy[self.value]
-        return GM.readuhalf_direct(m.buffer)
-    end,
-
-    read_int = function(self)
-        local m = message_proxy[self.value]
-        return GM.readint_direct(m.buffer)
-    end,
-
-    read_uint = function(self)
-        local m = message_proxy[self.value]
-        return GM.readuint_direct(m.buffer)
-    end,
-
-    read_float = function(self)
-        local m = message_proxy[self.value]
-        return GM.readfloat_direct(m.buffer)
     end,
 
     read_string = function(self)
@@ -195,6 +104,43 @@ methods_message = {
     end
 
 }
+
+local write_num = {
+    write_short     = GM.writeshort_direct,
+    write_ushort    = GM.writeushort_direct,
+    write_half      = GM.writehalf_direct,
+    write_uhalf     = GM.writeuhalf_direct,
+    write_int       = GM.writeint_direct,
+    write_uint      = GM.writeuint_direct,
+    write_float     = GM.writefloat_direct
+}
+local read_num = {
+    read_short      = GM.readshort_direct,
+    read_ushort     = GM.readushort_direct,
+    read_half       = GM.readhalf_direct,
+    read_uhalf      = GM.readuhalf_direct,
+    read_int        = GM.readint_direct,
+    read_uint       = GM.readuint_direct,
+    read_float      = GM.readfloat_direct
+}
+
+for k, fn in pairs(write_num) do
+    methods_message[k] = function(self, value)
+        value = Wrap.unwrap(value)
+        if type(value) ~= "number" then log.error("Argument is not a number", 2) end
+        local m = message_proxy[self.value]
+        if m.locked then log.error("Cannot modify message", 2) end
+        fn(m.buffer, value)
+    end
+end
+
+for k, fn in pairs(read_num) do
+    methods_message[k] = function(self)
+        local m = message_proxy[self.value]
+        return fn(m.buffer)
+    end
+end
+
 lock_table_message = Proxy.make_lock_table({"value", "RMT_object", table.unpack(Helper.table_get_keys(methods_message))})
 
 
