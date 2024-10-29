@@ -429,10 +429,8 @@ end
 
 -- ========== Initialize ==========
 
-initialize_equipment = function()
-    Callback.add("preStep", "RMT-equipment_onStep", equipment_onStep)
-    Callback.add("postHUDDraw", "RMT-equipment_onDraw", equipment_onDraw)
-end
+Callback.add("preStep", "RMT-equipment_onStep", equipment_onStep)
+Callback.add("postHUDDraw", "RMT-equipment_onDraw", equipment_onDraw)
 
 
 

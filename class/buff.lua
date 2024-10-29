@@ -223,9 +223,7 @@ end
 
 -- ========== Initialize ==========
 
-initialize_buff = function()
-    Callback.add("postHUDDraw", "RMT-buff_onDraw", buff_onDraw)
-end
+Callback.add("postHUDDraw", "RMT-buff_onDraw", buff_onDraw)
 
 
 

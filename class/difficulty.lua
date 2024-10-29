@@ -209,11 +209,9 @@ end
 
 -- ========== Initialize ==========
 
-initialize_difficulty = function()
-    Callback.add("preStep", "RMT-diff_onActive", diff_onActive)
-    Callback.add("preStep", "RMT-diff_onStep", diff_onStep)
-    Callback.add("postHUDDraw", "RMT-diff_onDraw", diff_onDraw)
-end
+Callback.add("preStep", "RMT-diff_onActive", diff_onActive)
+Callback.add("preStep", "RMT-diff_onStep", diff_onStep)
+Callback.add("postHUDDraw", "RMT-diff_onDraw", diff_onDraw)
 
 
 

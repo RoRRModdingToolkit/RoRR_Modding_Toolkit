@@ -52,18 +52,6 @@ require("./envy_setup")
 
 function __initialize()
     initialize_class()
-    
-    initialize_packet()
-    
+
     initialize_instance()
-    initialize_actor()
-    initialize_player()
-    
-    initialize_artifact()
-    initialize_buff()
-    initialize_difficulty()
-    initialize_equipment()
-    initialize_interactable()
-    -- initialize_item()
-    initialize_skill()
 end

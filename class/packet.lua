@@ -75,9 +75,7 @@ end
 
 -- ========== Initialize ==========
 
-initialize_packet = function()
-    Callback.add("net_message_onReceived", "RMT-packetReceived", packet_onReceived)
-end
+Callback.add("net_message_onReceived", "RMT-packetReceived", packet_onReceived)
 
 
 

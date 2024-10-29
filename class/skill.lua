@@ -325,10 +325,8 @@ end
 
 -- ========== Initialize ==========
 
-initialize_skill = function()
-    Callback.add("preStep", "RMT-skill_onPreStep", skill_onPreStep)
-    Callback.add("postStep", "RMT-skill_onPostStep", skill_onPostStep)
-end
+Callback.add("preStep", "RMT-skill_onPreStep", skill_onPreStep)
+Callback.add("postStep", "RMT-skill_onPostStep", skill_onPostStep)
 
 
 

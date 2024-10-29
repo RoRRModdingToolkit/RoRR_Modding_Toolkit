@@ -601,26 +601,24 @@ end
 
 -- ========== Initialize ==========
 
-initialize_actor = function()
-    Callback.add("onAttackCreate", "RMT-actor_onAttack", actor_onAttack)
-    Callback.add("onAttackCreate", "RMT-actor_onAttackAll", actor_onAttackAll)
-    Callback.add("onAttackHandleEnd", "RMT-actor_onPostAttack", actor_onPostAttack)
-    Callback.add("onAttackHandleEnd", "RMT-actor_onPostAttackAll", actor_onPostAttackAll)
-    Callback.add("onHitProc", "RMT-actor_onHit", actor_onHit)
-    Callback.add("onAttackHit", "RMT-actor_onHitAll", actor_onHitAll)
-    Callback.add("onKillProc", "RMT-actor_onKill", actor_onKill)
-    Callback.add("onDamagedProc", "RMT-actor_onDamaged", actor_onDamaged)
-    Callback.add("onDamageBlocked", "RMT-actor_onDamageBlocked", actor_onDamageBlocked)
-    Callback.add("onInteractableActivate", "RMT-actor_onInteract", actor_onInteract)
-    Callback.add("onEquipmentUse", "RMT-actor_onEquipmentUse", actor_onEquipmentUse)
+Callback.add("onAttackCreate", "RMT-actor_onAttack", actor_onAttack)
+Callback.add("onAttackCreate", "RMT-actor_onAttackAll", actor_onAttackAll)
+Callback.add("onAttackHandleEnd", "RMT-actor_onPostAttack", actor_onPostAttack)
+Callback.add("onAttackHandleEnd", "RMT-actor_onPostAttackAll", actor_onPostAttackAll)
+Callback.add("onHitProc", "RMT-actor_onHit", actor_onHit)
+Callback.add("onAttackHit", "RMT-actor_onHitAll", actor_onHitAll)
+Callback.add("onKillProc", "RMT-actor_onKill", actor_onKill)
+Callback.add("onDamagedProc", "RMT-actor_onDamaged", actor_onDamaged)
+Callback.add("onDamageBlocked", "RMT-actor_onDamageBlocked", actor_onDamageBlocked)
+Callback.add("onInteractableActivate", "RMT-actor_onInteract", actor_onInteract)
+Callback.add("onEquipmentUse", "RMT-actor_onEquipmentUse", actor_onEquipmentUse)
 
-    Actor:onDamaged("RMT-actorAllowStun", function(actor, damager)
-        -- Allow stun application even if damager.proc is false
-        if damager.stun > 0 and (damager.proc == 0.0 or damager.proc == false) and damager.RMT_allow_stun then
-            actor:apply_stun(damager.knockback_kind, damager.knockback_direction, damager.stun * 1.5)
-        end
-    end)
-end
+Actor:onDamaged("RMT-actorAllowStun", function(actor, damager)
+    -- Allow stun application even if damager.proc is false
+    if damager.stun > 0 and (damager.proc == 0.0 or damager.proc == false) and damager.RMT_allow_stun then
+        actor:apply_stun(damager.knockback_kind, damager.knockback_direction, damager.stun * 1.5)
+    end
+end)
 
 
 

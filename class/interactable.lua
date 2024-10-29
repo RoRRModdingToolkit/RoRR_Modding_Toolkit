@@ -237,10 +237,8 @@ end
 
 -- ========== Initialize ==========
 
-initialize_interactable = function()
-    Callback.add("preStep", "RMT.interactable_instance_onStep", interactable_instance_onStep)
-    Callback.add("postHUDDraw", "RMT.interactable_instance_onDraw", interactable_instance_onDraw)
-end
+Callback.add("preStep", "RMT.interactable_instance_onStep", interactable_instance_onStep)
+Callback.add("postHUDDraw", "RMT.interactable_instance_onDraw", interactable_instance_onDraw)
 
 
 
