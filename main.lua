@@ -64,6 +64,6 @@ function __initialize()
     initialize_difficulty()
     initialize_equipment()
     initialize_interactable()
-    initialize_item()
+    -- initialize_item()
     initialize_skill()
 end

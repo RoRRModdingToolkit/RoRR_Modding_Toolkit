@@ -763,22 +763,20 @@ end
 
 -- ========== Initialize ==========
 
-initialize_item = function()
-    Callback.add("onAttackCreate", "RMT-item_onAttack", item_onAttack)
-    Callback.add("onAttackCreate", "RMT-item_onAttackAll", item_onAttackAll)
-    Callback.add("onAttackHandleEnd", "RMT-item_onPostAttack", item_onPostAttack)
-    Callback.add("onAttackHandleEnd", "RMT-item_onPostAttackAll", item_onPostAttackAll)
-    Callback.add("onHitProc", "RMT-item_onHit", item_onHit)
-    Callback.add("onAttackHit", "RMT-item_onHitAll", item_onHitAll)
-    Callback.add("onKillProc", "RMT-item_onKill", item_onKill)
-    Callback.add("onDamagedProc", "RMT-item_onDamaged", item_onDamaged)
-    Callback.add("onDamageBlocked", "RMT-item_onDamageBlocked", item_onDamageBlocked)
-    Callback.add("onInteractableActivate", "RMT-item_onInteract", item_onInteract)
-    Callback.add("onEquipmentUse", "RMT-item_onEquipmentUse", item_onEquipmentUse)
-    Callback.add("onStageStart", "RMT-item_onNewStage", item_onNewStage)
-    Callback.add("preStep", "RMT-item_onStep", item_onStep)
-    Callback.add("postHUDDraw", "RMT-item_onDraw", item_onDraw)
-end
+Callback.add("onAttackCreate", "RMT-item_onAttack", item_onAttack)
+Callback.add("onAttackCreate", "RMT-item_onAttackAll", item_onAttackAll)
+Callback.add("onAttackHandleEnd", "RMT-item_onPostAttack", item_onPostAttack)
+Callback.add("onAttackHandleEnd", "RMT-item_onPostAttackAll", item_onPostAttackAll)
+Callback.add("onHitProc", "RMT-item_onHit", item_onHit)
+Callback.add("onAttackHit", "RMT-item_onHitAll", item_onHitAll)
+Callback.add("onKillProc", "RMT-item_onKill", item_onKill)
+Callback.add("onDamagedProc", "RMT-item_onDamaged", item_onDamaged)
+Callback.add("onDamageBlocked", "RMT-item_onDamageBlocked", item_onDamageBlocked)
+Callback.add("onInteractableActivate", "RMT-item_onInteract", item_onInteract)
+Callback.add("onEquipmentUse", "RMT-item_onEquipmentUse", item_onEquipmentUse)
+Callback.add("onStageStart", "RMT-item_onNewStage", item_onNewStage)
+Callback.add("preStep", "RMT-item_onStep", item_onStep)
+Callback.add("postHUDDraw", "RMT-item_onDraw", item_onDraw)
 
 
 
