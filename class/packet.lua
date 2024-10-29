@@ -25,7 +25,7 @@ end
 methods_packet = {
 
     message_begin = function(self)
-        return Message.new()
+        return Message.new(self.value)
     end,
 
 
@@ -68,7 +68,7 @@ metatable_packet = {
 local function packet_onReceived(self, other, result, args)
     local id = args[2].value
     local fn = callbacks_onReceived[id]
-    if fn then fn(Message.new(args[3].value, true), Instance.wrap(args[5].value)) end     -- buffer, Player instance (host only)
+    if fn then fn(Message.new(id, args[3].value, true), Instance.wrap(args[5].value)) end     -- buffer, Player instance (host only)
 end
 
 

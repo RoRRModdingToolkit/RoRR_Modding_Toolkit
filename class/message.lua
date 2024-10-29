@@ -8,9 +8,10 @@ local message_proxy = setmetatable({}, {__mode = "k"})
 
 -- ========== Static Methods ==========
 
-Message.new = function(buffer, locked)
+Message.new = function(packet, buffer, locked)
     local key = {}
     message_proxy[key] = {
+        packet = packet,
         buffer = buffer or GM._mod_net_message_begin(),
         locked = locked
     }
@@ -70,8 +71,8 @@ methods_message = {
 
     send_to_all = function(self)
         if Net.get_type() ~= Net.TYPE.host then log.error("Must be the host", 2) end
-        if m.locked then log.error("Message already sent", 2) end
         local m = message_proxy[self.value]
+        if m.locked then log.error("Message already sent", 2) end
         m.locked = true
         GM._mod_net_message_send(m.packet, 0)
     end,
@@ -79,8 +80,8 @@ methods_message = {
 
     send_direct = function(self, specific_player)
         if Net.get_type() ~= Net.TYPE.host then log.error("Must be the host", 2) end
-        if m.locked then log.error("Message already sent", 2) end
         local m = message_proxy[self.value]
+        if m.locked then log.error("Message already sent", 2) end
         m.locked = true
         GM._mod_net_message_send(m.packet, 1, specific_player)
     end,
@@ -88,8 +89,8 @@ methods_message = {
 
     send_exclude = function(self, specific_player)
         if Net.get_type() ~= Net.TYPE.host then log.error("Must be the host", 2) end
-        if m.locked then log.error("Message already sent", 2) end
         local m = message_proxy[self.value]
+        if m.locked then log.error("Message already sent", 2) end
         m.locked = true
         GM._mod_net_message_send(m.packet, 2, specific_player)
     end,
@@ -97,8 +98,8 @@ methods_message = {
 
     send_to_host = function(self)
         if Net.get_type() ~= Net.TYPE.client then log.error("Must be a client", 2) end
-        if m.locked then log.error("Message already sent", 2) end
         local m = message_proxy[self.value]
+        if m.locked then log.error("Message already sent", 2) end
         m.locked = true
         GM._mod_net_message_send(m.packet, 3)
     end
