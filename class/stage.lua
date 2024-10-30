@@ -58,6 +58,36 @@ methods_stage = {
             end
             gm._mod_stage_register(index, self.value)
         end
+
+
+        -- Remove previous environment log position
+        local env_log_order = List.wrap(gm.variable_global_get("environment_log_display_list"))
+        local pos = env_log_order:find(self.log_id)
+        if pos then env_log_order:delete(pos) end
+        
+        -- Set new environment log position
+        local pos = 0
+        for i, log_id in ipairs(env_log_order) do
+            local log_ = Class.ENVIRONMENT_LOG:get(log_id)
+            local iter_env = Stage.find(log_:get(0), log_:get(1))
+
+            local tier = 0
+            for t, n in ipairs(order) do
+                local list = List.wrap(n)
+                for _, s in ipairs(list) do
+                    if s == iter_env.value then
+                        tier = t
+                        break
+                    end
+                end
+            end
+
+            if tier > t[1] then
+                pos = i
+                break
+            end
+        end
+        env_log_order:insert(pos - 1, self.log_id)
     end,
 
 
@@ -190,6 +220,12 @@ methods_stage = {
     set_log_hidden = function(self, bool)
         if bool == nil then return end
         Class.ENVIRONMENT_LOG:get(self.log_id):set(14, bool)
+        
+        -- Move environment log position to end
+        local env_log_order = List.wrap(gm.variable_global_get("environment_log_display_list"))
+        local pos = env_log_order:find(self.log_id)
+        if pos then env_log_order:delete(pos) end
+        env_log_order:add(self.log_id)
     end,
 
 

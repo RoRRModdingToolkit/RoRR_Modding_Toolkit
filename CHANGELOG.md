@@ -1,3 +1,6 @@
+### v1.1.23
+* Custom environment logs are now sorted by stage progression index.
+
 ### v1.1.22
 * Monster_Card : Added `SPAWN_TYPE` enum.
 * Actor
