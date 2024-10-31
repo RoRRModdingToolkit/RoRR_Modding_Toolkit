@@ -193,6 +193,13 @@ Instance.count = function(obj)
 end
 
 
+Instance.get_CInstance = function(id)
+    local inst = gm.CInstance.instance_id_to_CInstance[id]
+    if inst then return Instance.wrap(inst) end
+    return Instance.wrap_invalid()
+end
+
+
 Instance.wrap = function(value)
     if not Instance.exists(value) then return Instance.wrap_invalid() end
 

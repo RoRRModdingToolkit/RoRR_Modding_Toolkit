@@ -1,3 +1,6 @@
+### v1.1.24
+* Instance : Added `get_CInstance`
+
 ### v1.1.23
 * Custom environment logs are now sorted by stage progression index.
 
