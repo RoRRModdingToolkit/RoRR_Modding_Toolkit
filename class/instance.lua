@@ -201,6 +201,7 @@ end
 
 
 Instance.wrap = function(value)
+    if type(value) == "number" then value = Instance.get_CInstance(id) end
     if not Instance.exists(value) then return Instance.wrap_invalid() end
 
     local RMT_object = "Instance"
