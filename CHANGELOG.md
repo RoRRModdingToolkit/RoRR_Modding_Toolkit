@@ -1,7 +1,7 @@
 ### v1.1.24
 * Instance
     * Added `get_CInstance`
-    * Wrap now accepts numerical instance IDs.
+    * `wrap` now accepts numerical instance IDs.
 
 ### v1.1.23
 * Custom environment logs are now sorted by stage progression index.
