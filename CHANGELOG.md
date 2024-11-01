@@ -10,6 +10,7 @@
 * Custom environment logs are now sorted by stage progression index.
 
 ### v1.1.22
+* Buff : Fixed error on line 155.
 * Monster_Card : Added `SPAWN_TYPE` enum.
 * Actor
     * `fire_` methods now return the actual attack instance as a second unpacked return value.
