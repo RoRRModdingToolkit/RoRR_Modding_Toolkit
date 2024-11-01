@@ -27,7 +27,7 @@ local class_arrays = {
 
 local class_wrappers = {}
 
-local class_find_table = {}     -- Hash table for quick lookup for <class>.find()
+local class_find_table = {}     -- Quick lookup tables for <class>.find()
 local class_array_sizes = {}
 local allow_find_repopulate = false
 
