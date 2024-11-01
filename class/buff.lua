@@ -152,7 +152,7 @@ end)
 
 gm.pre_script_hook(gm.constants.apply_buff_internal, function(self, other, result, args)
     -- Extend buff_stack if necessary
-    if args[1] ~= -4 and gm.typeof(args[1].value) == "struct" then
+    if gm.typeof(args[1].value) == "struct" then
         if gm.array_length(args[1].value.buff_stack) <= args[2].value then gm.array_resize(args[1].value.buff_stack, args[2].value + 1) end
     end
 end)
