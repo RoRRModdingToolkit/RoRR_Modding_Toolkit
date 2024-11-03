@@ -146,10 +146,15 @@ methods_actor = {
 
     fire_explosion_local = function(self, x, y, width, height, damage, explosion_sprite, sparks_sprite)
         local mask = gm.constants.sBite1Mask
-        self.value:fire_explosion_local(0, x, y, damage, sparks_sprite or -1, 2, explosion_sprite or -1, width / GM.sprite_get_width(mask), height / GM.sprite_get_height(mask))
+        self.value:fire_explosion_local(0, x, y, damage, sparks_sprite or -1, 2, width / GM.sprite_get_width(mask), height / GM.sprite_get_height(mask))
         local inst = gm.variable_global_get("attack_bullet")
         local damager = inst.attack_info
         damager.damage_color = Color.WHITE_ALMOST
+
+        -- Create explosion sprite manually
+        if explosion_sprite then
+            GM.instance_create(x, y, gm.constants.oEfExplosion).sprite_index = explosion_sprite
+        end
 
         return Damager.wrap(damager), Instance.wrap(inst)
     end,

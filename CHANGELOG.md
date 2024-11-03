@@ -1,5 +1,5 @@
 ### v1.1.25
-* 
+* Actor : Fixed `fire_explosion_local` (wrong argument count).
 
 ### v1.1.24
 * Instance
