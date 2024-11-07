@@ -55,3 +55,5 @@ v When .auto, store _ENV for Language loading
 
 - Lock ALL instance methods for all classes (only some are rn)
 v Add fire_explosion_local
+
+- Optimize callback system for several classes(?)
