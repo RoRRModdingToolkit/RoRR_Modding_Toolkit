@@ -1,8 +1,8 @@
 ### v1.1.26
 * Instance
     * The variable `id` is no longer wrapped as an Instance object when getting it from an instance.
-    * Removed `is` method (extra checks now embedded within `exists`).
-        * Fixed `is` method throwing an error when invalid `value` types are passed in.
+    * Removed `is` method (redundant; extra checks now embedded within `exists`).
+        * Fixed crashing when `value` argument was an invalid type.
 
 ### v1.1.25
 * Actor : Fixed `fire_explosion_local` (wrong argument count).

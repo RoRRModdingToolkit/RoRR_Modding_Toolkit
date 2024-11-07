@@ -10,6 +10,8 @@ Wrap = Proxy.new()
 -- ========== Static Methods ==========
 
 Wrap.wrap = function(value)
+    value = Wrap.unwrap(value)
+
     -- Array
     if gm.is_array(value) then
         return Array.wrap(value)
