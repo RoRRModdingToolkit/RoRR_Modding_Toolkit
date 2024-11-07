@@ -76,15 +76,19 @@ Instance.worm_bodies = Proxy.new({
 
 -- ========== Static Methods ==========
 
-Instance.exists = function(inst)
-    return GM.instance_exists(inst) == 1.0
+Instance.exists = function(value)
+    -- Do not use capital GM functions in here,
+    -- since GM calls Wrap -> Wrap calls Instance.exists
+    -- Circular recursion will happen
+    value = Wrap.unwrap(value)
+    if gm.typeof(value) == "struct" then value = value.id end
+    if type(value) ~= "number" or value < 100000.0 then return false end
+    return gm.instance_exists(value) == 1.0
 end
 
 
-Instance.is = function(value)
-    return gm.typeof(value) == "struct"
-       and gm.instance_exists(value) == 1.0
-       and gm.object_exists(value) == 0.0
+Instance.is = function(value)   -- Compatibility; does the exact same thing as "exists"
+    return Instance.exists(value)
 end
 
 
@@ -201,6 +205,7 @@ end
 
 
 Instance.wrap = function(value)
+    Wrap.unwrap(value)
     if type(value) == "number" then value = Instance.get_CInstance(value).value end
     if not Instance.exists(value) then return Instance.wrap_invalid() end
 
@@ -237,7 +242,7 @@ end
 methods_instance = {
 
     exists = function(self)
-        return gm.instance_exists(self.value) == 1.0
+        return Instance.exists(self.value)
     end,
 
 
@@ -434,6 +439,7 @@ lock_table_instance = Proxy.make_lock_table({"value", "RMT_object", table.unpack
 metatable_instance_gs = {
     -- Getter
     __index = function(table, key)
+        if key == "id" then return table.value.id end
         return Wrap.wrap(gm.variable_instance_get(table.value, key))
     end,
 
@@ -556,10 +562,10 @@ end)
 
 
 gm.post_script_hook(gm.constants.actor_heal_networked, function(self, other, result, args)
-    local actor = args[1].value
+    local actor = Instance.wrap(args[1].value)
     if callbacks[actor.id] and callbacks[actor.id]["onHeal"] then
         for k, fn in pairs(callbacks[actor.id]["onHeal"]) do
-            fn(Instance.wrap(actor), args[2].value)   -- Actor, Heal amount
+            fn(actor, args[2].value)   -- Actor, Heal amount
         end
     end
 end)
@@ -621,10 +627,10 @@ end
 local function inst_onHit(self, other, result, args)
     if not self.attack_info then return end
     if not self.attack_info.proc then return end
-    local actor = args[2].value
+    local actor = Instance.wrap(args[2].value)
     if callbacks[actor.id] and callbacks[actor.id]["onHit"] then
         for k, fn in pairs(callbacks[actor.id]["onHit"]) do
-            fn(Instance.wrap(actor), Instance.wrap(args[3].value), Damager.wrap(self.attack_info)) -- Attacker, Victim, Damager attack_info
+            fn(actor, Instance.wrap(args[3].value), Damager.wrap(self.attack_info)) -- Attacker, Victim, Damager attack_info
         end
     end
 end
@@ -632,21 +638,21 @@ end
 
 local function inst_onHitAll(self, other, result, args)
     local attack = args[2].value
-    local actor = attack.inflictor
+    local actor = Instance.wrap(attack.inflictor)
     if not Instance.exists(actor) then return end
     if callbacks[actor.id] and callbacks[actor.id]["onHitAll"] then
         for k, fn in pairs(callbacks[actor.id]["onHitAll"]) do
-            fn(Instance.wrap(actor), Instance.wrap(attack.target_true), Damager.wrap(attack.attack_info)) -- Attacker, Victim, Damager attack_info
+            fn(actor, Instance.wrap(attack.target_true), Damager.wrap(attack.attack_info)) -- Attacker, Victim, Damager attack_info
         end
     end
 end
 
 
 local function inst_onKill(self, other, result, args)
-    local actor = args[3].value
+    local actor = Instance.wrap(args[3].value)
     if callbacks[actor.id] and callbacks[actor.id]["onKill"] then
         for k, fn in pairs(callbacks[actor.id]["onKill"]) do
-            fn(Instance.wrap(actor), Instance.wrap(args[2].value))   -- Attacker, Victim
+            fn(actor, Instance.wrap(args[2].value))   -- Attacker, Victim
         end
     end
 end
@@ -654,10 +660,10 @@ end
 
 local function inst_onDamaged(self, other, result, args)
     if not args[3].value.attack_info then return end
-    local actor = args[2].value
+    local actor = Instance.wrap(args[2].value)
     if callbacks[actor.id] and callbacks[actor.id]["onDamaged"] then
         for k, fn in pairs(callbacks[actor.id]["onDamaged"]) do
-            fn(Instance.wrap(actor), Damager.wrap(args[3].value.attack_info))   -- Actor, Damager attack_info
+            fn(actor, Damager.wrap(args[3].value.attack_info))   -- Actor, Damager attack_info
         end
     end
 end
@@ -673,20 +679,20 @@ end
 
 
 local function inst_onInteract(self, other, result, args)
-    local actor = args[3].value
+    local actor = Instance.wrap(args[3].value)
     if callbacks[actor.id] and callbacks[actor.id]["onInteract"] then
         for k, fn in pairs(callbacks[actor.id]["onInteract"]) do
-            fn(Instance.wrap(actor), Instance.wrap(args[2].value))   -- Actor, Interactable
+            fn(actor, Instance.wrap(args[2].value))   -- Actor, Interactable
         end
     end
 end
 
 
 local function inst_onEquipmentUse(self, other, result, args)
-    local actor = args[2].value
+    local actor = Instance.wrap(args[2].value)
     if callbacks[actor.id] and callbacks[actor.id]["onEquipmentUse"] then
         for k, fn in pairs(callbacks[actor.id]["onEquipmentUse"]) do
-            fn(Instance.wrap(actor), Equipment.wrap(args[3].value))   -- Actor, Equipment ID
+            fn(actor, Equipment.wrap(args[3].value))   -- Actor, Equipment ID
         end
     end
 end
@@ -696,12 +702,12 @@ local function inst_onPreStep(self, other, result, args)
     if gm.variable_global_get("pause") then return end
 
     for id, c_table in pairs(callbacks) do
-        local inst = c_table["CInstance"]
+        local inst = Instance.wrap(c_table["CInstance"])
         if Instance.exists(inst) then
 
             if c_table["onPreStep"] then
                 for k, fn in pairs(c_table["onPreStep"]) do
-                    fn(Instance.wrap(inst))   -- Actor
+                    fn(inst)   -- Actor
                 end
             end
 
@@ -710,7 +716,7 @@ local function inst_onPreStep(self, other, result, args)
                 inst.RMT_has_shield_inst = nil
                 if c_table["onShieldBreak"] then
                     for k, fn in pairs(c_table["onShieldBreak"]) do
-                        fn(Instance.wrap(inst))   -- Instance
+                        fn(inst)   -- Instance
                     end
                 end
             end
@@ -725,12 +731,12 @@ local function inst_onPostStep(self, other, result, args)
     if gm.variable_global_get("pause") then return end
 
     for id, c_table in pairs(callbacks) do
-        local inst = c_table["CInstance"]
+        local inst = Instance.wrap(c_table["CInstance"])
         if Instance.exists(inst) then
 
             if c_table["onPostStep"] then
                 for k, fn in pairs(c_table["onPostStep"]) do
-                    fn(Instance.wrap(inst))   -- Instance
+                    fn(inst)   -- Instance
                 end
             end
 
@@ -744,12 +750,12 @@ local function inst_onDraw(self, other, result, args)
     if gm.variable_global_get("pause") then return end
 
     for id, c_table in pairs(callbacks) do
-        local inst = c_table["CInstance"]
+        local inst = Instance.wrap(c_table["CInstance"])
         if Instance.exists(inst) then
 
             if c_table["onDraw"] then
                 for k, fn in pairs(c_table["onDraw"]) do
-                    fn(Instance.wrap(inst))   -- Instance
+                    fn(inst)   -- Instance
                 end
             end
 

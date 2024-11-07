@@ -228,8 +228,9 @@ metatable_object = {
 gm.post_script_hook(gm.constants.callback_execute, function(self, other, result, args)
     -- Custom object callbacks
     if callbacks[args[1].value] then
+        local inst = Instance.wrap(args[2].value)
         for _, fn in pairs(callbacks[args[1].value]) do
-            fn(Instance.wrap(args[2].value))   -- Instance
+            fn(inst)   -- Instance
         end
     end
 end)

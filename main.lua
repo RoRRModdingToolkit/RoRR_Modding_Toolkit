@@ -1,8 +1,5 @@
 -- RoRR Modding Toolkit
 
-log.info("Successfully loaded ".._ENV["!guid"]..".")
-
-
 -- ENVY initial setup
 mods["MGReturns-ENVY"].auto()
 envy = mods["MGReturns-ENVY"]

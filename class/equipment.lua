@@ -291,8 +291,9 @@ metatable_class["Equipment"] = {
 gm.post_script_hook(gm.constants.callback_execute, function(self, other, result, args)
     -- onUse
     if callbacks[args[1].value] then
+        local actor = Instance.wrap(args[2].value)
         for _, fn in ipairs(callbacks[args[1].value]) do
-            fn(Instance.wrap(args[2].value))   -- Actor
+            fn(actor)   -- Actor
         end
     end
 end)
@@ -316,8 +317,8 @@ end)
 
 gm.pre_script_hook(gm.constants.equipment_set, function(self, other, result, args)
     if callbacks["onDrop"] then
+        local player = Instance.wrap(args[1].value)
         for _, fn in ipairs(callbacks["onDrop"]) do
-            local player = Instance.wrap(args[1].value)
             local equip = player:get_equipment()
             if equip and equip.value == fn[1] then
                 fn[2](player, Equipment.wrap(args[2].value))  -- Player, New equipment wrapper

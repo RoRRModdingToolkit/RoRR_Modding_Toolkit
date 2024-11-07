@@ -10,6 +10,8 @@ Wrap = Proxy.new()
 -- ========== Static Methods ==========
 
 Wrap.wrap = function(value)
+    value = Wrap.unwrap(value)
+
     -- Array
     if gm.is_array(value) then
         return Array.wrap(value)
@@ -23,7 +25,7 @@ Wrap.wrap = function(value)
     -- end
 
     -- Instance
-    if Instance.is(value) then
+    if Instance.exists(value) then
         return Instance.wrap(value)
     end
 
