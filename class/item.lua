@@ -514,9 +514,9 @@ end
 local function item_onAttack(self, other, result, args)
     if not args[2].value.proc or not Instance.exists(args[2].value.parent) then return end
     if callbacks["onAttack"] then
+        local actor = Instance.wrap(args[2].value.parent)
         for _, c in ipairs(callbacks["onAttack"]) do
             local item = c[1]
-            local actor = Instance.wrap(args[2].value.parent)
             local count = actor:item_stack_count(item)
             if count > 0 then
                 local func = c[2]
@@ -530,9 +530,9 @@ end
 local function item_onAttackAll(self, other, result, args)
     if not Instance.exists(args[2].value.parent) then return end
     if callbacks["onAttackAll"] then
+        local actor = Instance.wrap(args[2].value.parent)
         for _, c in ipairs(callbacks["onAttackAll"]) do
             local item = c[1]
-            local actor = Instance.wrap(args[2].value.parent)
             local count = actor:item_stack_count(item)
             if count > 0 then
                 local func = c[2]
@@ -546,9 +546,9 @@ end
 local function item_onPostAttack(self, other, result, args)
     if not args[2].value.proc or not Instance.exists(args[2].value.parent) then return end
     if callbacks["onPostAttack"] then
+        local actor = Instance.wrap(args[2].value.parent)
         for _, c in ipairs(callbacks["onPostAttack"]) do
             local item = c[1]
-            local actor = Instance.wrap(args[2].value.parent)
             local count = actor:item_stack_count(item)
             if count > 0 then
                 local func = c[2]
@@ -562,9 +562,9 @@ end
 local function item_onPostAttackAll(self, other, result, args)
     if not Instance.exists(args[2].value.parent) then return end
     if callbacks["onPostAttackAll"] then
+        local actor = Instance.wrap(args[2].value.parent)
         for _, c in ipairs(callbacks["onPostAttackAll"]) do
             local item = c[1]
-            local actor = Instance.wrap(args[2].value.parent)
             local count = actor:item_stack_count(item)
             if count > 0 then
                 local func = c[2]
@@ -577,9 +577,9 @@ end
 
 local function item_onHit(self, other, result, args)
     if callbacks["onHit"] then
+        local actor = Instance.wrap(args[2].value)
         for _, c in ipairs(callbacks["onHit"]) do
             local item = c[1]
-            local actor = Instance.wrap(args[2].value)
             local count = actor:item_stack_count(item)
             if count > 0 then
                 local func = c[2]
@@ -594,9 +594,9 @@ local function item_onHitAll(self, other, result, args)
     local attack = args[2].value
     if not Instance.exists(attack.inflictor) then return end
     if callbacks["onHitAll"] then
+        local actor = Instance.wrap(attack.inflictor)
         for _, c in ipairs(callbacks["onHitAll"]) do
             local item = c[1]
-            local actor = Instance.wrap(attack.inflictor)
             local count = actor:item_stack_count(item)
             if count > 0 then
                 local func = c[2]
@@ -609,9 +609,9 @@ end
 
 local function item_onKill(self, other, result, args)
     if callbacks["onKill"] then
+        local actor = Instance.wrap(args[3].value)
         for _, c in ipairs(callbacks["onKill"]) do
             local item = c[1]
-            local actor = Instance.wrap(args[3].value)
             local count = actor:item_stack_count(item)
             if count > 0 then
                 local func = c[2]
@@ -625,9 +625,9 @@ end
 local function item_onDamaged(self, other, result, args)
     if not args[3].value.attack_info then return end
     if callbacks["onDamaged"] then
+        local actor = Instance.wrap(args[2].value)
         for _, c in ipairs(callbacks["onDamaged"]) do
             local item = c[1]
-            local actor = Instance.wrap(args[2].value)
             local count = actor:item_stack_count(item)
             if count > 0 then
                 local func = c[2]
@@ -640,9 +640,9 @@ end
 
 local function item_onDamageBlocked(self, other, result, args)
     if callbacks["onDamageBlocked"] then
+        local actor = Instance.wrap(self)
         for _, c in ipairs(callbacks["onDamageBlocked"]) do
             local item = c[1]
-            local actor = Instance.wrap(self)
             local count = actor:item_stack_count(item)
             if count > 0 then
                 local func = c[2]
@@ -655,9 +655,9 @@ end
 
 local function item_onInteract(self, other, result, args)
     if callbacks["onInteract"] then
+        local actor = Instance.wrap(args[3].value)
         for _, c in ipairs(callbacks["onInteract"]) do
             local item = c[1]
-            local actor = Instance.wrap(args[3].value)
             local count = actor:item_stack_count(item)
             if count > 0 then
                 local func = c[2]
@@ -670,9 +670,9 @@ end
 
 local function item_onEquipmentUse(self, other, result, args)
     if callbacks["onEquipmentUse"] then
+        local actor = Instance.wrap(args[2].value)
         for _, c in ipairs(callbacks["onEquipmentUse"]) do
             local item = c[1]
-            local actor = Instance.wrap(args[2].value)
             local count = actor:item_stack_count(item)
             if count > 0 then
                 local func = c[2]
@@ -687,8 +687,8 @@ local function item_onNewStage(self, other, result, args)
     if callbacks["onNewStage"] then
         for n, a in ipairs(has_custom_item) do
             if Instance.exists(a) then
+                local actor = Instance.wrap(a)
                 for _, c in ipairs(callbacks["onNewStage"]) do
-                    local actor = Instance.wrap(a)
                     local count = actor:item_stack_count(c[1])
                     if count > 0 then
                         c[2](actor, count)  -- Actor, Stack count
@@ -707,8 +707,8 @@ local function item_onStep(self, other, result, args)
     if callbacks["onStep"] then
         for n, a in ipairs(has_custom_item) do
             if Instance.exists(a) then
+                local actor = Instance.wrap(a)
                 for _, c in ipairs(callbacks["onStep"]) do
-                    local actor = Instance.wrap(a)
                     local count = actor:item_stack_count(c[1])
                     if count > 0 then
                         c[2](actor, count)  -- Actor, Stack count
@@ -725,8 +725,8 @@ local function item_onStep(self, other, result, args)
                 if a.shield and a.shield > 0.0 then a.RMT_has_shield = true end
                 if a.RMT_has_shield and a.shield <= 0.0 then
                     a.RMT_has_shield = nil
+                    local actor = Instance.wrap(a)
                     for _, c in ipairs(callbacks["onShieldBreak"]) do
-                        local actor = Instance.wrap(a)
                         local count = actor:item_stack_count(c[1])
                         if count > 0 then
                             c[2](actor, count)  -- Actor, Stack count
@@ -746,8 +746,8 @@ local function item_onDraw(self, other, result, args)
     if callbacks["onDraw"] then
         for n, a in ipairs(has_custom_item) do
             if Instance.exists(a) then
+                local actor = Instance.wrap(a)
                 for _, c in ipairs(callbacks["onDraw"]) do
-                    local actor = Instance.wrap(a)
                     local count = actor:item_stack_count(c[1])
                     if count > 0 then
                         c[2](actor, count)  -- Actor, Stack count

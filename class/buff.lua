@@ -141,8 +141,8 @@ metatable_class["Buff"] = {
 gm.post_script_hook(gm.constants.callback_execute, function(self, other, result, args)
     -- onApply and onRemove
     if callbacks[args[1].value] then
+        local actor = Instance.wrap(args[2].value)
         for _, fn in pairs(callbacks[args[1].value]) do
-            local actor = Instance.wrap(args[2].value)
             local stack = actor:buff_stack_count(fn[1])
             fn[2](actor, stack)     -- Actor, Buff stack
         end
@@ -174,8 +174,8 @@ end)
 
 gm.pre_script_hook(gm.constants.actor_transform, function(self, other, result, args)
     if callbacks["onChange"] then
+        local actor = Instance.wrap(args[1].value)
         for _, fn in pairs(callbacks["onChange"]) do
-            local actor = Instance.wrap(args[1].value)
             local count = actor:buff_stack_count(fn[1])
             if count > 0 then
                 fn[2](actor, Instance.wrap(args[2].value), count)   -- Actor, To, Buff stack
@@ -206,8 +206,8 @@ local function buff_onDraw(self, other, result, args)
     if callbacks["onDraw"] then
         for n, a in ipairs(has_custom_buff) do
             if Instance.exists(a) then
+                local actor = Instance.wrap(a)
                 for _, c in ipairs(callbacks["onDraw"]) do
-                    local actor = Instance.wrap(a)
                     local count = actor:buff_stack_count(c[1])
                     if count > 0 then
                         c[2](actor, count)  -- Actor, Stack count
