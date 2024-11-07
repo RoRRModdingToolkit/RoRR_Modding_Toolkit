@@ -23,7 +23,7 @@ Wrap.wrap = function(value)
     -- end
 
     -- Instance
-    if Instance.is(value) then
+    if Instance.exists(value) then
         return Instance.wrap(value)
     end
 

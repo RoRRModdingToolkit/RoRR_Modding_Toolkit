@@ -76,15 +76,16 @@ Instance.worm_bodies = Proxy.new({
 
 -- ========== Static Methods ==========
 
-Instance.exists = function(inst)
-    return GM.instance_exists(inst) == 1.0
+Instance.exists = function(value)
+    value = Wrap.unwrap(value)
+    if gm.typeof(value) == "struct" then value = value.id end
+    if type(value) ~= "number" then return false end
+    return GM.instance_exists(value) == 1.0
 end
 
 
-Instance.is = function(value)
-    return gm.typeof(value) == "struct"
-       and gm.instance_exists(value) == 1.0
-       and gm.object_exists(value) == 0.0
+Instance.is = function(value)   -- Compatibility; does the exact same thing as "exists"
+    return Instance.exists(value)
 end
 
 
@@ -237,7 +238,7 @@ end
 methods_instance = {
 
     exists = function(self)
-        return gm.instance_exists(self.value) == 1.0
+        return Instance.exists(self.value)
     end,
 
 
@@ -434,6 +435,7 @@ lock_table_instance = Proxy.make_lock_table({"value", "RMT_object", table.unpack
 metatable_instance_gs = {
     -- Getter
     __index = function(table, key)
+        if key == "id" then return table.value.id end
         return Wrap.wrap(gm.variable_instance_get(table.value, key))
     end,
 
