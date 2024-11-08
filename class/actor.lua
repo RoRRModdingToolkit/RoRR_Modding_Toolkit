@@ -119,6 +119,7 @@ methods_actor = {
 
         local inst = GM._mod_attack_fire_bullet(self.value, x, y, range, direction, damage, hit_sprite or -1, can_pierce, true)
         local damager = inst.attack_info
+        damager.instance = inst
         damager.damage_color = Color.WHITE_ALMOST
 
         -- Set pierce multiplier
@@ -138,6 +139,7 @@ methods_actor = {
     fire_explosion = function(self, x, y, width, height, damage, explosion_sprite, sparks_sprite)
         local inst = GM._mod_attack_fire_explosion(self.value, x, y, width, height, damage, explosion_sprite or -1, sparks_sprite or -1, true)
         local damager = inst.attack_info
+        damager.instance = inst
         damager.damage_color = Color.WHITE_ALMOST
 
         return Damager.wrap(damager), Instance.wrap(inst)
@@ -149,6 +151,7 @@ methods_actor = {
         self.value:fire_explosion_local(0, x, y, damage, sparks_sprite or -1, 2, width / GM.sprite_get_width(mask), height / GM.sprite_get_height(mask))
         local inst = gm.variable_global_get("attack_bullet")
         local damager = inst.attack_info
+        damager.instance = inst
         damager.damage_color = Color.WHITE_ALMOST
 
         -- Create explosion sprite manually
@@ -165,6 +168,7 @@ methods_actor = {
 
         local inst = GM._mod_attack_fire_direct(self.value, target, x or target.x, y or target.y, direction or 0, damage, hit_sprite or -1, true)
         local damager = inst.attack_info
+        damager.instance = inst
         damager.damage_color = Color.WHITE_ALMOST
         
         return Damager.wrap(damager), Instance.wrap(inst)
