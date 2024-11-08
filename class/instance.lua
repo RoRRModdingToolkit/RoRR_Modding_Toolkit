@@ -78,6 +78,7 @@ Instance.worm_bodies = Proxy.new({
 
 Instance.exists = function(value)
     value = Wrap.unwrap(value)
+    if type(value) == "string" then return false end
     return gm.instance_exists(value) == 1.0
 end
 
