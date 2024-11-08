@@ -119,6 +119,7 @@ methods_actor = {
 
         local inst = GM._mod_attack_fire_bullet(self.value, x, y, range, direction, damage, hit_sprite or -1, can_pierce, true)
         local damager = inst.attack_info
+        damager.instance = Wrap.unwrap(inst)
         damager.damage_color = Color.WHITE_ALMOST
 
         -- Set pierce multiplier
@@ -131,16 +132,17 @@ methods_actor = {
             damager.tracer_kind = tracer
         end
 
-        return Damager.wrap(damager), Instance.wrap(inst)
+        return Damager.wrap(damager), inst
     end,
 
 
     fire_explosion = function(self, x, y, width, height, damage, explosion_sprite, sparks_sprite)
         local inst = GM._mod_attack_fire_explosion(self.value, x, y, width, height, damage, explosion_sprite or -1, sparks_sprite or -1, true)
         local damager = inst.attack_info
+        damager.instance = Wrap.unwrap(inst)
         damager.damage_color = Color.WHITE_ALMOST
 
-        return Damager.wrap(damager), Instance.wrap(inst)
+        return Damager.wrap(damager), inst
     end,
 
 
@@ -149,6 +151,7 @@ methods_actor = {
         self.value:fire_explosion_local(0, x, y, damage, sparks_sprite or -1, 2, width / GM.sprite_get_width(mask), height / GM.sprite_get_height(mask))
         local inst = gm.variable_global_get("attack_bullet")
         local damager = inst.attack_info
+        damager.instance = inst
         damager.damage_color = Color.WHITE_ALMOST
 
         -- Create explosion sprite manually
@@ -165,9 +168,10 @@ methods_actor = {
 
         local inst = GM._mod_attack_fire_direct(self.value, target, x or target.x, y or target.y, direction or 0, damage, hit_sprite or -1, true)
         local damager = inst.attack_info
+        damager.instance = Wrap.unwrap(inst)
         damager.damage_color = Color.WHITE_ALMOST
         
-        return Damager.wrap(damager), Instance.wrap(inst)
+        return Damager.wrap(damager), inst
     end,
     
 
@@ -516,8 +520,9 @@ local function actor_onAttack(self, other, result, args)
     if not args[2].value.proc then return end
     if callbacks["onAttack"] then
         local actor = Instance.wrap(self)
+        local damager = Damager.wrap(args[2].value)
         for k, fn in pairs(callbacks["onAttack"]) do
-            fn(actor, Damager.wrap(args[2].value))    -- Actor, Damager attack_info
+            fn(actor, damager)    -- Actor, Damager attack_info
         end
     end
 end
@@ -526,8 +531,9 @@ end
 local function actor_onAttackAll(self, other, result, args)
     if callbacks["onAttackAll"] then
         local actor = Instance.wrap(self)
+        local damager = Damager.wrap(args[2].value)
         for k, fn in pairs(callbacks["onAttackAll"]) do
-            fn(actor, Damager.wrap(args[2].value))    -- Actor, Damager attack_info
+            fn(actor, damager)    -- Actor, Damager attack_info
         end
     end
 end
@@ -537,8 +543,9 @@ local function actor_onPostAttack(self, other, result, args)
     if not args[2].value.proc or not Instance.exists(args[2].value.parent) then return end
     if callbacks["onPostAttack"] then
         local actor = Instance.wrap(args[2].value.parent)
+        local damager = Damager.wrap(args[2].value)
         for k, fn in pairs(callbacks["onPostAttack"]) do
-            fn(actor, Damager.wrap(args[2].value))    -- Actor, Damager attack_info
+            fn(actor, damager)    -- Actor, Damager attack_info
         end
     end
 end
@@ -548,8 +555,9 @@ local function actor_onPostAttackAll(self, other, result, args)
     if not Instance.exists(args[2].value.parent) then return end
     if callbacks["onPostAttackAll"] then
         local actor = Instance.wrap(args[2].value.parent)
+        local damager = Damager.wrap(args[2].value)
         for k, fn in pairs(callbacks["onPostAttackAll"]) do
-            fn(actor, Damager.wrap(args[2].value))    -- Actor, Damager attack_info
+            fn(actor, damager)    -- Actor, Damager attack_info
         end
     end
 end
@@ -561,8 +569,10 @@ local function actor_onHit(self, other, result, args)
     if callbacks["onHit"] then
         local actor = Instance.wrap(args[2].value)
         local victim = Instance.wrap(args[3].value)
+        local damager = Damager.wrap(self.attack_info)
+        damager.instance = self
         for k, fn in pairs(callbacks["onHit"]) do
-            fn(actor, victim, Damager.wrap(self.attack_info)) -- Attacker, Victim, Damager attack_info
+            fn(actor, victim, damager) -- Attacker, Victim, Damager attack_info
         end
     end
 end
@@ -574,8 +584,10 @@ local function actor_onHitAll(self, other, result, args)
     if callbacks["onHitAll"] then
         local actor = Instance.wrap(attack.inflictor)
         local victim = Instance.wrap(attack.target_true)
+        local damager = Damager.wrap(attack.attack_info)
+        damager.instance = attack
         for k, fn in pairs(callbacks["onHitAll"]) do
-            fn(actor, victim, Damager.wrap(attack.attack_info)) -- Attacker, Victim, Damager attack_info
+            fn(actor, victim, damager) -- Attacker, Victim, Damager attack_info
         end
     end
 end
@@ -597,6 +609,7 @@ local function actor_onDamaged(self, other, result, args)
     if callbacks["onDamaged"] then
         local actor = Instance.wrap(args[2].value)
         local damager = Damager.wrap(args[3].value.attack_info)
+        damager.instance = args[3].value
         for k, fn in pairs(callbacks["onDamaged"]) do
             fn(actor, damager)   -- Actor, Damager attack_info
         end
@@ -608,6 +621,7 @@ local function actor_onDamageBlocked(self, other, result, args)
     if callbacks["onDamageBlocked"] then
         local actor = Instance.wrap(self)
         local damager = Damager.wrap(other.attack_info)
+        damager.instance = other
         for k, fn in pairs(callbacks["onDamageBlocked"]) do
             fn(actor, damager)   -- Actor, Damager attack_info
         end

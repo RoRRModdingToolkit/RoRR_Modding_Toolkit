@@ -515,12 +515,13 @@ local function item_onAttack(self, other, result, args)
     if not args[2].value.proc or not Instance.exists(args[2].value.parent) then return end
     if callbacks["onAttack"] then
         local actor = Instance.wrap(args[2].value.parent)
+        local damager = Damager.wrap(args[2].value)
         for _, c in ipairs(callbacks["onAttack"]) do
             local item = c[1]
             local count = actor:item_stack_count(item)
             if count > 0 then
                 local func = c[2]
-                func(actor, Damager.wrap(args[2].value), count)    -- Actor, Damager attack_info, Stack count
+                func(actor, damager, count)    -- Actor, Damager attack_info, Stack count
             end
         end
     end
@@ -531,12 +532,13 @@ local function item_onAttackAll(self, other, result, args)
     if not Instance.exists(args[2].value.parent) then return end
     if callbacks["onAttackAll"] then
         local actor = Instance.wrap(args[2].value.parent)
+        local damager = Damager.wrap(args[2].value)
         for _, c in ipairs(callbacks["onAttackAll"]) do
             local item = c[1]
             local count = actor:item_stack_count(item)
             if count > 0 then
                 local func = c[2]
-                func(actor, Damager.wrap(args[2].value), count)    -- Actor, Damager attack_info, Stack count
+                func(actor, damager, count)    -- Actor, Damager attack_info, Stack count
             end
         end
     end
@@ -547,12 +549,13 @@ local function item_onPostAttack(self, other, result, args)
     if not args[2].value.proc or not Instance.exists(args[2].value.parent) then return end
     if callbacks["onPostAttack"] then
         local actor = Instance.wrap(args[2].value.parent)
+        local damager = Damager.wrap(args[2].value)
         for _, c in ipairs(callbacks["onPostAttack"]) do
             local item = c[1]
             local count = actor:item_stack_count(item)
             if count > 0 then
                 local func = c[2]
-                func(actor, Damager.wrap(args[2].value), count)    -- Actor, Damager attack_info, Stack count
+                func(actor, damager, count)    -- Actor, Damager attack_info, Stack count
             end
         end
     end
@@ -563,12 +566,13 @@ local function item_onPostAttackAll(self, other, result, args)
     if not Instance.exists(args[2].value.parent) then return end
     if callbacks["onPostAttackAll"] then
         local actor = Instance.wrap(args[2].value.parent)
+        local damager = Damager.wrap(args[2].value)
         for _, c in ipairs(callbacks["onPostAttackAll"]) do
             local item = c[1]
             local count = actor:item_stack_count(item)
             if count > 0 then
                 local func = c[2]
-                func(actor, Damager.wrap(args[2].value), count)    -- Actor, Damager attack_info, Stack count
+                func(actor, damager, count)    -- Actor, Damager attack_info, Stack count
             end
         end
     end
@@ -578,12 +582,14 @@ end
 local function item_onHit(self, other, result, args)
     if callbacks["onHit"] then
         local actor = Instance.wrap(args[2].value)
+        local damager = Damager.wrap(self.attack_info)
+        damager.instance = self
         for _, c in ipairs(callbacks["onHit"]) do
             local item = c[1]
             local count = actor:item_stack_count(item)
             if count > 0 then
                 local func = c[2]
-                func(actor, Instance.wrap(args[3].value), Damager.wrap(self.attack_info), count) -- Attacker, Victim, Damager attack_info, Stack count
+                func(actor, Instance.wrap(args[3].value), damager, count) -- Attacker, Victim, Damager attack_info, Stack count
             end
         end
     end
@@ -595,12 +601,15 @@ local function item_onHitAll(self, other, result, args)
     if not Instance.exists(attack.inflictor) then return end
     if callbacks["onHitAll"] then
         local actor = Instance.wrap(attack.inflictor)
+        local victim = Instance.wrap(attack.target_true)
+        local damager = Damager.wrap(attack.attack_info)
+        damager.instance = attack
         for _, c in ipairs(callbacks["onHitAll"]) do
             local item = c[1]
             local count = actor:item_stack_count(item)
             if count > 0 then
                 local func = c[2]
-                func(actor, Instance.wrap(attack.target_true), Damager.wrap(attack.attack_info), count) -- Attacker, Victim, Damager attack_info, Stack count
+                func(actor, victim, damager, count) -- Attacker, Victim, Damager attack_info, Stack count
             end
         end
     end
@@ -610,12 +619,13 @@ end
 local function item_onKill(self, other, result, args)
     if callbacks["onKill"] then
         local actor = Instance.wrap(args[3].value)
+        local victim = Instance.wrap(args[2].value)
         for _, c in ipairs(callbacks["onKill"]) do
             local item = c[1]
             local count = actor:item_stack_count(item)
             if count > 0 then
                 local func = c[2]
-                func(actor, Instance.wrap(args[2].value), count)   -- Attacker, Victim, Stack count
+                func(actor, victim, count)   -- Attacker, Victim, Stack count
             end
         end
     end
@@ -626,12 +636,14 @@ local function item_onDamaged(self, other, result, args)
     if not args[3].value.attack_info then return end
     if callbacks["onDamaged"] then
         local actor = Instance.wrap(args[2].value)
+        local damager = Damager.wrap(args[3].value.attack_info)
+        damager.instance = args[3].value
         for _, c in ipairs(callbacks["onDamaged"]) do
             local item = c[1]
             local count = actor:item_stack_count(item)
             if count > 0 then
                 local func = c[2]
-                func(actor, Damager.wrap(args[3].value.attack_info), count)   -- Actor, Damager attack_info, Stack count
+                func(actor, damager, count)   -- Actor, Damager attack_info, Stack count
             end
         end
     end
@@ -641,12 +653,14 @@ end
 local function item_onDamageBlocked(self, other, result, args)
     if callbacks["onDamageBlocked"] then
         local actor = Instance.wrap(self)
+        local damager = Damager.wrap(other.attack_info)
+        damager.instance = other
         for _, c in ipairs(callbacks["onDamageBlocked"]) do
             local item = c[1]
             local count = actor:item_stack_count(item)
             if count > 0 then
                 local func = c[2]
-                func(actor, Damager.wrap(other.attack_info), count)   -- Actor, Damager attack_info, Stack count
+                func(actor, damager, count)   -- Actor, Damager attack_info, Stack count
             end
         end
     end
@@ -656,12 +670,13 @@ end
 local function item_onInteract(self, other, result, args)
     if callbacks["onInteract"] then
         local actor = Instance.wrap(args[3].value)
+        local interactable = Instance.wrap(args[2].value)
         for _, c in ipairs(callbacks["onInteract"]) do
             local item = c[1]
             local count = actor:item_stack_count(item)
             if count > 0 then
                 local func = c[2]
-                func(actor, Instance.wrap(args[2].value), count)   -- Actor, Interactable, Stack count
+                func(actor, interactable, count)   -- Actor, Interactable, Stack count
             end
         end
     end
@@ -671,12 +686,13 @@ end
 local function item_onEquipmentUse(self, other, result, args)
     if callbacks["onEquipmentUse"] then
         local actor = Instance.wrap(args[2].value)
+        local equip = Equipment.wrap(args[3].value)
         for _, c in ipairs(callbacks["onEquipmentUse"]) do
             local item = c[1]
             local count = actor:item_stack_count(item)
             if count > 0 then
                 local func = c[2]
-                func(actor, Equipment.wrap(args[3].value), count)   -- Actor, Equipment ID, Stack count
+                func(actor, equip, count)   -- Actor, Equipment ID, Stack count
             end
         end
     end
