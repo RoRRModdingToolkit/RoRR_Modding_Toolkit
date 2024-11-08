@@ -77,18 +77,16 @@ Instance.worm_bodies = Proxy.new({
 -- ========== Static Methods ==========
 
 Instance.exists = function(value)
-    -- Do not use capital GM functions in here,
-    -- since GM calls Wrap -> Wrap calls Instance.exists
-    -- Circular recursion will happen
     value = Wrap.unwrap(value)
-    if gm.typeof(value) == "struct" then value = value.id end
-    if type(value) ~= "number" or value < 100000.0 then return false end
     return gm.instance_exists(value) == 1.0
 end
 
 
-Instance.is = function(value)   -- Compatibility; does the exact same thing as "exists"
-    return Instance.exists(value)
+Instance.is = function(value)
+    value = Wrap.unwrap(value)
+    return gm.typeof(value) == "struct"
+       and gm.instance_exists(value) == 1.0
+       and gm.object_exists(value) == 0.0
 end
 
 
