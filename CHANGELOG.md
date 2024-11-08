@@ -1,5 +1,6 @@
 ### v1.1.28
 * Instance : `exists` no longer throws an error if the argument is a string.
+* Damager : Added key `instance` (when applicable) to get the attack instance creating the damager.
 
 ### v1.1.27
 * Instance/Wrap : Reverted automatic wrapping of all valid IDs into Instance objects as a result of last update.

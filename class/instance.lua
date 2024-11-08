@@ -585,8 +585,10 @@ end
 local function inst_onAttack(self, other, result, args)
     if not args[2].value.proc then return end
     if callbacks[self.id] and callbacks[self.id]["onAttack"] then
+        local actor = Instance.wrap(self)
+        local damager = Damager.wrap(args[2].value)
         for k, fn in pairs(callbacks[self.id]["onAttack"]) do
-            fn(Instance.wrap(self), Damager.wrap(args[2].value))    -- Actor, Damager attack_info
+            fn(actor, damager)    -- Actor, Damager attack_info
         end
     end
 end
@@ -594,8 +596,10 @@ end
 
 local function inst_onAttackAll(self, other, result, args)
     if callbacks[self.id] and callbacks[self.id]["onAttackAll"] then
+        local actor = Instance.wrap(self)
+        local damager = Damager.wrap(args[2].value)
         for k, fn in pairs(callbacks[self.id]["onAttackAll"]) do
-            fn(Instance.wrap(self), Damager.wrap(args[2].value))    -- Actor, Damager attack_info
+            fn(actor, damager)    -- Actor, Damager attack_info
         end
     end
 end
@@ -605,8 +609,10 @@ local function inst_onPostAttack(self, other, result, args)
     local parent = args[2].value.parent
     if not args[2].value.proc or not Instance.exists(parent) then return end
     if callbacks[parent.id] and callbacks[parent.id]["onPostAttack"] then
+        local actor = Instance.wrap(parent)
+        local damager = Damager.wrap(args[2].value)
         for k, fn in pairs(callbacks[parent.id]["onPostAttack"]) do
-            fn(Instance.wrap(parent), Damager.wrap(args[2].value))    -- Actor, Damager attack_info
+            fn(actor, damager)    -- Actor, Damager attack_info
         end
     end
 end
@@ -616,8 +622,10 @@ local function inst_onPostAttackAll(self, other, result, args)
     local parent = args[2].value.parent
     if not Instance.exists(parent) then return end
     if callbacks[parent.id] and callbacks[parent.id]["onPostAttackAll"] then
+        local actor = Instance.wrap(parent)
+        local damager = Damager.wrap(args[2].value)
         for k, fn in pairs(callbacks[parent.id]["onPostAttackAll"]) do
-            fn(Instance.wrap(parent), Damager.wrap(args[2].value))    -- Actor, Damager attack_info
+            fn(actor, damager)    -- Actor, Damager attack_info
         end
     end
 end
@@ -628,8 +636,11 @@ local function inst_onHit(self, other, result, args)
     if not self.attack_info.proc then return end
     local actor = Instance.wrap(args[2].value)
     if callbacks[actor.id] and callbacks[actor.id]["onHit"] then
+        local victim = Instance.wrap(args[3].value)
+        local damager = Damager.wrap(self.attack_info)
+        damager.instance = self
         for k, fn in pairs(callbacks[actor.id]["onHit"]) do
-            fn(actor, Instance.wrap(args[3].value), Damager.wrap(self.attack_info)) -- Attacker, Victim, Damager attack_info
+            fn(actor, victim, damager) -- Attacker, Victim, Damager attack_info
         end
     end
 end
@@ -640,8 +651,11 @@ local function inst_onHitAll(self, other, result, args)
     local actor = Instance.wrap(attack.inflictor)
     if not Instance.exists(actor) then return end
     if callbacks[actor.id] and callbacks[actor.id]["onHitAll"] then
+        local victim = Instance.wrap(attack.target_true)
+        local damager = Damager.wrap(attack.attack_info)
+        damager.instance = attack
         for k, fn in pairs(callbacks[actor.id]["onHitAll"]) do
-            fn(actor, Instance.wrap(attack.target_true), Damager.wrap(attack.attack_info)) -- Attacker, Victim, Damager attack_info
+            fn(actor, victim, damager) -- Attacker, Victim, Damager attack_info
         end
     end
 end
@@ -650,8 +664,9 @@ end
 local function inst_onKill(self, other, result, args)
     local actor = Instance.wrap(args[3].value)
     if callbacks[actor.id] and callbacks[actor.id]["onKill"] then
+        local victim = Instance.wrap(args[2].value)
         for k, fn in pairs(callbacks[actor.id]["onKill"]) do
-            fn(actor, Instance.wrap(args[2].value))   -- Attacker, Victim
+            fn(actor, victim)   -- Attacker, Victim
         end
     end
 end
@@ -661,8 +676,10 @@ local function inst_onDamaged(self, other, result, args)
     if not args[3].value.attack_info then return end
     local actor = Instance.wrap(args[2].value)
     if callbacks[actor.id] and callbacks[actor.id]["onDamaged"] then
+        local damager = Damager.wrap(args[3].value.attack_info)
+        damager.instance = args[3].value
         for k, fn in pairs(callbacks[actor.id]["onDamaged"]) do
-            fn(actor, Damager.wrap(args[3].value.attack_info))   -- Actor, Damager attack_info
+            fn(actor, damager)   -- Actor, Damager attack_info
         end
     end
 end
@@ -670,8 +687,11 @@ end
 
 local function inst_onDamageBlocked(self, other, result, args)
     if callbacks[self.id] and callbacks[self.id]["onDamageBlocked"] then
+        local actor = Instance.wrap(self)
+        local damager = Damager.wrap(other.attack_info)
+        damager.instance = other
         for k, fn in pairs(callbacks[self.id]["onDamageBlocked"]) do
-            fn(Instance.wrap(self), Damager.wrap(other.attack_info))   -- Actor, Damager attack_info
+            fn(actor, damager)   -- Actor, Damager attack_info
         end
     end
 end
@@ -680,8 +700,9 @@ end
 local function inst_onInteract(self, other, result, args)
     local actor = Instance.wrap(args[3].value)
     if callbacks[actor.id] and callbacks[actor.id]["onInteract"] then
+        local interactable = Instance.wrap(args[2].value)
         for k, fn in pairs(callbacks[actor.id]["onInteract"]) do
-            fn(actor, Instance.wrap(args[2].value))   -- Actor, Interactable
+            fn(actor, interactable)   -- Actor, Interactable
         end
     end
 end
@@ -690,8 +711,9 @@ end
 local function inst_onEquipmentUse(self, other, result, args)
     local actor = Instance.wrap(args[2].value)
     if callbacks[actor.id] and callbacks[actor.id]["onEquipmentUse"] then
+        local equip = Equipment.wrap(args[3].value)
         for k, fn in pairs(callbacks[actor.id]["onEquipmentUse"]) do
-            fn(actor, Equipment.wrap(args[3].value))   -- Actor, Equipment ID
+            fn(actor, equip)   -- Actor, Equipment ID
         end
     end
 end

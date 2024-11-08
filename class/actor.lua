@@ -516,8 +516,9 @@ local function actor_onAttack(self, other, result, args)
     if not args[2].value.proc then return end
     if callbacks["onAttack"] then
         local actor = Instance.wrap(self)
+        local damager = Damager.wrap(args[2].value)
         for k, fn in pairs(callbacks["onAttack"]) do
-            fn(actor, Damager.wrap(args[2].value))    -- Actor, Damager attack_info
+            fn(actor, damager)    -- Actor, Damager attack_info
         end
     end
 end
@@ -526,8 +527,9 @@ end
 local function actor_onAttackAll(self, other, result, args)
     if callbacks["onAttackAll"] then
         local actor = Instance.wrap(self)
+        local damager = Damager.wrap(args[2].value)
         for k, fn in pairs(callbacks["onAttackAll"]) do
-            fn(actor, Damager.wrap(args[2].value))    -- Actor, Damager attack_info
+            fn(actor, damager)    -- Actor, Damager attack_info
         end
     end
 end
@@ -537,8 +539,9 @@ local function actor_onPostAttack(self, other, result, args)
     if not args[2].value.proc or not Instance.exists(args[2].value.parent) then return end
     if callbacks["onPostAttack"] then
         local actor = Instance.wrap(args[2].value.parent)
+        local damager = Damager.wrap(args[2].value)
         for k, fn in pairs(callbacks["onPostAttack"]) do
-            fn(actor, Damager.wrap(args[2].value))    -- Actor, Damager attack_info
+            fn(actor, damager)    -- Actor, Damager attack_info
         end
     end
 end
@@ -548,8 +551,9 @@ local function actor_onPostAttackAll(self, other, result, args)
     if not Instance.exists(args[2].value.parent) then return end
     if callbacks["onPostAttackAll"] then
         local actor = Instance.wrap(args[2].value.parent)
+        local damager = Damager.wrap(args[2].value)
         for k, fn in pairs(callbacks["onPostAttackAll"]) do
-            fn(actor, Damager.wrap(args[2].value))    -- Actor, Damager attack_info
+            fn(actor, damager)    -- Actor, Damager attack_info
         end
     end
 end
@@ -561,8 +565,10 @@ local function actor_onHit(self, other, result, args)
     if callbacks["onHit"] then
         local actor = Instance.wrap(args[2].value)
         local victim = Instance.wrap(args[3].value)
+        local damager = Damager.wrap(self.attack_info)
+        damager.instance = self
         for k, fn in pairs(callbacks["onHit"]) do
-            fn(actor, victim, Damager.wrap(self.attack_info)) -- Attacker, Victim, Damager attack_info
+            fn(actor, victim, damager) -- Attacker, Victim, Damager attack_info
         end
     end
 end
@@ -574,8 +580,10 @@ local function actor_onHitAll(self, other, result, args)
     if callbacks["onHitAll"] then
         local actor = Instance.wrap(attack.inflictor)
         local victim = Instance.wrap(attack.target_true)
+        local damager = Damager.wrap(attack.attack_info)
+        damager.instance = attack
         for k, fn in pairs(callbacks["onHitAll"]) do
-            fn(actor, victim, Damager.wrap(attack.attack_info)) -- Attacker, Victim, Damager attack_info
+            fn(actor, victim, damager) -- Attacker, Victim, Damager attack_info
         end
     end
 end
@@ -597,6 +605,7 @@ local function actor_onDamaged(self, other, result, args)
     if callbacks["onDamaged"] then
         local actor = Instance.wrap(args[2].value)
         local damager = Damager.wrap(args[3].value.attack_info)
+        damager.instance = args[3].value
         for k, fn in pairs(callbacks["onDamaged"]) do
             fn(actor, damager)   -- Actor, Damager attack_info
         end
@@ -608,6 +617,7 @@ local function actor_onDamageBlocked(self, other, result, args)
     if callbacks["onDamageBlocked"] then
         local actor = Instance.wrap(self)
         local damager = Damager.wrap(other.attack_info)
+        damager.instance = other
         for k, fn in pairs(callbacks["onDamageBlocked"]) do
             fn(actor, damager)   -- Actor, Damager attack_info
         end
