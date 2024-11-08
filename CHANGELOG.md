@@ -1,3 +1,6 @@
+### v1.1.27
+* Instance/Wrap : Reverted automatic wrapping of all valid IDs into Instance objects as a result of last update.
+
 ### v1.1.26
 * Instance
     * The variable `id` is no longer wrapped as an Instance object when getting it from an instance.
