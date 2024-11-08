@@ -91,6 +91,8 @@ end
 
 
 Helper.log_struct = function(struct, indent, no_borders)
+    struct = Wrap.unwrap(struct)
+    
     if not no_borders then log.info("----------") end
     indent = indent or ""
     local names = GM.struct_get_names(struct)
