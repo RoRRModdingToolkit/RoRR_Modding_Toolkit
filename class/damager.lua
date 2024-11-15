@@ -188,11 +188,9 @@ methods_damager = {
         for _, flag in ipairs(flags) do
             if (self.value.attack_flags & flag) <= 0 and state then
                 self.value.attack_flags = self.value.attack_flags + flag
-                return
             end
             if (self.value.attack_flags & flag) > 0 and (not state) then
                 self.value.attack_flags = self.value.attack_flags - flag
-                return
             end
         end
     end
