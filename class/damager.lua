@@ -181,8 +181,8 @@ methods_damager = {
     end,
 
 
-    set_attack_flags = function(flags, state)
-        if type(flags) ~= "table" then flags = {flags} end
+    set_attack_flags = function(self, flags, state)
+        if type(flags) ~= "table" then flags = table.pack(flags) end
         if state == nil then log.error("state argument not provided", 2) end
 
         for _, flag in ipairs(flags) do
