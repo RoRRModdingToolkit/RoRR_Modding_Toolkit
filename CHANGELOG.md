@@ -1,3 +1,10 @@
+### v1.1.29
+* Item : `onStep` callbacks now use `step_actor` internally.
+    * Added `onPreStep` callback
+* Item, Buff : `onDraw` callbacks now use `draw_actor` internally.
+    * Added `onPreDraw` callbacks
+* Damager : Added `ATTACK_FLAG` and `set_attack_flags`
+
 ### v1.1.28
 * Instance : `exists` no longer throws an error if the argument is a string.
 * Damager : Added key `instance` (when applicable) to get the attack instance creating the damager.
