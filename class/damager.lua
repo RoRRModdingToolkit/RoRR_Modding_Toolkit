@@ -53,6 +53,40 @@ Damager.TRACER = Proxy.new({
 }):lock()
 
 
+Damager.ATTACK_FLAG = Proxy.new{(
+    cd_reset_on_kill            = (1 << 0),
+    inflict_poison_dot          = (1 << 1),
+    chef_ignite                 = (1 << 2),
+    stun_proc_ef                = (1 << 3),
+    knockback_proc_ef           = (1 << 4), 
+    spawn_lightning             = (1 << 5),
+    sniper_bonus_60             = (1 << 6),
+    sniper_bonus_30             = (1 << 7),
+    hand_steam_1                = (1 << 8),
+    hand_steam_5                = (1 << 9),
+    drifter_scrap_bit1          = (1 << 10),
+    drifter_scrap_bit2          = (1 << 11),
+    drifter_execute             = (1 << 12),
+    miner_heat                  = (1 << 13),
+    commando_wound              = (1 << 14),
+    commando_wound_damage       = (1 << 15),
+    gain_skull_on_kill          = (1 << 16),
+    gain_skull_boosted          = (1 << 17),
+    chef_freeze                 = (1 << 18),
+    chef_bigfreeze              = (1 << 19),
+    chef_food                   = (1 << 20),
+    inflict_armor_strip         = (1 << 21),
+    inflict_flame_dot           = (1 << 22),
+    merc_afterimage_nodamage    = (1 << 23),
+    pilot_raid                  = (1 << 24),
+    pilot_raid_boosted          = (1 << 25),
+    pilot_mine                  = (1 << 26),
+    inflict_arti_flame_dot      = (1 << 27),
+    sawmerang                   = (1 << 28),
+    force_proc                  = (1 << 29)
+)}:lock()
+
+
 
 -- ========== Static Methods ==========
 
@@ -144,6 +178,23 @@ methods_damager = {
 
         if knockback_dir then self.knockback_direction = knockback_dir end
         if knockback_kind then self.knockback_kind = knockback_kind end
+    end,
+
+
+    set_attack_flags = function(flags, state)
+        if type(flags) ~= "table" then flags = {flags} end
+        if bool == nil then log.error("state argument not provided", 2) end
+
+        for _, flag in ipairs(flags) do
+            if (self.value.attack_flags & flag) <= 0 and state then
+                self.value.attack_flags = self.value.attack_flags + flag
+                return
+            end
+            if (self.value.attack_flags & flag) > 0 and (not state) then
+                self.value.attack_flags = self.value.attack_flags - flag
+                return
+            end
+        end
     end
 
 }
