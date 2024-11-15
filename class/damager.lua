@@ -53,7 +53,7 @@ Damager.TRACER = Proxy.new({
 }):lock()
 
 
-Damager.ATTACK_FLAG = Proxy.new{(
+Damager.ATTACK_FLAG = Proxy.new({
     cd_reset_on_kill            = (1 << 0),
     inflict_poison_dot          = (1 << 1),
     chef_ignite                 = (1 << 2),
@@ -84,7 +84,7 @@ Damager.ATTACK_FLAG = Proxy.new{(
     inflict_arti_flame_dot      = (1 << 27),
     sawmerang                   = (1 << 28),
     force_proc                  = (1 << 29)
-)}:lock()
+}):lock()
 
 
 
@@ -183,7 +183,7 @@ methods_damager = {
 
     set_attack_flags = function(flags, state)
         if type(flags) ~= "table" then flags = {flags} end
-        if bool == nil then log.error("state argument not provided", 2) end
+        if state == nil then log.error("state argument not provided", 2) end
 
         for _, flag in ipairs(flags) do
             if (self.value.attack_flags & flag) <= 0 and state then
