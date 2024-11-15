@@ -470,6 +470,72 @@ gm.post_script_hook(gm.constants.actor_heal_networked, function(self, other, res
 end)
 
 
+gm.pre_script_hook(gm.constants.step_actor, function(self, other, result, args)
+    local actor = Instance.wrap(self)
+
+    if callbacks["onPreStep"] then
+        for _, c in ipairs(callbacks["onPreStep"]) do
+            local count = actor:item_stack_count(c[1])
+            if count > 0 then
+                c[2](actor, count)  -- Actor, Stack count
+            end
+        end
+    end
+
+    if self.shield and self.shield > 0.0 then self.RMT_has_shield_item = true end
+    if self.RMT_has_shield_item and self.shield <= 0.0 then
+        self.RMT_has_shield_item = nil
+        if callbacks["onShieldBreak"] then
+            for _, c in ipairs(callbacks["onPreStep"]) do
+                local count = actor:item_stack_count(c[1])
+                if count > 0 then
+                    c[2](actor, count)  -- Actor, Stack count
+                end
+            end
+        end
+    end
+end)
+
+
+gm.post_script_hook(gm.constants.step_actor, function(self, other, result, args)
+    if callbacks["onStep"] then
+        local actor = Instance.wrap(self)
+        for _, c in ipairs(callbacks["onStep"]) do
+            local count = actor:item_stack_count(c[1])
+            if count > 0 then
+                c[2](actor, count)  -- Actor, Stack count
+            end
+        end
+    end
+end)
+
+
+gm.pre_script_hook(gm.constants.draw_actor, function(self, other, result, args)
+    if callbacks["onPreDraw"] then
+        local actor = Instance.wrap(self)
+        for _, c in ipairs(callbacks["onPreDraw"]) do
+            local count = actor:item_stack_count(c[1])
+            if count > 0 then
+                c[2](actor, count)  -- Actor, Stack count
+            end
+        end
+    end
+end)
+
+
+gm.post_script_hook(gm.constants.draw_actor, function(self, other, result, args)
+    if callbacks["onDraw"] then
+        local actor = Instance.wrap(self)
+        for _, c in ipairs(callbacks["onDraw"]) do
+            local count = actor:item_stack_count(c[1])
+            if count > 0 then
+                c[2](actor, count)  -- Actor, Stack count
+            end
+        end
+    end
+end)
+
+
 gm.pre_script_hook(gm.constants.__input_system_tick, function()
     -- Sort loot tables that have been added to
     for _, pool_id in ipairs(loot_toggled) do
@@ -717,63 +783,63 @@ local function item_onNewStage(self, other, result, args)
 end
 
 
-local function item_onStep(self, other, result, args)
-    if gm.variable_global_get("pause") then return end
+-- local function item_onStep(self, other, result, args)
+--     if gm.variable_global_get("pause") then return end
     
-    if callbacks["onStep"] then
-        for n, a in ipairs(has_custom_item) do
-            if Instance.exists(a) then
-                local actor = Instance.wrap(a)
-                for _, c in ipairs(callbacks["onStep"]) do
-                    local count = actor:item_stack_count(c[1])
-                    if count > 0 then
-                        c[2](actor, count)  -- Actor, Stack count
-                    end
-                end
-            else table.remove(has_custom_item, n)
-            end
-        end
-    end
+--     if callbacks["onStep"] then
+--         for n, a in ipairs(has_custom_item) do
+--             if Instance.exists(a) then
+--                 local actor = Instance.wrap(a)
+--                 for _, c in ipairs(callbacks["onStep"]) do
+--                     local count = actor:item_stack_count(c[1])
+--                     if count > 0 then
+--                         c[2](actor, count)  -- Actor, Stack count
+--                     end
+--                 end
+--             else table.remove(has_custom_item, n)
+--             end
+--         end
+--     end
 
-    if callbacks["onShieldBreak"] then
-        for n, a in ipairs(has_custom_item) do
-            if Instance.exists(a) then
-                if a.shield and a.shield > 0.0 then a.RMT_has_shield = true end
-                if a.RMT_has_shield and a.shield <= 0.0 then
-                    a.RMT_has_shield = nil
-                    local actor = Instance.wrap(a)
-                    for _, c in ipairs(callbacks["onShieldBreak"]) do
-                        local count = actor:item_stack_count(c[1])
-                        if count > 0 then
-                            c[2](actor, count)  -- Actor, Stack count
-                        end
-                    end
-                end
-            else table.remove(has_custom_item, n)
-            end
-        end
-    end
-end
+--     if callbacks["onShieldBreak"] then
+--         for n, a in ipairs(has_custom_item) do
+--             if Instance.exists(a) then
+--                 if a.shield and a.shield > 0.0 then a.RMT_has_shield = true end
+--                 if a.RMT_has_shield and a.shield <= 0.0 then
+--                     a.RMT_has_shield = nil
+--                     local actor = Instance.wrap(a)
+--                     for _, c in ipairs(callbacks["onShieldBreak"]) do
+--                         local count = actor:item_stack_count(c[1])
+--                         if count > 0 then
+--                             c[2](actor, count)  -- Actor, Stack count
+--                         end
+--                     end
+--                 end
+--             else table.remove(has_custom_item, n)
+--             end
+--         end
+--     end
+-- end
 
 
-local function item_onDraw(self, other, result, args)
-    if gm.variable_global_get("pause") then return end
+-- local function item_onDraw(self, other, result, args)
+--     if gm.variable_global_get("pause") then return end
 
-    if callbacks["onDraw"] then
-        for n, a in ipairs(has_custom_item) do
-            if Instance.exists(a) then
-                local actor = Instance.wrap(a)
-                for _, c in ipairs(callbacks["onDraw"]) do
-                    local count = actor:item_stack_count(c[1])
-                    if count > 0 then
-                        c[2](actor, count)  -- Actor, Stack count
-                    end
-                end
-            else table.remove(has_custom_item, n)
-            end
-        end
-    end
-end
+--     if callbacks["onDraw"] then
+--         for n, a in ipairs(has_custom_item) do
+--             if Instance.exists(a) then
+--                 local actor = Instance.wrap(a)
+--                 for _, c in ipairs(callbacks["onDraw"]) do
+--                     local count = actor:item_stack_count(c[1])
+--                     if count > 0 then
+--                         c[2](actor, count)  -- Actor, Stack count
+--                     end
+--                 end
+--             else table.remove(has_custom_item, n)
+--             end
+--         end
+--     end
+-- end
 
 
 
@@ -791,8 +857,8 @@ Callback.add("onDamageBlocked", "RMT-item_onDamageBlocked", item_onDamageBlocked
 Callback.add("onInteractableActivate", "RMT-item_onInteract", item_onInteract)
 Callback.add("onEquipmentUse", "RMT-item_onEquipmentUse", item_onEquipmentUse)
 Callback.add("onStageStart", "RMT-item_onNewStage", item_onNewStage)
-Callback.add("preStep", "RMT-item_onStep", item_onStep)
-Callback.add("postHUDDraw", "RMT-item_onDraw", item_onDraw)
+-- Callback.add("preStep", "RMT-item_onStep", item_onStep)
+-- Callback.add("postHUDDraw", "RMT-item_onDraw", item_onDraw)
 
 
 

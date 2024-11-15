@@ -32,11 +32,11 @@ Buff.new = function(namespace, identifier)
     buff.stack_number_col = Array.new(1, Color.WHITE)
 
     -- Add onApply callback to add actor to has_custom_buff table
-    buff:onApply(function(actor, stack)
-        if not Helper.table_has(has_custom_buff, actor.value) then
-            table.insert(has_custom_buff, actor.value)
-        end
-    end)
+    -- buff:onApply(function(actor, stack)
+    --     if not Helper.table_has(has_custom_buff, actor.value) then
+    --         table.insert(has_custom_buff, actor.value)
+    --     end
+    -- end)
 
     return buff
 end
@@ -91,11 +91,11 @@ methods_buff = {
         end
 
         -- Add onApply callback to add actor to has_custom_buff table
-        self:onApply(function(actor, stack)
-            if not Helper.table_has(has_custom_buff, actor.value) then
-                table.insert(has_custom_buff, actor.value)
-            end
-        end)
+        -- self:onApply(function(actor, stack)
+        --     if not Helper.table_has(has_custom_buff, actor.value) then
+        --         table.insert(has_custom_buff, actor.value)
+        --     end
+        -- end)
     end,
 
 
@@ -139,7 +139,7 @@ metatable_class["Buff"] = {
 -- ========== Hooks ==========
 
 gm.post_script_hook(gm.constants.callback_execute, function(self, other, result, args)
-    -- onApply and onRemove
+    -- onApply, onRemove, onStep
     if callbacks[args[1].value] then
         local actor = Instance.wrap(args[2].value)
         for _, fn in pairs(callbacks[args[1].value]) do
@@ -185,6 +185,32 @@ gm.pre_script_hook(gm.constants.actor_transform, function(self, other, result, a
 end)
 
 
+gm.pre_script_hook(gm.constants.draw_actor, function(self, other, result, args)
+    if callbacks["onPreDraw"] then
+        local actor = Instance.wrap(self)
+        for _, c in ipairs(callbacks["onPreDraw"]) do
+            local count = actor:buff_stack_count(c[1])
+            if count > 0 then
+                c[2](actor, count)  -- Actor, Stack count
+            end
+        end
+    end
+end)
+
+
+gm.post_script_hook(gm.constants.draw_actor, function(self, other, result, args)
+    if callbacks["onDraw"] then
+        local actor = Instance.wrap(self)
+        for _, c in ipairs(callbacks["onDraw"]) do
+            local count = actor:buff_stack_count(c[1])
+            if count > 0 then
+                c[2](actor, count)  -- Actor, Stack count
+            end
+        end
+    end
+end)
+
+
 
 -- ========== Callbacks ==========
 
@@ -200,30 +226,30 @@ function buff_onPostStatRecalc(actor)
 end
 
 
-local function buff_onDraw(self, other, result, args)
-    if gm.variable_global_get("pause") then return end
+-- local function buff_onDraw(self, other, result, args)
+--     if gm.variable_global_get("pause") then return end
 
-    if callbacks["onDraw"] then
-        for n, a in ipairs(has_custom_buff) do
-            if Instance.exists(a) then
-                local actor = Instance.wrap(a)
-                for _, c in ipairs(callbacks["onDraw"]) do
-                    local count = actor:buff_stack_count(c[1])
-                    if count > 0 then
-                        c[2](actor, count)  -- Actor, Stack count
-                    end
-                end
-            else table.remove(has_custom_buff, n)
-            end
-        end
-    end
-end
+--     if callbacks["onDraw"] then
+--         for n, a in ipairs(has_custom_buff) do
+--             if Instance.exists(a) then
+--                 local actor = Instance.wrap(a)
+--                 for _, c in ipairs(callbacks["onDraw"]) do
+--                     local count = actor:buff_stack_count(c[1])
+--                     if count > 0 then
+--                         c[2](actor, count)  -- Actor, Stack count
+--                     end
+--                 end
+--             else table.remove(has_custom_buff, n)
+--             end
+--         end
+--     end
+-- end
 
 
 
 -- ========== Initialize ==========
 
-Callback.add("postHUDDraw", "RMT-buff_onDraw", buff_onDraw)
+-- Callback.add("postHUDDraw", "RMT-buff_onDraw", buff_onDraw)
 
 
 
