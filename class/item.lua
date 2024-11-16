@@ -648,14 +648,15 @@ end
 local function item_onHit(self, other, result, args)
     if callbacks["onHit"] then
         local actor = Instance.wrap(args[2].value)
-        local damager = Damager.wrap(self.attack_info)
-        damager.instance = self
+        local victim = Instance.wrap(args[3].value)
+        local damager = Damager.wrap(args[4].value.attack_info)
+        damager.instance = args[4].value.inflictor
         for _, c in ipairs(callbacks["onHit"]) do
             local item = c[1]
             local count = actor:item_stack_count(item)
             if count > 0 then
                 local func = c[2]
-                func(actor, Instance.wrap(args[3].value), damager, count) -- Attacker, Victim, Damager attack_info, Stack count
+                func(actor, victim, damager, count, args[4].value) -- Attacker, Victim, Damager attack_info, Stack count, hit_info
             end
         end
     end
@@ -675,7 +676,7 @@ local function item_onHitAll(self, other, result, args)
             local count = actor:item_stack_count(item)
             if count > 0 then
                 local func = c[2]
-                func(actor, victim, damager, count) -- Attacker, Victim, Damager attack_info, Stack count
+                func(actor, victim, damager, count, attack) -- Attacker, Victim, Damager attack_info, Stack count, hit_info
             end
         end
     end
