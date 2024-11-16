@@ -1,6 +1,6 @@
 ﻿{
 	"name": "RoRR_Modding_Toolkit",
-	"version_number": "1.1.29",
+	"version_number": "1.1.30",
 	"website_url": "https://github.com/RoRRModdingToolkit/RoRR_Modding_Toolkit/wiki",
 	"description": "Friendly abstractions of the game's internal functions for easier modding.",
 	"dependencies": [

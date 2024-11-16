@@ -1,3 +1,7 @@
+### v1.1.30
+* Item, Actor, Instance : Fixed networking-related error for `onHit` callbacks.
+    `onHit` and `onHitAll` now pass `hit_info` struct as another argument.
+
 ### v1.1.29
 * Item : `onStep` callbacks now use `step_actor` internally.
     * Added `onPreStep` callback
