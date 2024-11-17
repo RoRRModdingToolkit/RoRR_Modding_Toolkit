@@ -1,3 +1,6 @@
+### v1.1.31
+* Item, Buff : Fixed lag related to internal change of `onStep` and `onDraw` callbacks.
+
 ### v1.1.30
 * Item, Actor, Instance : Fixed networking-related error for `onHit` callbacks.
     * `onHit` and `onHitAll` now pass `hit_info` struct as another argument.

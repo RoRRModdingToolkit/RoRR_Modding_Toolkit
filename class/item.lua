@@ -472,6 +472,7 @@ end)
 
 gm.pre_script_hook(gm.constants.step_actor, function(self, other, result, args)
     local actor = Instance.wrap(self)
+    if not Helper.table_has(has_custom_item, self) then return end
 
     if callbacks["onPreStep"] then
         for _, c in ipairs(callbacks["onPreStep"]) do
@@ -499,6 +500,7 @@ end)
 
 gm.post_script_hook(gm.constants.step_actor, function(self, other, result, args)
     if callbacks["onStep"] then
+        if not Helper.table_has(has_custom_item, self) then return end
         local actor = Instance.wrap(self)
         for _, c in ipairs(callbacks["onStep"]) do
             local count = actor:item_stack_count(c[1])
@@ -512,6 +514,7 @@ end)
 
 gm.pre_script_hook(gm.constants.draw_actor, function(self, other, result, args)
     if callbacks["onPreDraw"] then
+        if not Helper.table_has(has_custom_item, self) then return end
         local actor = Instance.wrap(self)
         for _, c in ipairs(callbacks["onPreDraw"]) do
             local count = actor:item_stack_count(c[1])
@@ -525,6 +528,7 @@ end)
 
 gm.post_script_hook(gm.constants.draw_actor, function(self, other, result, args)
     if callbacks["onDraw"] then
+        if not Helper.table_has(has_custom_item, self) then return end
         local actor = Instance.wrap(self)
         for _, c in ipairs(callbacks["onDraw"]) do
             local count = actor:item_stack_count(c[1])
