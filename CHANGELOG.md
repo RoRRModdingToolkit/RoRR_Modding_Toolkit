@@ -1,6 +1,7 @@
 ### v1.1.32
 * Actor : Added `apply_dot`
 * Survivor : Fixed some default sprites being wrong.
+* Damager : Added `get_attack_flag`
 
 ### v1.1.31
 * Item, Buff : Fixed lag related to internal change of `onStep` and `onDraw` callbacks.

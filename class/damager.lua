@@ -193,6 +193,11 @@ methods_damager = {
                 self.value.attack_flags = self.value.attack_flags - flag
             end
         end
+    end,
+
+
+    get_attack_flag = function(self, flag)
+        return (self.value.attack_flags & flag) > 0
     end
 
 }
