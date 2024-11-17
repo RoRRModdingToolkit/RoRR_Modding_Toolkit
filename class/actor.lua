@@ -230,6 +230,21 @@ methods_actor = {
     end,
 
 
+    apply_dot = function(self, damage, source, ticks, duration, color)
+        local dot = GM.instance_create(0, 0, gm.constants.oDot)
+        dot.target = self
+        dot.damage = damage
+        if source then
+            dot.parent = source
+            dot.damage = damage * source.damage
+        end
+        dot.ticks = ticks
+        dot.rate = (60 * duration) / ticks
+        if color then dot.textColor = color end
+        return dot
+    end,
+
+
     item_give = function(self, item, count, temp)
         item = Wrap.unwrap(item)
         if not temp then temp = false end

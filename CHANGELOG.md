@@ -1,3 +1,6 @@
+### v1.1.32
+* Actor : Added `apply_dot`
+
 ### v1.1.31
 * Item, Buff : Fixed lag related to internal change of `onStep` and `onDraw` callbacks.
 
