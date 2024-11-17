@@ -230,7 +230,7 @@ methods_actor = {
     end,
 
 
-    apply_dot = function(self, damage, source, ticks, duration, color, use_raw_damage)
+    apply_dot = function(self, damage, source, ticks, rate, color, use_raw_damage)
         local dot = GM.instance_create(0, 0, gm.constants.oDot)
         dot.target = self
         dot.damage = damage
@@ -239,7 +239,7 @@ methods_actor = {
             if not use_raw_damage then dot.damage = damage * source.damage end
         end
         dot.ticks = ticks
-        dot.rate = (60 * duration) / ticks
+        dot.rate = rate
         dot.textColor = Color.WHITE
         if color then dot.textColor = color end
         return dot
