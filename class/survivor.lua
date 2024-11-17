@@ -115,9 +115,9 @@ Survivor.new = function(namespace, identifier)
         fall                    = gm.constants.sCommandoFall,
         climb                   = gm.constants.sCommandoClimb,
         death                   = gm.constants.sCommandoDeath,
-        decoy                   = gm.constants.sDronePlayerCommandoIdle,
-        drone_idle              = gm.constants.sDronePlayerCommandoShoot,
-        drone_shoot             = gm.constants.sCommandoDecoy,
+        decoy                   = gm.constants.sCommandoDecoy,
+        drone_idle              = gm.constants.sDronePlayerCommandoIdle,
+        drone_shoot             = gm.constants.sDronePlayerCommandoShoot,
         climb_hurt              = -1,
         palette                 = gm.constants.sCommandoPalette,
         
