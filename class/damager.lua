@@ -181,6 +181,11 @@ methods_damager = {
     end,
 
 
+    get_attack_flag = function(self, flag)
+        return (self.value.attack_flags & flag) > 0
+    end,
+
+
     set_attack_flags = function(self, flags, state)
         if type(flags) ~= "table" then flags = table.pack(flags) end
         if state == nil then log.error("state argument not provided", 2) end
@@ -193,11 +198,6 @@ methods_damager = {
                 self.value.attack_flags = self.value.attack_flags - flag
             end
         end
-    end,
-
-
-    get_attack_flag = function(self, flag)
-        return (self.value.attack_flags & flag) > 0
     end
 
 }
