@@ -98,11 +98,9 @@ Item.new = function(namespace, identifier, no_log)
         item.item_log_id = log
     end
 
-    -- Add onPickup callback to add actor to has_custom_item table
+    -- Add actor to has_custom_item on pickup
     item:onPickup(function(actor, stack)
-        if not Helper.table_has(has_custom_item, actor.value) then
-            table.insert(has_custom_item, actor.value)
-        end
+		has_custom_item[actor.id] = true
     end)
     
     return item
@@ -231,11 +229,9 @@ methods_item = {
             end
         end
 
-        -- Add onPickup callback to add actor to has_custom_item table
+        -- Add actor to has_custom_item on pickup
         self:onPickup(function(actor, stack)
-            if not Helper.table_has(has_custom_item, actor.value) then
-                table.insert(has_custom_item, actor.value)
-            end
+            has_custom_item[actor.id] = true
         end)
     end,
 
@@ -471,6 +467,7 @@ end)
 
 
 gm.pre_script_hook(gm.constants.step_actor, function(self, other, result, args)
+    if not has_custom_item[self.id] then return end
     local actor = Instance.wrap(self)
 
     if callbacks["onPreStep"] then
@@ -499,6 +496,7 @@ end)
 
 gm.post_script_hook(gm.constants.step_actor, function(self, other, result, args)
     if callbacks["onStep"] then
+        if not has_custom_item[self.id] then return end
         local actor = Instance.wrap(self)
         for _, c in ipairs(callbacks["onStep"]) do
             local count = actor:item_stack_count(c[1])
@@ -512,6 +510,7 @@ end)
 
 gm.pre_script_hook(gm.constants.draw_actor, function(self, other, result, args)
     if callbacks["onPreDraw"] then
+        if not has_custom_item[self.id] then return end
         local actor = Instance.wrap(self)
         for _, c in ipairs(callbacks["onPreDraw"]) do
             local count = actor:item_stack_count(c[1])
@@ -525,6 +524,7 @@ end)
 
 gm.post_script_hook(gm.constants.draw_actor, function(self, other, result, args)
     if callbacks["onDraw"] then
+        if not has_custom_item[self.id] then return end
         local actor = Instance.wrap(self)
         for _, c in ipairs(callbacks["onDraw"]) do
             local count = actor:item_stack_count(c[1])
@@ -767,9 +767,9 @@ end
 
 
 local function item_onNewStage(self, other, result, args)
-    if callbacks["onNewStage"] then
-        for n, a in ipairs(has_custom_item) do
-            if Instance.exists(a) then
+    for a, _ in pairs(has_custom_item) do
+        if Instance.exists(a) then
+            if callbacks["onNewStage"] then
                 local actor = Instance.wrap(a)
                 for _, c in ipairs(callbacks["onNewStage"]) do
                     local count = actor:item_stack_count(c[1])
@@ -777,8 +777,8 @@ local function item_onNewStage(self, other, result, args)
                         c[2](actor, count)  -- Actor, Stack count
                     end
                 end
-            else table.remove(has_custom_item, n)
             end
+        else has_custom_item[self.id] = nil
         end
     end
 end
