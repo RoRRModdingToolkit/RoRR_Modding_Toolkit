@@ -240,6 +240,7 @@ methods_actor = {
         end
         dot.ticks = ticks
         dot.rate = (60 * duration) / ticks
+        dot.textColor = Color.WHITE
         if color then dot.textColor = color end
         return dot
     end,
