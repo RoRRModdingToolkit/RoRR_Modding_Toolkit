@@ -230,13 +230,13 @@ methods_actor = {
     end,
 
 
-    apply_dot = function(self, damage, source, ticks, rate, color, use_raw_damage)
+    apply_dot = function(self, damage, source, ticks, rate, color, use_damage_coeff)
         local dot = GM.instance_create(0, 0, gm.constants.oDot)
         dot.target = self
         dot.damage = damage
         if source then
             dot.parent = source
-            if not use_raw_damage then dot.damage = damage * source.damage end
+            if use_damage_coeff then dot.damage = damage * source.damage end
         end
         dot.ticks = ticks
         dot.rate = rate
