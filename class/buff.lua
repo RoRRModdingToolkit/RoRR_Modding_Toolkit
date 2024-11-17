@@ -31,11 +31,9 @@ Buff.new = function(namespace, identifier)
     -- Set default stack_number_col to pure white
     buff.stack_number_col = Array.new(1, Color.WHITE)
 
-    -- Add onApply callback to add actor to has_custom_buff table
+    -- Add actor to has_custom_buff on apply
     buff:onApply(function(actor, stack)
-        if not Helper.table_has(has_custom_buff, actor.value) then
-            table.insert(has_custom_buff, actor.value)
-        end
+		has_custom_buff[actor.id] = true
     end)
 
     return buff
@@ -90,11 +88,9 @@ methods_buff = {
             end
         end
 
-        -- Add onApply callback to add actor to has_custom_buff table
+        -- Add actor to has_custom_buff on apply
         self:onApply(function(actor, stack)
-            if not Helper.table_has(has_custom_buff, actor.value) then
-                table.insert(has_custom_buff, actor.value)
-            end
+            has_custom_buff[actor.id] = true
         end)
     end,
 
@@ -187,7 +183,7 @@ end)
 
 gm.pre_script_hook(gm.constants.draw_actor, function(self, other, result, args)
     if callbacks["onPreDraw"] then
-        if not Helper.table_has(has_custom_buff, self) then return end
+        if not has_custom_buff[self.id] then return end
         local actor = Instance.wrap(self)
         for _, c in ipairs(callbacks["onPreDraw"]) do
             local count = actor:buff_stack_count(c[1])
@@ -201,7 +197,7 @@ end)
 
 gm.post_script_hook(gm.constants.draw_actor, function(self, other, result, args)
     if callbacks["onDraw"] then
-        if not Helper.table_has(has_custom_buff, self) then return end
+        if not has_custom_buff[self.id] then return end
         local actor = Instance.wrap(self)
         for _, c in ipairs(callbacks["onDraw"]) do
             local count = actor:buff_stack_count(c[1])
