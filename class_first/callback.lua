@@ -72,8 +72,8 @@ end
 Callback.remove = function(id)
     if id:sub(1, 3) == "RMT" then log.error("Cannot remove RMT callbacks", 2) end
     
-    for _, c in ipairs(Callback.TYPE) do
-        local c_table = callbacks[c]
+    for _, c_id in pairs(Callback.TYPE) do
+        local c_table = callbacks[c_id]
         if c_table and c_table[id] then
             c_table[id] = nil
         end

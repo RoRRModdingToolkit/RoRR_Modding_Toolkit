@@ -103,6 +103,16 @@ Helper.log_struct = function(struct, indent, no_borders)
 end
 
 
+Helper.is_true = function(value)
+    return value == true or value == 1.0
+end
+
+
+Helper.is_false = function(value)
+    return (not value) or value == 0.0
+end
+
+
 Helper.chance = function(n)
     return gm.random_range(0, 1) <= n
 end

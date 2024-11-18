@@ -1,3 +1,11 @@
+### v1.1.33
+* Callback : Fixed `remove` not actually doing anything.
+* Actor : `fire_` methods now have an optional `no_proc` bool argument (default `false`).
+* Helper : Added `is_true` and `is_false`
+* Item
+    * Several callbacks renamed (e.g., `onPickup` -> `onAcquired`) and rewritten.
+    * Added callback `onPickupCollected`
+
 ### v1.1.32
 * Actor : Added `apply_dot`
 * Survivor : Fixed some default sprites being wrong.
