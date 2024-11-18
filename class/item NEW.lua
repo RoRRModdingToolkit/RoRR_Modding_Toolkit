@@ -556,7 +556,7 @@ Callback.add("onAttackHandleEnd", "RMT-Item.onAttackHandleEnd", function(self, o
 end)
 
 
-Callback.add("onAttackHandleEndProc", "RMT-Item.onAttackHandleEnd", function(self, other, result, args)
+Callback.add("onAttackHandleEnd", "RMT-Item.onAttackHandleEndProc", function(self, other, result, args)
     if not callbacks["onAttackHandleEndProc"] then return end
 
     local attackInfo = args[2].value
@@ -579,7 +579,7 @@ Callback.add("onAttackHandleEndProc", "RMT-Item.onAttackHandleEnd", function(sel
 end)
 
 
-Callback.add("onHitProc", "RMT-Item.onHitProc", function(self, other, result, args)     -- * Runs before onAttackHit
+Callback.add("onHitProc", "RMT-Item.onHitProc", function(self, other, result, args)     -- Runs before onAttackHit
     if not callbacks["onHitProc"] then return end
 
     local actor = Instance.wrap(args[2].value)
