@@ -6,7 +6,7 @@ Attack_Info = Proxy.new()
 
 -- ========== Enums ==========
 
-Damager.KNOCKBACK_KIND = Proxy.new({
+Attack_Info.KNOCKBACK_KIND = Proxy.new({
     none        = 0,
     standard    = 1,
     freeze      = 2,
@@ -15,13 +15,13 @@ Damager.KNOCKBACK_KIND = Proxy.new({
 }):lock()
 
 
-Damager.KNOCKBACK_DIR = Proxy.new({
+Attack_Info.KNOCKBACK_DIR = Proxy.new({
     left    = -1,
     right   = 1
 }):lock()
 
 
-Damager.TRACER = Proxy.new({
+Attack_Info.TRACER = Proxy.new({
     none                    = 0,
     wispg                   = 1,
     wispg2                  = 2,
@@ -53,7 +53,7 @@ Damager.TRACER = Proxy.new({
 }):lock()
 
 
-Damager.ATTACK_FLAG = Proxy.new({
+Attack_Info.ATTACK_FLAG = Proxy.new({
     cd_reset_on_kill            = (1 << 0),
     inflict_poison_dot          = (1 << 1),
     chef_ignite                 = (1 << 2),
@@ -90,19 +90,19 @@ Damager.ATTACK_FLAG = Proxy.new({
 
 -- ========== Static Methods ==========
 
-Damager.wrap = function(value)
-    return make_wrapper(value, "Damager", metatable_damager, lock_table_damager)
+Attack_Info.wrap = function(value)
+    return make_wrapper(value, "Attack_Info", metatable_attack_info, lock_table_attack_info)
 end
 
 
 
 -- ========== Instance Methods ==========
 
-methods_damager = {
+methods_attack_info = {
 
     use_raw_damage = function(self)
         if not self.parent:exists() then
-            log.error("damager does not have a parent", 2)
+            log.error("attack_info does not have a parent", 2)
             return
         end
 
@@ -110,18 +110,18 @@ methods_damager = {
     end,
 
 
-    add_offset = function(self, damager, offset)
-        damager = Wrap.unwrap(damager)
+    add_offset = function(self, attack_info, offset)
+        attack_info = Wrap.unwrap(attack_info)
 
         -- Overload 1
-        if type(damager) == "number" then
-            self.value.climb = self.value.climb + damager
+        if type(attack_info) == "number" then
+            self.value.climb = self.value.climb + attack_info
             return
         end
 
         -- Overload 2
-        if not gm.is_struct(damager) then log.error("Argument 1 is not a struct", 2) end
-        self.value.climb = damager.climb + (offset or 10.0)
+        if not gm.is_struct(attack_info.value) then log.error("Argument 1 is not valid", 2) end
+        self.value.climb = attack_info.climb + (offset or 10.0)
     end,
 
 
@@ -131,11 +131,14 @@ methods_damager = {
     set_colour = function(self, col) self:set_color(col) end,
 
 
+    set_damage = function(self, damage)
+        if not damage then log.error("No damage argument provided", 2) end
+        self.value.damage = damage
+    end,
+
+
     set_critical = function(self, bool)
-        if bool == nil then
-            log.error("set_critical needs a boolean value", 2)
-            return
-        end
+        if bool == nil then log.error("No bool argument provided", 2) end
         
         if (not self.critical) and bool then
             self.value.critical = true
@@ -144,16 +147,6 @@ methods_damager = {
             self.value.critical = false
             self.value.damage = self.value.damage / 2.0
         end
-    end,
-
-
-    set_proc = function(self, bool)
-        if bool == nil then
-            log.error("set_proc needs a boolean value", 2)
-            return
-        end
-
-        self.value.proc = bool
     end,
 
 
@@ -201,13 +194,13 @@ methods_damager = {
     end
 
 }
-lock_table_damager = Proxy.make_lock_table({"value", "RMT_object", table.unpack(Helper.table_get_keys(methods_damager))})
+lock_table_attack_info = Proxy.make_lock_table({"value", "RMT_object", table.unpack(Helper.table_get_keys(methods_attack_info))})
 
 
 
 -- ========== Metatables ==========
 
-metatable_damager_gs = {
+metatable_attack_info_gs = {
     -- Getter
     __index = function(table, key)
         if gm.variable_struct_exists(table.value, key) then
@@ -224,26 +217,26 @@ metatable_damager_gs = {
 }
 
 
-metatable_damager = {
+metatable_attack_info = {
     __index = function(table, key)
         -- Methods
-        if methods_damager[key] then
-            return methods_damager[key]
+        if methods_attack_info[key] then
+            return methods_attack_info[key]
         end
 
         -- Pass to next metatable
-        return metatable_damager_gs.__index(table, key)
+        return metatable_attack_info_gs.__index(table, key)
     end,
 
 
     __newindex = function(table, key, value) 
-        metatable_damager_gs.__newindex(table, key, value)
+        metatable_attack_info_gs.__newindex(table, key, value)
     end,
 
 
-    __metatable = "damager"
+    __metatable = "attack_info"
 }
 
 
 
-return Damager
+return Attack_Info

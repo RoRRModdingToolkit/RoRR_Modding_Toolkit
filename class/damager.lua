@@ -1,7 +1,5 @@
 -- Damager
 
-return
-
 Damager = Proxy.new()
 
 

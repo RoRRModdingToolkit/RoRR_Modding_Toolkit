@@ -204,7 +204,7 @@ end
 
 
 Instance.wrap = function(value)
-    Wrap.unwrap(value)
+    value = Wrap.unwrap(value)
     if type(value) == "number" then value = Instance.get_CInstance(value).value end
     if not Instance.exists(value) then return Instance.wrap_invalid() end
 
