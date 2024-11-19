@@ -22,7 +22,7 @@ methods_hit_info = {
             return
         end
 
-        self:set_damage(self.value.damage / self.value.parent.damage)
+        self:set_damage(self.value.damage / self.value.inflictor.damage)
     end,
 
 
