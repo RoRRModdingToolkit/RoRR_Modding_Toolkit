@@ -3,7 +3,7 @@
 Instance = Proxy.new()
 
 local callbacks = {}
-local valid_callbacks = {
+instance_valid_callbacks = {
     onDraw                  = true,     -- For non-actors
 
     onPreStep               = true,

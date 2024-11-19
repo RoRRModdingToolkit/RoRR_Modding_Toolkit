@@ -53,13 +53,12 @@ Player.get_from_name = function(name)
 end
 
 
-Player.add_callback = function(callback, id, func, skill, all_damage)
+Player.add_callback = function(callback, id, func, skill)
     table.insert(auto_callbacks, {
         callback,
         id,
         func,
-        skill,
-        all_damage
+        skill
     })
 end
 
@@ -123,27 +122,13 @@ methods_player = {
 }
 
 
-methods_player_callbacks = {
-    
-    onStatRecalc        = function(self, id, func) Player.add_callback("onStatRecalc", id, func) end,
-    onPostStatRecalc    = function(self, id, func) Player.add_callback("onPostStatRecalc", id, func) end,
-    onSkillUse          = function(self, id, func, skill) Player.add_callback("onSkillUse", id, func, skill) end,
-    onBasicUse          = function(self, id, func) Player.add_callback("onBasicUse", id, func) end,
-    onAttack            = function(self, id, func, all_damage) Player.add_callback("onAttack", id, func, nil, all_damage) end,
-    onPostAttack        = function(self, id, func, all_damage) Player.add_callback("onPostAttack", id, func, nil, all_damage) end,
-    onHit               = function(self, id, func, all_damage) Player.add_callback("onHit", id, func, nil, all_damage) end,
-    onKill              = function(self, id, func) Player.add_callback("onKill", id, func) end,
-    onDamaged           = function(self, id, func) Player.add_callback("onDamaged", id, func) end,
-    onDamageBlocked     = function(self, id, func) Player.add_callback("onDamageBlocked", id, func) end,
-    onHeal              = function(self, id, func) Player.add_callback("onHeal", id, func) end,
-    onShieldBreak       = function(self, id, func) Player.add_callback("onShieldBreak", id, func) end,
-    onInteract          = function(self, id, func) Player.add_callback("onInteract", id, func) end,
-    onEquipmentUse      = function(self, id, func) Player.add_callback("onEquipmentUse", id, func) end,
-    onPreStep           = function(self, id, func) Player.add_callback("onPreStep", id, func) end,
-    onPostStep          = function(self, id, func) Player.add_callback("onPostStep", id, func) end,
-    onDraw              = function(self, id, func) Player.add_callback("onDraw", id, func) end
+methods_player_callbacks = {}
 
-}
+for c, _ in pairs(instance_valid_callbacks) do
+    methods_player_callbacks[c] = function(self, id, func, skill)
+        Player.add_callback(c, id, func, skill)
+    end
+end
 
 
 
@@ -191,7 +176,7 @@ Callback.add("onGameStart", "RMT-player_addAutoCallbacks", function(self, other,
         local player = Player.get_client()
         if player:exists() then
             for _, c in ipairs(auto_callbacks) do
-                player:add_callback(c[1], c[2], c[3], c[4], c[5])
+                player:add_callback(c[1], c[2], c[3], c[4])
             end
         end
     end, 1)
