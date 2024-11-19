@@ -23,7 +23,11 @@ local valid_callbacks = {
     onInteractableActivate  = true,
     onPickupCollected       = true,
     onEquipmentUse          = true,
-    onStageStart            = true
+    onStageStart            = true,
+    onPreStep               = true,
+    onPostStep              = true,
+    onPreDraw               = true,
+    onPostDraw              = true
 }
 
 local has_custom_item = {}
@@ -490,6 +494,92 @@ gm.post_script_hook(gm.constants.actor_heal_networked, function(self, other, res
         if stack > 0 then
             for _, fn in ipairs(c_table) do
                 fn(actor, stack, heal_amount)
+            end
+        end
+    end
+end)
+
+
+gm.pre_script_hook(gm.constants.step_actor, function(self, other, result, args)
+    if not has_custom_item[self.id] then return end
+
+    local actor = Instance.wrap(self)
+    local actorData = actor:get_data("item")
+
+    if callbacks["onPreStep"] then
+        for item_id, c_table in pairs(callbacks["onPreStep"]) do
+            local stack = actor:item_stack_count(item_id)
+            if stack > 0 then
+                for _, fn in ipairs(c_table) do
+                    fn(actor, stack)
+                end
+            end
+        end
+    end
+
+    if not callbacks["onShieldBreak"] then return end
+
+    if self.shield and self.shield > 0.0 then actorData.has_shield = true end
+    if actorData.has_shield and self.shield <= 0.0 then
+        actorData.has_shield = nil
+
+        for item_id, c_table in pairs(callbacks["onShieldBreak"]) do
+            local stack = actor:item_stack_count(item_id)
+            if stack > 0 then
+                for _, fn in ipairs(c_table) do
+                    fn(actor, stack)
+                end
+            end
+        end
+    end
+end)
+
+
+gm.post_script_hook(gm.constants.step_actor, function(self, other, result, args)
+    if not callbacks["onPostStep"] then return end
+    if not has_custom_item[self.id] then return end
+
+    local actor = Instance.wrap(self)
+
+    for item_id, c_table in pairs(callbacks["onPostStep"]) do
+        local stack = actor:item_stack_count(item_id)
+        if stack > 0 then
+            for _, fn in ipairs(c_table) do
+                fn(actor, stack)
+            end
+        end
+    end
+end)
+
+
+gm.pre_script_hook(gm.constants.draw_actor, function(self, other, result, args)
+    if not callbacks["onPreDraw"] then return end
+    if not has_custom_item[self.id] then return end
+
+    local actor = Instance.wrap(self)
+
+    for item_id, c_table in pairs(callbacks["onPreDraw"]) do
+        local stack = actor:item_stack_count(item_id)
+        if stack > 0 then
+            for _, fn in ipairs(c_table) do
+                fn(actor, stack)
+            end
+        end
+    end
+end)
+
+
+gm.post_script_hook(gm.constants.draw_actor, function(self, other, result, args)
+    if not callbacks["onPostDraw"] then return end
+    if not has_custom_item[self.id] then return end
+
+    local actor = Instance.wrap(self)
+
+    for item_id, c_table in pairs(callbacks["onPostDraw"]) do
+        local stack = actor:item_stack_count(item_id)
+        if stack > 0 then
+            for _, fn in ipairs(c_table) do
+                fn(actor, stack)
             end
         end
     end
