@@ -4,7 +4,7 @@
 * Helper : Added `is_true` and `is_false`
 * Item, Buff, Instance, Actor, Player
     * Several callbacks renamed (e.g., `onPickup` -> `onAcquired`) and rewritten.
-    * Item : Added callback `onPickupCollected`
+    * Added callback `onPickupCollected`
 * Added Attack_Info class
 * Added Hit_Info class
 * Minor optimizations in callbacks across the board.
