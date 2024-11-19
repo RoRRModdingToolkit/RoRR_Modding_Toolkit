@@ -571,7 +571,7 @@ gm.post_script_hook(gm.constants.actor_heal_networked, function(self, other, res
 end)
 
 
-gm.pre_script_hook(gm.constants.__input_system_tick, function()
+gm.post_script_hook(gm.constants.__input_system_tick, function()
     -- Sort loot tables that have been added to
     for _, pool_id in ipairs(loot_toggled) do
         local loot_pools = Array.wrap(gm.variable_global_get("treasure_loot_pools"))
