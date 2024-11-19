@@ -110,27 +110,6 @@ methods_attack_info = {
     end,
 
 
-    add_offset = function(self, attack_info, offset)
-        attack_info = Wrap.unwrap(attack_info)
-
-        -- Overload 1
-        if type(attack_info) == "number" then
-            self.value.climb = self.value.climb + attack_info
-            return
-        end
-
-        -- Overload 2
-        if not gm.is_struct(attack_info.value) then log.error("Argument 1 is not valid", 2) end
-        self.value.climb = attack_info.climb + (offset or 10.0)
-    end,
-
-
-    set_color = function(self, col)
-        self.value.damage_color = col
-    end,
-    set_colour = function(self, col) self:set_color(col) end,
-
-
     set_damage = function(self, damage)
         if not damage then log.error("No damage argument provided", 2) end
 
@@ -159,6 +138,27 @@ methods_attack_info = {
             self.value.damage = self.value.damage / 2.0
         end
     end,
+
+
+    add_offset = function(self, attack_info, offset)
+        attack_info = Wrap.unwrap(attack_info)
+
+        -- Overload 1
+        if type(attack_info) == "number" then
+            self.value.climb = self.value.climb + attack_info
+            return
+        end
+
+        -- Overload 2
+        if not gm.is_struct(attack_info.value) then log.error("Argument 1 is not valid", 2) end
+        self.value.climb = attack_info.climb + (offset or 10.0)
+    end,
+
+
+    set_color = function(self, col)
+        self.value.damage_color = col
+    end,
+    set_colour = function(self, col) self:set_color(col) end,
 
 
     allow_stun = function(self)
