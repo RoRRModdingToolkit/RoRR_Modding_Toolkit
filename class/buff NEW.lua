@@ -67,7 +67,7 @@ end
 methods_buff = {
 
     add_callback = function(self, callback, func)
-        -- Add onApply callback to add actor to has_custom_item
+        -- Add onApply callback to add actor to has_custom_buff
         local function add_onApply()
             if has_callbacks[self.value] then return end
             has_callbacks[self.value] = true
@@ -183,17 +183,70 @@ gm.post_script_hook(gm.constants.recalculate_stats, function(self, other, result
 end)
 
 
--- gm.pre_script_hook(gm.constants.actor_transform, function(self, other, result, args)
---     if callbacks["onChange"] then
---         local actor = Instance.wrap(args[1].value)
---         for _, fn in pairs(callbacks["onChange"]) do
---             local count = actor:buff_stack_count(fn[1])
---             if count > 0 then
---                 fn[2](actor, Instance.wrap(args[2].value), count)   -- Actor, To, Buff stack
---             end
---         end
---     end
--- end)
+gm.post_script_hook(gm.constants.skill_activate, function(self, other, result, args)
+    local callback = {
+        "onPrimaryUse",
+        "onSecondaryUse",
+        "onUtilityUse",
+        "onSpecialUse"
+    }
+    callback = callback[args[1].value + 1]
+    if not callbacks[callback] then return end
+
+    if not has_custom_buff[self.id] then return end
+
+    local actor = Instance.wrap(self)
+    local active_skill = actor:get_active_skill(args[1].value)
+
+    for buff_id, c_table in pairs(callbacks[callback]) do
+        local stack = actor:buff_stack_count(buff_id)
+        if stack > 0 then
+            for _, fn in ipairs(c_table) do
+                fn(actor, stack, active_skill)
+            end
+        end
+    end
+end)
+
+
+gm.post_script_hook(gm.constants.actor_heal_networked, function(self, other, result, args)
+    if not callbacks["onHeal"] then return end
+
+    local actor = args[1].value
+    if not has_custom_buff[actor.id] then return end
+
+    actor = Instance.wrap(actor)
+    local heal_amount = args[2].value
+
+    for buff_id, c_table in pairs(callbacks["onHeal"]) do
+        local stack = actor:buff_stack_count(buff_id)
+        if stack > 0 then
+            for _, fn in ipairs(c_table) do
+                fn(actor, stack, heal_amount)
+            end
+        end
+    end
+end)
+
+
+gm.pre_script_hook(gm.constants.actor_transform, function(self, other, result, args)
+    if not callbacks["onTransform"] then return end
+
+    local actor = args[1].value
+    if not has_custom_buff[actor.id] then return end
+
+    actor = Instance.wrap(actor)
+    local to = Instance.wrap(args[2].value)
+
+    for buff_id, c_table in pairs(callbacks["onTransform"]) do
+        local stack = actor:buff_stack_count(buff_id)
+        if stack > 0 then
+            for _, fn in ipairs(c_table) do
+                fn(actor, to, stack)
+            end
+        end
+    end
+end)
 
 
 gm.pre_script_hook(gm.constants.draw_actor, function(self, other, result, args)
@@ -253,6 +306,262 @@ function buff_onPostStatRecalc(actor)
         end
     end
 end
+
+
+Callback.add("onAttackCreate", "RMT-Buff.onAttackCreate", function(self, other, result, args)
+    if not callbacks["onAttackCreate"] then return end
+
+    local attack_info = Attack_Info.wrap(args[2].value)
+    local actor = attack_info.parent
+
+    if not Instance.exists(actor) then return end
+    if not has_custom_buff[actor.id] then return end
+
+    actor = Instance.wrap(actor)
+
+    if callbacks["onAttackCreate"] then
+        for buff_id, c_table in pairs(callbacks["onAttackCreate"]) do
+            local stack = actor:buff_stack_count(buff_id)
+            if stack > 0 then
+                for _, fn in ipairs(c_table) do
+                    fn(actor, stack, attack_info)
+                end
+            end
+        end
+    end
+
+    if not attack_info.proc then return end
+
+    if callbacks["onAttackCreateProc"] then
+        for buff_id, c_table in pairs(callbacks["onAttackCreateProc"]) do
+            local stack = actor:buff_stack_count(buff_id)
+            if stack > 0 then
+                for _, fn in ipairs(c_table) do
+                    fn(actor, stack, attack_info)
+                end
+            end
+        end
+    end
+end)
+
+
+Callback.add("onAttackHit", "RMT-Buff.onAttackHit", function(self, other, result, args)
+    if not callbacks["onAttackHit"] then return end
+
+    local hit_info = Hit_Info.wrap(args[2].value)
+    local actor = hit_info.inflictor
+
+    if not Instance.exists(actor) then return end
+    if not has_custom_buff[actor.id] then return end
+
+    actor = Instance.wrap(actor)
+
+    for buff_id, c_table in pairs(callbacks["onAttackHit"]) do
+        local stack = actor:buff_stack_count(buff_id)
+        if stack > 0 then
+            for _, fn in ipairs(c_table) do
+                fn(actor, stack, hit_info)
+            end
+        end
+    end
+end)
+
+
+Callback.add("onAttackHandleEnd", "RMT-Buff.onAttackHandleEnd", function(self, other, result, args)
+    if not callbacks["onAttackHandleEnd"] then return end
+
+    local attack_info = Attack_Info.wrap(args[2].value)
+    local actor = attack_info.parent
+
+    if not Instance.exists(actor) then return end
+    if not has_custom_buff[actor.id] then return end
+
+    actor = Instance.wrap(actor)
+
+    if callbacks["onAttackHandleEnd"] then
+        for buff_id, c_table in pairs(callbacks["onAttackHandleEnd"]) do
+            local stack = actor:buff_stack_count(buff_id)
+            if stack > 0 then
+                for _, fn in ipairs(c_table) do
+                    fn(actor, stack, attack_info)
+                end
+            end
+        end
+    end
+
+    if not attack_info.proc then return end
+
+    if callbacks["onAttackHandleEndProc"] then
+        for buff_id, c_table in pairs(callbacks["onAttackHandleEndProc"]) do
+            local stack = actor:buff_stack_count(buff_id)
+            if stack > 0 then
+                for _, fn in ipairs(c_table) do
+                    fn(actor, stack, attack_info)
+                end
+            end
+        end
+    end
+end)
+
+
+Callback.add("onHitProc", "RMT-Buff.onHitProc", function(self, other, result, args)     -- Runs before onAttackHit
+    if not callbacks["onHitProc"] then return end
+
+    local actor = Instance.wrap(args[2].value)
+    if not has_custom_buff[actor.id] then return end
+
+    local victim = Instance.wrap(args[3].value)
+    local hit_info = Hit_Info.wrap(args[4].value)
+
+    for buff_id, c_table in pairs(callbacks["onHitProc"]) do
+        local stack = actor:buff_stack_count(buff_id)
+        if stack > 0 then
+            for _, fn in ipairs(c_table) do
+                fn(actor, victim, stack, hit_info)
+            end
+        end
+    end
+end)
+
+
+Callback.add("onKillProc", "RMT-Buff.onKillProc", function(self, other, result, args)
+    if not callbacks["onKillProc"] then return end
+
+    local actor = Instance.wrap(args[3].value)
+    if not has_custom_buff[actor.id] then return end
+
+    local victim = Instance.wrap(args[2].value)
+
+    for buff_id, c_table in pairs(callbacks["onKillProc"]) do
+        local stack = actor:buff_stack_count(buff_id)
+        if stack > 0 then
+            for _, fn in ipairs(c_table) do
+                fn(actor, victim, stack)
+            end
+        end
+    end
+end)
+
+
+Callback.add("onDamagedProc", "RMT-Buff.onDamagedProc", function(self, other, result, args)
+    if not callbacks["onDamagedProc"] then return end
+
+    local actor = Instance.wrap(args[2].value)
+    if not has_custom_buff[actor.id] then return end
+
+    local hit_info = Hit_Info.wrap(args[3].value)
+    local attacker = Instance.wrap(hit_info.inflictor)
+
+    for buff_id, c_table in pairs(callbacks["onDamagedProc"]) do
+        local stack = actor:buff_stack_count(buff_id)
+        if stack > 0 then
+            for _, fn in ipairs(c_table) do
+                fn(actor, attacker, stack, hit_info)
+            end
+        end
+    end
+end)
+
+
+Callback.add("onDamageBlocked", "RMT-Buff.onDamageBlocked", function(self, other, result, args)
+    if not callbacks["onDamageBlocked"] then return end
+
+    local actor = Instance.wrap(args[2].value)
+    if not has_custom_buff[actor.id] then return end
+
+    local damage = args[4].value
+
+    for buff_id, c_table in pairs(callbacks["onDamageBlocked"]) do
+        local stack = actor:buff_stack_count(buff_id)
+        if stack > 0 then
+            for _, fn in ipairs(c_table) do
+                fn(actor, stack, damage)
+            end
+        end
+    end
+end)
+
+
+Callback.add("onInteractableActivate", "RMT-Buff.onInteractableActivate", function(self, other, result, args)
+    if not callbacks["onInteractableActivate"] then return end
+
+    local actor = Instance.wrap(args[3].value)
+    if not has_custom_buff[actor.id] then return end
+
+    local interactable = args[2].value
+
+    for buff_id, c_table in pairs(callbacks["onInteractableActivate"]) do
+        local stack = actor:buff_stack_count(buff_id)
+        if stack > 0 then
+            for _, fn in ipairs(c_table) do
+                fn(actor, stack, interactable)
+            end
+        end
+    end
+end)
+
+
+Callback.add("onPickupCollected", "RMT-Buff.onPickupCollected", function(self, other, result, args)
+    if not callbacks["onPickupCollected"] then return end
+
+    local actor = Instance.wrap(args[3].value)
+    if not has_custom_buff[actor.id] then return end
+
+    local pickup_object = Instance.wrap(args[2].value)  -- Will be oCustomObject_pPickupbuff/Equipment for all custom buffs/equipment
+
+    for buff_id, c_table in pairs(callbacks["onPickupCollected"]) do
+        local stack = actor:buff_stack_count(buff_id)
+        if stack > 0 then
+            for _, fn in ipairs(c_table) do
+                fn(actor, stack, pickup_object)
+            end
+        end
+    end
+end)
+
+
+Callback.add("onEquipmentUse", "RMT-Buff.onEquipmentUse", function(self, other, result, args)
+    if not callbacks["onEquipmentUse"] then return end
+
+    local actor = Instance.wrap(args[2].value)
+    if not has_custom_buff[actor.id] then return end
+
+    local equipment = Equipment.wrap(args[3].value)
+    local direction = args[5].value
+
+    for buff_id, c_table in pairs(callbacks["onEquipmentUse"]) do
+        local stack = actor:buff_stack_count(buff_id)
+        if stack > 0 then
+            for _, fn in ipairs(c_table) do
+                fn(actor, stack, equipment, direction)
+            end
+        end
+    end
+end)
+
+
+Callback.add("onStageStart", "RMT-Buff.onStageStart", function(self, other, result, args)
+    for actor_id, _ in pairs(has_custom_buff) do
+        if not Instance.exists(actor_id) then
+            has_custom_buff[actor_id] = nil
+        end
+    end
+
+    if not callbacks["onStageStart"] then return end
+
+    for actor_id, _ in pairs(has_custom_buff) do
+        local actor = Instance.wrap(actor_id)
+
+        for buff_id, c_table in pairs(callbacks["onStageStart"]) do
+            local stack = actor:buff_stack_count(buff_id)
+            if stack > 0 then
+                for _, fn in ipairs(c_table) do
+                    fn(actor, stack)
+                end
+            end
+        end
+    end
+end)
 
 
 
