@@ -494,62 +494,64 @@ end)
 
 -- ========== Callback Hooks ==========
 
--- See if there is an easy equivalent for instances in general
+-- Add an equivalent for instances in general
 
--- gm.pre_script_hook(gm.constants.step_actor, function(self, other, result, args)
---     local inst = Instance.wrap(self)
---     local instData = inst:get_data("instance")
+gm.pre_script_hook(gm.constants.step_actor, function(self, other, result, args)
+    if not callbacks[self.id] then return end
 
---     if callbacks["onPreStep"] then
---         for _, fn in pairs(callbacks["onPreStep"]) do
---             fn(inst)
---         end
---     end
+    local actor = Instance.wrap(self)
+    local actorData = actor:get_data("instance")
 
---     if not callbacks["onShieldBreak"] then return end
+    if callbacks[self.id]["onPreStep"] then
+        for _, fn in pairs(callbacks[self.id]["onPreStep"]) do
+            fn(actor)
+        end
+    end
 
---     if self.shield and self.shield > 0.0 then actorData.has_shield = true end
---     if actorData.has_shield and self.shield <= 0.0 then
---         actorData.has_shield = nil
+    if not callbacks[self.id]["onShieldBreak"] then return end
 
---         for _, fn in pairs(callbacks["onShieldBreak"]) do
---             fn(actor)
---         end
---     end
--- end)
+    if self.shield and self.shield > 0.0 then actorData.has_shield = true end
+    if actorData.has_shield and self.shield <= 0.0 then
+        actorData.has_shield = nil
 
-
--- gm.post_script_hook(gm.constants.step_actor, function(self, other, result, args)
---     if not callbacks["onPostStep"] then return end
-
---     local actor = Instance.wrap(self)
-
---     for _, fn in pairs(callbacks["onPostStep"]) do
---         fn(actor)
---     end
--- end)
+        for _, fn in pairs(callbacks[self.id]["onShieldBreak"]) do
+            fn(actor)
+        end
+    end
+end)
 
 
--- gm.pre_script_hook(gm.constants.draw_actor, function(self, other, result, args)
---     if not callbacks["onPreDraw"] then return end
+gm.post_script_hook(gm.constants.step_actor, function(self, other, result, args)
+    if not callbacks[self.id] or not callbacks[self.id]["onPostStep"] then return end
 
---     local actor = Instance.wrap(self)
+    local actor = Instance.wrap(self)
 
---     for _, fn in pairs(callbacks["onPreDraw"]) do
---         fn(actor)
---     end
--- end)
+    for _, fn in pairs(callbacks[self.id]["onPostStep"]) do
+        fn(actor)
+    end
+end)
 
 
--- gm.post_script_hook(gm.constants.draw_actor, function(self, other, result, args)
---     if not callbacks["onPostDraw"] then return end
+gm.pre_script_hook(gm.constants.draw_actor, function(self, other, result, args)
+    if not callbacks[self.id] or not callbacks[self.id]["onPreDraw"] then return end
 
---     local actor = Instance.wrap(self)
+    local actor = Instance.wrap(self)
 
---     for _, fn in pairs(callbacks["onPostDraw"]) do
---         fn(actor)
---     end
--- end)
+    for _, fn in pairs(callbacks[self.id]["onPreDraw"]) do
+        fn(actor)
+    end
+end)
+
+
+gm.post_script_hook(gm.constants.draw_actor, function(self, other, result, args)
+    if not callbacks[self.id] or not callbacks[self.id]["onPostDraw"] then return end
+
+    local actor = Instance.wrap(self)
+
+    for _, fn in pairs(callbacks[self.id]["onPostDraw"]) do
+        fn(actor)
+    end
+end)
 
 
 gm.post_script_hook(gm.constants.recalculate_stats, function(self, other, result, args)
@@ -557,7 +559,7 @@ gm.post_script_hook(gm.constants.recalculate_stats, function(self, other, result
     local actorData = actor:get_data()
     actorData.post_stat_recalc = true
 
-    if not callbacks[self.id]["onStatRecalc"] then return end
+    if not callbacks[self.id] or not callbacks[self.id]["onStatRecalc"] then return end
 
     for _, fn in pairs(callbacks[self.id]["onStatRecalc"]) do
         fn(actor)
@@ -566,6 +568,8 @@ end)
 
 
 gm.post_script_hook(gm.constants.skill_activate, function(self, other, result, args)
+    if not callbacks[self.id] then return end
+
     local callback = {
         "onPrimaryUse",
         "onSecondaryUse",
@@ -597,7 +601,7 @@ end)
 
 gm.post_script_hook(gm.constants.actor_heal_networked, function(self, other, result, args)
     local actor = Instance.wrap(args[1].value)
-    if not callbacks[actor.id]["onHeal"] then return end
+    if not callbacks[actor.id] or not callbacks[actor.id]["onHeal"] then return end
 
     local heal_amount = args[2].value
 
