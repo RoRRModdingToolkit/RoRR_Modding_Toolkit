@@ -4,6 +4,8 @@ Item = class_refs["Item"]
 
 local callbacks = {}
 local valid_callbacks = {
+    onAcquire               = true,
+    onRemove                = true,
     onStatRecalc            = true,
     onPostStatRecalc        = true,
     onAttackCreate          = true,
@@ -368,39 +370,16 @@ methods_item = {
             end
 
         end
-    end,
-
-
-    -- Callbacks
-    onAcquire               = function(self, func) self:add_callback("onAcquire", func) end,
-    onRemove                = function(self, func) self:add_callback("onRemove", func) end,
-    onStatRecalc            = function(self, func) self:add_callback("onStatRecalc", func) end,
-    onPostStatRecalc        = function(self, func) self:add_callback("onPostStatRecalc", func) end,
-    onAttackCreate          = function(self, func) self:add_callback("onAttackCreate", func) end,
-    onAttackCreateProc      = function(self, func) self:add_callback("onAttackCreateProc", func) end,
-    onAttackHit             = function(self, func) self:add_callback("onAttackHit", func) end,
-    onAttackHandleEnd       = function(self, func) self:add_callback("onAttackHandleEnd", func) end,
-    onAttackHandleEndProc   = function(self, func) self:add_callback("onAttackHandleEndProc", func) end,
-    onHitProc               = function(self, func) self:add_callback("onHitProc", func) end,
-    onKillProc              = function(self, func) self:add_callback("onKillProc", func) end,
-    onDamagedProc           = function(self, func) self:add_callback("onDamagedProc", func) end,
-    onDamageBlocked         = function(self, func) self:add_callback("onDamageBlocked", func) end,
-    onHeal                  = function(self, func) self:add_callback("onHeal", func) end,
-    onShieldBreak           = function(self, func) self:add_callback("onShieldBreak", func) end,
-    onInteractableActivate  = function(self, func) self:add_callback("onInteractableActivate", func) end,
-    onPickupCollected       = function(self, func) self:add_callback("onPickupCollected", func) end,
-    onPrimaryUse            = function(self, func) self:add_callback("onPrimaryUse", func) end,
-    onSecondaryUse          = function(self, func) self:add_callback("onSecondaryUse", func) end,
-    onUtilityUse            = function(self, func) self:add_callback("onUtilityUse", func) end,
-    onSpecialUse            = function(self, func) self:add_callback("onSpecialUse", func) end,
-    onEquipmentUse          = function(self, func) self:add_callback("onEquipmentUse", func) end,
-    onStageStart            = function(self, func) self:add_callback("onStageStart", func) end,
-    onPreStep               = function(self, func) self:add_callback("onPreStep", func) end,
-    onPostStep              = function(self, func) self:add_callback("onPostStep", func) end,
-    onPreDraw               = function(self, func) self:add_callback("onPreDraw", func) end,
-    onPostDraw              = function(self, func) self:add_callback("onPostDraw", func) end
+    end
 
 }
+
+-- Callbacks
+for c, _ in pairs(valid_callbacks) do
+    methods_item[c] = function(self, func)
+        self:add_callback(c, func)
+    end
+end
 
 
 
