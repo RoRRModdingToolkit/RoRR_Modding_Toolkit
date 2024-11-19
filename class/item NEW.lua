@@ -6,6 +6,9 @@ Item = class_refs["Item"]
 
 local callbacks = {}
 local valid_callbacks = {
+    onStatRecalc            = true,
+    onPostStatRecalc        = true,
+    onSkillUse              = true,
     onAttackCreate          = true,
     onAttackCreateProc      = true,
     onAttackHit             = true,
@@ -20,7 +23,7 @@ local valid_callbacks = {
     onInteractableActivate  = true,
     onPickupCollected       = true,
     onEquipmentUse          = true,
-    onStageStart            = true,
+    onStageStart            = true
 }
 
 local has_custom_item = {}
@@ -187,7 +190,7 @@ methods_item = {
     end,
     
 
-    add_callback = function(self, callback, func)
+    add_callback = function(self, callback, func, slot)
         local function add_onAcquired()
             if has_callbacks[self.value] then return end
             has_callbacks[self.value] = true
@@ -211,6 +214,10 @@ methods_item = {
             table.insert(callbacks[callback_id], func)
 
         elseif valid_callbacks[callback] then
+            if callback == "onSkillUse" then
+                if not slot then log.error("Skill slot not specified", 2) end
+                callback = callback..math.floor(slot)
+            end
             add_onAcquired()
             if not callbacks[callback] then callbacks[callback] = {} end
             if not callbacks[callback][self.value] then callbacks[callback][self.value] = {} end
@@ -368,6 +375,9 @@ methods_item = {
 
 
     -- Callbacks
+    onStatRecalc            = function(self, func) self:add_callback("onStatRecalc", func) end,
+    onPostStatRecalc        = function(self, func) self:add_callback("onPostStatRecalc", func) end,
+    onSkillUse              = function(self, func, slot) self:add_callback("onSkillUse", func, slot) end,
     onPickup                = function(self, func) self:add_callback("onPickup", func) end,
     onRemove                = function(self, func) self:add_callback("onRemove", func) end,
     onAttackCreate          = function(self, func) self:add_callback("onAttackCreate", func) end,
@@ -384,7 +394,7 @@ methods_item = {
     onInteractableActivate  = function(self, func) self:add_callback("onInteractableActivate", func) end,
     onPickupCollected       = function(self, func) self:add_callback("onPickupCollected", func) end,
     onEquipmentUse          = function(self, func) self:add_callback("onEquipmentUse", func) end,
-    onStageStart            = function(self, func) self:add_callback("onStageStart", func) end,
+    onStageStart            = function(self, func) self:add_callback("onStageStart", func) end
 
 }
 
@@ -420,7 +430,67 @@ gm.post_script_hook(gm.constants.callback_execute, function(self, other, result,
     -- onPickup and onRemove
     if callbacks[args[1].value] then
         for _, fn in ipairs(callbacks[args[1].value]) do
-            fn(Instance.wrap(args[2].value), args[3].value)
+            local actor = Instance.wrap(args[2].value)
+            local stack = args[3].value
+            fn(actor, stack)
+        end
+    end
+end)
+
+
+gm.post_script_hook(gm.constants.recalculate_stats, function(self, other, result, args)
+    local actor = Instance.wrap(self)
+    actor:get_data().post_stat_recalc = true
+
+    if not callbacks["onStatRecalc"] then return end
+    if not has_custom_item[actor.id] then return end
+
+    for item_id, c_table in pairs(callbacks["onStatRecalc"]) do
+        local stack = actor:item_stack_count(item_id)
+        if stack > 0 then
+            for _, fn in ipairs(c_table) do
+                fn(actor, stack)
+            end
+        end
+    end
+end)
+
+
+gm.post_script_hook(gm.constants.skill_activate, function(self, other, result, args)
+    local callback = "onSkillUse"..math.floor(args[1].value)
+    if not callbacks[callback] then return end
+
+    if not has_custom_item[self.id] then return end
+
+    local actor = Instance.wrap(self)
+    local active_skill = actor:get_active_skill(args[1].value)
+
+    for item_id, c_table in pairs(callbacks[callback]) do
+        local stack = actor:item_stack_count(item_id)
+        if stack > 0 then
+            for _, fn in ipairs(c_table) do
+                fn(actor, stack, active_skill)
+            end
+        end
+    end
+end)
+
+
+gm.post_script_hook(gm.constants.actor_heal_networked, function(self, other, result, args)
+    if not callbacks["onHeal"] then return end
+
+    local actor = args[1].value
+    if not has_custom_item[actor.id] then return end
+
+    actor = Instance.wrap(actor)
+    local heal_amount = args[2].value
+
+    for item_id, c_table in pairs(callbacks["onHeal"]) do
+        local stack = actor:item_stack_count(item_id)
+        if stack > 0 then
+            for _, fn in ipairs(c_table) do
+                fn(actor, stack, heal_amount)
+            end
         end
     end
 end)
@@ -456,11 +526,13 @@ end)
 -- ========== Callbacks ==========
 
 function item_onPostStatRecalc(actor)
-    if callbacks["onPostStatRecalc"] then
-        for _, fn in ipairs(callbacks["onPostStatRecalc"]) do
-            local stack = actor:item_stack_count(fn[1])
-            if stack > 0 then
-                fn[2](actor, stack)   -- Actor, Stack count
+    if not callbacks["onPostStatRecalc"] then return end
+
+    for item_id, c_table in pairs(callbacks["onPostStatRecalc"]) do
+        local stack = actor:item_stack_count(item_id)
+        if stack > 0 then
+            for _, fn in ipairs(c_table) do
+                fn(actor, stack)
             end
         end
     end
