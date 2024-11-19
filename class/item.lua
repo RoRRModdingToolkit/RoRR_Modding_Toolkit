@@ -6,7 +6,6 @@ local callbacks = {}
 local valid_callbacks = {
     onStatRecalc            = true,
     onPostStatRecalc        = true,
-    onSkillUse              = true,
     onAttackCreate          = true,
     onAttackCreateProc      = true,
     onAttackHit             = true,
@@ -20,6 +19,10 @@ local valid_callbacks = {
     onShieldBreak           = true,
     onInteractableActivate  = true,
     onPickupCollected       = true,
+    onPrimaryUse            = true,
+    onSecondaryUse          = true,
+    onUtilityUse            = true,
+    onSpecialUse            = true,
     onEquipmentUse          = true,
     onStageStart            = true,
     onPreStep               = true,
@@ -192,7 +195,7 @@ methods_item = {
     end,
     
 
-    add_callback = function(self, callback, func, slot)
+    add_callback = function(self, callback, func)
         -- Add onAcquire callback to add actor to has_custom_item
         local function add_onAcquire()
             if has_callbacks[self.value] then return end
@@ -216,10 +219,6 @@ methods_item = {
             table.insert(callbacks[callback_id], func)
 
         elseif valid_callbacks[callback] then
-            if callback == "onSkillUse" then
-                if not slot then log.error("onSkillUse : Skill slot not specified", 3) end
-                callback = callback..math.floor(slot)
-            end
             add_onAcquire()
             if not callbacks[callback] then callbacks[callback] = {} end
             if not callbacks[callback][self.value] then callbacks[callback][self.value] = {} end
@@ -377,7 +376,6 @@ methods_item = {
     onRemove                = function(self, func) self:add_callback("onRemove", func) end,
     onStatRecalc            = function(self, func) self:add_callback("onStatRecalc", func) end,
     onPostStatRecalc        = function(self, func) self:add_callback("onPostStatRecalc", func) end,
-    onSkillUse              = function(self, func, slot) self:add_callback("onSkillUse", func, slot) end,
     onAttackCreate          = function(self, func) self:add_callback("onAttackCreate", func) end,
     onAttackCreateProc      = function(self, func) self:add_callback("onAttackCreateProc", func) end,
     onAttackHit             = function(self, func) self:add_callback("onAttackHit", func) end,
@@ -391,6 +389,10 @@ methods_item = {
     onShieldBreak           = function(self, func) self:add_callback("onShieldBreak", func) end,
     onInteractableActivate  = function(self, func) self:add_callback("onInteractableActivate", func) end,
     onPickupCollected       = function(self, func) self:add_callback("onPickupCollected", func) end,
+    onPrimaryUse            = function(self, func) self:add_callback("onPrimaryUse", func) end,
+    onSecondaryUse          = function(self, func) self:add_callback("onSecondaryUse", func) end,
+    onUtilityUse            = function(self, func) self:add_callback("onUtilityUse", func) end,
+    onSpecialUse            = function(self, func) self:add_callback("onSpecialUse", func) end,
     onEquipmentUse          = function(self, func) self:add_callback("onEquipmentUse", func) end,
     onStageStart            = function(self, func) self:add_callback("onStageStart", func) end
 
@@ -455,7 +457,12 @@ end)
 
 
 gm.post_script_hook(gm.constants.skill_activate, function(self, other, result, args)
-    local callback = "onSkillUse"..math.floor(args[1].value)
+    local callback = {
+        "onPrimaryUse",
+        "onSecondaryUse",
+        "onUtilityUse",
+        "onSpecialUse"
+    }[args[1].value + 1]
     if not callbacks[callback] then return end
 
     if not has_custom_item[self.id] then return end
