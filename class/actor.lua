@@ -118,48 +118,40 @@ methods_actor = {
         if pierce_multiplier then can_pierce = true end
 
         local inst = GM._mod_attack_fire_bullet(self.value, x, y, range, direction, damage, hit_sprite or -1, can_pierce, not no_proc)
-        local damager = inst.attack_info
-        damager.instance = Wrap.unwrap(inst)
-        damager.damage_color = Color.WHITE_ALMOST
+        local attack_info = inst.attack_info
+        attack_info.damage_color = Color.WHITE_ALMOST
 
         -- Set pierce multiplier
-        if pierce_multiplier then
-            damager.damage_degrade = (1.0 - pierce_multiplier)
-        end
+        -- and tracer_kind
+        if pierce_multiplier then attack_info.damage_degrade = (1.0 - pierce_multiplier) end
+        if tracer then attack_info.tracer_kind = tracer end
 
-        -- Set tracer_kind
-        if tracer then
-            damager.tracer_kind = tracer
-        end
-
-        return Damager.wrap(damager), inst
+        return inst
     end,
 
 
     fire_explosion = function(self, x, y, width, height, damage, explosion_sprite, sparks_sprite, no_proc)
         local inst = GM._mod_attack_fire_explosion(self.value, x, y, width, height, damage, explosion_sprite or -1, sparks_sprite or -1, not no_proc)
-        local damager = inst.attack_info
-        damager.instance = Wrap.unwrap(inst)
-        damager.damage_color = Color.WHITE_ALMOST
+        local attack_info = inst.attack_info
+        attack_info.damage_color = Color.WHITE_ALMOST
 
-        return Damager.wrap(damager), inst
+        return inst
     end,
 
 
     fire_explosion_local = function(self, x, y, width, height, damage, explosion_sprite, sparks_sprite, no_proc)
         local mask = gm.constants.sBite1Mask
         self.value:fire_explosion_local(0, x, y, damage, sparks_sprite or -1, 2, width / GM.sprite_get_width(mask), height / GM.sprite_get_height(mask))
-        local inst = gm.variable_global_get("attack_bullet")
-        local damager = inst.attack_info
-        damager.instance = inst
-        damager.damage_color = Color.WHITE_ALMOST
+        local inst = GM.variable_global_get("attack_bullet")
+        local attack_info = inst.attack_info
+        attack_info.damage_color = Color.WHITE_ALMOST
 
         -- Create explosion sprite manually
         if explosion_sprite then
             GM.instance_create(x, y, gm.constants.oEfExplosion).sprite_index = explosion_sprite
         end
 
-        return Damager.wrap(damager), Instance.wrap(inst)
+        return inst
     end,
 
 
@@ -167,11 +159,10 @@ methods_actor = {
         target = Wrap.unwrap(target)
 
         local inst = GM._mod_attack_fire_direct(self.value, target, x or target.x, y or target.y, direction or 0, damage, hit_sprite or -1, not no_proc)
-        local damager = inst.attack_info
-        damager.instance = Wrap.unwrap(inst)
-        damager.damage_color = Color.WHITE_ALMOST
+        local attack_info = inst.attack_info
+        attack_info.damage_color = Color.WHITE_ALMOST
         
-        return Damager.wrap(damager), inst
+        return inst
     end,
     
 
