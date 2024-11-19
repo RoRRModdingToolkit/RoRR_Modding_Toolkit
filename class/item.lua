@@ -412,9 +412,9 @@ metatable_class["Item"] = {
 gm.post_script_hook(gm.constants.callback_execute, function(self, other, result, args)
     -- onAcquire and onRemove
     if callbacks[args[1].value] then
+        local actor = Instance.wrap(args[2].value)
+        local stack = args[3].value
         for _, fn in ipairs(callbacks[args[1].value]) do
-            local actor = Instance.wrap(args[2].value)
-            local stack = args[3].value
             fn(actor, stack)
         end
     end
