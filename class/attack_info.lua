@@ -136,7 +136,7 @@ methods_attack_info = {
 
         -- set_damage before critical calculation
         local temp_crit_removal = false
-        if self.critical then
+        if Helper.is_true(self.critical) then
             temp_crit_removal = true
             self:set_critical(false)
         end
@@ -150,11 +150,11 @@ methods_attack_info = {
     set_critical = function(self, bool)
         if bool == nil then log.error("No bool argument provided", 2) end
         
-        if (not self.critical) and bool then
+        if Helper.is_false(self.critical) and bool then
             self.value.critical = true
             self.value.damage = self.value.damage * 2.0
 
-        elseif self.critical and (not bool) then
+        elseif Helper.is_true(self.critical) and (not bool) then
             self.value.critical = false
             self.value.damage = self.value.damage / 2.0
         end
