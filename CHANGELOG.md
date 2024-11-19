@@ -5,6 +5,8 @@
 * Item
     * Several callbacks renamed (e.g., `onPickup` -> `onAcquired`) and rewritten.
     * Added callback `onPickupCollected`
+* Added Attack_Info class
+* Added Hit_Info class
 
 ### v1.1.32
 * Actor : Added `apply_dot`

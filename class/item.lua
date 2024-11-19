@@ -238,6 +238,8 @@ methods_item = {
             local c_table = callbacks[callback]
             if c_table then c_table[self.value] = nil end
         end
+
+        has_callbacks[self.value] = nil
     end,
 
 
