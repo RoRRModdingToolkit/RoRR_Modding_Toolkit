@@ -195,11 +195,11 @@ methods_item = {
     
 
     add_callback = function(self, callback, func, slot)
+        -- Add onAcquired callback to add actor to has_custom_item
         local function add_onAcquired()
             if has_callbacks[self.value] then return end
             has_callbacks[self.value] = true
 
-            -- Add actor to has_custom_item onAcquired
             local callback_id = self.on_acquired
             if not callbacks[callback_id] then callbacks[callback_id] = {} end
             table.insert(callbacks[callback_id], function(actor, stack)
@@ -379,11 +379,11 @@ methods_item = {
 
 
     -- Callbacks
+    onAcquired              = function(self, func) self:add_callback("onAcquired", func) end,
+    onRemoved               = function(self, func) self:add_callback("onRemoved", func) end,
     onStatRecalc            = function(self, func) self:add_callback("onStatRecalc", func) end,
     onPostStatRecalc        = function(self, func) self:add_callback("onPostStatRecalc", func) end,
     onSkillUse              = function(self, func, slot) self:add_callback("onSkillUse", func, slot) end,
-    onPickup                = function(self, func) self:add_callback("onPickup", func) end,
-    onRemove                = function(self, func) self:add_callback("onRemove", func) end,
     onAttackCreate          = function(self, func) self:add_callback("onAttackCreate", func) end,
     onAttackCreateProc      = function(self, func) self:add_callback("onAttackCreateProc", func) end,
     onAttackHit             = function(self, func) self:add_callback("onAttackHit", func) end,
@@ -431,7 +431,7 @@ metatable_class["Item"] = {
 -- ========== Hooks ==========
 
 gm.post_script_hook(gm.constants.callback_execute, function(self, other, result, args)
-    -- onPickup and onRemove
+    -- onAcquired and onRemoved
     if callbacks[args[1].value] then
         for _, fn in ipairs(callbacks[args[1].value]) do
             local actor = Instance.wrap(args[2].value)
