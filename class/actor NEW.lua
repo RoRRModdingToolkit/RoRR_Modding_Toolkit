@@ -344,12 +344,12 @@ methods_actor_callbacks = {}
 
 for c, _ in pairs(valid_callbacks) do
     methods_actor_callbacks[c] = function(self, id, func)
-        Actor.add_callback(c, id, func) end
+        Actor.add_callback(c, id, func)
     end
 end
 
 methods_actor_callbacks["onSkillUse"] = function(self, id, func, skill)
-    Actor.add_callback(c, id, func, skill) end
+    Actor.add_callback(c, id, func, skill)
 end
 
 
