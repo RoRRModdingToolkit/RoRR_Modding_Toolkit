@@ -105,8 +105,8 @@ methods_attack_info = {
             log.error("attack_info does not have a parent", 2)
             return
         end
-
-        self.value.damage = self.value.damage / self.value.parent.damage
+        
+        self:set_damage(self.value.damage / self.value.parent.damage)
     end,
 
 
