@@ -7,6 +7,7 @@
     * Added callback `onPickupCollected`
 * Added Attack_Info class
 * Added Hit_Info class
+* Minor optimizations in callbacks across the board.
 
 ### v1.1.32
 * Actor : Added `apply_dot`
