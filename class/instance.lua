@@ -4,6 +4,8 @@ Instance = Proxy.new()
 
 local callbacks = {}
 local valid_callbacks = {
+    onDraw                  = true,     -- For non-actors
+
     onPreStep               = true,
     onPostStep              = true,
     onPreDraw               = true,
@@ -494,18 +496,18 @@ end)
 
 -- ========== Callback Hooks ==========
 
-gm.post_script_hook(gm.constants.__input_system_tick, function(self, other, result, args)
-    for inst_id, c_tables in pairs(callbacks) do
-        if c_tables["onStep"] then
-            local inst = Instance.wrap(inst_id)
-            if inst:exists() then
-                for _, fn in pairs(c_tables["onStep"]) do
-                    fn(inst)
-                end
-            end
-        end
-    end
-end)
+-- gm.post_script_hook(gm.constants.__input_system_tick, function(self, other, result, args)
+--     for inst_id, c_tables in pairs(callbacks) do
+--         if c_tables["onStep"] then
+--             local inst = Instance.wrap(inst_id)
+--             if inst:exists() then
+--                 for _, fn in pairs(c_tables["onStep"]) do
+--                     fn(inst)
+--                 end
+--             end
+--         end
+--     end
+-- end)
 
 
 gm.pre_script_hook(gm.constants.draw_hud, function(self, other, result, args)
@@ -647,6 +649,34 @@ function inst_onPostStatRecalc(actor)
         fn(actor)
     end
 end
+
+
+Callback.add("preStep", "RMT-Instance.preStep", function(self, other, result, args)
+    for inst_id, c_tables in pairs(callbacks) do
+        if c_tables["onPreStep"] then
+            local inst = Instance.wrap(inst_id)
+            if inst:exists() and gm.object_is_ancestor(inst.value.object_index, gm.constants.pActor) == 0.0 then
+                for _, fn in pairs(c_tables["onPreStep"]) do
+                    fn(inst)
+                end
+            end
+        end
+    end
+end)
+
+
+Callback.add("postStep", "RMT-Instance.postStep", function(self, other, result, args)
+    for inst_id, c_tables in pairs(callbacks) do
+        if c_tables["onPostStep"] then
+            local inst = Instance.wrap(inst_id)
+            if inst:exists() and gm.object_is_ancestor(inst.value.object_index, gm.constants.pActor) == 0.0 then
+                for _, fn in pairs(c_tables["onPostStep"]) do
+                    fn(inst)
+                end
+            end
+        end
+    end
+end)
 
 
 Callback.add("onAttackCreate", "RMT-Instance.onAttackCreate", function(self, other, result, args)
