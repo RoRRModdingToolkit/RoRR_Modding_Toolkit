@@ -268,6 +268,8 @@ end)
 
 
 gm.post_script_hook(gm.constants.skill_activate, function(self, other, result, args)
+    if not has_custom_buff[self.id] then return end
+    
     local callback = {
         "onPrimaryUse",
         "onSecondaryUse",
@@ -276,8 +278,6 @@ gm.post_script_hook(gm.constants.skill_activate, function(self, other, result, a
     }
     callback = callback[args[1].value + 1]
     if not callbacks[callback] then return end
-
-    if not has_custom_buff[self.id] then return end
 
     local actor = Instance.wrap(self)
     local active_skill = actor:get_active_skill(args[1].value)
@@ -359,8 +359,6 @@ end
 
 
 Callback.add("onAttackCreate", "RMT-Buff.onAttackCreate", function(self, other, result, args)
-    if not callbacks["onAttackCreate"] then return end
-
     local attack_info = Attack_Info.wrap(args[2].value)
     local actor = attack_info.parent
 
@@ -380,7 +378,7 @@ Callback.add("onAttackCreate", "RMT-Buff.onAttackCreate", function(self, other, 
         end
     end
 
-    if not attack_info.proc then return end
+    if Helper.is_false(attack_info.proc) then return end
 
     if callbacks["onAttackCreateProc"] then
         for buff_id, c_table in pairs(callbacks["onAttackCreateProc"]) do
@@ -418,8 +416,6 @@ end)
 
 
 Callback.add("onAttackHandleEnd", "RMT-Buff.onAttackHandleEnd", function(self, other, result, args)
-    if not callbacks["onAttackHandleEnd"] then return end
-
     local attack_info = Attack_Info.wrap(args[2].value)
     local actor = attack_info.parent
 
@@ -439,7 +435,7 @@ Callback.add("onAttackHandleEnd", "RMT-Buff.onAttackHandleEnd", function(self, o
         end
     end
 
-    if not attack_info.proc then return end
+    if Helper.is_false(attack_info.proc) then return end
 
     if callbacks["onAttackHandleEndProc"] then
         for buff_id, c_table in pairs(callbacks["onAttackHandleEndProc"]) do
@@ -538,7 +534,7 @@ Callback.add("onInteractableActivate", "RMT-Buff.onInteractableActivate", functi
     local actor = Instance.wrap(args[3].value)
     if not has_custom_buff[actor.id] then return end
 
-    local interactable = args[2].value
+    local interactable = Instance.wrap(args[2].value)
 
     for buff_id, c_table in pairs(callbacks["onInteractableActivate"]) do
         local stack = actor:buff_stack_count(buff_id)

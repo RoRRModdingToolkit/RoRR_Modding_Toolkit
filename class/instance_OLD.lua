@@ -1,38 +1,36 @@
 -- Instance
 
+return
+
 Instance = Proxy.new()
 
-local callbacks = {}
-local valid_callbacks = {
-    onPreStep               = true,
-    onPostStep              = true,
-    onPreDraw               = true,
-    onPostDraw              = true,
-    onStatRecalc            = true,
-    onPostStatRecalc        = true,
-    onAttackCreate          = true,
-    onAttackCreateProc      = true,
-    onAttackHit             = true,
-    onAttackHandleEnd       = true,
-    onAttackHandleEndProc   = true,
-    onHitProc               = true,
-    onKillProc              = true,
-    onDamagedProc           = true,
-    onDamageBlocked         = true,
-    onHeal                  = true,
-    onShieldBreak           = true,
-    onInteractableActivate  = true,
-    onPickupCollected       = true,
-    onPrimaryUse            = true,
-    onSecondaryUse          = true,
-    onUtilityUse            = true,
-    onSpecialUse            = true,
-    onSkillUse              = true,
-    onEquipmentUse          = true,
-    onStageStart            = true
-}
+local methods_instance_lock = {}
 
 local instance_data = {}
+
+local callbacks = {}
+local other_callbacks = {
+    "onPreStep",
+    "onPostStep",
+    "onDraw",
+    
+    "onStatRecalc",
+    "onPostStatRecalc",
+    "onBasicUse",
+    "onAttack",
+    "onAttackAll",
+    "onPostAttack",
+    "onPostAttackAll",
+    "onHit",
+    "onHitAll",
+    "onKill",
+    "onDamaged",
+    "onDamageBlocked",
+    "onHeal",
+    "onShieldBreak",
+    "onInteract",
+    "onEquipmentUse"
+}
 
 
 
@@ -327,7 +325,9 @@ methods_instance = {
     end,
 
 
-    add_callback = function(self, callback, id, func, skill)   
+    add_callback = function(self, callback, id, func, skill, all_damage)
+        if all_damage then callback = callback.."All" end
+    
         if callback == "onSkillUse" then
             skill = Wrap.unwrap(skill)
             if not callbacks[self.value.id] then
@@ -336,21 +336,24 @@ methods_instance = {
             end
             if not callbacks[self.value.id][callback] then callbacks[self.value.id][callback] = {} end
             if not callbacks[self.value.id][callback][skill] then callbacks[self.value.id][callback][skill] = {} end
-            if not callbacks[self.value.id][callback][skill][id] then callbacks[self.value.id][callback][skill][id] = func
+            if not callbacks[self.value.id][callback][skill][id] then
+                callbacks[self.value.id][callback][skill][id] = func
             else log.error("Callback ID already exists", 2)
             end
     
-        elseif valid_callbacks[callback] then
+        elseif Helper.table_has(other_callbacks, callback) then
             if not callbacks[self.value.id] then
                 callbacks[self.value.id] = {}
                 callbacks[self.value.id]["CInstance"] = self.value
             end
             if not callbacks[self.value.id][callback] then callbacks[self.value.id][callback] = {} end
-            if not callbacks[self.value.id][callback][id] then callbacks[self.value.id][callback][id] = func
+            if not callbacks[self.value.id][callback][id] then
+                callbacks[self.value.id][callback][id] = func
             else log.error("Callback ID already exists", 2)
             end
     
         else log.error("Invalid callback name", 2)
+    
         end
     end,
     
@@ -360,14 +363,24 @@ methods_instance = {
 
         local c_table = callbacks[self.value.id]["onSkillUse"]
         if c_table then
-            for _, skill_table in pairs(c_table) do
-                skill_table[id] = nil
+            for s, id_table in pairs(c_table) do
+                for i, __ in pairs(id_table) do
+                    if i == id then
+                        id_table[i] = nil
+                    end
+                end
             end
         end
-
-        for callback, _ in pairs(valid_callbacks) do
-            local c_table = callbacks[self.value.id][callback]
-            if c_table then c_table[id] = nil end
+    
+        for _, c in ipairs(other_callbacks) do
+            local c_table = callbacks[self.value.id][c]
+            if c_table then
+                for i, __ in pairs(c_table) do
+                    if i == id then
+                        c_table[i] = nil
+                    end
+                end
+            end
         end
     end,
     
@@ -377,28 +390,47 @@ methods_instance = {
 
         local c_table = callbacks[self.value.id]["onSkillUse"]
         if c_table then
-            for _, skill_table in pairs(c_table) do
-                if skill_table[id] then return true end
+            for s, id_table in pairs(c_table) do
+                for i, __ in pairs(id_table) do
+                    if i == id then return true end
+                end
             end
         end
-
-        for callback, _ in pairs(valid_callbacks) do
-            local c_table = callbacks[self.value.id][callback]
-            if c_table and c_table[id] then return true end
+    
+        for _, c in ipairs(other_callbacks) do
+            local c_table = callbacks[self.value.id][c]
+            if c_table then
+                for i, __ in pairs(c_table) do
+                    if i == id then return true end
+                end
+            end
         end
     
         return false
-    end
+    end,
+
+
+    -- Callbacks
+    onPreStep           = function(self, id, func) self:add_callback("onPreStep", id, func) end,
+    onPostStep          = function(self, id, func) self:add_callback("onPostStep", id, func) end,
+    onDraw              = function(self, id, func) self:add_callback("onDraw", id, func) end,
+    
+    onStatRecalc        = function(self, id, func) self:add_callback("onStatRecalc", id, func) end,
+    onPostStatRecalc    = function(self, id, func) self:add_callback("onPostStatRecalc", id, func) end,
+    onSkillUse          = function(self, id, func, skill) self:add_callback("onSkillUse", id, func, skill) end,
+    onBasicUse          = function(self, id, func) self:add_callback("onBasicUse", id, func) end,
+    onAttack            = function(self, id, func, all_damage) self:add_callback("onAttack", id, func, nil, all_damage) end,
+    onPostAttack        = function(self, id, func, all_damage) self:add_callback("onPostAttack", id, func, nil, all_damage) end,
+    onHit               = function(self, id, func, all_damage) self:add_callback("onHit", id, func, nil, all_damage) end,
+    onKill              = function(self, id, func) self:add_callback("onKill", id, func) end,
+    onDamaged           = function(self, id, func) self:add_callback("onDamaged", id, func) end,
+    onDamageBlocked     = function(self, id, func) self:add_callback("onDamageBlocked", id, func) end,
+    onHeal              = function(self, id, func) self:add_callback("onHeal", id, func) end,
+    onShieldBreak       = function(self, id, func) self:add_callback("onShieldBreak", id, func) end,
+    onInteract          = function(self, id, func) self:add_callback("onInteract", id, func) end,
+    onEquipmentUse      = function(self, id, func) self:add_callback("onEquipmentUse", id, func) end
 
 }
-
--- Callbacks
-for c, _ in pairs(valid_callbacks) do
-    methods_instance[c] = function(self, id, func, skill)
-        self:add_callback(c, id, func, skill)
-    end
-end
-
 lock_table_instance = Proxy.make_lock_table({"value", "RMT_object", table.unpack(Helper.table_get_keys(methods_instance))})
 
 
@@ -453,14 +485,14 @@ metatable_instance = {
 
 -- ========== Hooks ==========
 
+-- Remove non-existent instances from instance_data on room change
 gm.post_script_hook(gm.constants.room_goto, function(self, other, result, args)
-    -- On room change, remove non-existent instances
-    -- from instance_data and clear callbacks
     for k, v in pairs(instance_data) do
         if not Instance.exists(k) then
             instance_data[k] = nil
         end
     end
+
     for k, v in pairs(callbacks) do
         if not Instance.exists(k) then
             callbacks[k] = nil
@@ -470,7 +502,6 @@ end)
 
 
 gm.post_script_hook(gm.constants.actor_set_dead, function(self, other, result, args)
-    -- Remove instance_data and callbacks on non-player kill
     if self.object_index ~= gm.constants.oP then
         instance_data[self.id] = nil
         callbacks[self.id] = nil
@@ -479,11 +510,19 @@ end)
 
 
 gm.post_script_hook(gm.constants.actor_transform, function(self, other, result, args)
-    -- Move instance_data and callbacks to new instance
+    -- if instance_data[args[1].value.id] then
+    --     instance_data[args[2].value.id] = {}
+    --     for k, v in pairs(instance_data[args[1].value.id]) do
+    --         instance_data[args[2].value.id][k] = instance_data[args[1].value.id][k]
+    --     end
+    --     instance_data[args[1].value.id] = nil
+    -- end
+
     if instance_data[args[1].value.id] then
         instance_data[args[2].value.id] = instance_data[args[1].value.id]
         instance_data[args[1].value.id] = nil
     end
+
     if callbacks[args[1].value.id] then
         callbacks[args[2].value.id] = callbacks[args[1].value.id]
         callbacks[args[1].value.id] = nil
@@ -494,101 +533,31 @@ end)
 
 -- ========== Callback Hooks ==========
 
--- See if there is an easy equivalent for instances in general
-
--- gm.pre_script_hook(gm.constants.step_actor, function(self, other, result, args)
---     local inst = Instance.wrap(self)
---     local instData = inst:get_data("instance")
-
---     if callbacks["onPreStep"] then
---         for _, fn in pairs(callbacks["onPreStep"]) do
---             fn(inst)
---         end
---     end
-
---     if not callbacks["onShieldBreak"] then return end
-
---     if self.shield and self.shield > 0.0 then actorData.has_shield = true end
---     if actorData.has_shield and self.shield <= 0.0 then
---         actorData.has_shield = nil
-
---         for _, fn in pairs(callbacks["onShieldBreak"]) do
---             fn(actor)
---         end
---     end
--- end)
-
-
--- gm.post_script_hook(gm.constants.step_actor, function(self, other, result, args)
---     if not callbacks["onPostStep"] then return end
-
---     local actor = Instance.wrap(self)
-
---     for _, fn in pairs(callbacks["onPostStep"]) do
---         fn(actor)
---     end
--- end)
-
-
--- gm.pre_script_hook(gm.constants.draw_actor, function(self, other, result, args)
---     if not callbacks["onPreDraw"] then return end
-
---     local actor = Instance.wrap(self)
-
---     for _, fn in pairs(callbacks["onPreDraw"]) do
---         fn(actor)
---     end
--- end)
-
-
--- gm.post_script_hook(gm.constants.draw_actor, function(self, other, result, args)
---     if not callbacks["onPostDraw"] then return end
-
---     local actor = Instance.wrap(self)
-
---     for _, fn in pairs(callbacks["onPostDraw"]) do
---         fn(actor)
---     end
--- end)
-
-
 gm.post_script_hook(gm.constants.recalculate_stats, function(self, other, result, args)
-    local actor = Instance.wrap(self)
-    local actorData = actor:get_data()
-    actorData.post_stat_recalc = true
-
-    if not callbacks[self.id]["onStatRecalc"] then return end
-
-    for _, fn in pairs(callbacks[self.id]["onStatRecalc"]) do
-        fn(actor)
+    if callbacks[self.id] and callbacks[self.id]["onStatRecalc"] then
+        for k, fn in pairs(callbacks[self.id]["onStatRecalc"]) do
+            fn(Instance.wrap(self))   -- Actor
+        end
     end
 end)
 
 
 gm.post_script_hook(gm.constants.skill_activate, function(self, other, result, args)
-    local callback = {
-        "onPrimaryUse",
-        "onSecondaryUse",
-        "onUtilityUse",
-        "onSpecialUse"
-    }
-    callback = callback[args[1].value + 1]
-
-    local actor = Instance.wrap(self)
-    local active_skill = actor:get_active_skill(args[1].value)
-
-    if callbacks[self.id][callback] then
-        for _, fn in pairs(callbacks[self.id][callback]) do
-            fn(actor, active_skill)
+    if callbacks[self.id] then
+        if callbacks[self.id]["onSkillUse"] then
+            for id, skill in pairs(callbacks[self.id]["onSkillUse"]) do
+                if gm.array_get(self.skills, args[1].value).active_skill.skill_id == id then
+                    for k, fn in pairs(skill) do
+                        fn(Instance.wrap(self))   -- Actor
+                    end
+                end
+            end
         end
-    end
-    
-    if not callbacks[self.id]["onSkillUse"] then return end
 
-    for skill_id, skill in pairs(callbacks[self.id]["onSkillUse"]) do
-        if active_skill.skill_id == skill_id then
-            for _, fn in pairs(skill) do
-                fn(actor, active_skill)
+        if args[1].value ~= 0.0 or gm.array_get(self.skills, 0).active_skill.skill_id == 70.0 then return true end
+        if callbacks[self.id]["onBasicUse"] then
+            for k, fn in pairs(callbacks[self.id]["onBasicUse"]) do
+                fn(Instance.wrap(self))   -- Actor
             end
         end
     end
@@ -597,12 +566,10 @@ end)
 
 gm.post_script_hook(gm.constants.actor_heal_networked, function(self, other, result, args)
     local actor = Instance.wrap(args[1].value)
-    if not callbacks[actor.id]["onHeal"] then return end
-
-    local heal_amount = args[2].value
-
-    for _, fn in pairs(callbacks[actor.id]["onHeal"]) do
-        fn(actor, heal_amount)
+    if callbacks[actor.id] and callbacks[actor.id]["onHeal"] then
+        for k, fn in pairs(callbacks[actor.id]["onHeal"]) do
+            fn(actor, args[2].value)   -- Actor, Heal amount
+        end
     end
 end)
 
@@ -611,176 +578,216 @@ end)
 -- ========== Callbacks ==========
 
 function inst_onPostStatRecalc(actor)
-    if not callbacks[actor.id] or not callbacks[actor.id]["onPostStatRecalc"] then return end
-    
-    for _, fn in pairs(callbacks[actor.id]["onPostStatRecalc"]) do
-        fn(actor)
+    if callbacks[actor.id] and callbacks[actor.id]["onPostStatRecalc"] then
+        for k, fn in pairs(callbacks[actor.id]["onPostStatRecalc"]) do
+            fn(actor)   -- Actor
+        end
     end
 end
 
 
-Callback.add("onAttackCreate", "RMT-Instance.onAttackCreate", function(self, other, result, args)
-    local attack_info = Attack_Info.wrap(args[2].value)
-    local actor = attack_info.parent
-    
+local function inst_onAttack(self, other, result, args)
+    if not args[2].value.proc then return end
+    if callbacks[self.id] and callbacks[self.id]["onAttack"] then
+        local actor = Instance.wrap(self)
+        local damager = Damager.wrap(args[2].value)
+        for k, fn in pairs(callbacks[self.id]["onAttack"]) do
+            fn(actor, damager)    -- Actor, Damager attack_info
+        end
+    end
+end
+
+
+local function inst_onAttackAll(self, other, result, args)
+    if callbacks[self.id] and callbacks[self.id]["onAttackAll"] then
+        local actor = Instance.wrap(self)
+        local damager = Damager.wrap(args[2].value)
+        for k, fn in pairs(callbacks[self.id]["onAttackAll"]) do
+            fn(actor, damager)    -- Actor, Damager attack_info
+        end
+    end
+end
+
+
+local function inst_onPostAttack(self, other, result, args)
+    local parent = args[2].value.parent
+    if not args[2].value.proc or not Instance.exists(parent) then return end
+    if callbacks[parent.id] and callbacks[parent.id]["onPostAttack"] then
+        local actor = Instance.wrap(parent)
+        local damager = Damager.wrap(args[2].value)
+        for k, fn in pairs(callbacks[parent.id]["onPostAttack"]) do
+            fn(actor, damager)    -- Actor, Damager attack_info
+        end
+    end
+end
+
+
+local function inst_onPostAttackAll(self, other, result, args)
+    local parent = args[2].value.parent
+    if not Instance.exists(parent) then return end
+    if callbacks[parent.id] and callbacks[parent.id]["onPostAttackAll"] then
+        local actor = Instance.wrap(parent)
+        local damager = Damager.wrap(args[2].value)
+        for k, fn in pairs(callbacks[parent.id]["onPostAttackAll"]) do
+            fn(actor, damager)    -- Actor, Damager attack_info
+        end
+    end
+end
+
+
+local function inst_onHit(self, other, result, args)
+    if not self.attack_info then return end
+    if not self.attack_info.proc then return end
+    local actor = Instance.wrap(args[2].value)
+    if callbacks[actor.id] and callbacks[actor.id]["onHit"] then
+        local victim = Instance.wrap(args[3].value)
+        local damager = Damager.wrap(args[4].value.attack_info)
+        damager.instance = args[4].value.inflictor
+        for k, fn in pairs(callbacks[actor.id]["onHit"]) do
+            fn(actor, victim, damager, args[4].value) -- Attacker, Victim, Damager attack_info, hit_info
+        end
+    end
+end
+
+
+local function inst_onHitAll(self, other, result, args)
+    local attack = args[2].value
+    local actor = Instance.wrap(attack.inflictor)
     if not Instance.exists(actor) then return end
-    if not callbacks[actor.id] or not callbacks[actor.id]["onAttackCreate"] then return end
-
-    actor = Instance.wrap(actor)
-
-    if callbacks[actor.id]["onAttackCreate"] then
-        for _, fn in pairs(callbacks[actor.id]["onAttackCreate"]) do
-            fn(actor, attack_info)
+    if callbacks[actor.id] and callbacks[actor.id]["onHitAll"] then
+        local victim = Instance.wrap(attack.target_true)
+        local damager = Damager.wrap(attack.attack_info)
+        damager.instance = attack
+        for k, fn in pairs(callbacks[actor.id]["onHitAll"]) do
+            fn(actor, victim, damager, attack) -- Attacker, Victim, Damager attack_info, hit_info
         end
     end
-
-    if Helper.is_false(attack_info.proc) then return end
-
-    if callbacks[actor.id]["onAttackCreateProc"] then
-        for _, fn in pairs(callbacks[actor.id]["onAttackCreateProc"]) do
-            fn(actor, attack_info)
-        end
-    end
-end)
+end
 
 
-Callback.add("onAttackHit", "RMT-Instance.onAttackHit", function(self, other, result, args)
-    local hit_info = Hit_Info.wrap(args[2].value)
-    local actor = hit_info.inflictor
-    
-    if not Instance.exists(actor) then return end
-    if not callbacks[actor.id] or not callbacks[actor.id]["onAttackHit"] then return end
-
-    actor = Instance.wrap(actor)
-
-    for _, fn in pairs(callbacks[actor.id]["onAttackHit"]) do
-        fn(actor, hit_info)
-    end
-end)
-
-
-Callback.add("onAttackHandleEnd", "RMT-Instance.onAttackHandleEnd", function(self, other, result, args)
-    local attack_info = Attack_Info.wrap(args[2].value)
-    local actor = attack_info.parent
-    
-    if not Instance.exists(actor) then return end
-    if not callbacks[actor.id] or not callbacks[actor.id]["onAttackHandleEnd"] then return end
-
-    actor = Instance.wrap(actor)
-
-    if callbacks[actor.id]["onAttackHandleEnd"] then
-        for _, fn in pairs(callbacks[actor.id]["onAttackHandleEnd"]) do
-            fn(actor, attack_info)
-        end
-    end
-
-    if Helper.is_false(attack_info.proc) then return end
-
-    if callbacks[actor.id]["onAttackHandleEndProc"] then
-        for _, fn in pairs(callbacks[actor.id]["onAttackHandleEndProc"]) do
-            fn(actor, attack_info)
-        end
-    end
-end)
-
-
-Callback.add("onHitProc", "RMT-Instance.onHitProc", function(self, other, result, args)     -- Runs before onAttackHit
-    local actor = Instance.wrap(args[2].value)
-    if not callbacks[actor.id] or not callbacks[actor.id]["onHitProc"] then return end
-
-    local victim = Instance.wrap(args[3].value)
-    local hit_info = Hit_Info.wrap(args[4].value)
-
-    for _, fn in pairs(callbacks[actor.id]["onHitProc"]) do
-        fn(actor, victim, hit_info)
-    end
-end)
-
-
-Callback.add("onKillProc", "RMT-Instance.onKillProc", function(self, other, result, args)
+local function inst_onKill(self, other, result, args)
     local actor = Instance.wrap(args[3].value)
-    if not callbacks[actor.id] or not callbacks[actor.id]["onKillProc"] then return end
-
-    local victim = Instance.wrap(args[2].value)
-
-    for _, fn in pairs(callbacks[actor.id]["onKillProc"]) do
-        fn(actor, victim)
+    if callbacks[actor.id] and callbacks[actor.id]["onKill"] then
+        local victim = Instance.wrap(args[2].value)
+        for k, fn in pairs(callbacks[actor.id]["onKill"]) do
+            fn(actor, victim)   -- Attacker, Victim
+        end
     end
-end)
+end
 
 
-Callback.add("onDamagedProc", "RMT-Instance.onDamagedProc", function(self, other, result, args)
+local function inst_onDamaged(self, other, result, args)
+    if not args[3].value.attack_info then return end
     local actor = Instance.wrap(args[2].value)
-    if not callbacks[actor.id] or not callbacks[actor.id]["onDamagedProc"] then return end
-
-    local hit_info = Hit_Info.wrap(args[3].value)
-    local attacker = Instance.wrap(hit_info.inflictor)
-
-    for _, fn in pairs(callbacks[actor.id]["onDamagedProc"]) do
-        fn(actor, attacker, hit_info)
+    if callbacks[actor.id] and callbacks[actor.id]["onDamaged"] then
+        local damager = Damager.wrap(args[3].value.attack_info)
+        damager.instance = args[3].value
+        for k, fn in pairs(callbacks[actor.id]["onDamaged"]) do
+            fn(actor, damager)   -- Actor, Damager attack_info
+        end
     end
-end)
+end
 
 
-Callback.add("onDamageBlocked", "RMT-Instance.onDamageBlocked", function(self, other, result, args)
-    local actor = Instance.wrap(args[2].value)
-    if not callbacks[actor.id] or not callbacks[actor.id]["onDamageBlocked"] then return end
-
-    local damage = args[4].value
-
-    for _, fn in pairs(callbacks[actor.id]["onDamageBlocked"]) do
-        fn(actor, damage)
+local function inst_onDamageBlocked(self, other, result, args)
+    if callbacks[self.id] and callbacks[self.id]["onDamageBlocked"] then
+        local actor = Instance.wrap(self)
+        local damager = Damager.wrap(other.attack_info)
+        damager.instance = other
+        for k, fn in pairs(callbacks[self.id]["onDamageBlocked"]) do
+            fn(actor, damager)   -- Actor, Damager attack_info
+        end
     end
-end)
+end
 
 
-Callback.add("onInteractableActivate", "RMT-Instance.onInteractableActivate", function(self, other, result, args)
+local function inst_onInteract(self, other, result, args)
     local actor = Instance.wrap(args[3].value)
-    if not callbacks[actor.id] or not callbacks[actor.id]["onInteractableActivate"] then return end
-
-    local interactable = Instance.wrap(args[2].value)
-
-    for _, fn in pairs(callbacks[actor.id]["onInteractableActivate"]) do
-        fn(actor, interactable)
+    if callbacks[actor.id] and callbacks[actor.id]["onInteract"] then
+        local interactable = Instance.wrap(args[2].value)
+        for k, fn in pairs(callbacks[actor.id]["onInteract"]) do
+            fn(actor, interactable)   -- Actor, Interactable
+        end
     end
-end)
+end
 
 
-Callback.add("onPickupCollected", "RMT-Instance.onPickupCollected", function(self, other, result, args)
-    local actor = Instance.wrap(args[3].value)
-    if not callbacks[actor.id] or not callbacks[actor.id]["onPickupCollected"] then return end
-
-    local pickup_object = Instance.wrap(args[2].value)  -- Will be oCustomObject_pPickupItem/Equipment for all custom items/equipment
-
-    for _, fn in pairs(callbacks[actor.id]["onPickupCollected"]) do
-        fn(actor, pickup_object)
-    end
-end)
-
-
-Callback.add("onEquipmentUse", "RMT-Instance.onEquipmentUse", function(self, other, result, args)
+local function inst_onEquipmentUse(self, other, result, args)
     local actor = Instance.wrap(args[2].value)
-    if not callbacks[actor.id] or not callbacks[actor.id]["onEquipmentUse"] then return end
-
-    local equipment = Equipment.wrap(args[3].value)
-    local direction = args[5].value
-
-    for _, fn in pairs(callbacks[actor.id]["onEquipmentUse"]) do
-        fn(actor, equipment, direction)
+    if callbacks[actor.id] and callbacks[actor.id]["onEquipmentUse"] then
+        local equip = Equipment.wrap(args[3].value)
+        for k, fn in pairs(callbacks[actor.id]["onEquipmentUse"]) do
+            fn(actor, equip)   -- Actor, Equipment ID
+        end
     end
-end)
+end
 
 
-Callback.add("onStageStart", "RMT-Instance.onStageStart", function(self, other, result, args)
-    local actors = Instance.find_all(gm.constants.pActor)
-    for _, actor in ipairs(actors) do
-        if callbacks[actor.id] and callbacks[actor.id]["onStageStart"] then
-            for __, fn in pairs(callbacks[actor.id]["onStageStart"]) do
-                fn(actor)
+local function inst_onPreStep(self, other, result, args)
+    if gm.variable_global_get("pause") then return end
+
+    for id, c_table in pairs(callbacks) do
+        local inst = Instance.wrap(c_table["CInstance"])
+        if Instance.exists(inst) then
+
+            if c_table["onPreStep"] then
+                for k, fn in pairs(c_table["onPreStep"]) do
+                    fn(inst)   -- Actor
+                end
             end
+
+            if inst.shield and inst.shield > 0.0 then inst.RMT_has_shield_inst = true end
+            if inst.RMT_has_shield_inst and inst.shield <= 0.0 then
+                inst.RMT_has_shield_inst = nil
+                if c_table["onShieldBreak"] then
+                    for k, fn in pairs(c_table["onShieldBreak"]) do
+                        fn(inst)   -- Instance
+                    end
+                end
+            end
+
+        else callbacks[id] = nil
         end
     end
-end)
+end
+
+
+local function inst_onPostStep(self, other, result, args)
+    if gm.variable_global_get("pause") then return end
+
+    for id, c_table in pairs(callbacks) do
+        local inst = Instance.wrap(c_table["CInstance"])
+        if Instance.exists(inst) then
+
+            if c_table["onPostStep"] then
+                for k, fn in pairs(c_table["onPostStep"]) do
+                    fn(inst)   -- Instance
+                end
+            end
+
+        else callbacks[id] = nil
+        end
+    end
+end
+
+
+local function inst_onDraw(self, other, result, args)
+    if gm.variable_global_get("pause") then return end
+
+    for id, c_table in pairs(callbacks) do
+        local inst = Instance.wrap(c_table["CInstance"])
+        if Instance.exists(inst) then
+
+            if c_table["onDraw"] then
+                for k, fn in pairs(c_table["onDraw"]) do
+                    fn(inst)   -- Instance
+                end
+            end
+
+        else callbacks[id] = nil
+        end
+    end
+end
 
 
 
@@ -790,7 +797,23 @@ initialize_instance = function()
     lock_table_actor = Proxy.make_lock_table({"value", "RMT_object", table.unpack(Helper.table_get_keys(methods_instance)), table.unpack(Helper.table_get_keys(methods_actor))})
     lock_table_player = Proxy.make_lock_table({"value", "RMT_object", table.unpack(Helper.table_get_keys(methods_instance)), table.unpack(Helper.table_get_keys(methods_actor)), table.unpack(Helper.table_get_keys(methods_player))})
     lock_table_interactable_instance = Proxy.make_lock_table({"value", "RMT_object", table.unpack(Helper.table_get_keys(methods_instance)), table.unpack(Helper.table_get_keys(methods_interactable_instance))})
+
     gm_add_instance_methods(methods_instance)
+
+    Callback.add("onAttackCreate", "RMT-inst_onAttack", inst_onAttack)
+    Callback.add("onAttackCreate", "RMT-inst_onAttackAll", inst_onAttackAll)
+    Callback.add("onAttackHandleEnd", "RMT-inst_onPostAttack", inst_onPostAttack)
+    Callback.add("onAttackHandleEnd", "RMT-inst_onPostAttackAll", inst_onPostAttackAll)
+    Callback.add("onHitProc", "RMT-inst_onHit", inst_onHit)
+    Callback.add("onAttackHit", "RMT-inst_onHitAll", inst_onHitAll)
+    Callback.add("onKillProc", "RMT-inst_onKill", inst_onKill)
+    Callback.add("onDamagedProc", "RMT-inst_onDamaged", inst_onDamaged)
+    Callback.add("onDamageBlocked", "RMT-inst_onDamageBlocked", inst_onDamageBlocked)
+    Callback.add("onInteractableActivate", "RMT-inst_onInteract", inst_onInteract)
+    Callback.add("onEquipmentUse", "RMT-inst_onEquipmentUse", inst_onEquipmentUse)
+    Callback.add("preStep", "RMT-inst_onPreStep", inst_onPreStep)
+    Callback.add("postStep", "RMT-inst_onPostStep", inst_onPostStep)
+    Callback.add("postHUDDraw", "RMT-inst_onDraw", inst_onDraw)
 end
 
 
