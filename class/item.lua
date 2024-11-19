@@ -462,7 +462,8 @@ gm.post_script_hook(gm.constants.skill_activate, function(self, other, result, a
         "onSecondaryUse",
         "onUtilityUse",
         "onSpecialUse"
-    }[args[1].value + 1]
+    }
+    callback = callback[args[1].value + 1]
     if not callbacks[callback] then return end
 
     if not has_custom_item[self.id] then return end
