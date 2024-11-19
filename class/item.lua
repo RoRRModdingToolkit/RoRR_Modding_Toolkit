@@ -813,7 +813,7 @@ Callback.add("onPickupCollected", "RMT-Item.onPickupCollected", function(self, o
     local actor = Instance.wrap(args[3].value)
     if not has_custom_item[actor.id] then return end
 
-    local pickup_object = Instance.wrap(args[2].value)  -- Will be oCustomObject_pPickupItem for all custom items
+    local pickup_object = Instance.wrap(args[2].value)  -- Will be oCustomObject_pPickupItem/Equipment for all custom items/equipment
 
     for item_id, c_table in pairs(callbacks["onPickupCollected"]) do
         local stack = actor:item_stack_count(item_id)
