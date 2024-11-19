@@ -394,7 +394,11 @@ methods_item = {
     onUtilityUse            = function(self, func) self:add_callback("onUtilityUse", func) end,
     onSpecialUse            = function(self, func) self:add_callback("onSpecialUse", func) end,
     onEquipmentUse          = function(self, func) self:add_callback("onEquipmentUse", func) end,
-    onStageStart            = function(self, func) self:add_callback("onStageStart", func) end
+    onStageStart            = function(self, func) self:add_callback("onStageStart", func) end,
+    onPreStep               = function(self, func) self:add_callback("onPreStep", func) end,
+    onPostStep              = function(self, func) self:add_callback("onPostStep", func) end,
+    onPreDraw               = function(self, func) self:add_callback("onPreDraw", func) end,
+    onPostDraw              = function(self, func) self:add_callback("onPostDraw", func) end
 
 }
 
