@@ -3,29 +3,33 @@
 Item = class_refs["Item"]
 
 local callbacks = {}
-local other_callbacks = {
-    "onStatRecalc",
-    "onPostStatRecalc",
-    "onBasicUse",
-    "onAttack",
-    "onAttackAll",
-    "onPostAttack",
-    "onPostAttackAll",
-    "onHit",
-    "onHitAll",
-    "onKill",
-    "onDamaged",
-    "onDamageBlocked",
-    "onHeal",
-    "onShieldBreak",
-    "onInteract",
-    "onEquipmentUse",
-    "onNewStage",
-    "onStep",
-    "onDraw"
+local valid_callbacks = {
+    onStatRecalc            = true,
+    onPostStatRecalc        = true,
+    onSkillUse              = true,
+    onAttackCreate          = true,
+    onAttackCreateProc      = true,
+    onAttackHit             = true,
+    onAttackHandleEnd       = true,
+    onAttackHandleEndProc   = true,
+    onHitProc               = true,
+    onKillProc              = true,
+    onDamagedProc           = true,
+    onDamageBlocked         = true,
+    onHeal                  = true,
+    onShieldBreak           = true,
+    onInteractableActivate  = true,
+    onPickupCollected       = true,
+    onEquipmentUse          = true,
+    onStageStart            = true,
+    onPreStep               = true,
+    onPostStep              = true,
+    onPreDraw               = true,
+    onPostDraw              = true
 }
 
 local has_custom_item = {}
+local has_callbacks = {}
 
 local disabled_loot = {}
 local loot_toggled = {}     -- Loot pools that have been added to this frame
@@ -97,11 +101,6 @@ Item.new = function(namespace, identifier, no_log)
 
         item.item_log_id = log
     end
-
-    -- Add actor to has_custom_item on pickup
-    item:onPickup(function(actor, stack)
-		has_custom_item[actor.id] = true
-    end)
     
     return item
 end
@@ -193,21 +192,38 @@ methods_item = {
     end,
     
 
-    add_callback = function(self, callback, func, all_damage)
-        if all_damage then callback = callback.."All" end
+    add_callback = function(self, callback, func, slot)
+        -- Add onAcquire callback to add actor to has_custom_item
+        local function add_onAcquire()
+            if has_callbacks[self.value] then return end
+            has_callbacks[self.value] = true
+
+            local callback_id = self.on_acquired
+            if not callbacks[callback_id] then callbacks[callback_id] = {} end
+            table.insert(callbacks[callback_id], function(actor, stack)
+                has_custom_item[actor.id] = true
+            end)
+        end
 
         local callback_id = nil
-        if      callback == "onPickup" then callback_id = self.on_acquired
-        elseif  callback == "onRemove" then callback_id = self.on_removed
+        if      callback == "onAcquire"     then callback_id = self.on_acquired
+        elseif  callback == "onRemove"      then callback_id = self.on_removed
         end
 
         if callback_id then
+            add_onAcquire()
             if not callbacks[callback_id] then callbacks[callback_id] = {} end
             table.insert(callbacks[callback_id], func)
 
-        elseif Helper.table_has(other_callbacks, callback) then
+        elseif valid_callbacks[callback] then
+            if callback == "onSkillUse" then
+                if not slot then log.error("onSkillUse : Skill slot not specified", 3) end
+                callback = callback..math.floor(slot)
+            end
+            add_onAcquire()
             if not callbacks[callback] then callbacks[callback] = {} end
-            table.insert(callbacks[callback], {self.value, func})
+            if not callbacks[callback][self.value] then callbacks[callback][self.value] = {} end
+            table.insert(callbacks[callback][self.value], func)
 
         else log.error("Invalid callback name", 2)
         end
@@ -217,22 +233,11 @@ methods_item = {
     clear_callbacks = function(self)
         callbacks[self.on_acquired] = nil
         callbacks[self.on_removed] = nil
-
-        for _, c in ipairs(other_callbacks) do
-            local c_table = callbacks[c]
-            if c_table then
-                for i, v in ipairs(c_table) do
-                    if v[1] == self.value then
-                        table.remove(c_table, i)
-                    end
-                end
-            end
+    
+        for callback, _ in pairs(valid_callbacks) do
+            local c_table = callbacks[callback]
+            if c_table then c_table[self.value] = nil end
         end
-
-        -- Add actor to has_custom_item on pickup
-        self:onPickup(function(actor, stack)
-            has_custom_item[actor.id] = true
-        end)
     end,
 
 
@@ -366,24 +371,26 @@ methods_item = {
 
 
     -- Callbacks
-    onPickup            = function(self, func) self:add_callback("onPickup", func) end,
-    onRemove            = function(self, func) self:add_callback("onRemove", func) end,
-    onStatRecalc        = function(self, func) self:add_callback("onStatRecalc", func) end,
-    onPostStatRecalc    = function(self, func) self:add_callback("onPostStatRecalc", func) end,
-    onBasicUse          = function(self, func) self:add_callback("onBasicUse", func) end,
-    onAttack            = function(self, func, all_damage) self:add_callback("onAttack", func, all_damage) end,
-    onPostAttack        = function(self, func, all_damage) self:add_callback("onPostAttack", func, all_damage) end,
-    onHit               = function(self, func, all_damage) self:add_callback("onHit", func, all_damage) end,
-    onKill              = function(self, func) self:add_callback("onKill", func) end,
-    onDamaged           = function(self, func) self:add_callback("onDamaged", func) end,
-    onDamageBlocked     = function(self, func) self:add_callback("onDamageBlocked", func) end,
-    onHeal              = function(self, func) self:add_callback("onHeal", func) end,
-    onShieldBreak       = function(self, func) self:add_callback("onShieldBreak", func) end,
-    onInteract          = function(self, func) self:add_callback("onInteract", func) end,
-    onEquipmentUse      = function(self, func) self:add_callback("onEquipmentUse", func) end,
-    onNewStage          = function(self, func) self:add_callback("onNewStage", func) end,
-    onStep              = function(self, func) self:add_callback("onStep", func) end,
-    onDraw              = function(self, func) self:add_callback("onDraw", func) end
+    onAcquire               = function(self, func) self:add_callback("onAcquire", func) end,
+    onRemove                = function(self, func) self:add_callback("onRemove", func) end,
+    onStatRecalc            = function(self, func) self:add_callback("onStatRecalc", func) end,
+    onPostStatRecalc        = function(self, func) self:add_callback("onPostStatRecalc", func) end,
+    onSkillUse              = function(self, func, slot) self:add_callback("onSkillUse", func, slot) end,
+    onAttackCreate          = function(self, func) self:add_callback("onAttackCreate", func) end,
+    onAttackCreateProc      = function(self, func) self:add_callback("onAttackCreateProc", func) end,
+    onAttackHit             = function(self, func) self:add_callback("onAttackHit", func) end,
+    onAttackHandleEnd       = function(self, func) self:add_callback("onAttackHandleEnd", func) end,
+    onAttackHandleEndProc   = function(self, func) self:add_callback("onAttackHandleEndProc", func) end,
+    onHitProc               = function(self, func) self:add_callback("onHitProc", func) end,
+    onKillProc              = function(self, func) self:add_callback("onKillProc", func) end,
+    onDamaged               = function(self, func) self:add_callback("onDamaged", func) end,
+    onDamageBlocked         = function(self, func) self:add_callback("onDamageBlocked", func) end,
+    onHeal                  = function(self, func) self:add_callback("onHeal", func) end,
+    onShieldBreak           = function(self, func) self:add_callback("onShieldBreak", func) end,
+    onInteractableActivate  = function(self, func) self:add_callback("onInteractableActivate", func) end,
+    onPickupCollected       = function(self, func) self:add_callback("onPickupCollected", func) end,
+    onEquipmentUse          = function(self, func) self:add_callback("onEquipmentUse", func) end,
+    onStageStart            = function(self, func) self:add_callback("onStageStart", func) end
 
 }
 
@@ -416,10 +423,12 @@ metatable_class["Item"] = {
 -- ========== Hooks ==========
 
 gm.post_script_hook(gm.constants.callback_execute, function(self, other, result, args)
-    -- onPickup and onRemove
+    -- onAcquire and onRemove
     if callbacks[args[1].value] then
         for _, fn in ipairs(callbacks[args[1].value]) do
-            fn(Instance.wrap(args[2].value), args[3].value)
+            local actor = Instance.wrap(args[2].value)
+            local stack = args[3].value
+            fn(actor, stack)
         end
     end
 end)
@@ -427,26 +436,36 @@ end)
 
 gm.post_script_hook(gm.constants.recalculate_stats, function(self, other, result, args)
     local actor = Instance.wrap(self)
-    if callbacks["onStatRecalc"] then
-        for _, fn in ipairs(callbacks["onStatRecalc"]) do
-            local count = actor:item_stack_count(fn[1])
-            if count > 0 then
-                fn[2](actor, count)   -- Actor, Stack count
+    actor:get_data().post_stat_recalc = true
+
+    if not callbacks["onStatRecalc"] then return end
+    if not has_custom_item[actor.id] then return end
+
+    for item_id, c_table in pairs(callbacks["onStatRecalc"]) do
+        local stack = actor:item_stack_count(item_id)
+        if stack > 0 then
+            for _, fn in ipairs(c_table) do
+                fn(actor, stack)
             end
         end
     end
-    actor:get_data().post_stat_recalc = true
 end)
 
 
 gm.post_script_hook(gm.constants.skill_activate, function(self, other, result, args)
-    if args[1].value ~= 0.0 or gm.array_get(self.skills, 0).active_skill.skill_id == 70.0 then return true end
-    if callbacks["onBasicUse"] then
-        for _, fn in ipairs(callbacks["onBasicUse"]) do
-            local actor = Instance.wrap(self)
-            local count = actor:item_stack_count(fn[1])
-            if count > 0 then
-                fn[2](actor, count)   -- Actor, Stack count
+    local callback = "onSkillUse"..math.floor(args[1].value)
+    if not callbacks[callback] then return end
+
+    if not has_custom_item[self.id] then return end
+
+    local actor = Instance.wrap(self)
+    local active_skill = actor:get_active_skill(args[1].value)
+
+    for item_id, c_table in pairs(callbacks[callback]) do
+        local stack = actor:item_stack_count(item_id)
+        if stack > 0 then
+            for _, fn in ipairs(c_table) do
+                fn(actor, stack, active_skill)
             end
         end
     end
@@ -454,12 +473,19 @@ end)
 
 
 gm.post_script_hook(gm.constants.actor_heal_networked, function(self, other, result, args)
-    if callbacks["onHeal"] then
-        for _, fn in ipairs(callbacks["onHeal"]) do
-            local actor = Instance.wrap(args[1].value)
-            local count = actor:item_stack_count(fn[1])
-            if count > 0 then
-                fn[2](actor, args[2].value, count)   -- Actor, Heal amount, Stack count
+    if not callbacks["onHeal"] then return end
+
+    local actor = args[1].value
+    if not has_custom_item[actor.id] then return end
+
+    actor = Instance.wrap(actor)
+    local heal_amount = args[2].value
+
+    for item_id, c_table in pairs(callbacks["onHeal"]) do
+        local stack = actor:item_stack_count(item_id)
+        if stack > 0 then
+            for _, fn in ipairs(c_table) do
+                fn(actor, stack, heal_amount)
             end
         end
     end
@@ -468,25 +494,32 @@ end)
 
 gm.pre_script_hook(gm.constants.step_actor, function(self, other, result, args)
     if not has_custom_item[self.id] then return end
+
     local actor = Instance.wrap(self)
+    local actorData = actor:get_data("item")
 
     if callbacks["onPreStep"] then
-        for _, c in ipairs(callbacks["onPreStep"]) do
-            local count = actor:item_stack_count(c[1])
-            if count > 0 then
-                c[2](actor, count)  -- Actor, Stack count
+        for item_id, c_table in pairs(callbacks["onPreStep"]) do
+            local stack = actor:item_stack_count(item_id)
+            if stack > 0 then
+                for _, fn in ipairs(c_table) do
+                    fn(actor, stack)
+                end
             end
         end
     end
 
-    if self.shield and self.shield > 0.0 then self.RMT_has_shield_item = true end
-    if self.RMT_has_shield_item and self.shield <= 0.0 then
-        self.RMT_has_shield_item = nil
-        if callbacks["onShieldBreak"] then
-            for _, c in ipairs(callbacks["onPreStep"]) do
-                local count = actor:item_stack_count(c[1])
-                if count > 0 then
-                    c[2](actor, count)  -- Actor, Stack count
+    if not callbacks["onShieldBreak"] then return end
+
+    if self.shield and self.shield > 0.0 then actorData.has_shield = true end
+    if actorData.has_shield and self.shield <= 0.0 then
+        actorData.has_shield = nil
+
+        for item_id, c_table in pairs(callbacks["onShieldBreak"]) do
+            local stack = actor:item_stack_count(item_id)
+            if stack > 0 then
+                for _, fn in ipairs(c_table) do
+                    fn(actor, stack)
                 end
             end
         end
@@ -495,13 +528,16 @@ end)
 
 
 gm.post_script_hook(gm.constants.step_actor, function(self, other, result, args)
-    if callbacks["onStep"] then
-        if not has_custom_item[self.id] then return end
-        local actor = Instance.wrap(self)
-        for _, c in ipairs(callbacks["onStep"]) do
-            local count = actor:item_stack_count(c[1])
-            if count > 0 then
-                c[2](actor, count)  -- Actor, Stack count
+    if not callbacks["onPostStep"] then return end
+    if not has_custom_item[self.id] then return end
+
+    local actor = Instance.wrap(self)
+
+    for item_id, c_table in pairs(callbacks["onPostStep"]) do
+        local stack = actor:item_stack_count(item_id)
+        if stack > 0 then
+            for _, fn in ipairs(c_table) do
+                fn(actor, stack)
             end
         end
     end
@@ -509,13 +545,16 @@ end)
 
 
 gm.pre_script_hook(gm.constants.draw_actor, function(self, other, result, args)
-    if callbacks["onPreDraw"] then
-        if not has_custom_item[self.id] then return end
-        local actor = Instance.wrap(self)
-        for _, c in ipairs(callbacks["onPreDraw"]) do
-            local count = actor:item_stack_count(c[1])
-            if count > 0 then
-                c[2](actor, count)  -- Actor, Stack count
+    if not callbacks["onPreDraw"] then return end
+    if not has_custom_item[self.id] then return end
+
+    local actor = Instance.wrap(self)
+
+    for item_id, c_table in pairs(callbacks["onPreDraw"]) do
+        local stack = actor:item_stack_count(item_id)
+        if stack > 0 then
+            for _, fn in ipairs(c_table) do
+                fn(actor, stack)
             end
         end
     end
@@ -523,13 +562,16 @@ end)
 
 
 gm.post_script_hook(gm.constants.draw_actor, function(self, other, result, args)
-    if callbacks["onDraw"] then
-        if not has_custom_item[self.id] then return end
-        local actor = Instance.wrap(self)
-        for _, c in ipairs(callbacks["onDraw"]) do
-            local count = actor:item_stack_count(c[1])
-            if count > 0 then
-                c[2](actor, count)  -- Actor, Stack count
+    if not callbacks["onPostDraw"] then return end
+    if not has_custom_item[self.id] then return end
+
+    local actor = Instance.wrap(self)
+
+    for item_id, c_table in pairs(callbacks["onPostDraw"]) do
+        local stack = actor:item_stack_count(item_id)
+        if stack > 0 then
+            for _, fn in ipairs(c_table) do
+                fn(actor, stack)
             end
         end
     end
@@ -566,300 +608,289 @@ end)
 -- ========== Callbacks ==========
 
 function item_onPostStatRecalc(actor)
-    if callbacks["onPostStatRecalc"] then
-        for _, fn in ipairs(callbacks["onPostStatRecalc"]) do
-            local count = actor:item_stack_count(fn[1])
-            if count > 0 then
-                fn[2](actor, count)   -- Actor, Stack count
+    if not callbacks["onPostStatRecalc"] then return end
+
+    for item_id, c_table in pairs(callbacks["onPostStatRecalc"]) do
+        local stack = actor:item_stack_count(item_id)
+        if stack > 0 then
+            for _, fn in ipairs(c_table) do
+                fn(actor, stack)
             end
         end
     end
 end
 
 
-local function item_onAttack(self, other, result, args)
-    if not args[2].value.proc or not Instance.exists(args[2].value.parent) then return end
-    if callbacks["onAttack"] then
-        local actor = Instance.wrap(args[2].value.parent)
-        local damager = Damager.wrap(args[2].value)
-        for _, c in ipairs(callbacks["onAttack"]) do
-            local item = c[1]
-            local count = actor:item_stack_count(item)
-            if count > 0 then
-                local func = c[2]
-                func(actor, damager, count)    -- Actor, Damager attack_info, Stack count
+Callback.add("onAttackCreate", "RMT-Item.onAttackCreate", function(self, other, result, args)
+    if not callbacks["onAttackCreate"] then return end
+
+    local attackInfo = args[2].value
+    local actor = attackInfo.parent
+
+    if not Instance.exists(actor) then return end
+    if not has_custom_item[actor.id] then return end
+
+    actor = Instance.wrap(actor)
+
+    for item_id, c_table in pairs(callbacks["onAttackCreate"]) do
+        local stack = actor:item_stack_count(item_id)
+        if stack > 0 then
+            for _, fn in ipairs(c_table) do
+                fn(actor, stack, attackInfo)
             end
         end
     end
-end
+end)
 
 
-local function item_onAttackAll(self, other, result, args)
-    if not Instance.exists(args[2].value.parent) then return end
-    if callbacks["onAttackAll"] then
-        local actor = Instance.wrap(args[2].value.parent)
-        local damager = Damager.wrap(args[2].value)
-        for _, c in ipairs(callbacks["onAttackAll"]) do
-            local item = c[1]
-            local count = actor:item_stack_count(item)
-            if count > 0 then
-                local func = c[2]
-                func(actor, damager, count)    -- Actor, Damager attack_info, Stack count
+Callback.add("onAttackCreate", "RMT-Item.onAttackCreateProc", function(self, other, result, args)
+    if not callbacks["onAttackCreateProc"] then return end
+
+    local attackInfo = args[2].value
+    local actor = attackInfo.parent
+
+    if not attackInfo.proc then return end
+    if not Instance.exists(actor) then return end
+    if not has_custom_item[actor.id] then return end
+
+    actor = Instance.wrap(actor)
+
+    for item_id, c_table in pairs(callbacks["onAttackCreateProc"]) do
+        local stack = actor:item_stack_count(item_id)
+        if stack > 0 then
+            for _, fn in ipairs(c_table) do
+                fn(actor, stack, attackInfo)
             end
         end
     end
-end
+end)
 
 
-local function item_onPostAttack(self, other, result, args)
-    if not args[2].value.proc or not Instance.exists(args[2].value.parent) then return end
-    if callbacks["onPostAttack"] then
-        local actor = Instance.wrap(args[2].value.parent)
-        local damager = Damager.wrap(args[2].value)
-        for _, c in ipairs(callbacks["onPostAttack"]) do
-            local item = c[1]
-            local count = actor:item_stack_count(item)
-            if count > 0 then
-                local func = c[2]
-                func(actor, damager, count)    -- Actor, Damager attack_info, Stack count
+Callback.add("onAttackHit", "RMT-Item.onAttackHit", function(self, other, result, args)
+    if not callbacks["onAttackHit"] then return end
+
+    local hitInfo = args[2].value
+    local actor = hitInfo.inflictor
+
+    if not Instance.exists(actor) then return end
+    if not has_custom_item[actor.id] then return end
+
+    actor = Instance.wrap(actor)
+
+    for item_id, c_table in pairs(callbacks["onAttackHit"]) do
+        local stack = actor:item_stack_count(item_id)
+        if stack > 0 then
+            for _, fn in ipairs(c_table) do
+                fn(actor, stack, hitInfo)
             end
         end
     end
-end
+end)
 
 
-local function item_onPostAttackAll(self, other, result, args)
-    if not Instance.exists(args[2].value.parent) then return end
-    if callbacks["onPostAttackAll"] then
-        local actor = Instance.wrap(args[2].value.parent)
-        local damager = Damager.wrap(args[2].value)
-        for _, c in ipairs(callbacks["onPostAttackAll"]) do
-            local item = c[1]
-            local count = actor:item_stack_count(item)
-            if count > 0 then
-                local func = c[2]
-                func(actor, damager, count)    -- Actor, Damager attack_info, Stack count
+Callback.add("onAttackHandleEnd", "RMT-Item.onAttackHandleEnd", function(self, other, result, args)
+    if not callbacks["onAttackHandleEnd"] then return end
+
+    local attackInfo = args[2].value
+    local actor = attackInfo.parent
+
+    if not Instance.exists(actor) then return end
+    if not has_custom_item[actor.id] then return end
+
+    actor = Instance.wrap(actor)
+
+    for item_id, c_table in pairs(callbacks["onAttackHandleEnd"]) do
+        local stack = actor:item_stack_count(item_id)
+        if stack > 0 then
+            for _, fn in ipairs(c_table) do
+                fn(actor, stack, attackInfo)
             end
         end
     end
-end
+end)
 
 
-local function item_onHit(self, other, result, args)
-    if callbacks["onHit"] then
-        local actor = Instance.wrap(args[2].value)
-        local victim = Instance.wrap(args[3].value)
-        local damager = Damager.wrap(args[4].value.attack_info)
-        damager.instance = args[4].value.inflictor
-        for _, c in ipairs(callbacks["onHit"]) do
-            local item = c[1]
-            local count = actor:item_stack_count(item)
-            if count > 0 then
-                local func = c[2]
-                func(actor, victim, damager, count, args[4].value) -- Attacker, Victim, Damager attack_info, Stack count, hit_info
+Callback.add("onAttackHandleEnd", "RMT-Item.onAttackHandleEndProc", function(self, other, result, args)
+    if not callbacks["onAttackHandleEndProc"] then return end
+
+    local attackInfo = args[2].value
+    local actor = attackInfo.parent
+
+    if not attackInfo.proc then return end
+    if not Instance.exists(actor) then return end
+    if not has_custom_item[actor.id] then return end
+
+    actor = Instance.wrap(actor)
+
+    for item_id, c_table in pairs(callbacks["onAttackHandleEndProc"]) do
+        local stack = actor:item_stack_count(item_id)
+        if stack > 0 then
+            for _, fn in ipairs(c_table) do
+                fn(actor, stack, attackInfo)
             end
         end
     end
-end
+end)
 
 
-local function item_onHitAll(self, other, result, args)
-    local attack = args[2].value
-    if not Instance.exists(attack.inflictor) then return end
-    if callbacks["onHitAll"] then
-        local actor = Instance.wrap(attack.inflictor)
-        local victim = Instance.wrap(attack.target_true)
-        local damager = Damager.wrap(attack.attack_info)
-        damager.instance = attack
-        for _, c in ipairs(callbacks["onHitAll"]) do
-            local item = c[1]
-            local count = actor:item_stack_count(item)
-            if count > 0 then
-                local func = c[2]
-                func(actor, victim, damager, count, attack) -- Attacker, Victim, Damager attack_info, Stack count, hit_info
+Callback.add("onHitProc", "RMT-Item.onHitProc", function(self, other, result, args)     -- Runs before onAttackHit
+    if not callbacks["onHitProc"] then return end
+
+    local actor = Instance.wrap(args[2].value)
+    if not has_custom_item[actor.id] then return end
+
+    local victim = Instance.wrap(args[3].value)
+    local hitInfo = args[4].value
+
+    for item_id, c_table in pairs(callbacks["onHitProc"]) do
+        local stack = actor:item_stack_count(item_id)
+        if stack > 0 then
+            for _, fn in ipairs(c_table) do
+                fn(actor, victim, stack, hitInfo)
             end
         end
     end
-end
+end)
 
 
-local function item_onKill(self, other, result, args)
-    if callbacks["onKill"] then
-        local actor = Instance.wrap(args[3].value)
-        local victim = Instance.wrap(args[2].value)
-        for _, c in ipairs(callbacks["onKill"]) do
-            local item = c[1]
-            local count = actor:item_stack_count(item)
-            if count > 0 then
-                local func = c[2]
-                func(actor, victim, count)   -- Attacker, Victim, Stack count
+Callback.add("onKillProc", "RMT-Item.onKillProc", function(self, other, result, args)
+    if not callbacks["onKillProc"] then return end
+
+    local actor = Instance.wrap(args[3].value)
+    if not has_custom_item[actor.id] then return end
+
+    local victim = Instance.wrap(args[2].value)
+
+    for item_id, c_table in pairs(callbacks["onKillProc"]) do
+        local stack = actor:item_stack_count(item_id)
+        if stack > 0 then
+            for _, fn in ipairs(c_table) do
+                fn(actor, victim, stack)
             end
         end
     end
-end
+end)
 
 
-local function item_onDamaged(self, other, result, args)
-    if not args[3].value.attack_info then return end
-    if callbacks["onDamaged"] then
-        local actor = Instance.wrap(args[2].value)
-        local damager = Damager.wrap(args[3].value.attack_info)
-        damager.instance = args[3].value
-        for _, c in ipairs(callbacks["onDamaged"]) do
-            local item = c[1]
-            local count = actor:item_stack_count(item)
-            if count > 0 then
-                local func = c[2]
-                func(actor, damager, count)   -- Actor, Damager attack_info, Stack count
+Callback.add("onDamagedProc", "RMT-Item.onDamagedProc", function(self, other, result, args)
+    if not callbacks["onDamagedProc"] then return end
+
+    local actor = Instance.wrap(args[2].value)
+    if not has_custom_item[actor.id] then return end
+
+    local hitInfo = args[3].value
+    local attacker = Instance.wrap(hitInfo.inflictor)
+
+    for item_id, c_table in pairs(callbacks["onDamagedProc"]) do
+        local stack = actor:item_stack_count(item_id)
+        if stack > 0 then
+            for _, fn in ipairs(c_table) do
+                fn(actor, attacker, stack, hitInfo)
             end
         end
     end
-end
+end)
 
 
-local function item_onDamageBlocked(self, other, result, args)
-    if callbacks["onDamageBlocked"] then
-        local actor = Instance.wrap(self)
-        local damager = Damager.wrap(other.attack_info)
-        damager.instance = other
-        for _, c in ipairs(callbacks["onDamageBlocked"]) do
-            local item = c[1]
-            local count = actor:item_stack_count(item)
-            if count > 0 then
-                local func = c[2]
-                func(actor, damager, count)   -- Actor, Damager attack_info, Stack count
+Callback.add("onDamageBlocked", "RMT-Item.onDamageBlocked", function(self, other, result, args)
+    if not callbacks["onDamageBlocked"] then return end
+
+    local actor = Instance.wrap(args[2].value)
+    if not has_custom_item[actor.id] then return end
+
+    local damage = args[4].value
+
+    for item_id, c_table in pairs(callbacks["onDamageBlocked"]) do
+        local stack = actor:item_stack_count(item_id)
+        if stack > 0 then
+            for _, fn in ipairs(c_table) do
+                fn(actor, stack, damage)
             end
         end
     end
-end
+end)
 
 
-local function item_onInteract(self, other, result, args)
-    if callbacks["onInteract"] then
-        local actor = Instance.wrap(args[3].value)
-        local interactable = Instance.wrap(args[2].value)
-        for _, c in ipairs(callbacks["onInteract"]) do
-            local item = c[1]
-            local count = actor:item_stack_count(item)
-            if count > 0 then
-                local func = c[2]
-                func(actor, interactable, count)   -- Actor, Interactable, Stack count
+Callback.add("onInteractableActivate", "RMT-Item.onInteractableActivate", function(self, other, result, args)
+    if not callbacks["onInteractableActivate"] then return end
+
+    local actor = Instance.wrap(args[3].value)
+    if not has_custom_item[actor.id] then return end
+
+    local interactable = args[2].value
+
+    for item_id, c_table in pairs(callbacks["onInteractableActivate"]) do
+        local stack = actor:item_stack_count(item_id)
+        if stack > 0 then
+            for _, fn in ipairs(c_table) do
+                fn(actor, stack, interactable)
             end
         end
     end
-end
+end)
 
 
-local function item_onEquipmentUse(self, other, result, args)
-    if callbacks["onEquipmentUse"] then
-        local actor = Instance.wrap(args[2].value)
-        local equip = Equipment.wrap(args[3].value)
-        for _, c in ipairs(callbacks["onEquipmentUse"]) do
-            local item = c[1]
-            local count = actor:item_stack_count(item)
-            if count > 0 then
-                local func = c[2]
-                func(actor, equip, count)   -- Actor, Equipment ID, Stack count
+Callback.add("onPickupCollected", "RMT-Item.onPickupCollected", function(self, other, result, args)
+    if not callbacks["onPickupCollected"] then return end
+
+    local actor = Instance.wrap(args[3].value)
+    if not has_custom_item[actor.id] then return end
+
+    local pickup_object = Instance.wrap(args[2].value)  -- Will be oCustomObject_pPickupItem for all custom items
+
+    for item_id, c_table in pairs(callbacks["onPickupCollected"]) do
+        local stack = actor:item_stack_count(item_id)
+        if stack > 0 then
+            for _, fn in ipairs(c_table) do
+                fn(actor, stack, pickup_object)
             end
         end
     end
-end
+end)
 
 
-local function item_onNewStage(self, other, result, args)
-    for a, _ in pairs(has_custom_item) do
-        if Instance.exists(a) then
-            if callbacks["onNewStage"] then
-                local actor = Instance.wrap(a)
-                for _, c in ipairs(callbacks["onNewStage"]) do
-                    local count = actor:item_stack_count(c[1])
-                    if count > 0 then
-                        c[2](actor, count)  -- Actor, Stack count
-                    end
+Callback.add("onEquipmentUse", "RMT-Item.onEquipmentUse", function(self, other, result, args)
+    if not callbacks["onEquipmentUse"] then return end
+
+    local actor = Instance.wrap(args[2].value)
+    if not has_custom_item[actor.id] then return end
+
+    local equipment = Equipment.wrap(args[3].value)
+    local direction = args[5].value
+
+    for item_id, c_table in pairs(callbacks["onEquipmentUse"]) do
+        local stack = actor:item_stack_count(item_id)
+        if stack > 0 then
+            for _, fn in ipairs(c_table) do
+                fn(actor, stack, equipment, direction)
+            end
+        end
+    end
+end)
+
+
+Callback.add("onStageStart", "RMT-Item.onStageStart", function(self, other, result, args)
+    for actor_id, _ in pairs(has_custom_item) do
+        if not Instance.exists(actor_id) then
+            has_custom_item[actor_id] = nil
+        end
+    end
+
+    if not callbacks["onStageStart"] then return end
+
+    for actor_id, _ in pairs(has_custom_item) do
+        local actor = Instance.wrap(actor_id)
+
+        for item_id, c_table in pairs(callbacks["onStageStart"]) do
+            local stack = actor:item_stack_count(item_id)
+            if stack > 0 then
+                for _, fn in ipairs(c_table) do
+                    fn(actor, stack)
                 end
             end
-        else has_custom_item[self.id] = nil
         end
     end
-end
-
-
--- local function item_onStep(self, other, result, args)
---     if gm.variable_global_get("pause") then return end
-    
---     if callbacks["onStep"] then
---         for n, a in ipairs(has_custom_item) do
---             if Instance.exists(a) then
---                 local actor = Instance.wrap(a)
---                 for _, c in ipairs(callbacks["onStep"]) do
---                     local count = actor:item_stack_count(c[1])
---                     if count > 0 then
---                         c[2](actor, count)  -- Actor, Stack count
---                     end
---                 end
---             else table.remove(has_custom_item, n)
---             end
---         end
---     end
-
---     if callbacks["onShieldBreak"] then
---         for n, a in ipairs(has_custom_item) do
---             if Instance.exists(a) then
---                 if a.shield and a.shield > 0.0 then a.RMT_has_shield = true end
---                 if a.RMT_has_shield and a.shield <= 0.0 then
---                     a.RMT_has_shield = nil
---                     local actor = Instance.wrap(a)
---                     for _, c in ipairs(callbacks["onShieldBreak"]) do
---                         local count = actor:item_stack_count(c[1])
---                         if count > 0 then
---                             c[2](actor, count)  -- Actor, Stack count
---                         end
---                     end
---                 end
---             else table.remove(has_custom_item, n)
---             end
---         end
---     end
--- end
-
-
--- local function item_onDraw(self, other, result, args)
---     if gm.variable_global_get("pause") then return end
-
---     if callbacks["onDraw"] then
---         for n, a in ipairs(has_custom_item) do
---             if Instance.exists(a) then
---                 local actor = Instance.wrap(a)
---                 for _, c in ipairs(callbacks["onDraw"]) do
---                     local count = actor:item_stack_count(c[1])
---                     if count > 0 then
---                         c[2](actor, count)  -- Actor, Stack count
---                     end
---                 end
---             else table.remove(has_custom_item, n)
---             end
---         end
---     end
--- end
-
-
-
--- ========== Initialize ==========
-
-Callback.add("onAttackCreate", "RMT-item_onAttack", item_onAttack)
-Callback.add("onAttackCreate", "RMT-item_onAttackAll", item_onAttackAll)
-Callback.add("onAttackHandleEnd", "RMT-item_onPostAttack", item_onPostAttack)
-Callback.add("onAttackHandleEnd", "RMT-item_onPostAttackAll", item_onPostAttackAll)
-Callback.add("onHitProc", "RMT-item_onHit", item_onHit)
-Callback.add("onAttackHit", "RMT-item_onHitAll", item_onHitAll)
-Callback.add("onKillProc", "RMT-item_onKill", item_onKill)
-Callback.add("onDamagedProc", "RMT-item_onDamaged", item_onDamaged)
-Callback.add("onDamageBlocked", "RMT-item_onDamageBlocked", item_onDamageBlocked)
-Callback.add("onInteractableActivate", "RMT-item_onInteract", item_onInteract)
-Callback.add("onEquipmentUse", "RMT-item_onEquipmentUse", item_onEquipmentUse)
-Callback.add("onStageStart", "RMT-item_onNewStage", item_onNewStage)
--- Callback.add("preStep", "RMT-item_onStep", item_onStep)
--- Callback.add("postHUDDraw", "RMT-item_onDraw", item_onDraw)
+end)
 
 
 
