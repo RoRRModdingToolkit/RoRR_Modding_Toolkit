@@ -496,21 +496,8 @@ end)
 
 -- ========== Callback Hooks ==========
 
--- gm.post_script_hook(gm.constants.__input_system_tick, function(self, other, result, args)
---     for inst_id, c_tables in pairs(callbacks) do
---         if c_tables["onStep"] then
---             local inst = Instance.wrap(inst_id)
---             if inst:exists() then
---                 for _, fn in pairs(c_tables["onStep"]) do
---                     fn(inst)
---                 end
---             end
---         end
---     end
--- end)
-
-
 gm.pre_script_hook(gm.constants.draw_hud, function(self, other, result, args)
+    -- Non-actor exclusive
     for inst_id, c_tables in pairs(callbacks) do
         if c_tables["onDraw"] then
             local inst = Instance.wrap(inst_id)
@@ -652,6 +639,7 @@ end
 
 
 Callback.add("preStep", "RMT-Instance.preStep", function(self, other, result, args)
+    -- Non-actor exclusive
     for inst_id, c_tables in pairs(callbacks) do
         if c_tables["onPreStep"] then
             local inst = Instance.wrap(inst_id)
@@ -666,6 +654,7 @@ end)
 
 
 Callback.add("postStep", "RMT-Instance.postStep", function(self, other, result, args)
+    -- Non-actor exclusive
     for inst_id, c_tables in pairs(callbacks) do
         if c_tables["onPostStep"] then
             local inst = Instance.wrap(inst_id)
