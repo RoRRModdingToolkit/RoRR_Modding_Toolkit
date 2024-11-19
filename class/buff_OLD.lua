@@ -1,5 +1,7 @@
 -- Buff
 
+return
+
 Buff = class_refs["Buff"]
 
 local callbacks = {}
