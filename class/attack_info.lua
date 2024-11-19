@@ -133,7 +133,17 @@ methods_attack_info = {
 
     set_damage = function(self, damage)
         if not damage then log.error("No damage argument provided", 2) end
+
+        -- set_damage before critical calculation
+        local temp_crit_removal = false
+        if self.critical then
+            temp_crit_removal = true
+            self:set_critical(false)
+        end
+
         self.value.damage = damage
+
+        if temp_crit_removal then self:set_critical(true) end
     end,
 
 
@@ -143,6 +153,7 @@ methods_attack_info = {
         if (not self.critical) and bool then
             self.value.critical = true
             self.value.damage = self.value.damage * 2.0
+
         elseif self.critical and (not bool) then
             self.value.critical = false
             self.value.damage = self.value.damage / 2.0
