@@ -440,7 +440,7 @@ metatable_instance_gs = {
     __index = function(table, key)
         if key == "id" then return table.value.id end
         local val = gm.variable_instance_get(table.value, key)
-        if key == "attack_info" then return Attack_Info.wrap(attack_info) end
+        if key == "attack_info" then return Attack_Info.wrap(val) end
         return Wrap.wrap(val)
     end,
 
