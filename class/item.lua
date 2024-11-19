@@ -642,34 +642,26 @@ Callback.add("onAttackCreate", "RMT-Item.onAttackCreate", function(self, other, 
 
     actor = Instance.wrap(actor)
 
-    for item_id, c_table in pairs(callbacks["onAttackCreate"]) do
-        local stack = actor:item_stack_count(item_id)
-        if stack > 0 then
-            for _, fn in ipairs(c_table) do
-                fn(actor, stack, attack_info)
+    if callbacks["onAttackCreate"] then
+        for item_id, c_table in pairs(callbacks["onAttackCreate"]) do
+            local stack = actor:item_stack_count(item_id)
+            if stack > 0 then
+                for _, fn in ipairs(c_table) do
+                    fn(actor, stack, attack_info)
+                end
             end
         end
     end
-end)
-
-
-Callback.add("onAttackCreate", "RMT-Item.onAttackCreateProc", function(self, other, result, args)
-    if not callbacks["onAttackCreateProc"] then return end
-
-    local attack_info = args[2].value
-    local actor = attack_info.parent
 
     if not attack_info.proc then return end
-    if not Instance.exists(actor) then return end
-    if not has_custom_item[actor.id] then return end
 
-    actor = Instance.wrap(actor)
-
-    for item_id, c_table in pairs(callbacks["onAttackCreateProc"]) do
-        local stack = actor:item_stack_count(item_id)
-        if stack > 0 then
-            for _, fn in ipairs(c_table) do
-                fn(actor, stack, attack_info)
+    if callbacks["onAttackCreateProc"] then
+        for item_id, c_table in pairs(callbacks["onAttackCreateProc"]) do
+            local stack = actor:item_stack_count(item_id)
+            if stack > 0 then
+                for _, fn in ipairs(c_table) do
+                    fn(actor, stack, attack_info)
+                end
             end
         end
     end
@@ -709,34 +701,26 @@ Callback.add("onAttackHandleEnd", "RMT-Item.onAttackHandleEnd", function(self, o
 
     actor = Instance.wrap(actor)
 
-    for item_id, c_table in pairs(callbacks["onAttackHandleEnd"]) do
-        local stack = actor:item_stack_count(item_id)
-        if stack > 0 then
-            for _, fn in ipairs(c_table) do
-                fn(actor, stack, attack_info)
+    if callbacks["onAttackHandleEnd"] then
+        for item_id, c_table in pairs(callbacks["onAttackHandleEnd"]) do
+            local stack = actor:item_stack_count(item_id)
+            if stack > 0 then
+                for _, fn in ipairs(c_table) do
+                    fn(actor, stack, attack_info)
+                end
             end
         end
     end
-end)
-
-
-Callback.add("onAttackHandleEnd", "RMT-Item.onAttackHandleEndProc", function(self, other, result, args)
-    if not callbacks["onAttackHandleEndProc"] then return end
-
-    local attack_info = args[2].value
-    local actor = attack_info.parent
 
     if not attack_info.proc then return end
-    if not Instance.exists(actor) then return end
-    if not has_custom_item[actor.id] then return end
 
-    actor = Instance.wrap(actor)
-
-    for item_id, c_table in pairs(callbacks["onAttackHandleEndProc"]) do
-        local stack = actor:item_stack_count(item_id)
-        if stack > 0 then
-            for _, fn in ipairs(c_table) do
-                fn(actor, stack, attack_info)
+    if callbacks["onAttackHandleEndProc"] then
+        for item_id, c_table in pairs(callbacks["onAttackHandleEndProc"]) do
+            local stack = actor:item_stack_count(item_id)
+            if stack > 0 then
+                for _, fn in ipairs(c_table) do
+                    fn(actor, stack, attack_info)
+                end
             end
         end
     end
