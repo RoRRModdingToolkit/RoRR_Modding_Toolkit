@@ -209,7 +209,7 @@ methods_item = {
 
         local callback_id = nil
         if      callback == "onAcquire"     then callback_id = self.on_acquired
-        elseif  callback == "onRemoved"     then callback_id = self.on_removed
+        elseif  callback == "onRemove"      then callback_id = self.on_removed
         end
 
         if callback_id then
