@@ -494,7 +494,33 @@ end)
 
 -- ========== Callback Hooks ==========
 
--- Add an equivalent for instances in general
+gm.post_script_hook(gm.constants.__input_system_tick, function(self, other, result, args)
+    for inst_id, c_tables in pairs(callbacks) do
+        if c_tables["onStep"] then
+            local inst = Instance.wrap(inst_id)
+            if inst:exists() then
+                for _, fn in pairs(c_tables["onStep"]) do
+                    fn(inst)
+                end
+            end
+        end
+    end
+end)
+
+
+gm.pre_script_hook(gm.constants.draw_hud, function(self, other, result, args)
+    for inst_id, c_tables in pairs(callbacks) do
+        if c_tables["onDraw"] then
+            local inst = Instance.wrap(inst_id)
+            if inst:exists() then
+                for _, fn in pairs(c_tables["onDraw"]) do
+                    fn(inst)
+                end
+            end
+        end
+    end
+end)
+
 
 gm.pre_script_hook(gm.constants.step_actor, function(self, other, result, args)
     if not callbacks[self.id] then return end
