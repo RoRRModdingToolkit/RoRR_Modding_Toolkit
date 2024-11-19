@@ -6,7 +6,8 @@ local callbacks = {}
 local valid_callbacks = {
     onApply                 = true,
     onRemove                = true,
-    onStep                  = true,
+    onPreStep               = true,
+    onPostStep              = true,
     onPreDraw               = true,
     onPostDraw              = true,
     onStatRecalc            = true,
@@ -80,7 +81,6 @@ methods_buff = {
         local callback_id = nil
         if      callback == "onApply"       then callback_id = self.on_apply
         elseif  callback == "onRemove"      then callback_id = self.on_remove
-        elseif  callback == "onStep"        then callback_id = self.on_step
         end
 
         if callback_id then
@@ -151,13 +151,65 @@ metatable_class["Buff"] = {
 -- ========== Hooks ==========
 
 gm.post_script_hook(gm.constants.callback_execute, function(self, other, result, args)
-    -- onApply, onRemove, onStep
+    -- onApply and onRemove
     if callbacks[args[1].value] then
         local id = callbacks[args[1].value]["id"]
         local actor = Instance.wrap(args[2].value)
         local stack = actor:buff_stack_count(id)
         for _, fn in ipairs(callbacks[args[1].value]) do
             fn(actor, stack)
+        end
+    end
+end)
+
+
+gm.pre_script_hook(gm.constants.step_actor, function(self, other, result, args)
+    if not has_custom_buff[self.id] then return end
+
+    local actor = Instance.wrap(self)
+    local actorData = actor:get_data("buff")
+
+    if callbacks["onPreStep"] then
+        for buff_id, c_table in pairs(callbacks["onPreStep"]) do
+            local stack = actor:buff_stack_count(buff_id)
+            if stack > 0 then
+                for _, fn in ipairs(c_table) do
+                    fn(actor, stack)
+                end
+            end
+        end
+    end
+
+    if not callbacks["onShieldBreak"] then return end
+
+    if self.shield and self.shield > 0.0 then actorData.has_shield = true end
+    if actorData.has_shield and self.shield <= 0.0 then
+        actorData.has_shield = nil
+
+        for buff_id, c_table in pairs(callbacks["onShieldBreak"]) do
+            local stack = actor:buff_stack_count(buff_id)
+            if stack > 0 then
+                for _, fn in ipairs(c_table) do
+                    fn(actor, stack)
+                end
+            end
+        end
+    end
+end)
+
+
+gm.post_script_hook(gm.constants.step_actor, function(self, other, result, args)
+    if not callbacks["onPostStep"] then return end
+    if not has_custom_buff[self.id] then return end
+
+    local actor = Instance.wrap(self)
+
+    for buff_id, c_table in pairs(callbacks["onPostStep"]) do
+        local stack = actor:buff_stack_count(buff_id)
+        if stack > 0 then
+            for _, fn in ipairs(c_table) do
+                fn(actor, stack)
+            end
         end
     end
 end)
