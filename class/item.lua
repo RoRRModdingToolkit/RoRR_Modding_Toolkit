@@ -624,8 +624,8 @@ end
 Callback.add("onAttackCreate", "RMT-Item.onAttackCreate", function(self, other, result, args)
     if not callbacks["onAttackCreate"] then return end
 
-    local attackInfo = args[2].value
-    local actor = attackInfo.parent
+    local attack_info = args[2].value
+    local actor = attack_info.parent
 
     if not Instance.exists(actor) then return end
     if not has_custom_item[actor.id] then return end
@@ -636,7 +636,7 @@ Callback.add("onAttackCreate", "RMT-Item.onAttackCreate", function(self, other, 
         local stack = actor:item_stack_count(item_id)
         if stack > 0 then
             for _, fn in ipairs(c_table) do
-                fn(actor, stack, attackInfo)
+                fn(actor, stack, attack_info)
             end
         end
     end
@@ -646,10 +646,10 @@ end)
 Callback.add("onAttackCreate", "RMT-Item.onAttackCreateProc", function(self, other, result, args)
     if not callbacks["onAttackCreateProc"] then return end
 
-    local attackInfo = args[2].value
-    local actor = attackInfo.parent
+    local attack_info = args[2].value
+    local actor = attack_info.parent
 
-    if not attackInfo.proc then return end
+    if not attack_info.proc then return end
     if not Instance.exists(actor) then return end
     if not has_custom_item[actor.id] then return end
 
@@ -659,7 +659,7 @@ Callback.add("onAttackCreate", "RMT-Item.onAttackCreateProc", function(self, oth
         local stack = actor:item_stack_count(item_id)
         if stack > 0 then
             for _, fn in ipairs(c_table) do
-                fn(actor, stack, attackInfo)
+                fn(actor, stack, attack_info)
             end
         end
     end
@@ -669,8 +669,8 @@ end)
 Callback.add("onAttackHit", "RMT-Item.onAttackHit", function(self, other, result, args)
     if not callbacks["onAttackHit"] then return end
 
-    local hitInfo = args[2].value
-    local actor = hitInfo.inflictor
+    local hit_info = args[2].value
+    local actor = hit_info.inflictor
 
     if not Instance.exists(actor) then return end
     if not has_custom_item[actor.id] then return end
@@ -681,7 +681,7 @@ Callback.add("onAttackHit", "RMT-Item.onAttackHit", function(self, other, result
         local stack = actor:item_stack_count(item_id)
         if stack > 0 then
             for _, fn in ipairs(c_table) do
-                fn(actor, stack, hitInfo)
+                fn(actor, stack, hit_info)
             end
         end
     end
@@ -691,8 +691,8 @@ end)
 Callback.add("onAttackHandleEnd", "RMT-Item.onAttackHandleEnd", function(self, other, result, args)
     if not callbacks["onAttackHandleEnd"] then return end
 
-    local attackInfo = args[2].value
-    local actor = attackInfo.parent
+    local attack_info = args[2].value
+    local actor = attack_info.parent
 
     if not Instance.exists(actor) then return end
     if not has_custom_item[actor.id] then return end
@@ -703,7 +703,7 @@ Callback.add("onAttackHandleEnd", "RMT-Item.onAttackHandleEnd", function(self, o
         local stack = actor:item_stack_count(item_id)
         if stack > 0 then
             for _, fn in ipairs(c_table) do
-                fn(actor, stack, attackInfo)
+                fn(actor, stack, attack_info)
             end
         end
     end
@@ -713,10 +713,10 @@ end)
 Callback.add("onAttackHandleEnd", "RMT-Item.onAttackHandleEndProc", function(self, other, result, args)
     if not callbacks["onAttackHandleEndProc"] then return end
 
-    local attackInfo = args[2].value
-    local actor = attackInfo.parent
+    local attack_info = args[2].value
+    local actor = attack_info.parent
 
-    if not attackInfo.proc then return end
+    if not attack_info.proc then return end
     if not Instance.exists(actor) then return end
     if not has_custom_item[actor.id] then return end
 
@@ -726,7 +726,7 @@ Callback.add("onAttackHandleEnd", "RMT-Item.onAttackHandleEndProc", function(sel
         local stack = actor:item_stack_count(item_id)
         if stack > 0 then
             for _, fn in ipairs(c_table) do
-                fn(actor, stack, attackInfo)
+                fn(actor, stack, attack_info)
             end
         end
     end
@@ -740,13 +740,13 @@ Callback.add("onHitProc", "RMT-Item.onHitProc", function(self, other, result, ar
     if not has_custom_item[actor.id] then return end
 
     local victim = Instance.wrap(args[3].value)
-    local hitInfo = args[4].value
+    local hit_info = args[4].value
 
     for item_id, c_table in pairs(callbacks["onHitProc"]) do
         local stack = actor:item_stack_count(item_id)
         if stack > 0 then
             for _, fn in ipairs(c_table) do
-                fn(actor, victim, stack, hitInfo)
+                fn(actor, victim, stack, hit_info)
             end
         end
     end
@@ -778,14 +778,14 @@ Callback.add("onDamagedProc", "RMT-Item.onDamagedProc", function(self, other, re
     local actor = Instance.wrap(args[2].value)
     if not has_custom_item[actor.id] then return end
 
-    local hitInfo = args[3].value
-    local attacker = Instance.wrap(hitInfo.inflictor)
+    local hit_info = args[3].value
+    local attacker = Instance.wrap(hit_info.inflictor)
 
     for item_id, c_table in pairs(callbacks["onDamagedProc"]) do
         local stack = actor:item_stack_count(item_id)
         if stack > 0 then
             for _, fn in ipairs(c_table) do
-                fn(actor, attacker, stack, hitInfo)
+                fn(actor, attacker, stack, hit_info)
             end
         end
     end
