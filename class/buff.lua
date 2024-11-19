@@ -6,6 +6,9 @@ local callbacks = {}
 local valid_callbacks = {
     onApply                 = true,
     onRemove                = true,
+    onStep                  = true,
+    onPreDraw               = true,
+    onPostDraw              = true,
     onStatRecalc            = true,
     onPostStatRecalc        = true,
     onAttackCreate          = true,
@@ -27,10 +30,7 @@ local valid_callbacks = {
     onSpecialUse            = true,
     onEquipmentUse          = true,
     onStageStart            = true,
-    onTransform             = true,
-    onStep                  = true,
-    onPreDraw               = true,
-    onPostDraw              = true
+    onTransform             = true
 }
 
 local has_custom_buff = {}
@@ -163,6 +163,40 @@ gm.post_script_hook(gm.constants.callback_execute, function(self, other, result,
 end)
 
 
+gm.pre_script_hook(gm.constants.draw_actor, function(self, other, result, args)
+    if not callbacks["onPreDraw"] then return end
+    if not has_custom_buff[self.id] then return end
+
+    local actor = Instance.wrap(self)
+
+    for buff_id, c_table in pairs(callbacks["onPreDraw"]) do
+        local stack = actor:buff_stack_count(buff_id)
+        if stack > 0 then
+            for _, fn in ipairs(c_table) do
+                fn(actor, stack)
+            end
+        end
+    end
+end)
+
+
+gm.post_script_hook(gm.constants.draw_actor, function(self, other, result, args)
+    if not callbacks["onPostDraw"] then return end
+    if not has_custom_buff[self.id] then return end
+
+    local actor = Instance.wrap(self)
+
+    for buff_id, c_table in pairs(callbacks["onPostDraw"]) do
+        local stack = actor:buff_stack_count(buff_id)
+        if stack > 0 then
+            for _, fn in ipairs(c_table) do
+                fn(actor, stack)
+            end
+        end
+    end
+end)
+
+
 gm.post_script_hook(gm.constants.recalculate_stats, function(self, other, result, args)
     local actor = Instance.wrap(self)
     actor:get_data().post_stat_recalc = true
@@ -241,40 +275,6 @@ gm.pre_script_hook(gm.constants.actor_transform, function(self, other, result, a
         if stack > 0 then
             for _, fn in ipairs(c_table) do
                 fn(actor, to, stack)
-            end
-        end
-    end
-end)
-
-
-gm.pre_script_hook(gm.constants.draw_actor, function(self, other, result, args)
-    if not callbacks["onPreDraw"] then return end
-    if not has_custom_buff[self.id] then return end
-
-    local actor = Instance.wrap(self)
-
-    for buff_id, c_table in pairs(callbacks["onPreDraw"]) do
-        local stack = actor:buff_stack_count(buff_id)
-        if stack > 0 then
-            for _, fn in ipairs(c_table) do
-                fn(actor, stack)
-            end
-        end
-    end
-end)
-
-
-gm.post_script_hook(gm.constants.draw_actor, function(self, other, result, args)
-    if not callbacks["onPostDraw"] then return end
-    if not has_custom_buff[self.id] then return end
-
-    local actor = Instance.wrap(self)
-
-    for buff_id, c_table in pairs(callbacks["onPostDraw"]) do
-        local stack = actor:buff_stack_count(buff_id)
-        if stack > 0 then
-            for _, fn in ipairs(c_table) do
-                fn(actor, stack)
             end
         end
     end

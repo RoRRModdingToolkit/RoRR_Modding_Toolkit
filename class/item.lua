@@ -6,6 +6,10 @@ local callbacks = {}
 local valid_callbacks = {
     onAcquire               = true,
     onRemove                = true,
+    onPreStep               = true,
+    onPostStep              = true,
+    onPreDraw               = true,
+    onPostDraw              = true,
     onStatRecalc            = true,
     onPostStatRecalc        = true,
     onAttackCreate          = true,
@@ -26,11 +30,7 @@ local valid_callbacks = {
     onUtilityUse            = true,
     onSpecialUse            = true,
     onEquipmentUse          = true,
-    onStageStart            = true,
-    onPreStep               = true,
-    onPostStep              = true,
-    onPreDraw               = true,
-    onPostDraw              = true
+    onStageStart            = true
 }
 
 local has_custom_item = {}
@@ -421,70 +421,6 @@ gm.post_script_hook(gm.constants.callback_execute, function(self, other, result,
 end)
 
 
-gm.post_script_hook(gm.constants.recalculate_stats, function(self, other, result, args)
-    local actor = Instance.wrap(self)
-    actor:get_data().post_stat_recalc = true
-
-    if not callbacks["onStatRecalc"] then return end
-    if not has_custom_item[actor.id] then return end
-
-    for item_id, c_table in pairs(callbacks["onStatRecalc"]) do
-        local stack = actor:item_stack_count(item_id)
-        if stack > 0 then
-            for _, fn in ipairs(c_table) do
-                fn(actor, stack)
-            end
-        end
-    end
-end)
-
-
-gm.post_script_hook(gm.constants.skill_activate, function(self, other, result, args)
-    local callback = {
-        "onPrimaryUse",
-        "onSecondaryUse",
-        "onUtilityUse",
-        "onSpecialUse"
-    }
-    callback = callback[args[1].value + 1]
-    if not callbacks[callback] then return end
-
-    if not has_custom_item[self.id] then return end
-
-    local actor = Instance.wrap(self)
-    local active_skill = actor:get_active_skill(args[1].value)
-
-    for item_id, c_table in pairs(callbacks[callback]) do
-        local stack = actor:item_stack_count(item_id)
-        if stack > 0 then
-            for _, fn in ipairs(c_table) do
-                fn(actor, stack, active_skill)
-            end
-        end
-    end
-end)
-
-
-gm.post_script_hook(gm.constants.actor_heal_networked, function(self, other, result, args)
-    if not callbacks["onHeal"] then return end
-
-    local actor = args[1].value
-    if not has_custom_item[actor.id] then return end
-
-    actor = Instance.wrap(actor)
-    local heal_amount = args[2].value
-
-    for item_id, c_table in pairs(callbacks["onHeal"]) do
-        local stack = actor:item_stack_count(item_id)
-        if stack > 0 then
-            for _, fn in ipairs(c_table) do
-                fn(actor, stack, heal_amount)
-            end
-        end
-    end
-end)
-
-
 gm.pre_script_hook(gm.constants.step_actor, function(self, other, result, args)
     if not has_custom_item[self.id] then return end
 
@@ -565,6 +501,70 @@ gm.post_script_hook(gm.constants.draw_actor, function(self, other, result, args)
         if stack > 0 then
             for _, fn in ipairs(c_table) do
                 fn(actor, stack)
+            end
+        end
+    end
+end)
+
+
+gm.post_script_hook(gm.constants.recalculate_stats, function(self, other, result, args)
+    local actor = Instance.wrap(self)
+    actor:get_data().post_stat_recalc = true
+
+    if not callbacks["onStatRecalc"] then return end
+    if not has_custom_item[actor.id] then return end
+
+    for item_id, c_table in pairs(callbacks["onStatRecalc"]) do
+        local stack = actor:item_stack_count(item_id)
+        if stack > 0 then
+            for _, fn in ipairs(c_table) do
+                fn(actor, stack)
+            end
+        end
+    end
+end)
+
+
+gm.post_script_hook(gm.constants.skill_activate, function(self, other, result, args)
+    local callback = {
+        "onPrimaryUse",
+        "onSecondaryUse",
+        "onUtilityUse",
+        "onSpecialUse"
+    }
+    callback = callback[args[1].value + 1]
+    if not callbacks[callback] then return end
+
+    if not has_custom_item[self.id] then return end
+
+    local actor = Instance.wrap(self)
+    local active_skill = actor:get_active_skill(args[1].value)
+
+    for item_id, c_table in pairs(callbacks[callback]) do
+        local stack = actor:item_stack_count(item_id)
+        if stack > 0 then
+            for _, fn in ipairs(c_table) do
+                fn(actor, stack, active_skill)
+            end
+        end
+    end
+end)
+
+
+gm.post_script_hook(gm.constants.actor_heal_networked, function(self, other, result, args)
+    if not callbacks["onHeal"] then return end
+
+    local actor = args[1].value
+    if not has_custom_item[actor.id] then return end
+
+    actor = Instance.wrap(actor)
+    local heal_amount = args[2].value
+
+    for item_id, c_table in pairs(callbacks["onHeal"]) do
+        local stack = actor:item_stack_count(item_id)
+        if stack > 0 then
+            for _, fn in ipairs(c_table) do
+                fn(actor, stack, heal_amount)
             end
         end
     end
