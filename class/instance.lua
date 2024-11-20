@@ -290,6 +290,8 @@ methods_instance = {
                     end
                 end
                 
+                -- Prevent RMT's guid from being used unless it
+                -- is actually the calling mod (no other guids)
                 if mod_id == _ENV["!guid"] then level = level + 1
                 else break
                 end
