@@ -1,5 +1,6 @@
 ### v1.1.33
 * Callback : Fixed `remove` not actually doing anything.
+    * Also fixed various `remove_callbacks` that may or may not have been broken.
 * Actor : `fire_` methods now have an optional `no_proc` bool argument (default `false`).
 * Helper : Added `is_true` and `is_false`
 * Item, Equipment, Buff, Instance, Actor, Player
@@ -7,7 +8,7 @@
     * Added callback `onPickupCollected`
 * Added Attack_Info class
 * Added Hit_Info class
-* Minor optimizations in callbacks across the board.
+* Minor optimizations in various callbacks.
 
 ### v1.1.32
 * Actor : Added `apply_dot`
