@@ -549,7 +549,7 @@ end)
 -- ========== Callback Hooks ==========
 
 gm.pre_script_hook(gm.constants.draw_hud, function(self, other, result, args)
-    -- Non-actor exclusive
+    -- For non-actors
     for inst_id, c_tables in pairs(callbacks) do
         if c_tables["onDraw"] then
             local inst = Instance.wrap(inst_id)
