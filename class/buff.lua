@@ -200,8 +200,8 @@ end)
 
 
 gm.post_script_hook(gm.constants.step_actor, function(self, other, result, args)
-    if not callbacks["onPostStep"] then return end
     if not has_custom_buff[self.id] then return end
+    if not callbacks["onPostStep"] then return end
 
     local actor = Instance.wrap(self)
 
@@ -217,8 +217,8 @@ end)
 
 
 gm.pre_script_hook(gm.constants.draw_actor, function(self, other, result, args)
-    if not callbacks["onPreDraw"] then return end
     if not has_custom_buff[self.id] then return end
+    if not callbacks["onPreDraw"] then return end
 
     local actor = Instance.wrap(self)
 
@@ -234,8 +234,8 @@ end)
 
 
 gm.post_script_hook(gm.constants.draw_actor, function(self, other, result, args)
-    if not callbacks["onPostDraw"] then return end
     if not has_custom_buff[self.id] then return end
+    if not callbacks["onPostDraw"] then return end
 
     local actor = Instance.wrap(self)
 
