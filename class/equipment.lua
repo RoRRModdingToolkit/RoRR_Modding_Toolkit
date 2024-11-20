@@ -538,7 +538,7 @@ end)
 -- ========== Callbacks ==========
 
 function equipment_onPostStatRecalc(player)
-    if not player.RMT_object == "Player" then return end
+    if player.RMT_object ~= "Player" then return end
     local equipment = player:get_equipment()
 
     if not equipment
