@@ -482,7 +482,7 @@ gm.post_script_hook(gm.constants.skill_activate, function(self, other, result, a
 end)
 
 
-gm.post_script_hook(gm.constants.player_heal_networked, function(self, other, result, args)
+gm.post_script_hook(gm.constants.actor_heal_networked, function(self, other, result, args)
     local player = args[1].value
     if not has_custom_equip[player.id] then return end
 
