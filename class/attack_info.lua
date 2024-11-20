@@ -141,7 +141,7 @@ methods_attack_info = {
     end,
 
 
-    add_offset = function(self, attack_info, offset)
+    add_climb = function(self, attack_info, offset)
         attack_info = Wrap.unwrap(attack_info)
         
         -- Overload 1
