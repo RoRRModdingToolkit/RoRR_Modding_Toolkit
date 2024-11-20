@@ -99,7 +99,7 @@ methods_actor = {
 
 
     fire_bullet = function(self, x, y, range, direction, damage, pierce_multiplier, hit_sprite, tracer, no_proc)
-        -- Set whether or not the bullet damager can pierce
+        -- Set whether or not the bullet attack can pierce
         local can_pierce = false
         if pierce_multiplier then can_pierce = true end
 
@@ -200,8 +200,8 @@ methods_actor = {
 
     apply_stun = function(self, kind, direction, duration)
         -- Other types don't completely stun
-        if kind > Damager.KNOCKBACK_KIND.standard then
-            gm.actor_knockback_inflict(self.value, Damager.KNOCKBACK_KIND.standard, direction, 1)
+        if kind > Attack_Info.KNOCKBACK_KIND.standard then
+            gm.actor_knockback_inflict(self.value, Attack_Info.KNOCKBACK_KIND.standard, direction, 1)
         end
         gm.actor_knockback_inflict(self.value, kind, direction, duration *60)
     end,
@@ -688,7 +688,7 @@ end)
 -- ========== Initialize ==========
 
 Actor:onDamagedProc("RMT-actorAllowStun", function(actor, attacker, hit_info)
-    -- Allow stun application even if damager.proc is false
+    -- Allow stun application even if attack_info.proc is false
     if not hit_info.attack_info then return end
     if hit_info.stun > 0 and Helper.is_false(hit_info.proc) and hit_info.RMT_allow_stun then
         actor:apply_stun(hit_info.knockback_kind, hit_info.knockback_direction, hit_info.stun * 1.5)
