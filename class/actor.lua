@@ -132,6 +132,7 @@ methods_actor = {
         self.value:fire_explosion_local(0, x, y, damage, sparks_sprite or -1, 2, width / GM.sprite_get_width(mask), height / GM.sprite_get_height(mask))
         local inst = GM.variable_global_get("attack_bullet")
         local attack_info = inst.attack_info
+        attack_info.proc = not no_proc
         attack_info.damage_color = Color.WHITE_ALMOST
 
         -- Create explosion sprite manually
