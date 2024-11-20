@@ -673,7 +673,7 @@ Callback.add("onAttackCreate", "RMT-Instance.onAttackCreate", function(self, oth
     local actor = attack_info.parent
     
     if not Instance.exists(actor) then return end
-    if not callbacks[actor.id] or not callbacks[actor.id]["onAttackCreate"] then return end
+    if not callbacks[actor.id] then return end
 
     actor = Instance.wrap(actor)
 
