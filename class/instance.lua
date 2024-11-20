@@ -296,6 +296,41 @@ methods_instance = {
             end
         end
 
+        -- log.info(mod_id)
+
+        -- if not mod_id then
+        --     -- Find ID of mod that called this method
+        --     mod_id = "main"
+        --     local level = 2
+        --     while true do
+        --         local info = debug.getinfo(level, "f")
+        --         if not info then
+        --             mod_id = _ENV["!guid"]
+        --             break
+        --         end
+        --         local func = info.func
+
+        --         -- Taken from ENVY
+        --         local i = 0
+        --         repeat
+        --             i = i + 1
+        --             local name, val = debug.getupvalue(func, i)
+        --             if name == "_ENV" then
+        --                 mod_id = val["!guid"]
+        --                 break
+        --             end
+        --         until not name
+                
+        --         -- Prevent RMT's guid from being used unless it
+        --         -- is actually the calling mod (no other guids)
+        --         if mod_id == _ENV["!guid"] then level = level + 1
+        --         else break
+        --         end
+        --     end
+        -- end
+
+        -- log.info(mod_id)
+
         -- Create data table if it doesn't already exist and return it
         if not instance_data[self.value.id] then instance_data[self.value.id] = {} end
         if not instance_data[self.value.id][mod_id] then instance_data[self.value.id][mod_id] = {} end
