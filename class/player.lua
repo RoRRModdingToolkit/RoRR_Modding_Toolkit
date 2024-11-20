@@ -64,11 +64,12 @@ end
 
 
 Player.remove_callback = function(id)
-    for n, c in ipairs(auto_callbacks) do
-        if c[2] == id then
-            table.remove(auto_callbacks, n)
-            return
+    local i = #auto_callbacks
+    while i > 0 do
+        if auto_callbacks[i][2] == id then
+            table.remove(auto_callbacks, i)
         end
+        i = i - 1
     end
 end
 

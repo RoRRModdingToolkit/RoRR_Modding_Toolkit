@@ -713,7 +713,7 @@ Callback.add("onAttackHandleEnd", "RMT-Instance.onAttackHandleEnd", function(sel
     local actor = attack_info.parent
     
     if not Instance.exists(actor) then return end
-    if not callbacks[actor.id] or not callbacks[actor.id]["onAttackHandleEnd"] then return end
+    if not callbacks[actor.id] then return end
 
     actor = Instance.wrap(actor)
 
