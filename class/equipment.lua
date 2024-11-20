@@ -349,7 +349,7 @@ gm.pre_script_hook(gm.constants.equipment_set, function(self, other, result, arg
 
     local new_equipment = Equipment.wrap(args[2].value)
 
-    for _, fn in ipairs(callbacks[equipment.value]["onDrop"]) do
+    for _, fn in ipairs(callbacks["onDrop"][equipment.value]) do
         fn(player, new_equipment)
     end
 end)
