@@ -143,7 +143,7 @@ methods_attack_info = {
 
     add_offset = function(self, attack_info, offset)
         attack_info = Wrap.unwrap(attack_info)
-
+        
         -- Overload 1
         if type(attack_info) == "number" then
             self.value.climb = self.value.climb + attack_info
@@ -151,7 +151,8 @@ methods_attack_info = {
         end
 
         -- Overload 2
-        if not gm.is_struct(attack_info.value) then log.error("Argument 1 is not valid", 2) end
+        if not gm.is_struct(attack_info) then log.error("Argument 1 is not valid", 2) end
+        if attack_info.attack_info then attack_info = attack_info.attack_info end   -- "Unwrap" hit_info struct
         self.value.climb = attack_info.climb + (offset or 10.0)
     end,
 
