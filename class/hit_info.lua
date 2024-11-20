@@ -7,6 +7,7 @@ Hit_Info = Proxy.new()
 -- ========== Static Methods ==========
 
 Hit_Info.wrap = function(value)
+    if not value then return nil end
     return make_wrapper(value, "Hit_Info", metatable_hit_info, lock_table_hit_info)
 end
 
@@ -89,7 +90,9 @@ metatable_hit_info = {
         end
 
         -- Pass to next metatable
-        return metatable_attack_info.__index(Attack_Info.wrap(table.value.attack_info), key)
+        local ai = table.attack_info
+        if not ai then return nil end
+        return metatable_attack_info.__index(ai, key)
     end,
 
 

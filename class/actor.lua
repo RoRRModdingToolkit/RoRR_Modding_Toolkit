@@ -688,6 +688,7 @@ end)
 
 Actor:onDamagedProc("RMT-actorAllowStun", function(actor, attacker, hit_info)
     -- Allow stun application even if damager.proc is false
+    if not hit_info.attack_info then return end
     if hit_info.stun > 0 and Helper.is_false(hit_info.proc) and hit_info.RMT_allow_stun then
         actor:apply_stun(hit_info.knockback_kind, hit_info.knockback_direction, hit_info.stun * 1.5)
     end

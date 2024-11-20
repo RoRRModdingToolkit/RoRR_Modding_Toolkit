@@ -73,6 +73,7 @@ methods_buff = {
 
             local callback_id = self.on_apply
             if not callbacks[callback_id] then callbacks[callback_id] = {} end
+            callbacks[callback_id]["id"] = self.value
             table.insert(callbacks[callback_id], function(actor, stack)
                 has_custom_buff[actor.id] = true
             end)

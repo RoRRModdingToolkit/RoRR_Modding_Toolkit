@@ -342,7 +342,7 @@ methods_instance = {
             else log.error("Callback ID already exists", 2)
             end
     
-        elseif valid_callbacks[callback] then
+        elseif instance_valid_callbacks[callback] then
             if not callbacks[self.value.id] then
                 callbacks[self.value.id] = {}
                 callbacks[self.value.id]["CInstance"] = self.value
@@ -367,7 +367,7 @@ methods_instance = {
             end
         end
 
-        for callback, _ in pairs(valid_callbacks) do
+        for callback, _ in pairs(instance_valid_callbacks) do
             local c_table = callbacks[self.value.id][callback]
             if c_table then c_table[id] = nil end
         end
@@ -384,7 +384,7 @@ methods_instance = {
             end
         end
 
-        for callback, _ in pairs(valid_callbacks) do
+        for callback, _ in pairs(instance_valid_callbacks) do
             local c_table = callbacks[self.value.id][callback]
             if c_table and c_table[id] then return true end
         end
@@ -395,7 +395,7 @@ methods_instance = {
 }
 
 -- Callbacks
-for c, _ in pairs(valid_callbacks) do
+for c, _ in pairs(instance_valid_callbacks) do
     methods_instance[c] = function(self, id, func, skill)
         self:add_callback(c, id, func, skill)
     end
