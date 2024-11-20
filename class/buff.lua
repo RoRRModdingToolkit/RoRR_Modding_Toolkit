@@ -17,6 +17,8 @@ local valid_callbacks = {
     onAttackHit             = true,
     onAttackHandleEnd       = true,
     onAttackHandleEndProc   = true,
+    onDamageCalculate       = true,
+    onDamageCalculateProc   = true,
     onHitProc               = true,
     onKillProc              = true,
     onDamagedProc           = true,
@@ -264,6 +266,47 @@ gm.post_script_hook(gm.constants.recalculate_stats, function(self, other, result
                 fn(actor, stack)
             end
         end
+    end
+end)
+
+
+gm.pre_script_hook(gm.constants.damager_calculate_damage, function(self, other, result, args)
+    if not callbacks["onDamageCalculate"] then return end
+
+    local actor = Instance.wrap(args[6].value)
+    if not Instance.exists(actor) then return end
+    if not has_custom_buff[actor.id] then return end
+
+    local victim = Instance.wrap(args[2].value)
+    local damage = args[4].value
+    local hit_info = Hit_Info.wrap(args[1].value)
+
+    if callbacks["onDamageCalculate"] then
+        for buff_id, c_table in pairs(callbacks["onDamageCalculate"]) do
+            local stack = actor:buff_stack_count(buff_id)
+            if stack > 0 then
+                for _, fn in ipairs(c_table) do
+                    local new = fn(actor, victim, stack, damage, hit_info)
+                    if type(new) == "number" then damage = new end   -- Replace damage
+                end
+            end
+        end
+        args[4].value = damage
+    end
+
+    if Helper.is_false(hit_info.proc) then return end
+
+    if callbacks["onDamageCalculateProc"] then
+        for buff_id, c_table in pairs(callbacks["onDamageCalculateProc"]) do
+            local stack = actor:buff_stack_count(buff_id)
+            if stack > 0 then
+                for _, fn in ipairs(c_table) do
+                    local new = fn(actor, victim, stack, damage, hit_info)
+                    if type(new) == "number" then damage = new end   -- Replace damage
+                end
+            end
+        end
+        args[4].value = damage
     end
 end)
 

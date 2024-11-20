@@ -15,6 +15,8 @@ local valid_callbacks = {
     onAttackHit             = true,
     onAttackHandleEnd       = true,
     onAttackHandleEndProc   = true,
+    onDamageCalculate       = true,
+    onDamageCalculateProc   = true,
     onHitProc               = true,
     onKillProc              = true,
     onDamagedProc           = true,
@@ -223,25 +225,24 @@ methods_actor = {
     end,
 
 
-    item_give = function(self, item, count, temp)
+    item_give = function(self, item, count, kind)
         item = Wrap.unwrap(item)
-        if not temp then temp = false end
-        gm.item_give(self.value, item, count or 1, temp)
+        if not kind then kind = Item.STACK_KIND.normal end
+        gm.item_give(self.value, item, count or 1, kind)
     end,
 
 
-    item_remove = function(self, item, count, temp)
+    item_remove = function(self, item, count, kind)
         item = Wrap.unwrap(item)
-        if not temp then temp = false end
-        gm.item_take(self.value, item, count or 1, temp)
+        if not kind then kind = Item.STACK_KIND.normal end
+        gm.item_take(self.value, item, count or 1, kind)
     end,
 
 
-    item_stack_count = function(self, item, item_type)
+    item_stack_count = function(self, item, kind)
         item = Wrap.unwrap(item)
-        if item_type == Item.TYPE.real then return gm.item_count(self.value, item, false) end
-        if item_type == Item.TYPE.temporary then return gm.item_count(self.value, item, true) end
-        return gm.item_count(self.value, item, false) + gm.item_count(self.value, item, true)
+        if not kind then kind = Item.STACK_KIND.any end
+        return gm.item_count(self.value, item, kind)
     end,
 
 
@@ -462,6 +463,36 @@ gm.post_script_hook(gm.constants.recalculate_stats, function(self, other, result
 
     for _, fn in pairs(callbacks["onStatRecalc"]) do
         fn(actor)
+    end
+end)
+
+
+gm.pre_script_hook(gm.constants.damager_calculate_damage, function(self, other, result, args)
+    if not callbacks["onDamageCalculate"] then return end
+
+    local actor = Instance.wrap(args[6].value)
+    if not Instance.exists(actor) then return end
+
+    local victim = Instance.wrap(args[2].value)
+    local damage = args[4].value
+    local hit_info = Hit_Info.wrap(args[1].value)
+
+    if callbacks["onDamageCalculate"] then
+        for _, fn in pairs(callbacks["onDamageCalculate"]) do
+            local new = fn(actor, victim, damage, hit_info)
+            if type(new) == "number" then damage = new end   -- Replace damage
+        end
+        args[4].value = damage
+    end
+
+    if Helper.is_false(hit_info.proc) then return end
+
+    if callbacks["onDamageCalculateProc"] then
+        for _, fn in pairs(callbacks["onDamageCalculateProc"]) do
+            local new = fn(actor, victim, damage, hit_info)
+            if type(new) == "number" then damage = new end   -- Replace damage
+        end
+        args[4].value = damage
     end
 end)
 
