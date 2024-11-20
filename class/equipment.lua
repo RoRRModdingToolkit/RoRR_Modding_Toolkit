@@ -3,15 +3,38 @@
 Equipment = class_refs["Equipment"]
 
 local callbacks = {}
-local other_callbacks = {
-    "onPickup",
-    "onDrop",
-    "onStatRecalc",
-    "onPostStatRecalc",
-    "onStep",
-    "onDraw"
+local valid_callbacks = {
+    onPickup                = true,
+    onDrop                  = true,
+    onUse                   = true,
+    onPreStep               = true,
+    onPostStep              = true,
+    onPreDraw               = true,
+    onPostDraw              = true,
+    onStatRecalc            = true,
+    onPostStatRecalc        = true,
+    onAttackCreate          = true,
+    onAttackCreateProc      = true,
+    onAttackHit             = true,
+    onAttackHandleEnd       = true,
+    onAttackHandleEndProc   = true,
+    onHitProc               = true,
+    onKillProc              = true,
+    onDamagedProc           = true,
+    onDamageBlocked         = true,
+    onHeal                  = true,
+    onShieldBreak           = true,
+    onInteractableActivate  = true,
+    onPickupCollected       = true,
+    onPrimaryUse            = true,
+    onSecondaryUse          = true,
+    onUtilityUse            = true,
+    onSpecialUse            = true,
+    onStageStart            = true
 }
 
+local has_custom_equip = {}
+local has_callbacks = {}
 local is_passive = {}
 
 local disabled_loot = {}
@@ -115,18 +138,32 @@ methods_equipment = {
     
 
     add_callback = function(self, callback, func)
+        -- Add onPickup/onDrop callback to add/remove actor to/from has_custom_equip
+        local function add_onPickup()
+            if has_callbacks[self.value] then return end
+            has_callbacks[self.value] = true
+
+            self:onPickup(function(actor)
+                has_custom_equip[actor.id] = true
+            end)
+            self:onDrop(function(actor, new_equipment)
+                has_custom_equip[actor.id] = nil
+            end)
+        end
 
         if callback == "onUse" then
+            add_onPickup()
             local callback_id = self.on_use
             if not callbacks[callback_id] then callbacks[callback_id] = {} end
             table.insert(callbacks[callback_id], func)
 
-        elseif Helper.table_has(other_callbacks, callback) then
+        elseif valid_callbacks[callback] then
+            add_onPickup()
             if not callbacks[callback] then callbacks[callback] = {} end
-            table.insert(callbacks[callback], {self.value, func})
+            if not callbacks[callback][self.value] then callbacks[callback][self.value] = {} end
+            table.insert(callbacks[callback][self.value], func)
 
         else log.error("Invalid callback name", 2)
-
         end
     end,
 
@@ -134,16 +171,12 @@ methods_equipment = {
     clear_callbacks = function(self)
         callbacks[self.on_use] = nil
 
-        for _, c in ipairs(other_callbacks) do
-            local c_table = callbacks[c]
-            if c_table then
-                for i, v in ipairs(c_table) do
-                    if v[1] == self.value then
-                        table.remove(c_table, i)
-                    end
-                end
-            end
+        for callback, _ in pairs(valid_callbacks) do
+            local c_table = callbacks[callback]
+            if c_table then c_table[self.value] = nil end
         end
+
+        has_callbacks[self.value] = nil
     end,
 
 
@@ -246,19 +279,16 @@ methods_equipment = {
             end
 
         end
-    end,
-
-
-    -- Callbacks
-    onPickup            = function(self, func) self:add_callback("onPickup", func) end,
-    onDrop              = function(self, func) self:add_callback("onDrop", func) end,
-    onUse               = function(self, func) self:add_callback("onUse", func) end,
-    onStatRecalc        = function(self, func) self:add_callback("onStatRecalc", func) end,
-    onPostStatRecalc    = function(self, func) self:add_callback("onPostStatRecalc", func) end,
-    onStep              = function(self, func) self:add_callback("onStep", func) end,
-    onDraw              = function(self, func) self:add_callback("onDraw", func) end
+    end
 
 }
+
+-- Callbacks
+for c, _ in pairs(valid_callbacks) do
+    methods_equipment[c] = function(self, func)
+        self:add_callback(c, func)
+    end
+end
 
 
 
@@ -291,61 +321,181 @@ metatable_class["Equipment"] = {
 gm.post_script_hook(gm.constants.callback_execute, function(self, other, result, args)
     -- onUse
     if callbacks[args[1].value] then
-        local actor = Instance.wrap(args[2].value)
+        local player = Instance.wrap(args[2].value)
         for _, fn in ipairs(callbacks[args[1].value]) do
-            fn(actor)   -- Actor
-        end
-    end
-end)
-
-
-gm.post_script_hook(gm.constants.recalculate_stats, function(self, other, result, args)
-    local actor = Instance.wrap(self)
-    if callbacks["onStatRecalc"] then
-        for _, fn in ipairs(callbacks["onStatRecalc"]) do
-            if actor.RMT_object == "Player" then
-                local equip = actor:get_equipment()
-                if equip and equip.value == fn[1] then
-                    fn[2](actor)  -- Player
-                end
-            end
-        end
-    end
-    actor:get_data().post_stat_recalc = true
-end)
-
-
-gm.pre_script_hook(gm.constants.equipment_set, function(self, other, result, args)
-    if callbacks["onDrop"] then
-        local player = Instance.wrap(args[1].value)
-        for _, fn in ipairs(callbacks["onDrop"]) do
-            local equip = player:get_equipment()
-            if equip and equip.value == fn[1] then
-                fn[2](player, Equipment.wrap(args[2].value))  -- Player, New equipment wrapper
-            end
-        end
-    end
-end)
-
-
-gm.post_script_hook(gm.constants.equipment_set, function(self, other, result, args)
-    local player = Instance.wrap(args[1].value)
-    player:recalculate_stats()
-    if callbacks["onPickup"] then
-        for _, fn in ipairs(callbacks["onPickup"]) do
-            local equip = player:get_equipment()
-            if equip and equip.value == fn[1] then
-                fn[2](player)  -- Player
-            end
+            fn(player)
         end
     end
 end)
 
 
 gm.pre_script_hook(gm.constants.item_use_equipment, function(self, other, result, args)
-    local equip = Instance.wrap(self):get_equipment()
-    if equip and is_passive[equip.value] then
+    -- Prevent passive equipment use
+    local equipment = Instance.wrap(self):get_equipment()
+    if equipment and is_passive[equipment.value] then
         return false
+    end
+end)
+
+
+gm.pre_script_hook(gm.constants.equipment_set, function(self, other, result, args)
+    local player = Instance.wrap(args[1].value)
+    local equipment = player:get_equipment()
+
+    if not callbacks[equipment.value]
+    or not callbacks[equipment.value]["onDrop"] then return end
+
+    local new_equipment = Equipment.wrap(args[2].value)
+
+    for _, fn in ipairs(callbacks[equipment.value]["onDrop"]) do
+        fn(player, new_equipment)
+    end
+end)
+
+
+gm.post_script_hook(gm.constants.equipment_set, function(self, other, result, args)
+    local player = Instance.wrap(args[1].value)
+    local equipment = player:get_equipment()
+
+    if not callbacks[equipment.value]
+    or not callbacks[equipment.value]["onPickup"] then return end
+
+    for _, fn in ipairs(callbacks[equipment.value]["onPickup"]) do
+        fn(player)
+    end
+
+    player:recalculate_stats()
+end)
+
+
+gm.pre_script_hook(gm.constants.step_actor, function(self, other, result, args)
+    if not has_custom_equip[self.id] then return end
+
+    local player = Instance.wrap(self)
+    local playerData = player:get_data("equip")
+    local equipment = player:get_equipment()
+
+    if not callbacks[equipment.value] then return end
+
+    if callbacks[equipment.value]["onPreStep"] then
+        for _, fn in ipairs(callbacks[equipment.value]["onPreStep"]) do
+            fn(player)
+        end
+    end
+
+    if not callbacks[equipment.value]["onShieldBreak"] then return end
+
+    if self.shield and self.shield > 0.0 then playerData.has_shield = true end
+    if playerData.has_shield and self.shield <= 0.0 then
+        playerData.has_shield = nil
+
+        for _, fn in ipairs(callbacks[equipment.value]["onShieldBreak"]) do
+            fn(player)
+        end
+    end
+end)
+
+
+gm.post_script_hook(gm.constants.step_actor, function(self, other, result, args)
+    if not has_custom_equip[self.id] then return end
+
+    local player = Instance.wrap(self)
+    local equipment = player:get_equipment()
+
+    if not callbacks[equipment.value]
+    or not callbacks[equipment.value]["onPostStep"] then return end
+
+    for _, fn in ipairs(callbacks[equipment.value]["onPostStep"]) do
+        fn(player)
+    end
+end)
+
+
+gm.pre_script_hook(gm.constants.draw_actor, function(self, other, result, args)
+    if not has_custom_equip[self.id] then return end
+
+    local player = Instance.wrap(self)
+    local equipment = player:get_equipment()
+
+    if not callbacks[equipment.value]
+    or not callbacks[equipment.value]["onPreDraw"] then return end
+
+    for _, fn in ipairs(callbacks[equipment.value]["onPreDraw"]) do
+        fn(player)
+    end
+end)
+
+
+gm.post_script_hook(gm.constants.draw_actor, function(self, other, result, args)
+    if not has_custom_equip[self.id] then return end
+
+    local player = Instance.wrap(self)
+    local equipment = player:get_equipment()
+
+    if not callbacks[equipment.value]
+    or not callbacks[equipment.value]["onPostDraw"] then return end
+
+    for _, fn in ipairs(callbacks[equipment.value]["onPostDraw"]) do
+        fn(player)
+    end
+end)
+
+
+gm.post_script_hook(gm.constants.recalculate_stats, function(self, other, result, args)
+    local player = Instance.wrap(self)
+    player:get_data().post_stat_recalc = true
+    if not has_custom_equip[player.id] then return end
+
+    local equipment = player:get_equipment()
+
+    if not callbacks[equipment.value]
+    or not callbacks[equipment.value]["onStatRecalc"] then return end
+
+    for _, fn in ipairs(callbacks[equipment.value]["onStatRecalc"]) do
+        fn(player)
+    end
+end)
+
+
+gm.post_script_hook(gm.constants.skill_activate, function(self, other, result, args)
+    if not has_custom_equip[self.id] then return end
+    
+    local callback = {
+        "onPrimaryUse",
+        "onSecondaryUse",
+        "onUtilityUse",
+        "onSpecialUse"
+    }
+    callback = callback[args[1].value + 1]
+
+    local player = Instance.wrap(self)
+    local equipment = player:get_equipment()
+
+    if not callbacks[equipment.value]
+    or not callbacks[equipment.value][callback] then return end
+
+    local active_skill = player:get_active_skill(args[1].value)
+
+    for _, fn in ipairs(callbacks[equipment.value][callback]) do
+        fn(player, active_skill)
+    end
+end)
+
+
+gm.post_script_hook(gm.constants.player_heal_networked, function(self, other, result, args)
+    local player = args[1].value
+    if not has_custom_equip[player.id] then return end
+
+    player = Instance.wrap(player)
+    local equipment = player:get_equipment()
+
+    if not callbacks[equipment.value]
+    or not callbacks[equipment.value]["onHeal"] then return end
+
+    local heal_amount = args[2].value
+
+    for _, fn in ipairs(callbacks[equipment.value]["onHeal"]) do
+        fn(player, heal_amount)
     end
 end)
 
@@ -379,59 +529,216 @@ end)
 
 -- ========== Callbacks ==========
 
-function equipment_onPostStatRecalc(actor)
-    if callbacks["onPostStatRecalc"] then
-        for _, fn in ipairs(callbacks["onPostStatRecalc"]) do
-            if actor.RMT_object == "Player" then
-                local equip = actor:get_equipment()
-                if equip and equip.value == fn[1] then
-                    fn[2](actor)  -- Player
-                end
-            end
-        end
+function equipment_onPostStatRecalc(player)
+    if not player.RMT_object == "Player" then return end
+    local equipment = player:get_equipment()
+
+    if not callbacks[equipment.value]
+    or not callbacks[equipment.value]["onPostStatRecalc"] then return end
+
+    for _, fn in ipairs(callbacks[equipment.value]["onPostStatRecalc"]) do
+        fn(player)
     end
 end
 
 
-local function equipment_onStep(self, other, result, args)
-    if gm.variable_global_get("pause") then return end
-    
-    if callbacks["onStep"] then
-        local players = Instance.find_all(gm.constants.oP)
-        for n, player in ipairs(players) do
-            for _, c in ipairs(callbacks["onStep"]) do
-                local equip = player:get_equipment()
-                if equip and equip.value == c[1] then
-                    c[2](player)  -- Player
-                end
+Callback.add("onAttackCreate", "RMT-Equipment.onAttackCreate", function(self, other, result, args)
+    local attack_info = Attack_Info.wrap(args[2].value)
+    local player = attack_info.parent
+
+    if not Instance.exists(player) then return end
+    if not has_custom_equip[player.id] then return end
+
+    player = Instance.wrap(player)
+    local equipment = player:get_equipment()
+
+    if not callbacks[equipment.value] then return end
+
+    if callbacks[equipment.value]["onAttackCreate"] then
+        for _, fn in ipairs(callbacks[equipment.value]["onAttackCreate"]) do
+            fn(player, attack_info)
+        end
+    end
+
+    if Helper.is_false(attack_info.proc) then return end
+
+    if callbacks[equipment.value]["onAttackCreateProc"] then
+        for _, fn in ipairs(callbacks[equipment.value]["onAttackCreateProc"]) do
+            fn(player, attack_info)
+        end
+    end
+end)
+
+
+Callback.add("onAttackHit", "RMT-Equipment.onAttackHit", function(self, other, result, args)
+    local hit_info = Hit_Info.wrap(args[2].value)
+    local player = hit_info.inflictor
+
+    if not Instance.exists(player) then return end
+    if not has_custom_equip[player.id] then return end
+
+    player = Instance.wrap(player)
+    local equipment = player:get_equipment()
+
+    if not callbacks[equipment.value]
+    or not callbacks[equipment.value]["onAttackHit"] then return end
+
+    for _, fn in ipairs(callbacks[equipment.value]["onAttackHit"]) do
+        fn(player, hit_info)
+    end
+end)
+
+
+Callback.add("onAttackHandleEnd", "RMT-Equipment.onAttackHandleEnd", function(self, other, result, args)
+    local attack_info = Attack_Info.wrap(args[2].value)
+    local player = attack_info.parent
+
+    if not Instance.exists(player) then return end
+    if not has_custom_equip[player.id] then return end
+
+    player = Instance.wrap(player)
+    local equipment = player:get_equipment()
+
+    if not callbacks[equipment.value] then return end
+
+    if callbacks[equipment.value]["onAttackHandleEnd"] then
+        for _, fn in ipairs(callbacks[equipment.value]["onAttackHandleEnd"]) do
+            fn(player, attack_info)
+        end
+    end
+
+    if Helper.is_false(attack_info.proc) then return end
+
+    if callbacks[equipment.value]["onAttackHandleEndProc"] then
+        for _, fn in ipairs(callbacks[equipment.value]["onAttackHandleEndProc"]) do
+            fn(player, attack_info)
+        end
+    end
+end)
+
+
+Callback.add("onHitProc", "RMT-Equipment.onHitProc", function(self, other, result, args)     -- Runs before onAttackHit
+    local player = Instance.wrap(args[2].value)
+    if not has_custom_equip[player.id] then return end
+
+    local equipment = player:get_equipment()
+
+    if not callbacks[equipment.value]
+    or not callbacks[equipment.value]["onHitProc"] then return end
+
+    local victim = Instance.wrap(args[3].value)
+    local hit_info = Hit_Info.wrap(args[4].value)
+
+    for _, fn in ipairs(callbacks[equipment.value]["onHitProc"]) do
+        fn(player, victim, hit_info)
+    end
+end)
+
+
+Callback.add("onKillProc", "RMT-Equipment.onKillProc", function(self, other, result, args)
+    local player = Instance.wrap(args[3].value)
+    if not has_custom_equip[player.id] then return end
+
+    local equipment = player:get_equipment()
+
+    if not callbacks[equipment.value]
+    or not callbacks[equipment.value]["onKillProc"] then return end
+
+    local victim = Instance.wrap(args[2].value)
+
+    for _, fn in ipairs(callbacks[equipment.value]["onKillProc"]) do
+        fn(player, victim)
+    end
+end)
+
+
+Callback.add("onDamagedProc", "RMT-Equipment.onDamagedProc", function(self, other, result, args)
+    local player = Instance.wrap(args[2].value)
+    if not has_custom_equip[player.id] then return end
+
+    local equipment = player:get_equipment()
+
+    if not callbacks[equipment.value]
+    or not callbacks[equipment.value]["onDamagedProc"] then return end
+
+    local hit_info = Hit_Info.wrap(args[3].value)
+    local attacker = Instance.wrap(hit_info.inflictor)
+
+    for _, fn in ipairs(callbacks[equipment.value]["onDamagedProc"]) do
+        fn(player, attacker, hit_info)
+    end
+end)
+
+
+Callback.add("onDamageBlocked", "RMT-Equipment.onDamageBlocked", function(self, other, result, args)
+    local player = Instance.wrap(args[2].value)
+    if not has_custom_equip[player.id] then return end
+
+    local equipment = player:get_equipment()
+
+    if not callbacks[equipment.value]
+    or not callbacks[equipment.value]["onDamageBlocked"] then return end
+
+    local damage = args[4].value
+
+    for _, fn in ipairs(callbacks[equipment.value]["onDamageBlocked"]) do
+        fn(player, damage)
+    end
+end)
+
+
+Callback.add("onInteractableActivate", "RMT-Equipment.onInteractableActivate", function(self, other, result, args)
+    local player = Instance.wrap(args[3].value)
+    if not has_custom_equip[player.id] then return end
+
+    local equipment = player:get_equipment()
+
+    if not callbacks[equipment.value]
+    or not callbacks[equipment.value]["onInteractableActivate"] then return end
+
+    local interactable = Instance.wrap(args[2].value)
+
+    for _, fn in ipairs(callbacks[equipment.value]["onInteractableActivate"]) do
+        fn(player, interactable)
+    end
+end)
+
+
+Callback.add("onPickupCollected", "RMT-Equipment.onPickupCollected", function(self, other, result, args)
+    local player = Instance.wrap(args[3].value)
+    if not has_custom_equip[player.id] then return end
+
+    local equipment = player:get_equipment()
+
+    if not callbacks[equipment.value]
+    or not callbacks[equipment.value]["onPickupCollected"] then return end
+
+    local pickup_object = Instance.wrap(args[2].value)  -- Will be oCustomObject_pPickupItem/Equipment for all custom items/equipment
+
+    for _, fn in ipairs(callbacks[equipment.value]["onPickupCollected"]) do
+        fn(player, pickup_object)
+    end
+end)
+
+
+Callback.add("onStageStart", "RMT-Equipment.onStageStart", function(self, other, result, args)
+    for player_id, _ in pairs(has_custom_equip) do
+        if not Instance.exists(player_id) then
+            has_custom_equip[player_id] = nil
+        end
+    end
+
+    for player_id, _ in pairs(has_custom_equip) do
+        local player = Instance.wrap(player_id)
+        local equipment = player:get_equipment()
+
+        if callbacks[equipment.value] and callbacks[equipment.value]["onStageStart"] then
+            for _, fn in ipairs(callbacks[equipment.value]["onStageStart"]) do
+                fn(player)
             end
         end
     end
-end
-
-
-local function equipment_onDraw(self, other, result, args)
-    if gm.variable_global_get("pause") then return end
-
-    if callbacks["onDraw"] then
-        local players = Instance.find_all(gm.constants.oP)
-        for n, player in ipairs(players) do
-            for _, c in ipairs(callbacks["onDraw"]) do
-                local equip = player:get_equipment()
-                if equip and equip.value == c[1] then
-                    c[2](player)  -- Player
-                end
-            end
-        end
-    end
-end
-
-
-
--- ========== Initialize ==========
-
-Callback.add("preStep", "RMT-equipment_onStep", equipment_onStep)
-Callback.add("postHUDDraw", "RMT-equipment_onDraw", equipment_onDraw)
+end)
 
 
 

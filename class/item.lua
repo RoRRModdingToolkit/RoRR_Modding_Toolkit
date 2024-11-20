@@ -202,10 +202,8 @@ methods_item = {
         local function add_onAcquire()
             if has_callbacks[self.value] then return end
             has_callbacks[self.value] = true
-
-            local callback_id = self.on_acquired
-            if not callbacks[callback_id] then callbacks[callback_id] = {} end
-            table.insert(callbacks[callback_id], function(actor, stack)
+            
+            self:onAcquire(function(actor, stack)
                 has_custom_item[actor.id] = true
             end)
         end

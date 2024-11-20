@@ -2,7 +2,7 @@
 * Callback : Fixed `remove` not actually doing anything.
 * Actor : `fire_` methods now have an optional `no_proc` bool argument (default `false`).
 * Helper : Added `is_true` and `is_false`
-* Item, Buff, Instance, Actor, Player
+* Item, Equipment, Buff, Instance, Actor, Player
     * Several callbacks renamed (e.g., `onPickup` -> `onAcquired`) and rewritten.
     * Added callback `onPickupCollected`
 * Added Attack_Info class
