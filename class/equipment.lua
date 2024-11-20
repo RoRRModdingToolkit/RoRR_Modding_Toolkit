@@ -582,9 +582,11 @@ Callback.add("onAttackHit", "RMT-Equipment.onAttackHit", function(self, other, r
 
     if not callbacks[equipment.value]
     or not callbacks[equipment.value]["onAttackHit"] then return end
+    
+    local victim = Instance.wrap(hit_info.target_true)
 
     for _, fn in ipairs(callbacks[equipment.value]["onAttackHit"]) do
-        fn(player, hit_info)
+        fn(player, victim, hit_info)
     end
 end)
 

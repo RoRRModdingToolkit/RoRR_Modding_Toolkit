@@ -701,9 +701,10 @@ Callback.add("onAttackHit", "RMT-Instance.onAttackHit", function(self, other, re
     if not callbacks[actor.id] or not callbacks[actor.id]["onAttackHit"] then return end
 
     actor = Instance.wrap(actor)
+    local victim = Instance.wrap(hit_info.target_true)
 
     for _, fn in pairs(callbacks[actor.id]["onAttackHit"]) do
-        fn(actor, hit_info)
+        fn(actor, victim, hit_info)
     end
 end)
 

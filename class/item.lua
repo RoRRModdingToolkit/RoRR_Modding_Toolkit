@@ -657,12 +657,13 @@ Callback.add("onAttackHit", "RMT-Item.onAttackHit", function(self, other, result
     if not has_custom_item[actor.id] then return end
 
     actor = Instance.wrap(actor)
+    local victim = Instance.wrap(hit_info.target_true)
 
     for item_id, c_table in pairs(callbacks["onAttackHit"]) do
         local stack = actor:item_stack_count(item_id)
         if stack > 0 then
             for _, fn in ipairs(c_table) do
-                fn(actor, stack, hit_info)
+                fn(actor, victim, stack, hit_info)
             end
         end
     end
