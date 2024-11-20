@@ -273,12 +273,25 @@ methods_instance = {
         if not mod_id then
             -- Find ID of mod that called this method
             mod_id = "main"
-            local src = debug.getinfo(2, "S").source
-            local split = Array.wrap(gm.string_split(src, "\\"))
-            for i = 1, #split do
-                if split[i] == "plugins" and i < #split then
-                    mod_id = split[i + 1]
+            local level = 2
+            while true do
+                local src = debug.getinfo(level, "S")
+                if not src then
+                    mod_id = _ENV["!guid"]
                     break
+                end
+                src = src.source
+
+                local split = Array.wrap(gm.string_split(src, "\\"))
+                for i = 1, #split do
+                    if split[i] == "plugins" and i < #split then
+                        mod_id = split[i + 1]
+                        break
+                    end
+                end
+                
+                if mod_id == _ENV["!guid"] then level = level + 1
+                else break
                 end
             end
         end

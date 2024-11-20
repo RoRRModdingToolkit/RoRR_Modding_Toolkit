@@ -389,6 +389,8 @@ Actor:setmetatable(metatable_actor_callbacks)
 -- ========== Hooks ==========
 
 gm.pre_script_hook(gm.constants.step_actor, function(self, other, result, args)
+    if not callbacks["onPreStep"] and not callbacks["onShieldBreak"] then return end
+
     local actor = Instance.wrap(self)
     local actorData = actor:get_data("actor")
 
