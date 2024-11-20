@@ -347,6 +347,7 @@ end)
 
 function buff_onPostStatRecalc(actor)
     if not callbacks["onPostStatRecalc"] then return end
+    if not has_custom_buff[actor.id] then return end
 
     for buff_id, c_table in pairs(callbacks["onPostStatRecalc"]) do
         local stack = actor:buff_stack_count(buff_id)

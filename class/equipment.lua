@@ -358,11 +358,10 @@ gm.post_script_hook(gm.constants.equipment_set, function(self, other, result, ar
     local player = Instance.wrap(args[1].value)
     local equipment = player:get_equipment()
 
-    if not callbacks[equipment.value]
-    or not callbacks[equipment.value]["onPickup"] then return end
-
-    for _, fn in ipairs(callbacks[equipment.value]["onPickup"]) do
-        fn(player)
+    if equipment and callbacks[equipment.value] and callbacks[equipment.value]["onPickup"] then
+        for _, fn in ipairs(callbacks[equipment.value]["onPickup"]) do
+            fn(player)
+        end
     end
 
     player:recalculate_stats()
@@ -538,12 +537,19 @@ end)
 -- ========== Callbacks ==========
 
 function equipment_onPostStatRecalc(player)
+    log.info(gm.object_get_name(player.value.object_index))
+    log.info(player.RMT_object)
+
     if player.RMT_object ~= "Player" then return end
     local equipment = player:get_equipment()
+
+    log.info(equipment)
 
     if not equipment
     or not callbacks[equipment.value]
     or not callbacks[equipment.value]["onPostStatRecalc"] then return end
+
+    log.info("flag b")
 
     for _, fn in ipairs(callbacks[equipment.value]["onPostStatRecalc"]) do
         fn(player)

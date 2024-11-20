@@ -600,6 +600,7 @@ end)
 
 function item_onPostStatRecalc(actor)
     if not callbacks["onPostStatRecalc"] then return end
+    if not has_custom_item[actor.id] then return end
 
     for item_id, c_table in pairs(callbacks["onPostStatRecalc"]) do
         local stack = actor:item_stack_count(item_id)
