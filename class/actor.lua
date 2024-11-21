@@ -100,12 +100,14 @@ methods_actor = {
     end,
 
 
-    fire_bullet = function(self, x, y, range, direction, damage, pierce_multiplier, hit_sprite, tracer, no_proc)
+    fire_bullet = function(self, x, y, range, direction, damage, pierce_multiplier, hit_sprite, tracer, can_proc)
         -- Set whether or not the bullet attack can pierce
         local can_pierce = false
         if pierce_multiplier then can_pierce = true end
 
-        local inst = GM._mod_attack_fire_bullet(self.value, x, y, range, direction, damage, hit_sprite or -1, can_pierce, not no_proc)
+        if can_proc == nil then can_proc = true end
+
+        local inst = GM._mod_attack_fire_bullet(self.value, x, y, range, direction, damage, hit_sprite or -1, can_pierce, can_proc)
         local attack_info = inst.attack_info
         attack_info.damage_color = Color.WHITE_ALMOST
 
@@ -118,8 +120,10 @@ methods_actor = {
     end,
 
 
-    fire_explosion = function(self, x, y, width, height, damage, explosion_sprite, sparks_sprite, no_proc)
-        local inst = GM._mod_attack_fire_explosion(self.value, x, y, width, height, damage, explosion_sprite or -1, sparks_sprite or -1, not no_proc)
+    fire_explosion = function(self, x, y, width, height, damage, explosion_sprite, sparks_sprite, can_proc)
+        if can_proc == nil then can_proc = true end
+
+        local inst = GM._mod_attack_fire_explosion(self.value, x, y, width, height, damage, explosion_sprite or -1, sparks_sprite or -1, can_proc)
         local attack_info = inst.attack_info
         attack_info.damage_color = Color.WHITE_ALMOST
 
@@ -127,12 +131,14 @@ methods_actor = {
     end,
 
 
-    fire_explosion_local = function(self, x, y, width, height, damage, explosion_sprite, sparks_sprite, no_proc)
+    fire_explosion_local = function(self, x, y, width, height, damage, explosion_sprite, sparks_sprite, can_proc)
+        if can_proc == nil then can_proc = true end
+
         local mask = gm.constants.sBite1Mask
         self.value:fire_explosion_local(0, x, y, damage, sparks_sprite or -1, 2, width / GM.sprite_get_width(mask), height / GM.sprite_get_height(mask))
         local inst = GM.variable_global_get("attack_bullet")
         local attack_info = inst.attack_info
-        attack_info.proc = not no_proc
+        attack_info.proc = can_proc
         attack_info.damage_color = Color.WHITE_ALMOST
 
         -- Create explosion sprite manually
@@ -144,10 +150,12 @@ methods_actor = {
     end,
 
 
-    fire_direct = function(self, target, damage, direction, x, y, hit_sprite, no_proc)
+    fire_direct = function(self, target, damage, direction, x, y, hit_sprite, can_proc)
         target = Wrap.unwrap(target)
 
-        local inst = GM._mod_attack_fire_direct(self.value, target, x or target.x, y or target.y, direction or 0, damage, hit_sprite or -1, not no_proc)
+        if can_proc == nil then can_proc = true end
+
+        local inst = GM._mod_attack_fire_direct(self.value, target, x or target.x, y or target.y, direction or 0, damage, hit_sprite or -1, can_proc)
         local attack_info = inst.attack_info
         attack_info.damage_color = Color.WHITE_ALMOST
         
