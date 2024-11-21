@@ -1,17 +1,17 @@
-### v1.1.33
-* Callback : Fixed `remove` not actually doing anything.
-    * Also fixed various `remove_callbacks` that may or may not have been broken.
-* Actor : `fire_` methods now have an optional `no_proc` bool argument (default `false`).
-    * Also returns the attack instance only now.
-* Helper : Added `is_true` and `is_false`
+### v1.2.0
+* Added Attack_Info class
+* Added Hit_Info class
 * Item, Equipment, Buff, Instance, Actor, Player
     * Several callbacks renamed (e.g., `onPickup` -> `onAcquired`) and rewritten.
     * Added callbacks `onPickupCollected` and `onDamageCalculate`
     * Item : Replaced `TYPE` with `STACK_KIND`
         * Affects `actor:item_give`, etc. as well
+* Callback : Fixed `remove` not actually doing anything.
+    * Also fixed various `remove_callbacks` that may or may not have been broken.
+* Actor : `fire_` methods now have an optional `no_proc` bool argument (default `false`).
+    * Also returns the attack instance only now.
+* Helper : Added `is_true` and `is_false`
 * Instance : Fixed `get_data` pulling a different table in certain circumstances.
-* Added Attack_Info class
-* Added Hit_Info class
 * Minor optimizations in various callbacks.
 
 ### v1.1.32
