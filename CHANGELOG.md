@@ -8,6 +8,7 @@
     * Several callbacks renamed (e.g., `onPickup` -> `onAcquired`) and rewritten.
     * Added callbacks `onPickupCollected` and `onDamageCalculate`
     * Item : Replaced `TYPE` with `STACK_KIND`
+        * Affects `actor:item_give`, etc. as well
 * Instance : Fixed `get_data` pulling a different table in certain circumstances.
 * Added Attack_Info class
 * Added Hit_Info class
