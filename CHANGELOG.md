@@ -4,8 +4,9 @@
 * Item, Equipment, Buff, Instance, Actor, Player
     * Several callbacks renamed (e.g., `onPickup` -> `onAcquired`) and rewritten.
     * Added callbacks `onPickupCollected` and `onDamageCalculate`
-    * Item : Replaced `TYPE` with `STACK_KIND`
-        * Affects `actor:item_give`, etc. as well
+* Item : Replaced `TYPE` with `STACK_KIND`
+    * Affects `actor:item_give`, etc. as well
+* Item, Equipment : Added `is_loot`
 * Callback : Fixed `remove` not actually doing anything.
     * Also fixed various `remove_callbacks` that may or may not have been broken.
 * Actor : `fire_` methods now have an optional `no_proc` bool argument (default `false`).

@@ -331,12 +331,25 @@ methods_item = {
     end,
 
 
+    is_loot = function(self)
+        local loot_pools = Array.wrap(gm.variable_global_get("treasure_loot_pools"))
+        local obj = self.object_id
+
+        for i = 0, #loot_pools - 1 do
+            local drop_pool = List.wrap(loot_pools:get(i).drop_pool)
+            local pos = drop_pool:find(obj)
+            if pos then return true end
+        end
+
+        return false
+    end,
+
+
     toggle_loot = function(self, enabled)
         if enabled == nil then return end
 
         local loot_pools = Array.wrap(gm.variable_global_get("treasure_loot_pools"))
-        local item_array = Class.ITEM:get(self.value)
-        local obj = item_array:get(8)
+        local obj = self.object_id
         
         if enabled then
             if disabled_loot[self.value] then
