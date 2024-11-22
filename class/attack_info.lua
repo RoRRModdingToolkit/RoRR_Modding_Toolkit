@@ -111,6 +111,15 @@ methods_attack_info = {
     end,
 
 
+    get_damage_nocrit = function(self)
+        local damage = self.value.damage
+        if Helper.is_true(self.critical) then
+            damage = damage / 2.0
+        end
+        return damage
+    end,
+
+
     set_damage = function(self, damage)
         if not damage then log.error("No damage argument provided", 2) end
 
