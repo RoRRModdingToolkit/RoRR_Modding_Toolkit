@@ -541,7 +541,7 @@ gm.post_script_hook(gm.constants.skill_activate, function(self, other, result, a
 end)
 
 
-gm.post_script_hook(gm.constants.actor_heal_networked, function(self, other, result, args)
+gm.pre_script_hook(gm.constants.actor_heal_networked, function(self, other, result, args)
     if not callbacks["onHeal"] then return end
     
     local player = args[1].value
@@ -556,8 +556,10 @@ gm.post_script_hook(gm.constants.actor_heal_networked, function(self, other, res
     local heal_amount = args[2].value
 
     for _, fn in ipairs(callbacks["onHeal"][equipment.value]) do
-        fn(player, heal_amount)
+        local new = fn(player, heal_amount)
+        if type(new) == "number" then heal_amount = new end   -- Replace heal_amount
     end
+    args[2].value = heal_amount
 end)
 
 

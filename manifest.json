@@ -4,7 +4,7 @@
 	"website_url": "https://github.com/RoRRModdingToolkit/RoRR_Modding_Toolkit/wiki",
 	"description": "Friendly abstractions of the game's internal functions for easier modding.",
 	"dependencies": [
-		"ReturnOfModding-ReturnOfModding-1.0.49",
+		"ReturnOfModding-ReturnOfModding-1.0.50",
 		"MGReturns-ENVY-1.1.1"
 	]
 }

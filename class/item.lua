@@ -607,7 +607,7 @@ gm.post_script_hook(gm.constants.skill_activate, function(self, other, result, a
 end)
 
 
-gm.post_script_hook(gm.constants.actor_heal_networked, function(self, other, result, args)
+gm.pre_script_hook(gm.constants.actor_heal_networked, function(self, other, result, args)
     if not callbacks["onHeal"] then return end
 
     local actor = args[1].value
@@ -620,10 +620,12 @@ gm.post_script_hook(gm.constants.actor_heal_networked, function(self, other, res
         local stack = actor:item_stack_count(item_id)
         if stack > 0 then
             for _, fn in ipairs(c_table) do
-                fn(actor, stack, heal_amount)
+                local new = fn(actor, stack, heal_amount)
+                if type(new) == "number" then heal_amount = new end   -- Replace heal_amount
             end
         end
     end
+    args[2].value = heal_amount
 end)
 
 
