@@ -274,7 +274,9 @@ methods_actor = {
 
         local stack_count = self:buff_stack_count(buff)
         if (not count) or count >= stack_count then gm.remove_buff(self.value, buff)
-        else self.buff_stack:set(buff, stack_count - count)
+        else
+            self.buff_stack:set(buff, stack_count - count)
+            self:recalculate_stats()
         end
     end,
 
