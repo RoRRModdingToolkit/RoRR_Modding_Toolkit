@@ -6,38 +6,54 @@ Monster_Log = class_refs["Monster_Log"]
 
 -- ========== Static Methods ==========
 
-Monster_Log.new = function(monster_card)
-    
-    if type(monster_card) ~= "table" or monster_card.RMT_object ~= "Monster_Card" then log.error("monster_card is not a RMT Monster_Card, got a "..type(monster_card), 2) return end
-    
+Monster_Log.new = function(namespace, identifier)
     -- Check if monster_log already exist
-    local monster_log = Monster_Log.find(monster_card.namespace, monster_card.identifier)
+    local monster_log = Monster_Log.find(namespace, identifier)
     if monster_log then return monster_log end
 
     -- Create monster_log
     monster_log = Monster_Log.wrap(
         gm.monster_log_create(
-            monster_card.namespace,      -- Namespace
-            monster_card.identifier      -- Identifier
+            namespace,      -- Namespace
+            identifier      -- Identifier
         )
     )
 
-    -- Make monster_log abstraction
-    local abstraction = Monster_Log.wrap(monster_log)
-
-    -- Set the Log backdrop index based on the is_boss field of the monster card
-
-    -- Create Log book object (IMPORTANT: log book object of rorr monster are outside the 800 object index)
-
-    -- Set the enemy tracking kills and deaths
-    -- Both array may be different if the enemy is composite (like lemurian rider)
-    local enemy_kills = Array.wrap(abstraction.enemy_object_ids_kills)
-    local enemy_deaths = Array.wrap(abstraction.enemy_object_ids_deaths)
-    enemy_kills:push(monster_card.object_id)
-    enemy_deaths:push(monster_card.object_id)
-
     return monster_log
 end
+
+-- Monster_Log.new = function(monster_card)
+    
+--     if type(monster_card) ~= "table" or monster_card.RMT_object ~= "Monster_Card" then log.error("monster_card is not a RMT Monster_Card, got a "..type(monster_card), 2) return end
+    
+--     -- Check if monster_log already exist
+--     local monster_log = Monster_Log.find(monster_card.namespace, monster_card.identifier)
+--     if monster_log then return monster_log end
+
+--     -- Create monster_log
+--     monster_log = Monster_Log.wrap(
+--         gm.monster_log_create(
+--             monster_card.namespace,      -- Namespace
+--             monster_card.identifier      -- Identifier
+--         )
+--     )
+
+--     -- Make monster_log abstraction
+--     local abstraction = Monster_Log.wrap(monster_log)
+
+--     -- Set the Log backdrop index based on the is_boss field of the monster card
+
+--     -- Create Log book object (IMPORTANT: log book object of rorr monster are outside the 800 object index)
+
+--     -- Set the enemy tracking kills and deaths
+--     -- Both array may be different if the enemy is composite (like lemurian rider)
+--     local enemy_kills = Array.wrap(abstraction.enemy_object_ids_kills)
+--     local enemy_deaths = Array.wrap(abstraction.enemy_object_ids_deaths)
+--     enemy_kills:push(monster_card.object_id)
+--     enemy_deaths:push(monster_card.object_id)
+
+--     return monster_log
+-- end
 
 
 -- ========== Instance Methods ==========

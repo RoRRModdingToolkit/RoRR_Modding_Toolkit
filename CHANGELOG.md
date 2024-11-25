@@ -10,10 +10,12 @@
 * Callback : Fixed `remove` not actually doing anything.
     * Also fixed various `remove_callbacks` that may or may not have been broken.
 * Actor : `fire_` methods now have an optional `can_proc` bool argument (default `true`).
-    * Also returns the attack instance only now.
+    * `fire_` methods also return the attack instance only now.
+    * `buff_remove` now calls `recalculate_stats` when removing stacks.
 * Helper : Added `is_true` and `is_false`
 * Instance : Fixed `get_data` pulling a different table in certain circumstances.
 * Array, List : `new` overload: can now supply a lua table as a single argument.
+* Monster_Log : `new` now takes in `namespace, identifier` instead of a monster card.
 * Minor optimizations in various callbacks.
 
 ### v1.1.32
