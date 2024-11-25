@@ -13,6 +13,7 @@
     * Also returns the attack instance only now.
 * Helper : Added `is_true` and `is_false`
 * Instance : Fixed `get_data` pulling a different table in certain circumstances.
+* Array, List : `new` overload: can now supply a lua table as a single argument.
 * Minor optimizations in various callbacks.
 
 ### v1.1.32

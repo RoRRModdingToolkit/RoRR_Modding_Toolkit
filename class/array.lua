@@ -7,6 +7,18 @@ Array = Proxy.new()
 -- ========== Static Methods ==========
 
 Array.new = function(size, value)
+    size = Wrap.unwrap(size)
+
+    -- Overload 1
+    if type(size) == "table" then
+        local arr = gm.array_create(0)
+        for _, v in ipairs(size) do
+            gm.array_push(arr, Wrap.unwrap(v))
+        end
+        return Array.wrap(arr)
+    end
+
+    -- Overload 2
     return Array.wrap(gm.array_create(size or 0, value or 0))
 end
 

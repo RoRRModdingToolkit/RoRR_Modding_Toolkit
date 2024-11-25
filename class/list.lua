@@ -6,7 +6,15 @@ List = Proxy.new()
 
 -- ========== Static Methods ==========
 
-List.new = function()
+List.new = function(table)
+    if table then
+        local list = gm.ds_list_create()
+        for _, v in ipairs(table) do
+            gm.ds_list_add(list, Wrap.unwrap(v))
+        end
+        return List.wrap(list)
+    end
+
     return List.wrap(gm.ds_list_create())
 end
 
