@@ -756,10 +756,11 @@ Callback.add("onDamageBlocked", "RMT-Equipment.onDamageBlocked", function(self, 
     if not equipment
     or not callbacks["onDamageBlocked"][equipment.value] then return end
 
-    local damage = args[4].value
+    -- local damage = args[4].value
+    local source = Instance.wrap(other)
 
     for _, fn in ipairs(callbacks["onDamageBlocked"][equipment.value]) do
-        fn(player, damage)
+        fn(player, source)
     end
 end)
 

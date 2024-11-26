@@ -125,7 +125,8 @@ Item.find_all = function(filter)
     local size = #array
     for i = 0, size - 1 do
         local item = array:get(i)
-        if item[ind] == filter then
+        if (item[ind] == filter)
+        or (filter == nil) then
             table.insert(items, Item.wrap(i))
         end
     end
@@ -831,13 +832,14 @@ Callback.add("onDamageBlocked", "RMT-Item.onDamageBlocked", function(self, other
     local actor = Instance.wrap(args[2].value)
     if not has_custom_item[actor.id] then return end
 
-    local damage = args[4].value
+    -- local damage = args[4].value
+    local source = Instance.wrap(other)
 
     for item_id, c_table in pairs(callbacks["onDamageBlocked"]) do
         local stack = actor:item_stack_count(item_id)
         if stack > 0 then
             for _, fn in ipairs(c_table) do
-                fn(actor, stack, damage)
+                fn(actor, stack, source)
             end
         end
     end
