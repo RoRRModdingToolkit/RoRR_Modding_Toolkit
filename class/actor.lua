@@ -674,11 +674,11 @@ Callback.add("onDamageBlocked", "RMT-Actor.onDamageBlocked", function(self, othe
     if not callbacks["onDamageBlocked"] then return end
 
     local actor = Instance.wrap(args[2].value)
-    -- local damage = args[4].value
-    local source = Instance.wrap(other)
+    local damage = args[4].value
+    -- local source = Instance.wrap(other)
 
     for _, fn in pairs(callbacks["onDamageBlocked"]) do
-        fn(actor, source)
+        fn(actor, damage)
     end
 end)
 

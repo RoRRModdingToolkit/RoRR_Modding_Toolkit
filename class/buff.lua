@@ -563,14 +563,14 @@ Callback.add("onDamageBlocked", "RMT-Buff.onDamageBlocked", function(self, other
     local actor = Instance.wrap(args[2].value)
     if not has_custom_buff[actor.id] then return end
 
-    -- local damage = args[4].value
-    local source = Instance.wrap(other)
+    local damage = args[4].value
+    -- local source = Instance.wrap(other)
 
     for buff_id, c_table in pairs(callbacks["onDamageBlocked"]) do
         local stack = actor:buff_stack_count(buff_id)
         if stack > 0 then
             for _, fn in ipairs(c_table) do
-                fn(actor, stack, source)
+                fn(actor, stack, damage)
             end
         end
     end
