@@ -181,7 +181,8 @@ end
 methods_item = {
 
     create = function(self, x, y, target)
-        if not self.object_id then return nil end
+        if self.object_id == nil
+        or self.object_id == -1 then return nil end
 
         GM.item_drop_object(self.object_id, x, y, target, false)
 
