@@ -11,11 +11,18 @@ local current_frame = 0
 Alarm.create = function(func, time, ...)
     local future_frame = current_frame+time
     if not alarms[future_frame] then alarms[future_frame] = {} end
-    alarms[future_frame][#alarms[future_frame]+1] = {
+    local alarm = {
         fn = func,
         args = select(1, ...),
-        src = envy.getfenv(2)["!guid"]
+        src = envy.getfenv(2)["!guid"],
+        frame = future_frame
     }
+    table.insert(alarms[future_frame], alarm)
+    return alarm
+end
+
+Alarm.destroy = function(alarm)
+    Helper.table_remove(alarms[alarm.frame], alarm)
 end
 
 gm.post_script_hook(gm.constants.__input_system_tick, function()

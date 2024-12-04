@@ -17,6 +17,9 @@
 * Instance : Fixed `get_data` pulling a different table in certain circumstances.
 * Array, List : `new` overload: can now supply a lua table as a single argument.
 * Monster_Log : `new` now takes in `namespace, identifier` instead of a monster card.
+* Alarm
+    * `create` now returns the alarm table.
+    * Added `destroy`
 * Minor optimizations in various callbacks.
 
 ### v1.1.32
