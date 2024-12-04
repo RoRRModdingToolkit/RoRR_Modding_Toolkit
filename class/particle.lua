@@ -64,6 +64,9 @@ methods_particle = {
         GM.part_type_sprite(self, sprite, animate, stretch, random)
     end,
 
+
+    -- TODO: Add rest of property setters from GML
+
 }
 lock_table_particle = Proxy.make_lock_table({"value", "RMT_object", table.unpack(Helper.table_get_keys(methods_particle))})
 
