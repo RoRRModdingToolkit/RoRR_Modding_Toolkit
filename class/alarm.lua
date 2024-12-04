@@ -23,6 +23,7 @@ end
 
 Alarm.destroy = function(alarm)
     if type(alarm) ~= "table" then return end
+    if not alarms[alarm.frame] then return end
     Helper.table_remove(alarms[alarm.frame], alarm)
 end
 
