@@ -458,8 +458,15 @@ end)
 
 
 gm.pre_script_hook(gm.constants.recalculate_stats, function(self, other, result, args)
-    -- There was a reason for this existing but I forgot why
-    -- Nevertheless it seems important so do not remove
+    -- Without this, if any shield damage is taken while
+    -- NOT in possession of a vanilla shield item,
+    -- running recalculate_stats will remove the
+    -- remaining amount of shield
+
+    -- This is probably related to the fact that the
+    -- recalculate_stats hook below is post_script, and thus
+    -- runs after some important code in recalculate_stats
+
     local actor = Instance.wrap(self)
     local actorData = actor:get_data()
     actorData.current_shield = actor.shield
