@@ -463,14 +463,13 @@ gm.pre_script_hook(gm.constants.recalculate_stats, function(self, other, result,
     local actor = Instance.wrap(self)
     local actorData = actor:get_data()
     actorData.current_shield = actor.shield
-    actorData.current_maxshield = actor.maxshield
 end)
 
 
 gm.post_script_hook(gm.constants.recalculate_stats, function(self, other, result, args)
     local actor = Instance.wrap(self)
     local actorData = actor:get_data()
-    actor.shield = actorData.current_shield + (actor.maxshield - actorData.current_maxshield)
+    actor.shield = actorData.current_shield
     actorData.post_stat_recalc = true
 
     if not callbacks["onStatRecalc"] then return end
