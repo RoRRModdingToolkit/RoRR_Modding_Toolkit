@@ -1,6 +1,7 @@
 ### v1.2.0
 * Added Attack_Info class
 * Added Hit_Info class
+* Added Particle class
 * Item, Equipment, Buff, Instance, Actor, Player
     * Several callbacks renamed (e.g., `onPickup` -> `onAcquired`) and rewritten.
     * Added callbacks `onPickupCollected` and `onDamageCalculate`
