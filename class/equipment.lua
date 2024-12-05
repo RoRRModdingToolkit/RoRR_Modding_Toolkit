@@ -467,7 +467,7 @@ gm.post_script_hook(gm.constants.recalculate_stats, function(self, other, result
     if not callbacks["onStatRecalc"] then return end
     
     local player = Instance.wrap(self)
-    player:get_data().post_stat_recalc = true
+    player:get_data(nil, _ENV["!guid"]).post_stat_recalc = true
     if not has_custom_equip[player.id] then return end
 
     local equipment = player:get_equipment()

@@ -313,7 +313,7 @@ gm.post_script_hook(gm.constants.recalculate_stats, function(self, other, result
             end
         end
     end
-    actor:get_data().post_stat_recalc = true
+    actor:get_data(nil, _ENV["!guid"]).post_stat_recalc = true
 end)
 
 

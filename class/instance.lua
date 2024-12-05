@@ -623,7 +623,7 @@ end)
 
 gm.post_script_hook(gm.constants.recalculate_stats, function(self, other, result, args)
     local actor = Instance.wrap(self)
-    local actorData = actor:get_data()
+    local actorData = actor:get_data(nil, _ENV["!guid"])
     actorData.post_stat_recalc = true
 
     if not callbacks[self.id] or not callbacks[self.id]["onStatRecalc"] then return end

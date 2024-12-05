@@ -468,14 +468,14 @@ gm.pre_script_hook(gm.constants.recalculate_stats, function(self, other, result,
     -- runs after some important code in recalculate_stats
 
     local actor = Instance.wrap(self)
-    local actorData = actor:get_data()
+    local actorData = actor:get_data(nil, _ENV["!guid"])
     actorData.current_shield = actor.shield
 end)
 
 
 gm.post_script_hook(gm.constants.recalculate_stats, function(self, other, result, args)
     local actor = Instance.wrap(self)
-    local actorData = actor:get_data()
+    local actorData = actor:get_data(nil, _ENV["!guid"])
     actor.shield = actorData.current_shield
     actorData.post_stat_recalc = true
 

@@ -420,14 +420,14 @@ Actor:setmetatable(metatable_actor_callbacks)
 gm.pre_script_hook(gm.constants.recalculate_stats, function(self, other, result, args)
     -- Internal
     local actor = Instance.wrap(self)
-    local actor_data = actor:get_data()
+    local actor_data = actor:get_data(nil, _ENV["!guid"])
     actor_data.current_shield = actor.shield
 end)
 
 
 gm.post_script_hook(gm.constants.recalculate_stats, function(self, other, result, args)
     local actor = Instance.wrap(self)
-    local actor_data = actor:get_data()
+    local actor_data = actor:get_data(nil, _ENV["!guid"])
     actor.shield = actor_data.current_shield
 
     if callbacks["onStatRecalc"] then

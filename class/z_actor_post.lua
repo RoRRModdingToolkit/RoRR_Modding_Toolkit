@@ -2,7 +2,7 @@
 
 gm.post_script_hook(gm.constants.recalculate_stats, function(self, other, result, args)
     local actor = Instance.wrap(self)
-    actorData = actor:get_data()
+    actorData = actor:get_data(nil, _ENV["!guid"])
 
     -- Run onPostStatRecalc
     if actorData.post_stat_recalc then
