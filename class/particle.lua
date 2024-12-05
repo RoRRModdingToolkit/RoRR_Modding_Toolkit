@@ -93,7 +93,7 @@ methods_particle = {
 
 
     create_color = function(self, x, y, color, count, system)
-        GM.part_particles_create(system or Particle.SYSTEM.above, x, y, self, color, count or 1)
+        GM.part_particles_create_color(system or Particle.SYSTEM.above, x, y, self, color, count or 1)
     end
 
     create_colour = function(self, x, y, color, count, system)
