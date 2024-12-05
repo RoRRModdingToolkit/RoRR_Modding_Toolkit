@@ -88,7 +88,7 @@ end
 methods_particle = {
 
     create = function(self, x, y, count, system)
-        GM.part_particles_create(system or 0, x, y, self, count or 1)
+        GM.part_particles_create(system or Particle.SYSTEM.above, x, y, self, count or 1)
     end
 
 }
@@ -107,6 +107,9 @@ metatable_particle = {
         -- GML part_type_ methods
         if key:sub(1, 4) == "set_" then
             local fn = key:sub(5, #key)
+            if fn:sub(1, 5) == "color" then
+                fn = "colour"..fn:sub(6, #fn)
+            end
             return GM["part_type_"..fn]
         end
 
