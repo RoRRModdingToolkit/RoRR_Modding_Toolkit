@@ -4,6 +4,38 @@ Particle = Proxy.new()
 
 
 
+-- ========== Enums ==========
+
+Particle.SYSTEM = Proxy.new({
+    above           = 0,
+    below           = 1,
+    middle          = 2,
+    background      = 3,
+    veryAbove       = 4,
+    damage          = 5,
+    damage_above    = 6
+}):lock()
+
+
+Particle.SHAPE = Proxy.new({
+    pixel       = 0,
+    disk        = 1,
+    square      = 2,
+    line        = 3,
+    star        = 4,
+    circle      = 5,
+    ring        = 6,
+    sphere      = 7,
+    flare       = 8,
+    spark       = 9,
+    explosion   = 10,
+    cloud       = 11,
+    smoke       = 12,
+    snow        = 13
+}):lock()
+
+
+
 -- ========== Static Methods ==========
 
 Particle.new = function(namespace, identifier)
@@ -46,7 +78,7 @@ end
 
 
 Particle.wrap = function(value)
-    return make_wrapper(value, "Particle", metatable_particle, lock_table_particle)
+    return make_wrapper(value, "Particle", metatable_particle)
 end
 
 
@@ -57,18 +89,9 @@ methods_particle = {
 
     create = function(self, x, y, count, system)
         GM.part_particles_create(system or 0, x, y, self, count or 1)
-    end,
-
-
-    set_sprite = function(self, sprite, animate, stretch, random)
-        GM.part_type_sprite(self, sprite, animate, stretch, random)
-    end,
-
-
-    -- TODO: Add rest of property setters from GML
+    end
 
 }
-lock_table_particle = Proxy.make_lock_table({"value", "RMT_object", table.unpack(Helper.table_get_keys(methods_particle))})
 
 
 
@@ -80,13 +103,19 @@ metatable_particle = {
         if methods_particle[key] then
             return methods_particle[key]
         end
+
+        -- GML part_type_ methods
+        if key:sub(1, 4) == "set_" then
+            local fn = key:sub(5, #key)
+            return GM["part_type_"..fn]
+        end
+
         return nil
     end,
-    
+
 
     __newindex = function(table, key, value)
-        -- Setter
-        log.error("Particle has no properties to set; use methods instead", 2)
+        log.error("Particle has no settable properties; use methods instead", 2)
     end,
 
 
