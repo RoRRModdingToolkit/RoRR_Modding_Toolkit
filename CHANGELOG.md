@@ -21,6 +21,7 @@
 * Alarm
     * `create` now returns the alarm table.
     * Added `destroy`
+* Array : `contains` last 2 args are now optional.
 * Minor optimizations in various callbacks.
 * Now prevents online play if any incompatible mods are loaded.
 
