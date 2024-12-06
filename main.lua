@@ -27,11 +27,14 @@ for _, name in ipairs(names) do
 end
 
 
+-- Require internal files (these last)
+local names = path.get_files(_ENV["!plugins_mod_folder_path"].."/internal_last")
+for _, name in ipairs(names) do require(name) end
+
+
 -- Extra public refs
 class_refs["Proxy"] = Proxy     -- Making this public too; might be useful to someone
 class_refs["Colour"] = Color
-
-class_refs["Z_Actor_Post"] = nil    -- Hacky solution but I'm too tired to find another way rn
 
 
 -- Lock public classes after finalization
