@@ -22,6 +22,7 @@
     * `create` now returns the alarm table.
     * Added `destroy`
 * Minor optimizations in various callbacks.
+* Now prevents online play if any incompatible mods are loaded.
 
 ### v1.1.32
 * Actor : Added `apply_dot`
