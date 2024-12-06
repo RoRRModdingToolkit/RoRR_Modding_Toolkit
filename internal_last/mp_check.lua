@@ -76,12 +76,12 @@ gm.post_code_execute("gml_Object_oStartMenu_Draw_73", function(self, other, code
     local mx, my = gm.variable_global_get("mouse_x"), gm.variable_global_get("mouse_y")
     if Helper.is_true(gm.point_in_rectangle(mx, my, box_x, box_y, box_x + box_w, box_y + box_h)) then
         -- Box
-        gm.draw_set_alpha(0.4)
+        gm.draw_set_alpha(0.4 * opacity)
         local c = Color.BLACK
         gm.draw_rectangle_color(text_x - 136, text_y + 24, text_x + 136, text_y + 32 + (#incomp * 16), c, c, c, c, false)
 
         -- Mod names
-        gm.draw_set_alpha(1.0)
+        gm.draw_set_alpha(opacity)
         gm.draw_set_valign(2)
         gm.draw_set_halign(0)
         local c = Color.WHITE
