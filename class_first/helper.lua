@@ -223,5 +223,41 @@ Helper.mixed_hyperbolic = function(stack_count, chance, base_chance)
 end
 
 
+Helper.read_json = function(filepath)
+    -- Read file content
+    local str = ""
+    local file = gm.file_text_open_read(filepath)
+    while gm.file_text_eof(file) == 0.0 do
+        str = str..gm.file_text_readln(file)
+    end
+    gm.file_text_close(file)
+
+    -- Parse string
+    local gm_parse = gm.json_parse(str)
+    local keys = GM.variable_struct_get_names(gm_parse)
+
+    -- Format parsed table (recursive)
+    local function parse_struct(t, struct, keys)
+        for _, key in ipairs(keys) do
+            local val = struct[key]
+            if gm.is_struct(val) then
+                t[key] = {}
+                parse_struct(t[key], val, GM.variable_struct_get_names(val))
+            elseif gm.is_array(val) then
+                t[key] = {}
+                local array = Array.wrap(val)
+                for _, val in ipairs(array) do
+                    table.insert(t[key], val)
+                end
+            else t[key] = val
+            end
+        end
+        return t
+    end
+
+    return parse_struct({}, gm_parse, keys)
+end
+
+
 
 return Helper

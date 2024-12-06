@@ -14,7 +14,9 @@
 * Actor : `fire_` methods now have an optional `can_proc` bool argument (default `true`).
     * `fire_` methods also return the attack instance only now.
     * `buff_remove` now calls `recalculate_stats` when removing stacks.
-* Helper : Added `is_true` and `is_false`
+* Helper
+    * Added `is_true` and `is_false`
+    * Added `read_json`
 * Instance : Fixed `get_data` pulling a different table in certain circumstances.
 * Array, List : `new` overload: can now supply a lua table as a single argument.
 * Monster_Log : `new` now takes in `namespace, identifier` instead of a monster card.

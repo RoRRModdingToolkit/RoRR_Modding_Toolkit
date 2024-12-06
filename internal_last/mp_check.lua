@@ -15,21 +15,10 @@ local ui_hook = 0     -- Have the hook automatically stop itself (so it doesn't 
 mods.on_all_mods_loaded(function()
     for _, m_id in ipairs(mods.loading_order) do
         local manifest = mods[m_id]["!plugins_mod_folder_path"].."\\manifest.json"
-
-        -- Read file content
-        local str = ""
-        local file = gm.file_text_open_read(manifest)
-        while gm.file_text_eof(file) == 0.0 do
-            str = str..gm.file_text_readln(file)
-        end
-        gm.file_text_close(file)
-
-        -- Parse string
-        local parse = gm.json_parse(str)
-        local names = GM.variable_struct_get_names(parse)
+        local json = Helper.read_json(manifest)
 
         -- Add to incompatibility list if not marked
-        if not (names:contains("mp") and Helper.is_true(parse["mp"]))
+        if  not json["mp"]
         and not Helper.table_has(whitelist, m_id) then
             local split = GM.string_split(m_id, "-")
             table.insert(incomp, {split[1], split[2]})
