@@ -5,8 +5,8 @@ local whitelist = {
     "ReturnOfModding-GLOBAL"
 }
 
-local text_x = nil
-local text_y = nil
+local text_x, text_y
+local box_x, box_y, box_w, box_h
 local ui_hook = 0     -- Have the hook automatically stop itself (so it doesn't make unnecessary checks later)
 
 
@@ -34,12 +34,6 @@ mods.on_all_mods_loaded(function()
             table.insert(incomp, {split[1], split[2]})
         end
     end
-
-    for _, v in ipairs(incomp) do
-        log.info(v)
-        if type(v) == "table" then log.info(tostring(v[1]).."-"..tostring(v[2])) end
-        log.info("")
-    end
 end)
 
 
@@ -57,6 +51,7 @@ gm.post_code_execute("gml_Object_oStartMenu_Draw_73", function(self, other, code
         end
     end
 
+    -- Disable Online button
     local opacity = 1.0
     if startMenu and startMenu:exists() then
         startMenu.menu[3].disabled = true
@@ -66,15 +61,40 @@ gm.post_code_execute("gml_Object_oStartMenu_Draw_73", function(self, other, code
     ui_hook = 10
     if (not text_x) or (not text_y) then return end
 
-    local str = #incomp.." incompatible mod"..((#incomp > 1) and "s" or "")
-
+    -- "x incompatible mod(s)" text
     gm.draw_set_font(2.0)
     gm.draw_set_halign(1)
     gm.draw_set_valign(1)
+    local str = #incomp.." incompatible mod"..((#incomp > 1) and "s" or "")
     local col = {Color.ORANGE, Color.BLACK, Color.BLACK}
     for i = 3, 1, -1 do
         local c = col[i]
         gm.draw_text_color(text_x, text_y + i, str, c, c, c, c, opacity)
+    end
+
+    -- Incompatible mod list
+    local mx, my = gm.variable_global_get("mouse_x"), gm.variable_global_get("mouse_y")
+    if Helper.is_true(gm.point_in_rectangle(mx, my, box_x, box_y, box_x + box_w, box_y + box_h)) then
+        -- Box
+        gm.draw_set_alpha(0.4)
+        local c = Color.BLACK
+        gm.draw_rectangle_color(text_x - 136, text_y + 24, text_x + 136, text_y + 32 + (#incomp * 16), c, c, c, c, false)
+
+        -- Mod names
+        gm.draw_set_alpha(1.0)
+        gm.draw_set_valign(2)
+        gm.draw_set_halign(0)
+        local c = Color.WHITE
+        for i = 1, #incomp do
+            gm.draw_text_color(text_x - 124, text_y + 24 + (i * 16), incomp[i][2], c, c, c, c, 1.0)
+        end
+
+        -- Mod authors
+        gm.draw_set_halign(2)
+        local c = Color.GRAY
+        for i = 1, #incomp do
+            gm.draw_text_color(text_x + 124, text_y + 24 + (i * 16), "by "..incomp[i][1], c, c, c, c, 1.0)
+        end
     end
 end)
 
@@ -86,6 +106,7 @@ gm.post_script_hook(gm.constants._ui_draw_box_text, function(self, other, result
     if args[5].value == Language.translate_token("ui.title.startOnline") then
         text_x = args[1].value - 20 + args[3].value/2
         text_y = args[2].value - 2 + args[4].value/2
+        box_x, box_y, box_w, box_h = args[1].value, args[2].value, args[3].value, args[4].value
     end
     ui_hook = ui_hook - 1
 end)
