@@ -82,23 +82,21 @@ gm.post_code_execute("gml_Object_oStartMenu_Draw_73", function(self, other, code
         gm.draw_rectangle_color(text_x - 136, text_y + 24, text_x + 136, text_y + 32 + (#incomp * 16), c, c, c, c, false)
 
         -- Mod names
-        gm.draw_set_alpha(opacity)
+        gm.draw_set_alpha(1.0)
         gm.draw_set_valign(2)
         gm.draw_set_halign(0)
         local c = Color.WHITE
         for i = 1, #incomp do
-            gm.draw_text_color(text_x - 128, text_y + 24 + (i * 16), incomp[i][2], c, c, c, c, 1.0)
+            gm.draw_text_color(text_x - 128, text_y + 24 + (i * 16), incomp[i][2], c, c, c, c, opacity)
         end
 
         -- Mod authors
         gm.draw_set_halign(2)
         local c = Color.GRAY
         for i = 1, #incomp do
-            gm.draw_text_color(text_x + 128, text_y + 24 + (i * 16), "by "..incomp[i][1], c, c, c, c, 1.0)
+            gm.draw_text_color(text_x + 128, text_y + 24 + (i * 16), "by "..incomp[i][1], c, c, c, c, opacity)
         end
     end
-    
-    gm.draw_set_alpha(1.0)
 end)
 
 
