@@ -97,6 +97,8 @@ gm.post_code_execute("gml_Object_oStartMenu_Draw_73", function(self, other, code
             gm.draw_text_color(text_x + 128, text_y + 24 + (i * 16), "by "..incomp[i][1], c, c, c, c, 1.0)
         end
     end
+    
+    gm.draw_set_alpha(1.0)
 end)
 
 
