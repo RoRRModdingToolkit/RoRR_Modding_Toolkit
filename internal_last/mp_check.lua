@@ -2,7 +2,8 @@
 
 local incomp = {}
 local whitelist = {
-    "ReturnOfModding-GLOBAL"
+    "ReturnOfModding-GLOBAL",
+    "MGReturns-ENVY"
 }
 
 local text_x, text_y
