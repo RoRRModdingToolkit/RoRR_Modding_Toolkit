@@ -88,7 +88,7 @@ methods_array = {
 
 
     contains = function(self, value, offset, length)
-        return gm.array_contains(self.value, Wrap.unwrap(value), offset, length)
+        return gm.array_contains(self.value, Wrap.unwrap(value), offset or 0, length or (#self - 1))
     end,
 
 
