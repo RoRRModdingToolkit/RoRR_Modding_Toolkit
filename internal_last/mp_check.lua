@@ -8,6 +8,7 @@ local whitelist = {
 
 local text_x, text_y
 local box_x, box_y, box_w, box_h
+local initial_fadein
 local ui_hook = 0     -- Have the hook automatically stop itself (so it doesn't make unnecessary checks later)
 
 
@@ -46,6 +47,14 @@ gm.post_code_execute("gml_Object_oStartMenu_Draw_73", function(self, other, code
     if startMenu and startMenu:exists() then
         startMenu.menu[3].disabled = true
         opacity = 1.0 - startMenu.menu_transition
+    end
+
+    -- Initial opacity fade-in on first title screen load (minor but looks better)
+    if initial_fadein then
+        if initial_fadein < 1.0 then
+            initial_fadein = initial_fadein + 1/15
+            opacity = Helper.ease_in(initial_fadein)
+        end
     end
 
     ui_hook = 10
@@ -97,6 +106,7 @@ gm.post_script_hook(gm.constants._ui_draw_box_text, function(self, other, result
         text_x = args[1].value - 20 + args[3].value/2
         text_y = args[2].value - 2 + args[4].value/2
         box_x, box_y, box_w, box_h = args[1].value, args[2].value, args[3].value, args[4].value
+        if not initial_fadein then initial_fadein = 0 end
     end
     ui_hook = ui_hook - 1
 end)
