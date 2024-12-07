@@ -8,8 +8,8 @@ Interactable = Proxy.new()
 
 methods_interactable = {
 
-    set_active = function(self, active, activator, arg3, arg4)  -- check what those args are again
-        GM.interactable_set_active(self, activator or self.activator, active or 0, arg3 or false, arg4 or false)
+    set_active = function(self, active, activator, is_hack, hack_double)
+        GM.interactable_set_active(self, activator or self.activator, active or 0, is_hack or false, hack_double or false)
     end
 
 }
