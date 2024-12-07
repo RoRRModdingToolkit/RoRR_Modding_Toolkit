@@ -85,7 +85,7 @@ gm.post_code_execute("gml_Object_oStartMenu_Draw_73", function(self, other, code
         gm.draw_set_halign(0)
         local c = Color.WHITE
         for i = 1, #incomp do
-            gm.draw_text_color(text_x - 128, text_y + 26 + (i * 16), incomp[i][2], c, c, c, c, opacity)
+            gm.draw_text_color(text_x - 128, text_y + 26 + (i * 16), incomp[i][2]:gsub("_", " "), c, c, c, c, opacity)
         end
 
         -- Mod authors
