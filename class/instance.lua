@@ -38,6 +38,17 @@ instance_valid_callbacks = {
 
 local instance_data = {}
 
+local interactables = {     -- Used by .wrap
+    gm.constants.pInteractable                      = true,
+    gm.constants.pInteractableChest                 = true,
+    gm.constants.pInteractableCrate                 = true,
+    gm.constants.pInteractableDrone                 = true,
+    gm.constants.oCustomObject_pInteractable        = true,
+    gm.constants.oCustomObject_pInteractableChest   = true,
+    gm.constants.oCustomObject_pInteractableCrate   = true,
+    gm.constants.oCustomObject_pInteractableDrone   = true
+}
+
 
 
 -- ========== Tables ==========
@@ -220,11 +231,7 @@ Instance.wrap = function(value)
     local mt = metatable_instance
     local lt = lock_table_instance
 
-    if value.object_index == gm.constants.oCustomObject_pInteractable then
-        RMT_object = "Interactable Instance"
-        mt = metatable_interactable_instance
-        lt = lock_table_interactable_instance
-    elseif value.object_index == gm.constants.oP then
+    if value.object_index == gm.constants.oP then
         RMT_object = "Player"
         mt = metatable_player
         lt = lock_table_player
@@ -232,6 +239,10 @@ Instance.wrap = function(value)
         RMT_object = "Actor"
         mt = metatable_actor
         lt = lock_table_actor
+    elseif interactables[value.object_index] then
+        RMT_object = "Interactable"
+        mt = metatable_interactable
+        lt = lock_table_interactable
     end
 
     return make_wrapper(value, RMT_object, mt, lt)
@@ -923,7 +934,7 @@ end)
 initialize_instance = function()
     lock_table_actor = Proxy.make_lock_table({"value", "RMT_object", table.unpack(Helper.table_get_keys(methods_instance)), table.unpack(Helper.table_get_keys(methods_actor))})
     lock_table_player = Proxy.make_lock_table({"value", "RMT_object", table.unpack(Helper.table_get_keys(methods_instance)), table.unpack(Helper.table_get_keys(methods_actor)), table.unpack(Helper.table_get_keys(methods_player))})
-    lock_table_interactable_instance = Proxy.make_lock_table({"value", "RMT_object", table.unpack(Helper.table_get_keys(methods_instance)), table.unpack(Helper.table_get_keys(methods_interactable_instance))})
+    lock_table_interactable = Proxy.make_lock_table({"value", "RMT_object", table.unpack(Helper.table_get_keys(methods_instance)), table.unpack(Helper.table_get_keys(methods_interactable))})
     gm_add_instance_methods(methods_instance)
 end
 
