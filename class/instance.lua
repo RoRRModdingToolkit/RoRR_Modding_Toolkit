@@ -38,16 +38,15 @@ instance_valid_callbacks = {
 
 local instance_data = {}
 
-local interactables = {     -- Used by .wrap
-    gm.constants.pInteractable                      = true,
-    gm.constants.pInteractableChest                 = true,
-    gm.constants.pInteractableCrate                 = true,
-    gm.constants.pInteractableDrone                 = true,
-    gm.constants.oCustomObject_pInteractable        = true,
-    gm.constants.oCustomObject_pInteractableChest   = true,
-    gm.constants.oCustomObject_pInteractableCrate   = true,
-    gm.constants.oCustomObject_pInteractableDrone   = true
-}
+local interactables = {}    -- Used by .wrap
+interactables[gm.constants.pInteractable]                       = true
+interactables[gm.constants.pInteractableChest]                  = true
+interactables[gm.constants.pInteractableCrate]                  = true
+interactables[gm.constants.pInteractableDrone]                  = true
+interactables[gm.constants.oCustomObject_pInteractable]         = true
+interactables[gm.constants.oCustomObject_pInteractableChest]    = true
+interactables[gm.constants.oCustomObject_pInteractableCrate]    = true
+interactables[gm.constants.oCustomObject_pInteractableDrone]    = true
 
 
 
