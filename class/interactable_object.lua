@@ -66,12 +66,10 @@ metatable_interactable_object = {
 -- ========== Hooks ==========
 
 gm.post_script_hook(gm.constants.interactable_check_cost, function(self, other, result, args)
-    if callbacks["onCheckCost"] then
-        for obj, c_table in pairs(callbacks["onCheckCost"]) do
-            for _, fn in ipairs(c_table) do
-                local new = fn(Instance.wrap(args[3].value), args[2].value, args[1].value, result.value)
-                if type(new) == "boolean" then result.value = new end
-            end
+    if callbacks["onCheckCost"] and callbacks["onCheckCost"][self.__object_index] then
+        for _, fn in pairs(callbacks["onCheckCost"][self.__object_index]) do
+            local new = fn(Instance.wrap(self), Instance.wrap(args[3].value), args[2].value, args[1].value, result.value)
+            if type(new) == "boolean" then result.value = new end
         end
     end
 end)

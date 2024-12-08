@@ -2,6 +2,7 @@
 * Added Attack_Info class
 * Added Hit_Info class
 * Added Particle class
+* Added Interactable_Instance class
 * Item, Equipment, Buff, Instance, Actor, Player
     * Several callbacks renamed (e.g., `onPickup` -> `onAcquired`) and rewritten.
     * Added callbacks `onPickupCollected` and `onDamageCalculate`
@@ -24,6 +25,7 @@
     * `create` now returns the alarm table.
     * Added `destroy`
 * Array : `contains` last 2 args are now optional.
+* Interactable_Object : Renamed from Interactable, and now only adds one extra callback.
 * Minor optimizations in various callbacks.
 * Now prevents online play if any incompatible mods are loaded.
 
