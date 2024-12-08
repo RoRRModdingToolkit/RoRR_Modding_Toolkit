@@ -1,5 +1,7 @@
 -- Interactable Instance
 
+Interactable_Instance = Proxy.new()
+
 
 
 -- ========== Instance Methods ==========
@@ -35,3 +37,7 @@ metatable_interactable_instance = {
 
     __metatable = "Interactable_Instance"
 }
+
+
+
+return Interactable_Instance
