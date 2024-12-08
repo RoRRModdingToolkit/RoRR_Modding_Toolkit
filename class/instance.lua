@@ -235,9 +235,9 @@ Instance.wrap = function(value)
     elseif gm.object_is_ancestor(value.object_index, gm.constants.pActor) == 1.0 then
         mt = metatable_actor
         lt = lock_table_actor
-    elseif interactables[value.object_index] then
-        mt = metatable_interactable_instance
-        lt = lock_table_interactable_instance
+    -- elseif interactables[value.object_index] then
+    --     mt = metatable_interactable_instance
+    --     lt = lock_table_interactable_instance
     end
 
     return make_wrapper(value, mt, lt)

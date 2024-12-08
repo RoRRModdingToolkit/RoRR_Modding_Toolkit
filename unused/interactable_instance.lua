@@ -8,6 +8,8 @@ Interactable_Instance = Proxy.new()
 
 methods_interactable_instance = {
 
+    -- This will proc onInteractableActive again actually
+    -- Perhaps it is not needed then
     set_active = function(self, active, activator, is_hack, hack_double)
         GM.interactable_set_active(self, activator or self.activator, active or 0, is_hack or false, hack_double or false)
     end
