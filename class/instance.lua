@@ -929,7 +929,7 @@ end)
 initialize_instance = function()
     lock_table_actor = Proxy.make_lock_table({"value", "RMT_object", table.unpack(Helper.table_get_keys(methods_instance)), table.unpack(Helper.table_get_keys(methods_actor))})
     lock_table_player = Proxy.make_lock_table({"value", "RMT_object", table.unpack(Helper.table_get_keys(methods_instance)), table.unpack(Helper.table_get_keys(methods_actor)), table.unpack(Helper.table_get_keys(methods_player))})
-    lock_table_interactable_instance = Proxy.make_lock_table({"value", "RMT_object", table.unpack(Helper.table_get_keys(methods_instance)), table.unpack(Helper.table_get_keys(methods_interactable_instance))})
+    -- lock_table_interactable_instance = Proxy.make_lock_table({"value", "RMT_object", table.unpack(Helper.table_get_keys(methods_instance)), table.unpack(Helper.table_get_keys(methods_interactable_instance))})
     gm_add_instance_methods(methods_instance)
 end
 
