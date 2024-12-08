@@ -86,11 +86,6 @@ Object.find = function(namespace, identifier)
 end
 
 
--- Object.wrap = function(value)
---     return make_wrapper(value, metatable_object, lock_table_object)
--- end
-
-
 Object.wrap = function(value)
     value = Wrap.unwrap(value)
 
