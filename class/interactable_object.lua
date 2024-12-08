@@ -68,7 +68,7 @@ metatable_interactable_object = {
 gm.post_script_hook(gm.constants.interactable_check_cost, function(self, other, result, args)
     if callbacks["onCheckCost"] and callbacks["onCheckCost"][self.__object_index] then
         for _, fn in pairs(callbacks["onCheckCost"][self.__object_index]) do
-            local new = fn(Instance.wrap(self), Instance.wrap(args[3].value), args[2].value, args[1].value, result.value)
+            local new = fn(Instance.wrap(self), Instance.wrap(args[3].value), args[2].value, args[1].value, result.value)   -- 3, 4 : cost, cost_type
             if type(new) == "boolean" then result.value = new end
         end
     end
