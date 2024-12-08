@@ -15,7 +15,7 @@ end
 
 
 Packet.wrap = function(value)
-    return make_wrapper(value, "Packet", metatable_packet, lock_table_packet)
+    return make_wrapper(value, metatable_packet, lock_table_packet)
 end
 
 

@@ -226,30 +226,26 @@ Instance.wrap = function(value)
     if type(value) == "number" then value = Instance.get_CInstance(value).value end
     if not Instance.exists(value) then return Instance.wrap_invalid() end
 
-    local RMT_object = "Instance"
     local mt = metatable_instance
     local lt = lock_table_instance
 
     if value.object_index == gm.constants.oP then
-        RMT_object = "Player"
         mt = metatable_player
         lt = lock_table_player
     elseif gm.object_is_ancestor(value.object_index, gm.constants.pActor) == 1.0 then
-        RMT_object = "Actor"
         mt = metatable_actor
         lt = lock_table_actor
     elseif interactables[value.object_index] then
-        RMT_object = "Interactable Instance"
         mt = metatable_interactable_instance
         lt = lock_table_interactable_instance
     end
 
-    return make_wrapper(value, RMT_object, mt, lt)
+    return make_wrapper(value, mt, lt)
 end
 
 
 Instance.wrap_invalid = function()
-    return make_wrapper(-4, "Instance", metatable_instance, lock_table_instance)
+    return make_wrapper(-4, metatable_instance, lock_table_instance)
 end
 
 

@@ -87,14 +87,13 @@ end
 
 
 -- Object.wrap = function(value)
---     return make_wrapper(value, "Object", metatable_object, lock_table_object)
+--     return make_wrapper(value, metatable_object, lock_table_object)
 -- end
 
 
 Object.wrap = function(value)
     value = Wrap.unwrap(value)
 
-    local RMT_object = "Object"
     local mt = metatable_object
     local lt = lock_table_object
 
@@ -102,7 +101,6 @@ Object.wrap = function(value)
     or gm.object_is_ancestor(value, gm.constants.pInteractableChest) == 1.0
     or gm.object_is_ancestor(value, gm.constants.pInteractableCrate) == 1.0
     or gm.object_is_ancestor(value, gm.constants.pInteractableDrone) == 1.0 then
-        RMT_object = "Interactable Object"
         mt = metatable_interactable_object
         lt = lock_table_interactable_object
     end
@@ -115,13 +113,12 @@ Object.wrap = function(value)
         or obj_index == gm.constants.pInteractableChest
         or obj_index == gm.constants.pInteractableCrate
         or obj_index == gm.constants.pInteractableDrone then
-            RMT_object = "Interactable Object"
             mt = metatable_interactable_object
             lt = lock_table_interactable_object
         end
     end
 
-    return make_wrapper(value, RMT_object, mt, lt)
+    return make_wrapper(value, mt, lt)
 end
 
 

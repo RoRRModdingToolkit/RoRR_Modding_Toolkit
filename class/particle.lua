@@ -78,7 +78,7 @@ end
 
 
 Particle.wrap = function(value)
-    return make_wrapper(value, "Particle", metatable_particle)
+    return make_wrapper(value, metatable_particle)
 end
 
 

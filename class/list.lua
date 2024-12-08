@@ -20,7 +20,7 @@ end
 
 
 List.wrap = function(value)
-    return make_wrapper(value, "List", metatable_list, lock_table_list)
+    return make_wrapper(value, metatable_list, lock_table_list)
 end
 
 

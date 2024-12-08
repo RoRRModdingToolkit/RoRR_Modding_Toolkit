@@ -156,7 +156,7 @@ for class, class_array_id in pairs(class_arrays) do
     t.wrap = function(value)
         local mt = metatable_class_gs[class]
         if metatable_class[class] then mt = metatable_class[class] end
-        return make_wrapper(value, class, mt)
+        return make_wrapper(value, mt)
     end
 
     metatable_class_gs[class] = {

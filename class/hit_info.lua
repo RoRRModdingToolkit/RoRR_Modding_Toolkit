@@ -8,7 +8,7 @@ Hit_Info = Proxy.new()
 
 Hit_Info.wrap = function(value)
     if not value then return nil end
-    return make_wrapper(value, "Hit_Info", metatable_hit_info, lock_table_hit_info)
+    return make_wrapper(value, metatable_hit_info, lock_table_hit_info)
 end
 
 

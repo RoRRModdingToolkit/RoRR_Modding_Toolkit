@@ -20,7 +20,7 @@ end
 
 
 Message.wrap = function(value)
-    return make_wrapper(value, "Message", metatable_message, lock_table_message)
+    return make_wrapper(value, metatable_message, lock_table_message)
 end
 
 

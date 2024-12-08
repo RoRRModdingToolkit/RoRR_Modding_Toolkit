@@ -92,7 +92,7 @@ Attack_Info.ATTACK_FLAG = Proxy.new({
 
 Attack_Info.wrap = function(value)
     if not value then return nil end
-    return make_wrapper(value, "Attack_Info", metatable_attack_info, lock_table_attack_info)
+    return make_wrapper(value, metatable_attack_info, lock_table_attack_info)
 end
 
 

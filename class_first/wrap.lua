@@ -42,10 +42,10 @@ end
 
 -- ========== Internal ==========
 
-make_wrapper = function(value, RMT_object, metatable, lock_table)
+make_wrapper = function(value, metatable, lock_table)
     local wrapper = Proxy.new({
         value = value,
-        RMT_object = RMT_object
+        RMT_object = metatable.__metatable
     })
     wrapper:setmetatable(metatable)
 

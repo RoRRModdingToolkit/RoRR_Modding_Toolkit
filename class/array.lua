@@ -28,7 +28,7 @@ Array.wrap = function(value)
         log.error("value is not an array", 2)
     end
 
-    return make_wrapper(value, "Array", metatable_array, lock_table_array)
+    return make_wrapper(value, metatable_array, lock_table_array)
 end
 
 
