@@ -49,7 +49,7 @@ metatable_interactable_object = {
         end
 
         -- Pass to next metatable
-        return metatable_object_gs.__index(table, key)
+        return metatable_object.__index(table, key)
     end,
     
 

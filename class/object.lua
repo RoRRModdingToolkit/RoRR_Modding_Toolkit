@@ -104,6 +104,7 @@ Object.wrap = function(value)
         local custom_object = Array.wrap(gm.variable_global_get("custom_object"))
         local obj_array = custom_object:get(value - Object.CUSTOM_START)
         local obj_index = obj_array:get(0)
+
         if obj_index == gm.constants.oCustomObject_pInteractable
         or obj_index == gm.constants.oCustomObject_pInteractableChest
         or obj_index == gm.constants.oCustomObject_pInteractableCrate
