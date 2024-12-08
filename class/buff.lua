@@ -146,7 +146,7 @@ metatable_class["Buff"] = {
     end,
 
 
-    __metatable = "buff"
+    __metatable = "Buff"
 }
 
 

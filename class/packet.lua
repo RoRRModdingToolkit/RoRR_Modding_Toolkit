@@ -58,7 +58,7 @@ metatable_packet = {
     end,
 
     
-    __metatable = "packet"
+    __metatable = "Packet"
 }
 
 

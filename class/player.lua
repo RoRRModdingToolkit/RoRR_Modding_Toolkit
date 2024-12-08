@@ -152,7 +152,7 @@ metatable_player = {
     end,
 
 
-    __metatable = "player"
+    __metatable = "Player"
 }
 
 
@@ -164,7 +164,7 @@ metatable_player_callbacks = {
         end
     end,
 
-    __metatable = "player_callbacks"
+    __metatable = "Player Callbacks"
 }
 Player:setmetatable(metatable_player_callbacks)
 

@@ -26,7 +26,7 @@ metatable_initialize = {
         table.insert(post_funcs[envy.getfenv(2)["!guid"]], func)
     end,
     
-    __metatable = "initialize"
+    __metatable = "Initialize"
 }
 Initialize:setmetatable(metatable_initialize)
 

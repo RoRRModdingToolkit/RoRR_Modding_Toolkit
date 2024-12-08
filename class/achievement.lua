@@ -197,7 +197,7 @@ metatable_class["Achievement"] = {
     end,
 
 
-    __metatable = "achievement"
+    __metatable = "Achievement"
 }
 
 

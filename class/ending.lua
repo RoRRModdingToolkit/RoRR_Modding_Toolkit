@@ -63,7 +63,7 @@ metatable_class["Ending"] = {
     end,
 
 
-    __metatable = "ending"
+    __metatable = "Ending"
 }
 
 

@@ -165,7 +165,7 @@ metatable_message = {
     end,
 
     
-    __metatable = "message"
+    __metatable = "Message"
 }
 
 

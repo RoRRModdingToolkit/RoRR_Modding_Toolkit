@@ -543,7 +543,7 @@ metatable_class["Survivor"] = {
     end,
 
 
-    __metatable = "survivor"
+    __metatable = "Survivor"
 }
 
 

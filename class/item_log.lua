@@ -82,7 +82,7 @@ metatable_class["Item_Log"] = {
     end,
 
 
-    __metatable = "item_log"
+    __metatable = "Item_Log"
 }
 
 

@@ -121,7 +121,7 @@ metatable_class["State"] = {
     end,
 
 
-    __metatable = "state"
+    __metatable = "State"
 }
 
 

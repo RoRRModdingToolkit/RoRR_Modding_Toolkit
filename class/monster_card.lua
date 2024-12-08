@@ -59,7 +59,7 @@ metatable_class["Monster_Card"] = {
     end,
 
 
-    __metatable = "monster_card"
+    __metatable = "Monster_Card"
 }
 
 

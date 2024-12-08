@@ -256,7 +256,7 @@ metatable_attack_info = {
     end,
 
 
-    __metatable = "attack_info"
+    __metatable = "Attack_Info"
 }
 
 

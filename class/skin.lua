@@ -70,7 +70,7 @@ metatable_class["Skin"] = {
     end,
 
 
-    __metatable = "skin"
+    __metatable = "Skin"
 }
 
 return Skin

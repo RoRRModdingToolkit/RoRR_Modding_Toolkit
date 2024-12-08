@@ -58,7 +58,7 @@ metatable_interactable_object = {
     end,
 
 
-    __metatable = "Interactable Object"
+    __metatable = "Interactable_Object"
 }
 
 

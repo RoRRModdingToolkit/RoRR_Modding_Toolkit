@@ -163,7 +163,7 @@ metatable_color = {
   end,
 
 
-  __metatable = "color"
+  __metatable = "Color"
 }
 Color:setmetatable(metatable_color)
 

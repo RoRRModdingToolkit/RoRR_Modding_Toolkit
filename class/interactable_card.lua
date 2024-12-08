@@ -48,7 +48,7 @@ metatable_class["Interactable_Card"] = {
     end,
 
 
-    __metatable = "interactable_card"
+    __metatable = "Interactable_Card"
 }
 
 

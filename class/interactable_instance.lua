@@ -33,5 +33,5 @@ metatable_interactable_instance = {
     end,
 
 
-    __metatable = "Interactable Instance"
+    __metatable = "Interactable_Instance"
 }

@@ -510,7 +510,7 @@ metatable_instance = {
     end,
 
     
-    __metatable = "instance"
+    __metatable = "Instance"
 }
 
 

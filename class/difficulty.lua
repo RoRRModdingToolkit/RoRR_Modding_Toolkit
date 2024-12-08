@@ -144,7 +144,7 @@ metatable_class["Difficulty"] = {
     end,
 
 
-    __metatable = "difficulty"
+    __metatable = "Difficulty"
 }
 
 

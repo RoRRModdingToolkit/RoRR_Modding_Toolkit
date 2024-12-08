@@ -132,7 +132,7 @@ metatable_list = {
     end,
 
     
-    __metatable = "list"
+    __metatable = "List"
 }
 
 

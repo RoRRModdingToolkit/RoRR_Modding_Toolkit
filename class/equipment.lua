@@ -327,7 +327,7 @@ metatable_class["Equipment"] = {
     end,
 
 
-    __metatable = "equipment"
+    __metatable = "Equipment"
 }
 
 

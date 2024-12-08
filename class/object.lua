@@ -257,7 +257,7 @@ metatable_object = {
     end,
 
 
-    __metatable = "object"
+    __metatable = "Object"
 }
 
 

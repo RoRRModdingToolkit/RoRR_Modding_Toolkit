@@ -419,7 +419,7 @@ metatable_class["Item"] = {
     end,
 
 
-    __metatable = "item"
+    __metatable = "Item"
 }
 
 

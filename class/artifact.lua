@@ -157,7 +157,7 @@ metatable_class["Artifact"] = {
     end,
 
 
-    __metatable = "artifact"
+    __metatable = "Artifact"
 }
 
 

@@ -262,7 +262,7 @@ metatable_class["Stage"] = {
     end,
 
 
-    __metatable = "stage"
+    __metatable = "Stage"
 }
 
 

@@ -113,7 +113,7 @@ metatable_class["Environment_Log"] = {
     end,
 
 
-    __metatable = "environment_log"
+    __metatable = "Environment_Log"
 }
 
 

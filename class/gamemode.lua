@@ -56,7 +56,7 @@ metatable_class["Gamemode"] = {
     end,
 
 
-    __metatable = "gamemode"
+    __metatable = "Gamemode"
 }
 
 

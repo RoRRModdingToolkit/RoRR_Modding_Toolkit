@@ -102,7 +102,7 @@ metatable_hit_info = {
     end,
 
 
-    __metatable = "hit_info"
+    __metatable = "Hit_Info"
 }
 
 

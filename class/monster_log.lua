@@ -144,7 +144,7 @@ metatable_class["Monster_Log"] = {
     end,
 
 
-    __metatable = "monster_log"
+    __metatable = "Monster_Log"
 }
 
 

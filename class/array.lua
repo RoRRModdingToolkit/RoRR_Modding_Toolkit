@@ -133,7 +133,7 @@ metatable_array = {
     end,
 
 
-    __metatable = "array"
+    __metatable = "Array"
 }
 
 

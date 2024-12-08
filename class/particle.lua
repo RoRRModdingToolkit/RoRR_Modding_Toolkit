@@ -128,7 +128,7 @@ metatable_particle = {
     end,
 
 
-    __metatable = "particle"
+    __metatable = "Particle"
 }
 
 

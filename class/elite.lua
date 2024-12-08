@@ -86,7 +86,7 @@ metatable_class["Elite"] = {
     end,
 
 
-    __metatable = "elite"
+    __metatable = "Elite"
 }
 
 
