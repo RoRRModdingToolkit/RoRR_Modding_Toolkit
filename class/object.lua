@@ -86,8 +86,42 @@ Object.find = function(namespace, identifier)
 end
 
 
+-- Object.wrap = function(value)
+--     return make_wrapper(value, "Object", metatable_object, lock_table_object)
+-- end
+
+
 Object.wrap = function(value)
-    return make_wrapper(value, "Object", metatable_object, lock_table_object)
+    value = Wrap.unwrap(value)
+
+    local RMT_object = "Object"
+    local mt = metatable_object
+    local lt = lock_table_object
+
+    if gm.object_is_ancestor(value, gm.constants.pInteractable) == 1.0
+    or gm.object_is_ancestor(value, gm.constants.pInteractableChest) == 1.0
+    or gm.object_is_ancestor(value, gm.constants.pInteractableCrate) == 1.0
+    or gm.object_is_ancestor(value, gm.constants.pInteractableDrone) == 1.0 then
+        RMT_object = "Interactable Object"
+        mt = metatable_interactable_object
+        lt = lock_table_interactable_object
+    end
+    
+    if value >= Object.CUSTOM_START then
+        local custom_object = Array.wrap(gm.variable_global_get("custom_object"))
+        local obj_array = custom_object:get(value - Object.CUSTOM_START)
+        local obj_index = obj_array:get(0)
+        if obj_index == gm.constants.pInteractable
+        or obj_index == gm.constants.pInteractableChest
+        or obj_index == gm.constants.pInteractableCrate
+        or obj_index == gm.constants.pInteractableDrone then
+            RMT_object = "Interactable Object"
+            mt = metatable_interactable_object
+            lt = lock_table_interactable_object
+        end
+    end
+
+    return make_wrapper(value, RMT_object, mt, lt)
 end
 
 
@@ -122,6 +156,11 @@ methods_object = {
 
 
     clear_callbacks = function(self)
+        self:clear_callbacks_obj_actual()
+    end,
+
+
+    clear_callbacks_obj_actual = function(self)
         callbacks[self.on_create] = nil
         callbacks[self.on_destroy] = nil
         callbacks[self.on_step] = nil

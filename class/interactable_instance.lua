@@ -1,12 +1,10 @@
--- Interactable
-
-Interactable = Proxy.new()
+-- Interactable Instance
 
 
 
 -- ========== Instance Methods ==========
 
-methods_interactable = {
+methods_interactable_instance = {
 
     set_active = function(self, active, activator, is_hack, hack_double)
         GM.interactable_set_active(self, activator or self.activator, active or 0, is_hack or false, hack_double or false)
@@ -18,11 +16,11 @@ methods_interactable = {
 
 -- ========== Metatables ==========
 
-metatable_interactable = {
+metatable_interactable_instance = {
     __index = function(table, key)
         -- Methods
-        if methods_interactable[key] then
-            return methods_interactable[key]
+        if methods_interactable_instance[key] then
+            return methods_interactable_instance[key]
         end
 
         -- Pass to next metatable
@@ -35,9 +33,5 @@ metatable_interactable = {
     end,
 
 
-    __metatable = "Interactable"
+    __metatable = "Interactable Instance"
 }
-
-
-
-return Interactable
