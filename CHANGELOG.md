@@ -2,6 +2,8 @@
 * Added Attack_Info class
 * Added Hit_Info class
 * Added Particle class
+* All class arrays : Added default `find_all` implementation
+    * Item : Original `find_all` implementation removed
 * Item, Equipment, Buff, Instance, Actor, Player
     * Several callbacks renamed (e.g., `onPickup` -> `onAcquired`) and rewritten.
     * Added callbacks `onPickupCollected` and `onDamageCalculate`
