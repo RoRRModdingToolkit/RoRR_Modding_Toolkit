@@ -153,6 +153,21 @@ for class, class_array_id in pairs(class_arrays) do
         return nil
     end
 
+    t.find_all = function(namespace)
+        local _t = {}
+
+        local find_table = class_find_table[class_array_id_og]
+        for str, num in pairs(find_table) do
+            local element = t.wrap(num)
+            if (not namespace)
+            or element:get(0) == namespace then
+                table.insert(_t, element)
+            end
+        end
+
+        return _t, #_t > 0
+    end
+
     t.wrap = function(value)
         local mt = metatable_class_gs[class]
         if metatable_class[class] then mt = metatable_class[class] end

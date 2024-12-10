@@ -115,6 +115,7 @@ Item.new = function(namespace, identifier, no_log)
 end
 
 
+-- Override
 Item.find_all = function(filter)
     local items = {}
 
