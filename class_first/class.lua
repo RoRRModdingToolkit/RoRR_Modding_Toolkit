@@ -155,15 +155,17 @@ for class, class_array_id in pairs(class_arrays) do
         return nil
     end
 
-    t.find_all = function(namespace)
+    t.find_all = function(filter, property)
         local _t = {}
+
+        local property = property or 0   -- filter property (default namespace)
 
         local find_table = class_find_table[class_array_id_og]
         for id, _ in ipairs(find_table) do
             if _ ~= "invalid" then
                 local element = t.wrap(id)
-                if (not namespace)
-                or element:get(0) == namespace then
+                if (not filter)
+                or element:get(property) == filter then
                     table.insert(_t, element)
                 end
             end
