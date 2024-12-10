@@ -70,13 +70,14 @@ class_find_repopulate = function(class)
 
         for i = 0, size - 1 do
             local element = gm.array_get(arr, i)
+            local full = "invalid"
             if gm.is_array(element) then
                 local namespace = gm.array_get(element, 0)
                 local identifier = gm.array_get(element, 1)
                 local full = namespace.."-"..identifier
-                t[full] = i
-                t[i] = full
             end
+            t[full] = i
+            t[i] = full
         end
     end
 end
@@ -159,10 +160,12 @@ for class, class_array_id in pairs(class_arrays) do
 
         local find_table = class_find_table[class_array_id_og]
         for id, _ in ipairs(find_table) do
-            local element = t.wrap(id)
-            if (not namespace)
-            or element:get(0) == namespace then
-                table.insert(_t, element)
+            if _ ~= "invalid" then
+                local element = t.wrap(id)
+                if (not namespace)
+                or element:get(0) == namespace then
+                    table.insert(_t, element)
+                end
             end
         end
 
