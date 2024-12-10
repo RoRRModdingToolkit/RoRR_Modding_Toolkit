@@ -115,27 +115,6 @@ Item.new = function(namespace, identifier, no_log)
 end
 
 
--- Override
-Item.find_all = function(filter)
-    local items = {}
-
-    local ind = 1   -- namespace
-    if type(filter) == "number" then ind = 7 end    -- tier
-
-    local array = Class.ITEM
-    local size = #array
-    for i = 0, size - 1 do
-        local item = array:get(i)
-        if (item[ind] == filter)
-        or (filter == nil) then
-            table.insert(items, Item.wrap(i))
-        end
-    end
-
-    return items, #items > 0
-end
-
-
 Item.get_random = function(...)
     local tiers = {}
     if ... then
