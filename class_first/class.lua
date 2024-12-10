@@ -75,6 +75,7 @@ class_find_repopulate = function(class)
                 local identifier = gm.array_get(element, 1)
                 local full = namespace.."-"..identifier
                 t[full] = i
+                t[i] = full
             end
         end
     end
@@ -157,8 +158,8 @@ for class, class_array_id in pairs(class_arrays) do
         local _t = {}
 
         local find_table = class_find_table[class_array_id_og]
-        for str, num in pairs(find_table) do
-            local element = t.wrap(num)
+        for id, _ in ipairs(find_table) do
+            local element = t.wrap(id)
             if (not namespace)
             or element:get(0) == namespace then
                 table.insert(_t, element)
