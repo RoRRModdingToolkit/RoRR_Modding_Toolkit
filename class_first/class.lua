@@ -74,7 +74,7 @@ class_find_repopulate = function(class)
             if gm.is_array(element) then
                 local namespace = gm.array_get(element, 0)
                 local identifier = gm.array_get(element, 1)
-                local full = namespace.."-"..identifier
+                full = namespace.."-"..identifier
             end
             t[full] = i
             t[i] = full
