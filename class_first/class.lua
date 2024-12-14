@@ -160,13 +160,14 @@ for class, class_array_id in pairs(class_arrays) do
 
         local property = property or 0   -- filter property (default namespace)
 
+        local arr = gm.variable_global_get(class_array_id_og)
         local find_table = class_find_table[class_array_id_og]
         for id, _ in ipairs(find_table) do
             if _ ~= "invalid" then
-                local element = t.wrap(id)
+                local element = gm.array_get(arr, id)
                 if (not filter)
                 or element:get(property) == filter then
-                    table.insert(_t, element)
+                    table.insert(_t, t.wrap(id))
                 end
             end
         end
