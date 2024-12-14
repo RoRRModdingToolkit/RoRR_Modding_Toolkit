@@ -1,6 +1,8 @@
 -- ENVY
 
-function public.setup(env)
+function public.setup(env, mp)
+    if mp then table.insert(mp_marked, env["!guid"]) end
+
     if env == nil then
         env = envy.getfenv(2)
     end
@@ -12,9 +14,9 @@ function public.setup(env)
 end
 
 
-function public.auto()
+function public.auto(mp)
     local env = envy.getfenv(2)
-    local wrapper = public.setup(env)
+    local wrapper = public.setup(env, mp)
     envy.import_all(env, wrapper)
 
     Language.register_autoload(env)

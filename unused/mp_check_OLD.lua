@@ -1,7 +1,10 @@
--- -- Multiplayer Check
+-- Multiplayer Check
 
-mp_marked = {}
 local incomp = {}
+local whitelist = {
+    "ReturnOfModding-GLOBAL",
+    "MGReturns-ENVY"
+}
 
 local text_x, text_y
 local box_x, box_y, box_w, box_h
@@ -9,23 +12,17 @@ local initial_fadein
 local ui_hook = 0     -- Have the hook automatically stop itself (so it doesn't make unnecessary checks later)
 
 
--- MP check all RMT-dependent mods for
+-- Check all mods' manifest.json for "mp": true
 mods.on_all_mods_loaded(function()
     for _, m_id in ipairs(mods.loading_order) do
-        local m = mods[m_id]
+        local manifest = mods[m_id]["!plugins_mod_folder_path"].."\\manifest.json"
+        local json = Helper.read_json(manifest)
 
-        -- Check if mod has RMT as a dependency
-        if Helper.table_has(
-            m._PLUGIN.dependencies_no_version_number,
-            "RoRRModdingToolkit-RoRR_Modding_Toolkit"
-        ) then
-
-            -- Add to incompatibility list if not marked
-            if not Helper.table_has(mp_marked, m["!guid"]) then
-                local split = GM.string_split(m_id, "-")
-                table.insert(incomp, {split[1], split[2]})
-            end
-
+        -- Add to incompatibility list if not marked
+        if  not json["mp"]
+        and not Helper.table_has(whitelist, m_id) then
+            local split = GM.string_split(m_id, "-")
+            table.insert(incomp, {split[1], split[2]})
         end
     end
 end)

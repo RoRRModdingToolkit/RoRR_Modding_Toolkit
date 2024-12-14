@@ -28,7 +28,7 @@
 * Array : `contains` last 2 args are now optional.
 * Interactable_Object : Renamed from Interactable, and now only adds one extra callback.
 * Minor optimizations in various callbacks.
-* Now prevents online play if any incompatible mods are loaded.
+* Now prevents online play if any (RMT-dependent) incompatible mods are loaded.
 
 ### v1.1.32
 * Actor : Added `apply_dot`
