@@ -6,6 +6,5 @@
 	"dependencies": [
 		"ReturnOfModding-ReturnOfModding-1.0.54",
 		"MGReturns-ENVY-1.1.1"
-	],
-	"mp": true
+	]
 }
