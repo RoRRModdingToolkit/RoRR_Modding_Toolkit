@@ -6,6 +6,7 @@
     * Item : Original `find_all` implementation removed
 * Item, Equipment, Buff, Instance, Actor, Player
     * Several callbacks renamed (e.g., `onPickup` -> `onAcquired`) and rewritten.
+        * Namely, callbacks that passed "`damager`" will now either pass `attack_info` or `hit_info`.
     * Added callbacks `onPickupCollected` and `onDamageCalculate`
 * Item
     * Replaced `TYPE` with `STACK_KIND`; affects `actor:item_give`, etc. as well.
