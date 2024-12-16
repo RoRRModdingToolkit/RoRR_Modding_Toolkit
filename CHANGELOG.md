@@ -1,3 +1,6 @@
+### v1.2.1
+* Resources : No longer triggers a crash when a resource function is called before base game initialization.
+
 ### v1.2.0
 * Added Attack_Info class
 * Added Hit_Info class

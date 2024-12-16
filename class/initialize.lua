@@ -2,7 +2,7 @@
 
 Initialize = Proxy.new()
 
-local init = false
+initialized = false
 local funcs = {}
 local post_funcs = {}
 
@@ -14,7 +14,7 @@ local legacy_load = {}
 
 metatable_initialize = {
     __call = function(t, func, post)
-        if init then return end
+        if initialized then return end
 
         if not post then
             if not funcs[envy.getfenv(2)["!guid"]] then funcs[envy.getfenv(2)["!guid"]] = {} end
@@ -35,8 +35,8 @@ Initialize:setmetatable(metatable_initialize)
 -- ========== Initialize ==========
 
 gm.pre_script_hook(gm.constants.__input_system_tick, function()
-    if not init then
-        init = true
+    if not initialized then
+        initialized = true
 
         -- Initialize RMT first
         __initialize()
