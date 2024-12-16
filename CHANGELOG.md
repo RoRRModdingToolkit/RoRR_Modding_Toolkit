@@ -1,5 +1,6 @@
 ### v1.2.1
 * Resources : No longer triggers a crash when a resource function is called before base game initialization.
+* Object : No longer runs a callback if `inst` is actually non-existent (not sure what causes this).
 
 ### v1.2.0
 * Added Attack_Info class

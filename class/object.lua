@@ -261,6 +261,7 @@ gm.post_script_hook(gm.constants.callback_execute, function(self, other, result,
     -- Custom object callbacks
     if callbacks[args[1].value] then
         local inst = Instance.wrap(args[2].value)
+        if not inst:exists() then return end
         for _, fn in pairs(callbacks[args[1].value]) do
             fn(inst)   -- Instance
         end
