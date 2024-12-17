@@ -34,6 +34,10 @@ Net.get_type = function()
     return Net.TYPE.single
 end
 
+Net.is_single   = function() return Net.get_type() == Net.TYPE.single   end
+Net.is_host     = function() return Net.get_type() == Net.TYPE.host     end
+Net.is_client   = function() return Net.get_type() == Net.TYPE.client   end
+
 
 
 return Net
