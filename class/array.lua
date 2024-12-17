@@ -92,6 +92,15 @@ methods_array = {
     end,
 
 
+    find = function(self, value)
+        value = Wrap.unwrap(value)
+        for i, v in ipairs(self) do
+            if v == value then return i - 1 end
+        end
+        return nil
+    end,
+
+
     sort = function(self, descending)
         gm.array_sort(self.value, not descending)
     end

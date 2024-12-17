@@ -2,6 +2,7 @@
 * Net : Added `is_single`, `is_host`, `is_client`
 * Helper : Added `sync_crate_contents`
 * Item : `spawn_crate` now automatically syncs crate contents.
+* Array : Added `find`
 
 ### v1.2.1
 * Resources : No longer triggers a crash when a resource function is called before base game initialization.
