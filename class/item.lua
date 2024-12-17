@@ -139,6 +139,8 @@ end
 
 
 Item.spawn_crate = function(x, y, tier, items)
+    if Net.is_client() then log.error("Cannot call this as client", 2) end
+
     local inst = Object.find("ror-generated_CommandCrate_"..tier):create(x, y)
 
     -- Replace default items with custom set
@@ -150,6 +152,9 @@ Item.spawn_crate = function(x, y, tier, items)
         end
         inst.contents = arr
     end
+
+    -- [Host]  Sync crate contents
+    if Net.is_host() then Alarm.create(function() Helper.sync_crate_contents(inst) end, 1) end
 
     return inst
 end
