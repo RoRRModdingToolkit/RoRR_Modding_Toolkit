@@ -301,7 +301,7 @@ function initialize_helper()
             local message = packet_syncCrate:message_begin()
             message:write_instance(crate)
             message:write_string(contents_raw)
-            message:send_to_all()
+            message:send_exclude(player)
         end
     end)
 end
