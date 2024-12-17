@@ -52,6 +52,7 @@ require("./envy_setup")
 
 function __initialize()
     initialize_class()
+    initialize_helper()
 
     initialize_instance()
 end

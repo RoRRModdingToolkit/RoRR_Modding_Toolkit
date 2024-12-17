@@ -2,6 +2,8 @@
 
 Helper = Proxy.new()
 
+local packet_syncCrate
+
 
 
 -- ========== Static Methods ==========
@@ -256,6 +258,52 @@ Helper.read_json = function(filepath)
     end
 
     return parse_struct({}, gm_parse, keys)
+end
+
+
+Helper.sync_crate_contents = function(crate)
+    if Net.is_single() then return end
+    crate = Instance.wrap(crate)
+
+    local array = crate.contents
+    local contents = {}
+    for _, obj_id in ipairs(array) do
+        table.insert(contents, obj_id)
+    end
+
+    local message = packet_syncCrate:message_begin()
+    message:write_instance(crate)
+    message:write_string(Helper.table_to_string(contents))
+
+    if Net.is_host() then message:send_to_all()
+    else message:send_to_host()
+    end
+end
+
+
+
+-- ========== Initialize ==========
+
+function initialize_helper()
+    packet_syncCrate = Packet.new()
+    packet_syncCrate:onReceived(function(message, player)
+        local crate = message:read_instance()
+        local contents_raw = message:read_string()
+        local contents = Helper.string_to_table(contents_raw)
+
+        crate.contents = Array.new()
+        for _, obj_id in ipairs(contents) do
+            crate.contents:insert(0, obj_id)
+        end
+
+        -- [Host]  Send to other players
+        if Net.is_host() then
+            local message = packet_syncCrate:message_begin()
+            message:write_instance(crate)
+            message:write_string(contents_raw)
+            message:send_to_all()
+        end
+    end)
 end
 
 
