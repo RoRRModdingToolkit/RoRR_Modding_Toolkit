@@ -1,3 +1,6 @@
+### v1.2.3
+* Fixed online lobbies crashing when "Allow rule voting" was enabled with custom difficulties.
+
 ### v1.2.2
 * Net : Added `is_single`, `is_host`, `is_client`
 * Helper : Added `sync_crate_contents`

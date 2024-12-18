@@ -1,4 +1,4 @@
--- -- Multiplayer Check
+-- Multiplayer Check
 
 mp_marked = {}
 local incomp = {}
