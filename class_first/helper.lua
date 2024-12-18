@@ -293,7 +293,7 @@ function initialize_helper()
 
         crate.contents = Array.new()
         for _, obj_id in ipairs(contents) do
-            crate.contents:insert(0, obj_id)
+            crate.contents:push(obj_id)
         end
 
         -- [Host]  Send to other players
