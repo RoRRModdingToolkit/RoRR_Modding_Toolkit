@@ -1,5 +1,6 @@
 ### v1.2.3
 * Fixed online lobbies crashing when "Allow rule voting" was enabled with custom difficulties.
+* Net : Changed internals for `get_type` (and by extension `is_single`, `is_host`, `is_client`).
 
 ### v1.2.2
 * Net : Added `is_single`, `is_host`, `is_client`

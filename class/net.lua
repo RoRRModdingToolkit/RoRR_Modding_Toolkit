@@ -7,6 +7,7 @@ Net = Proxy.new()
 -- ========== Enums ==========
 
 Net.TYPE = Proxy.new({
+    -- Only one may be true at a time
     single      = 0,
     host        = 1,
     client      = 2
@@ -17,21 +18,9 @@ Net.TYPE = Proxy.new({
 -- ========== Static Methods ==========
 
 Net.get_type = function()
-    local oPrePlayer = Instance.find(gm.constants.oPrePlayer)
-    if oPrePlayer:exists() then
-        if oPrePlayer.m_id == 1.0 then return Net.TYPE.host
-        elseif oPrePlayer.m_id > 1.0 then return Net.TYPE.client
-        end
-    end
-
-    local p = Player.get_client()
-    if p:exists() then
-        if p.m_id == 1.0 then return Net.TYPE.host
-        elseif p.m_id > 1.0 then return Net.TYPE.client
-        end
-    end
-
-    return Net.TYPE.single
+    if not gm._mod_net_isOnline()   then return Net.TYPE.single end
+    if gm._mod_net_isHost()         then return Net.TYPE.host   end
+    return Net.TYPE.client
 end
 
 Net.is_single   = function() return Net.get_type() == Net.TYPE.single   end
