@@ -1,3 +1,8 @@
+### v1.2.4
+* Difficulty : Removed all class callbacks entirely
+    * Mostly redundant; just add a Callback and check with `is_active`
+    * Also lack of control over `onActive`/`onInactive`
+
 ### v1.2.3
 * Fixed online lobbies crashing when "Allow rule voting" was enabled with custom difficulties.
 * Net : Changed internals for `get_type` (and by extension `is_single`, `is_host`, `is_client`).

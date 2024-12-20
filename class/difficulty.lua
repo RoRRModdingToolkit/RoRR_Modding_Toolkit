@@ -42,20 +42,20 @@ methods_difficulty = {
     end,
 
 
-    add_callback = function(self, callback, func)
-        if Helper.table_has(other_callbacks, callback) then
-            if not callbacks[self.value] then callbacks[self.value] = {} end
-            if not callbacks[self.value][callback] then callbacks[self.value][callback] = {} end
-            table.insert(callbacks[self.value][callback], func)
+    -- add_callback = function(self, callback, func)
+    --     if Helper.table_has(other_callbacks, callback) then
+    --         if not callbacks[self.value] then callbacks[self.value] = {} end
+    --         if not callbacks[self.value][callback] then callbacks[self.value][callback] = {} end
+    --         table.insert(callbacks[self.value][callback], func)
 
-        else log.error("Invalid callback name", 2)
-        end
-    end,
+    --     else log.error("Invalid callback name", 2)
+    --     end
+    -- end,
 
 
-    clear_callbacks = function(self)
-        callbacks[self.value] = nil
-    end,
+    -- clear_callbacks = function(self)
+    --     callbacks[self.value] = nil
+    -- end,
 
 
     set_text = function(self, name, description)
@@ -116,10 +116,10 @@ methods_difficulty = {
 
 
     -- Callbacks
-    onActive        = function(self, func) self:add_callback("onActive", func) end,
-    onInactive      = function(self, func) self:add_callback("onInactive", func) end,
-    onStep          = function(self, func) self:add_callback("onStep", func) end,
-    onDraw          = function(self, func) self:add_callback("onDraw", func) end
+    -- onActive        = function(self, func) self:add_callback("onActive", func) end,
+    -- onInactive      = function(self, func) self:add_callback("onInactive", func) end,
+    -- onStep          = function(self, func) self:add_callback("onStep", func) end,
+    -- onDraw          = function(self, func) self:add_callback("onDraw", func) end
     
 }
 
@@ -151,67 +151,67 @@ metatable_class["Difficulty"] = {
 
 -- ========== Callbacks ==========
 
-local function diff_onActive(self, other, result, args)
-    local current = gm._mod_game_getDifficulty()
+-- local function diff_onActive(self, other, result, args)
+--     local current = gm._mod_game_getDifficulty()
 
-    if current ~= active then
-        local content = callbacks[active]
-        if content and content["onInactive"] then
-            for _, fn in ipairs(content["onInactive"]) do
-                fn()
-            end
-        end
+--     if current ~= active then
+--         local content = callbacks[active]
+--         if content and content["onInactive"] then
+--             for _, fn in ipairs(content["onInactive"]) do
+--                 fn()
+--             end
+--         end
 
-        content = callbacks[current]
-        if content and content["onActive"] then
-            for _, fn in ipairs(content["onActive"]) do
-                fn()
-            end
-        end
+--         content = callbacks[current]
+--         if content and content["onActive"] then
+--             for _, fn in ipairs(content["onActive"]) do
+--                 fn()
+--             end
+--         end
 
-        -- Recalculate all actor stats
-        local actors = Instance.find_all(gm.constants.pActor)
-        for _, actor in ipairs(actors) do
-            actor:recalculate_stats()
-        end
-    end
+--         -- Recalculate all actor stats
+--         local actors = Instance.find_all(gm.constants.pActor)
+--         for _, actor in ipairs(actors) do
+--             actor:recalculate_stats()
+--         end
+--     end
 
-    active = current
-end
-
-
-local function diff_onStep(self, other, result, args)
-    if gm.variable_global_get("pause") then return end
-
-    for id, content in pairs(callbacks) do
-        if content["onStep"] and Difficulty.wrap(id):is_active() then
-            for _, fn in ipairs(content["onStep"]) do
-                fn()
-            end
-        end
-    end
-end
+--     active = current
+-- end
 
 
-local function diff_onDraw(self, other, result, args)
-    if gm.variable_global_get("pause") then return end
+-- local function diff_onStep(self, other, result, args)
+--     if gm.variable_global_get("pause") then return end
 
-    for id, content in pairs(callbacks) do
-        if content["onDraw"] and Difficulty.wrap(id):is_active() then
-            for _, fn in ipairs(content["onDraw"]) do
-                fn()
-            end
-        end
-    end
-end
+--     for id, content in pairs(callbacks) do
+--         if content["onStep"] and Difficulty.wrap(id):is_active() then
+--             for _, fn in ipairs(content["onStep"]) do
+--                 fn()
+--             end
+--         end
+--     end
+-- end
+
+
+-- local function diff_onDraw(self, other, result, args)
+--     if gm.variable_global_get("pause") then return end
+
+--     for id, content in pairs(callbacks) do
+--         if content["onDraw"] and Difficulty.wrap(id):is_active() then
+--             for _, fn in ipairs(content["onDraw"]) do
+--                 fn()
+--             end
+--         end
+--     end
+-- end
 
 
 
 -- ========== Initialize ==========
 
-Callback.add("preStep", "RMT-diff_onActive", diff_onActive)
-Callback.add("preStep", "RMT-diff_onStep", diff_onStep)
-Callback.add("postHUDDraw", "RMT-diff_onDraw", diff_onDraw)
+-- Callback.add("onStageStart", "RMT-diff_onActive", diff_onActive)
+-- Callback.add("preStep", "RMT-diff_onStep", diff_onStep)
+-- Callback.add("postHUDDraw", "RMT-diff_onDraw", diff_onDraw)
 
 
 
