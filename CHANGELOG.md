@@ -1,3 +1,10 @@
+### v1.2.5
+* Item, Equipment, Buff, Instance, Actor, Player
+    * Removed `onDamageCalculate` and `onDamageCalculateProc` callbacks due to errors (`hit_info` does not exist for client attacks for whatever reason).
+* Resources
+    * Calling `sprite_load` for an existing sprite now allows you to modify the sprite's origin.
+    * `sfx_load` now returns the existing sound ID for a namespace-identifier that already exists.
+
 ### v1.2.4
 * Difficulty : Removed all class callbacks entirely
     * Mostly redundant; just add a Callback and check with `is_active`

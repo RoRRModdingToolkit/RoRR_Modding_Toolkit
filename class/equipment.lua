@@ -18,8 +18,8 @@ local valid_callbacks = {
     onAttackHit             = true,
     onAttackHandleEnd       = true,
     onAttackHandleEndProc   = true,
-    onDamageCalculate       = true,
-    onDamageCalculateProc   = true,
+    -- onDamageCalculate       = true,
+    -- onDamageCalculateProc   = true,
     onHitProc               = true,
     onKillProc              = true,
     onDamagedProc           = true,
@@ -481,39 +481,39 @@ gm.post_script_hook(gm.constants.recalculate_stats, function(self, other, result
 end)
 
 
-gm.pre_script_hook(gm.constants.damager_calculate_damage, function(self, other, result, args)
-    if not callbacks["onDamageCalculate"] then return end
+-- gm.pre_script_hook(gm.constants.damager_calculate_damage, function(self, other, result, args)
+--     if not callbacks["onDamageCalculate"] then return end
 
-    local player = Instance.wrap(args[6].value)
-    if not Instance.exists(actor) then return end
-    if not has_custom_equip[player.id] then return end
+--     local player = Instance.wrap(args[6].value)
+--     if not Instance.exists(actor) then return end
+--     if not has_custom_equip[player.id] then return end
 
-    local equipment = player:get_equipment()
+--     local equipment = player:get_equipment()
 
-    if not equipment then return end
+--     if not equipment then return end
 
-    local victim = Instance.wrap(args[2].value)
-    local damage = args[4].value
-    local hit_info = Hit_Info.wrap(args[1].value)
+--     local victim = Instance.wrap(args[2].value)
+--     local damage = args[4].value
+--     local hit_info = Hit_Info.wrap(args[1].value)
 
-    if callbacks["onDamageCalculate"] and callbacks["onDamageCalculate"][equipment.value] then
-        for _, fn in ipairs(callbacks["onDamageCalculate"][equipment.value]) do
-            local new = fn(player, victim, damage, hit_info)
-            if type(new) == "number" then damage = new end   -- Replace damage
-        end
-        args[4].value = damage
-    end
+--     if callbacks["onDamageCalculate"] and callbacks["onDamageCalculate"][equipment.value] then
+--         for _, fn in ipairs(callbacks["onDamageCalculate"][equipment.value]) do
+--             local new = fn(player, victim, damage, hit_info)
+--             if type(new) == "number" then damage = new end   -- Replace damage
+--         end
+--         args[4].value = damage
+--     end
 
-    if Helper.is_false(hit_info.proc) then return end
+--     if Helper.is_false(hit_info.proc) then return end
 
-    if callbacks["onDamageCalculateProc"] and callbacks["onDamageCalculateProc"][equipment.value] then
-        for _, fn in ipairs(callbacks["onDamageCalculateProc"][equipment.value]) do
-            local new = fn(player, victim, damage, hit_info)
-            if type(new) == "number" then damage = new end   -- Replace damage
-        end
-        args[4].value = damage
-    end
-end)
+--     if callbacks["onDamageCalculateProc"] and callbacks["onDamageCalculateProc"][equipment.value] then
+--         for _, fn in ipairs(callbacks["onDamageCalculateProc"][equipment.value]) do
+--             local new = fn(player, victim, damage, hit_info)
+--             if type(new) == "number" then damage = new end   -- Replace damage
+--         end
+--         args[4].value = damage
+--     end
+-- end)
 
 
 gm.post_script_hook(gm.constants.skill_activate, function(self, other, result, args)

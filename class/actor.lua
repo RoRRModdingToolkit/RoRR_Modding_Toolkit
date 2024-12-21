@@ -15,8 +15,8 @@ local valid_callbacks = {
     onAttackHit             = true,
     onAttackHandleEnd       = true,
     onAttackHandleEndProc   = true,
-    onDamageCalculate       = true,
-    onDamageCalculateProc   = true,
+    -- onDamageCalculate       = true,
+    -- onDamageCalculateProc   = true,
     onHitProc               = true,
     onKillProc              = true,
     onDamagedProc           = true,
@@ -487,34 +487,34 @@ gm.post_script_hook(gm.constants.recalculate_stats, function(self, other, result
 end)
 
 
-gm.pre_script_hook(gm.constants.damager_calculate_damage, function(self, other, result, args)
-    if not callbacks["onDamageCalculate"] then return end
+-- gm.pre_script_hook(gm.constants.damager_calculate_damage, function(self, other, result, args)
+--     if not callbacks["onDamageCalculate"] then return end
 
-    local actor = Instance.wrap(args[6].value)
-    if not Instance.exists(actor) then return end
+--     local actor = Instance.wrap(args[6].value)
+--     if not Instance.exists(actor) then return end
 
-    local victim = Instance.wrap(args[2].value)
-    local damage = args[4].value
-    local hit_info = Hit_Info.wrap(args[1].value)
+--     local victim = Instance.wrap(args[2].value)
+--     local damage = args[4].value
+--     local hit_info = Hit_Info.wrap(args[1].value)
 
-    if callbacks["onDamageCalculate"] then
-        for _, fn in pairs(callbacks["onDamageCalculate"]) do
-            local new = fn(actor, victim, damage, hit_info)
-            if type(new) == "number" then damage = new end   -- Replace damage
-        end
-        args[4].value = damage
-    end
+--     if callbacks["onDamageCalculate"] then
+--         for _, fn in pairs(callbacks["onDamageCalculate"]) do
+--             local new = fn(actor, victim, damage, hit_info)
+--             if type(new) == "number" then damage = new end   -- Replace damage
+--         end
+--         args[4].value = damage
+--     end
 
-    if Helper.is_false(hit_info.proc) then return end
+--     if Helper.is_false(hit_info.proc) then return end
 
-    if callbacks["onDamageCalculateProc"] then
-        for _, fn in pairs(callbacks["onDamageCalculateProc"]) do
-            local new = fn(actor, victim, damage, hit_info)
-            if type(new) == "number" then damage = new end   -- Replace damage
-        end
-        args[4].value = damage
-    end
-end)
+--     if callbacks["onDamageCalculateProc"] then
+--         for _, fn in pairs(callbacks["onDamageCalculateProc"]) do
+--             local new = fn(actor, victim, damage, hit_info)
+--             if type(new) == "number" then damage = new end   -- Replace damage
+--         end
+--         args[4].value = damage
+--     end
+-- end)
 
 
 gm.post_script_hook(gm.constants.skill_activate, function(self, other, result, args)
