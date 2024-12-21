@@ -4,13 +4,17 @@
 Resources = Proxy.new()
 
 
--- == Section Sprites == --
+
+-- ========== Static Methods ==========
 
 Resources.sprite_load = function(namespace, identifier, path, img_num, x_orig, y_orig, speed, bbox_left, bbox_top, bbox_right, bbox_bottom)
     if not initialized then log.error("Cannot be called before base game initialization", 2) end
     
     local sprite = gm.sprite_find(namespace.."-"..identifier)
-    if sprite then return sprite end
+    if sprite then
+        gm.sprite_set_offset(sprite, x_orig or 0, y_orig or 0)
+        return sprite
+    end
     
     sprite = gm.sprite_add_w(
         namespace,
@@ -37,6 +41,7 @@ Resources.sprite_load = function(namespace, identifier, path, img_num, x_orig, y
     return sprite
 end
 
+
 Resources.sprite_duplicate = function(id, x_offset, y_offset, speed)
     if not initialized then log.error("Cannot be called before base game initialization", 2) end
     
@@ -57,15 +62,26 @@ Resources.sprite_duplicate = function(id, x_offset, y_offset, speed)
     return sprite
 end
 
+
 Resources.sfx_load = function(namespace, identifier, path)
     if not initialized then log.error("Cannot be run before base game initialization", 2) end
+
+    local sfx = gm._mod_sound_find(identifier, namespace)
+    if sfx ~= -1 then return sfx end
     
-    local sfx = gm.sound_add_w(namespace, identifier, path)
-    if sfx == -1 then 
+    sfx = gm.sound_add_w(
+        namespace,
+        identifier,
+        path
+    )
+
+    if sfx == -1 then
         log.error("Couldn't load sfx "..path, 2)
     end
+
     return sfx
 end
+
 
 
 return Resources
