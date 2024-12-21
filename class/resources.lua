@@ -12,7 +12,7 @@ Resources.sprite_load = function(namespace, identifier, path, img_num, x_orig, y
     
     local sprite = gm.sprite_find(namespace.."-"..identifier)
     if sprite then
-        gm.sprite_set_offset(sprite, x_orig or 0, y_orig or 0)
+        if x_orig and y_orig then gm.sprite_set_offset(sprite, x_orig or 0, y_orig or 0) end
         return sprite
     end
     
@@ -42,25 +42,25 @@ Resources.sprite_load = function(namespace, identifier, path, img_num, x_orig, y
 end
 
 
-Resources.sprite_duplicate = function(id, x_offset, y_offset, speed)
-    if not initialized then log.error("Cannot be called before base game initialization", 2) end
+-- Resources.sprite_duplicate = function(id, x_orig, y_orig, speed)
+--     if not initialized then log.error("Cannot be called before base game initialization", 2) end
     
-    local sprite = gm.sprite_duplicate(id)
+--     local sprite = gm.sprite_duplicate(id)
 
-    if sprite == -1 then
-        log.error("Error trying to duplicate sprite. Loading default sprite instead.", 2)
-        return 0
-    end
+--     if sprite == -1 then
+--         log.error("Error trying to duplicate sprite. Loading default sprite instead.", 2)
+--         return 0
+--     end
 
-    if x_offset and y_offset then
-        gm.sprite_set_offset(sprite, x_offset, y_offset)
-    end
+--     if x_orig and y_orig then
+--         gm.sprite_set_offset(sprite, x_orig, y_orig)
+--     end
 
-    if speed then
-        gm.sprite_set_speed(sprite, speed, 1) -- always set in framespergameframe since framerate is constant
-    end
-    return sprite
-end
+--     if speed then
+--         gm.sprite_set_speed(sprite, speed, 1) -- always set in framespergameframe since framerate is constant
+--     end
+--     return sprite
+-- end
 
 
 Resources.sfx_load = function(namespace, identifier, path)

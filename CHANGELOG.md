@@ -3,6 +3,7 @@
     * Removed `onDamageCalculate` and `onDamageCalculateProc` callbacks due to errors (`hit_info` does not exist for client attacks for whatever reason).
 * Resources
     * Calling `sprite_load` for an existing sprite now allows you to modify the sprite's origin.
+    * Removed `sprite_duplicate` since sprites really should not be cloned that way (no namespace-identifier lookup).
     * `sfx_load` now returns the existing sound ID for a namespace-identifier that already exists.
 
 ### v1.2.4
