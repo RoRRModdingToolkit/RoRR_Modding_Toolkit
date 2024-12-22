@@ -1,3 +1,6 @@
+### v1.2.6
+* Item, Equipment : `toggle_loot` and related methods can now modify pools while in a run.
+
 ### v1.2.5
 * Item, Equipment, Buff, Instance, Actor, Player
     * Removed `onDamageCalculate` and `onDamageCalculateProc` callbacks due to errors (`hit_info` does not exist for client attacks for whatever reason).

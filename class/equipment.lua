@@ -247,6 +247,7 @@ methods_equipment = {
 
         for i = 0, #loot_pools - 1 do
             local drop_pool = List.wrap(loot_pools:get(i).drop_pool)
+            if in_run then drop_pool = List.wrap(loot_pools:get(i).available_drop_pool) end
             local pos = drop_pool:find(obj)
             if pos then return true end
         end
@@ -265,8 +266,8 @@ methods_equipment = {
             if disabled_loot[self.value] then
                 -- Add back to loot pools
                 for _, pool_id in ipairs(disabled_loot[self.value]) do
-                    local drop_pool = List.wrap(loot_pools:get(pool_id).drop_pool)
-                    drop_pool:add(obj)
+                    List.wrap(loot_pools:get(pool_id).drop_pool):add(obj)
+                    if in_run then List.wrap(loot_pools:get(pool_id).available_drop_pool):add(obj) end
 
                     if not Helper.table_has(loot_toggled, pool_id) then
                         table.insert(loot_toggled, pool_id)
@@ -288,6 +289,12 @@ methods_equipment = {
                     if pos then
                         drop_pool:delete(pos)
                         table.insert(pools, i)
+                    end
+
+                    if in_run then
+                        local drop_pool = List.wrap(loot_pools:get(i).available_drop_pool)
+                        local pos = drop_pool:find(obj)
+                        if pos then drop_pool:delete(pos) end
                     end
                 end
 
@@ -568,23 +575,29 @@ gm.pre_script_hook(gm.constants.__input_system_tick, function()
     -- Sort loot tables that have been added to
     for _, pool_id in ipairs(loot_toggled) do
         local loot_pools = Array.wrap(gm.variable_global_get("treasure_loot_pools"))
+        local tier_pool = loot_pools:get(pool_id)
 
         -- Get equipment IDs from objects and sort
-        local ids = List.new()
-        local drop_pool = List.wrap(loot_pools:get(pool_id).drop_pool)
-        for _, obj in ipairs(drop_pool) do
-            ids:add(gm.object_to_equipment(obj))
-        end
-        ids:sort()
+        local pools = {"drop_pool", "available_drop_pool"}
+        local count = 1
+        if in_run then count = 2 end
+        for i = 1, count do
+            local ids = List.new()
+            local drop_pool = List.wrap(tier_pool[pools[i]])
+            for __, obj in ipairs(drop_pool) do
+                ids:add(gm.object_to_equipment(obj))
+            end
+            ids:sort()
 
-        -- Add objects of sorted IDs back into loot pool
-        drop_pool:clear()
-        for _, id in ipairs(ids) do
-            local equip = Class.EQUIPMENT:get(id)
-            local obj = equip:get(8)
-            drop_pool:add(obj)
+            -- Add objects of sorted IDs back into loot pool
+            drop_pool:clear()
+            for __, id in ipairs(ids) do
+                local equip = Class.EQUIPMENT:get(id)
+                local obj = equip:get(8)
+                drop_pool:add(obj)
+            end
+            ids:destroy()
         end
-        ids:destroy()
     end
     loot_toggled = {}
 end)
