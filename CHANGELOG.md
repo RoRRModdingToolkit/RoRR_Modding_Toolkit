@@ -1,5 +1,6 @@
 ### v1.2.6
 * Item, Equipment : `toggle_loot` and related methods can now modify pools while in a run.
+* Instance : Getting from an invalid instance will now return `nil`.
 
 ### v1.2.5
 * Item, Equipment, Buff, Instance, Actor, Player

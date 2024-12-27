@@ -468,6 +468,8 @@ lock_table_instance = Proxy.make_lock_table({"value", "RMT_object", table.unpack
 metatable_instance_gs = {
     -- Getter
     __index = function(table, key)
+        if type(table.value) == "number" then return nil end
+
         if key == "id" then return table.value.id end
         local val = gm.variable_instance_get(table.value, key)
         if key == "attack_info" then return Attack_Info.wrap(val) end
@@ -476,7 +478,9 @@ metatable_instance_gs = {
 
 
     -- Setter
-    __newindex = function(table, key, value)            
+    __newindex = function(table, key, value)
+        if type(table.value) == "number" then return end
+        
         value = Wrap.unwrap(value)
         gm.variable_instance_set(table.value, key, value)
 
