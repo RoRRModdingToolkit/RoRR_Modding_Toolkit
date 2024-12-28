@@ -209,9 +209,9 @@ metatable_class["Difficulty"] = {
 
 -- ========== Initialize ==========
 
--- Callback.add("onStageStart", "RMT-diff_onActive", diff_onActive)
--- Callback.add("preStep", "RMT-diff_onStep", diff_onStep)
--- Callback.add("postHUDDraw", "RMT-diff_onDraw", diff_onDraw)
+-- Callback_Raw.add("onStageStart", "RMT-diff_onActive", diff_onActive)
+-- Callback_Raw.add("preStep", "RMT-diff_onStep", diff_onStep)
+-- Callback_Raw.add("postHUDDraw", "RMT-diff_onDraw", diff_onDraw)
 
 
 

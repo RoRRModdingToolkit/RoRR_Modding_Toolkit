@@ -75,7 +75,7 @@ end
 
 -- ========== Initialize ==========
 
-Callback.add("net_message_onReceived", "RMT-packetReceived", packet_onReceived)
+Callback_Raw.add("net_message_onReceived", "RMT-packetReceived", packet_onReceived)
 
 
 

@@ -731,7 +731,7 @@ function inst_onPostStatRecalc(actor)
 end
 
 
-Callback.add("preStep", "RMT-Instance.preStep", function(self, other, result, args)
+Callback_Raw.add("preStep", "RMT-Instance.preStep", function(self, other, result, args)
     -- Non-actor exclusive
     for inst_id, c_tables in pairs(callbacks) do
         if c_tables["onPreStep"] then
@@ -746,7 +746,7 @@ Callback.add("preStep", "RMT-Instance.preStep", function(self, other, result, ar
 end)
 
 
-Callback.add("postStep", "RMT-Instance.postStep", function(self, other, result, args)
+Callback_Raw.add("postStep", "RMT-Instance.postStep", function(self, other, result, args)
     -- Non-actor exclusive
     for inst_id, c_tables in pairs(callbacks) do
         if c_tables["onPostStep"] then
@@ -761,7 +761,7 @@ Callback.add("postStep", "RMT-Instance.postStep", function(self, other, result, 
 end)
 
 
-Callback.add("onAttackCreate", "RMT-Instance.onAttackCreate", function(self, other, result, args)
+Callback_Raw.add("onAttackCreate", "RMT-Instance.onAttackCreate", function(self, other, result, args)
     local attack_info = Attack_Info.wrap(args[2].value)
     local actor = attack_info.parent
     
@@ -786,7 +786,7 @@ Callback.add("onAttackCreate", "RMT-Instance.onAttackCreate", function(self, oth
 end)
 
 
-Callback.add("onAttackHit", "RMT-Instance.onAttackHit", function(self, other, result, args)
+Callback_Raw.add("onAttackHit", "RMT-Instance.onAttackHit", function(self, other, result, args)
     local hit_info = Hit_Info.wrap(args[2].value)
     local actor = hit_info.inflictor
     
@@ -802,7 +802,7 @@ Callback.add("onAttackHit", "RMT-Instance.onAttackHit", function(self, other, re
 end)
 
 
-Callback.add("onAttackHandleEnd", "RMT-Instance.onAttackHandleEnd", function(self, other, result, args)
+Callback_Raw.add("onAttackHandleEnd", "RMT-Instance.onAttackHandleEnd", function(self, other, result, args)
     local attack_info = Attack_Info.wrap(args[2].value)
     local actor = attack_info.parent
     
@@ -827,7 +827,7 @@ Callback.add("onAttackHandleEnd", "RMT-Instance.onAttackHandleEnd", function(sel
 end)
 
 
-Callback.add("onHitProc", "RMT-Instance.onHitProc", function(self, other, result, args)     -- Runs before onAttackHit
+Callback_Raw.add("onHitProc", "RMT-Instance.onHitProc", function(self, other, result, args)     -- Runs before onAttackHit
     local actor = Instance.wrap(args[2].value)
     if not callbacks[actor.id] or not callbacks[actor.id]["onHitProc"] then return end
 
@@ -840,7 +840,7 @@ Callback.add("onHitProc", "RMT-Instance.onHitProc", function(self, other, result
 end)
 
 
-Callback.add("onKillProc", "RMT-Instance.onKillProc", function(self, other, result, args)
+Callback_Raw.add("onKillProc", "RMT-Instance.onKillProc", function(self, other, result, args)
     local actor = Instance.wrap(args[3].value)
     if not callbacks[actor.id] or not callbacks[actor.id]["onKillProc"] then return end
 
@@ -852,7 +852,7 @@ Callback.add("onKillProc", "RMT-Instance.onKillProc", function(self, other, resu
 end)
 
 
-Callback.add("onDamagedProc", "RMT-Instance.onDamagedProc", function(self, other, result, args)
+Callback_Raw.add("onDamagedProc", "RMT-Instance.onDamagedProc", function(self, other, result, args)
     local actor = Instance.wrap(args[2].value)
     if not callbacks[actor.id] or not callbacks[actor.id]["onDamagedProc"] then return end
 
@@ -865,7 +865,7 @@ Callback.add("onDamagedProc", "RMT-Instance.onDamagedProc", function(self, other
 end)
 
 
-Callback.add("onDamageBlocked", "RMT-Instance.onDamageBlocked", function(self, other, result, args)
+Callback_Raw.add("onDamageBlocked", "RMT-Instance.onDamageBlocked", function(self, other, result, args)
     local actor = Instance.wrap(args[2].value)
     if not callbacks[actor.id] or not callbacks[actor.id]["onDamageBlocked"] then return end
 
@@ -878,7 +878,7 @@ Callback.add("onDamageBlocked", "RMT-Instance.onDamageBlocked", function(self, o
 end)
 
 
-Callback.add("onInteractableActivate", "RMT-Instance.onInteractableActivate", function(self, other, result, args)
+Callback_Raw.add("onInteractableActivate", "RMT-Instance.onInteractableActivate", function(self, other, result, args)
     local actor = Instance.wrap(args[3].value)
     if not callbacks[actor.id] or not callbacks[actor.id]["onInteractableActivate"] then return end
 
@@ -890,7 +890,7 @@ Callback.add("onInteractableActivate", "RMT-Instance.onInteractableActivate", fu
 end)
 
 
-Callback.add("onPickupCollected", "RMT-Instance.onPickupCollected", function(self, other, result, args)
+Callback_Raw.add("onPickupCollected", "RMT-Instance.onPickupCollected", function(self, other, result, args)
     local actor = Instance.wrap(args[3].value)
     if not callbacks[actor.id] or not callbacks[actor.id]["onPickupCollected"] then return end
 
@@ -902,7 +902,7 @@ Callback.add("onPickupCollected", "RMT-Instance.onPickupCollected", function(sel
 end)
 
 
-Callback.add("onEquipmentUse", "RMT-Instance.onEquipmentUse", function(self, other, result, args)
+Callback_Raw.add("onEquipmentUse", "RMT-Instance.onEquipmentUse", function(self, other, result, args)
     local actor = Instance.wrap(args[2].value)
     if not callbacks[actor.id] or not callbacks[actor.id]["onEquipmentUse"] then return end
 
@@ -915,7 +915,7 @@ Callback.add("onEquipmentUse", "RMT-Instance.onEquipmentUse", function(self, oth
 end)
 
 
-Callback.add("onStageStart", "RMT-Instance.onStageStart", function(self, other, result, args)
+Callback_Raw.add("onStageStart", "RMT-Instance.onStageStart", function(self, other, result, args)
     local actors = Instance.find_all(gm.constants.pActor)
     for _, actor in ipairs(actors) do
         if callbacks[actor.id] and callbacks[actor.id]["onStageStart"] then

@@ -621,7 +621,7 @@ function equipment_onPostStatRecalc(player)
 end
 
 
-Callback.add("onAttackCreate", "RMT-Equipment.onAttackCreate", function(self, other, result, args)
+Callback_Raw.add("onAttackCreate", "RMT-Equipment.onAttackCreate", function(self, other, result, args)
     local attack_info = Attack_Info.wrap(args[2].value)
     local player = attack_info.parent
 
@@ -649,7 +649,7 @@ Callback.add("onAttackCreate", "RMT-Equipment.onAttackCreate", function(self, ot
 end)
 
 
-Callback.add("onAttackHit", "RMT-Equipment.onAttackHit", function(self, other, result, args)
+Callback_Raw.add("onAttackHit", "RMT-Equipment.onAttackHit", function(self, other, result, args)
     if not callbacks["onAttackHit"] then return end
     
     local hit_info = Hit_Info.wrap(args[2].value)
@@ -672,7 +672,7 @@ Callback.add("onAttackHit", "RMT-Equipment.onAttackHit", function(self, other, r
 end)
 
 
-Callback.add("onAttackHandleEnd", "RMT-Equipment.onAttackHandleEnd", function(self, other, result, args)
+Callback_Raw.add("onAttackHandleEnd", "RMT-Equipment.onAttackHandleEnd", function(self, other, result, args)
     local attack_info = Attack_Info.wrap(args[2].value)
     local player = attack_info.parent
 
@@ -700,7 +700,7 @@ Callback.add("onAttackHandleEnd", "RMT-Equipment.onAttackHandleEnd", function(se
 end)
 
 
-Callback.add("onHitProc", "RMT-Equipment.onHitProc", function(self, other, result, args)     -- Runs before onAttackHit
+Callback_Raw.add("onHitProc", "RMT-Equipment.onHitProc", function(self, other, result, args)     -- Runs before onAttackHit
     if not callbacks["onHitProc"] then return end
     
     local player = Instance.wrap(args[2].value)
@@ -720,7 +720,7 @@ Callback.add("onHitProc", "RMT-Equipment.onHitProc", function(self, other, resul
 end)
 
 
-Callback.add("onKillProc", "RMT-Equipment.onKillProc", function(self, other, result, args)
+Callback_Raw.add("onKillProc", "RMT-Equipment.onKillProc", function(self, other, result, args)
     if not callbacks["onKillProc"] then return end
     
     local player = Instance.wrap(args[3].value)
@@ -739,7 +739,7 @@ Callback.add("onKillProc", "RMT-Equipment.onKillProc", function(self, other, res
 end)
 
 
-Callback.add("onDamagedProc", "RMT-Equipment.onDamagedProc", function(self, other, result, args)
+Callback_Raw.add("onDamagedProc", "RMT-Equipment.onDamagedProc", function(self, other, result, args)
     if not callbacks["onDamagedProc"] then return end
     
     local player = Instance.wrap(args[2].value)
@@ -759,7 +759,7 @@ Callback.add("onDamagedProc", "RMT-Equipment.onDamagedProc", function(self, othe
 end)
 
 
-Callback.add("onDamageBlocked", "RMT-Equipment.onDamageBlocked", function(self, other, result, args)
+Callback_Raw.add("onDamageBlocked", "RMT-Equipment.onDamageBlocked", function(self, other, result, args)
     if not callbacks["onDamageBlocked"] then return end
     
     local player = Instance.wrap(args[2].value)
@@ -779,7 +779,7 @@ Callback.add("onDamageBlocked", "RMT-Equipment.onDamageBlocked", function(self, 
 end)
 
 
-Callback.add("onInteractableActivate", "RMT-Equipment.onInteractableActivate", function(self, other, result, args)
+Callback_Raw.add("onInteractableActivate", "RMT-Equipment.onInteractableActivate", function(self, other, result, args)
     if not callbacks["onInteractableActivate"] then return end
     
     local player = Instance.wrap(args[3].value)
@@ -798,7 +798,7 @@ Callback.add("onInteractableActivate", "RMT-Equipment.onInteractableActivate", f
 end)
 
 
-Callback.add("onPickupCollected", "RMT-Equipment.onPickupCollected", function(self, other, result, args)
+Callback_Raw.add("onPickupCollected", "RMT-Equipment.onPickupCollected", function(self, other, result, args)
     if not callbacks["onPickupCollected"] then return end
     
     local player = Instance.wrap(args[3].value)
@@ -817,7 +817,7 @@ Callback.add("onPickupCollected", "RMT-Equipment.onPickupCollected", function(se
 end)
 
 
-Callback.add("onStageStart", "RMT-Equipment.onStageStart", function(self, other, result, args)
+Callback_Raw.add("onStageStart", "RMT-Equipment.onStageStart", function(self, other, result, args)
     for player_id, _ in pairs(has_custom_equip) do
         if not Instance.exists(player_id) then
             has_custom_equip[player_id] = nil

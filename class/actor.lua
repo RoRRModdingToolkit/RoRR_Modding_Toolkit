@@ -573,7 +573,7 @@ function actor_onPostStatRecalc(actor)
 end
 
 
-Callback.add("onAttackCreate", "RMT-Actor.onAttackCreate", function(self, other, result, args)
+Callback_Raw.add("onAttackCreate", "RMT-Actor.onAttackCreate", function(self, other, result, args)
     local attack_info = Attack_Info.wrap(args[2].value)
     local actor = attack_info.parent
 
@@ -597,7 +597,7 @@ Callback.add("onAttackCreate", "RMT-Actor.onAttackCreate", function(self, other,
 end)
 
 
-Callback.add("onAttackHit", "RMT-Actor.onAttackHit", function(self, other, result, args)
+Callback_Raw.add("onAttackHit", "RMT-Actor.onAttackHit", function(self, other, result, args)
     if not callbacks["onAttackHit"] then return end
 
     local hit_info = Hit_Info.wrap(args[2].value)
@@ -614,7 +614,7 @@ Callback.add("onAttackHit", "RMT-Actor.onAttackHit", function(self, other, resul
 end)
 
 
-Callback.add("onAttackHandleEnd", "RMT-Actor.onAttackHandleEnd", function(self, other, result, args)
+Callback_Raw.add("onAttackHandleEnd", "RMT-Actor.onAttackHandleEnd", function(self, other, result, args)
     local attack_info = Attack_Info.wrap(args[2].value)
     local actor = attack_info.parent
 
@@ -638,7 +638,7 @@ Callback.add("onAttackHandleEnd", "RMT-Actor.onAttackHandleEnd", function(self, 
 end)
 
 
-Callback.add("onHitProc", "RMT-Actor.onHitProc", function(self, other, result, args)     -- Runs before onAttackHit
+Callback_Raw.add("onHitProc", "RMT-Actor.onHitProc", function(self, other, result, args)     -- Runs before onAttackHit
     if not callbacks["onHitProc"] then return end
 
     local actor = Instance.wrap(args[2].value)
@@ -651,7 +651,7 @@ Callback.add("onHitProc", "RMT-Actor.onHitProc", function(self, other, result, a
 end)
 
 
-Callback.add("onKillProc", "RMT-Actor.onKillProc", function(self, other, result, args)
+Callback_Raw.add("onKillProc", "RMT-Actor.onKillProc", function(self, other, result, args)
     if not callbacks["onKillProc"] then return end
 
     local actor = Instance.wrap(args[3].value)
@@ -663,7 +663,7 @@ Callback.add("onKillProc", "RMT-Actor.onKillProc", function(self, other, result,
 end)
 
 
-Callback.add("onDamagedProc", "RMT-Actor.onDamagedProc", function(self, other, result, args)
+Callback_Raw.add("onDamagedProc", "RMT-Actor.onDamagedProc", function(self, other, result, args)
     if not callbacks["onDamagedProc"] then return end
 
     local actor = Instance.wrap(args[2].value)
@@ -676,7 +676,7 @@ Callback.add("onDamagedProc", "RMT-Actor.onDamagedProc", function(self, other, r
 end)
 
 
-Callback.add("onDamageBlocked", "RMT-Actor.onDamageBlocked", function(self, other, result, args)
+Callback_Raw.add("onDamageBlocked", "RMT-Actor.onDamageBlocked", function(self, other, result, args)
     if not callbacks["onDamageBlocked"] then return end
 
     local actor = Instance.wrap(args[2].value)
@@ -689,7 +689,7 @@ Callback.add("onDamageBlocked", "RMT-Actor.onDamageBlocked", function(self, othe
 end)
 
 
-Callback.add("onInteractableActivate", "RMT-Actor.onInteractableActivate", function(self, other, result, args)
+Callback_Raw.add("onInteractableActivate", "RMT-Actor.onInteractableActivate", function(self, other, result, args)
     if not callbacks["onInteractableActivate"] then return end
 
     local actor = Instance.wrap(args[3].value)
@@ -701,7 +701,7 @@ Callback.add("onInteractableActivate", "RMT-Actor.onInteractableActivate", funct
 end)
 
 
-Callback.add("onPickupCollected", "RMT-Actor.onPickupCollected", function(self, other, result, args)
+Callback_Raw.add("onPickupCollected", "RMT-Actor.onPickupCollected", function(self, other, result, args)
     if not callbacks["onPickupCollected"] then return end
 
     local actor = Instance.wrap(args[3].value)
@@ -713,7 +713,7 @@ Callback.add("onPickupCollected", "RMT-Actor.onPickupCollected", function(self, 
 end)
 
 
-Callback.add("onEquipmentUse", "RMT-Actor.onEquipmentUse", function(self, other, result, args)
+Callback_Raw.add("onEquipmentUse", "RMT-Actor.onEquipmentUse", function(self, other, result, args)
     if not callbacks["onEquipmentUse"] then return end
 
     local actor = Instance.wrap(args[2].value)
@@ -726,7 +726,7 @@ Callback.add("onEquipmentUse", "RMT-Actor.onEquipmentUse", function(self, other,
 end)
 
 
-Callback.add("onStageStart", "RMT-Actor.onStageStart", function(self, other, result, args)
+Callback_Raw.add("onStageStart", "RMT-Actor.onStageStart", function(self, other, result, args)
     if not callbacks["onStageStart"] then return end
     
     local actors = Instance.find_all(gm.constants.pActor)

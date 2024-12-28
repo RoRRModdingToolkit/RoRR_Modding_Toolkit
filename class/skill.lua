@@ -325,8 +325,8 @@ end
 
 -- ========== Initialize ==========
 
-Callback.add("preStep", "RMT-skill_onPreStep", skill_onPreStep)
-Callback.add("postStep", "RMT-skill_onPostStep", skill_onPostStep)
+Callback_Raw.add("preStep", "RMT-skill_onPreStep", skill_onPreStep)
+Callback_Raw.add("postStep", "RMT-skill_onPostStep", skill_onPostStep)
 
 
 

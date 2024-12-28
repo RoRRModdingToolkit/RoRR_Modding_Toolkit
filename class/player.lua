@@ -172,7 +172,7 @@ Player:setmetatable(metatable_player_callbacks)
 
 -- ========== Initialize ==========
 
-Callback.add("onGameStart", "RMT-player_addAutoCallbacks", function(self, other, result, args)
+Callback_Raw.add("onGameStart", "RMT-player_addAutoCallbacks", function(self, other, result, args)
     Alarm.create(function()
         local player = Player.get_client()
         if player:exists() then

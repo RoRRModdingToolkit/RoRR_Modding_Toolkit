@@ -405,7 +405,7 @@ function buff_onPostStatRecalc(actor)
 end
 
 
-Callback.add("onAttackCreate", "RMT-Buff.onAttackCreate", function(self, other, result, args)
+Callback_Raw.add("onAttackCreate", "RMT-Buff.onAttackCreate", function(self, other, result, args)
     local attack_info = Attack_Info.wrap(args[2].value)
     local actor = attack_info.parent
 
@@ -440,7 +440,7 @@ Callback.add("onAttackCreate", "RMT-Buff.onAttackCreate", function(self, other, 
 end)
 
 
-Callback.add("onAttackHit", "RMT-Buff.onAttackHit", function(self, other, result, args)
+Callback_Raw.add("onAttackHit", "RMT-Buff.onAttackHit", function(self, other, result, args)
     if not callbacks["onAttackHit"] then return end
 
     local hit_info = Hit_Info.wrap(args[2].value)
@@ -463,7 +463,7 @@ Callback.add("onAttackHit", "RMT-Buff.onAttackHit", function(self, other, result
 end)
 
 
-Callback.add("onAttackHandleEnd", "RMT-Buff.onAttackHandleEnd", function(self, other, result, args)
+Callback_Raw.add("onAttackHandleEnd", "RMT-Buff.onAttackHandleEnd", function(self, other, result, args)
     local attack_info = Attack_Info.wrap(args[2].value)
     local actor = attack_info.parent
 
@@ -498,7 +498,7 @@ Callback.add("onAttackHandleEnd", "RMT-Buff.onAttackHandleEnd", function(self, o
 end)
 
 
-Callback.add("onHitProc", "RMT-Buff.onHitProc", function(self, other, result, args)     -- Runs before onAttackHit
+Callback_Raw.add("onHitProc", "RMT-Buff.onHitProc", function(self, other, result, args)     -- Runs before onAttackHit
     if not callbacks["onHitProc"] then return end
 
     local actor = Instance.wrap(args[2].value)
@@ -518,7 +518,7 @@ Callback.add("onHitProc", "RMT-Buff.onHitProc", function(self, other, result, ar
 end)
 
 
-Callback.add("onKillProc", "RMT-Buff.onKillProc", function(self, other, result, args)
+Callback_Raw.add("onKillProc", "RMT-Buff.onKillProc", function(self, other, result, args)
     if not callbacks["onKillProc"] then return end
 
     local actor = Instance.wrap(args[3].value)
@@ -537,7 +537,7 @@ Callback.add("onKillProc", "RMT-Buff.onKillProc", function(self, other, result, 
 end)
 
 
-Callback.add("onDamagedProc", "RMT-Buff.onDamagedProc", function(self, other, result, args)
+Callback_Raw.add("onDamagedProc", "RMT-Buff.onDamagedProc", function(self, other, result, args)
     if not callbacks["onDamagedProc"] then return end
 
     local actor = Instance.wrap(args[2].value)
@@ -557,7 +557,7 @@ Callback.add("onDamagedProc", "RMT-Buff.onDamagedProc", function(self, other, re
 end)
 
 
-Callback.add("onDamageBlocked", "RMT-Buff.onDamageBlocked", function(self, other, result, args)
+Callback_Raw.add("onDamageBlocked", "RMT-Buff.onDamageBlocked", function(self, other, result, args)
     if not callbacks["onDamageBlocked"] then return end
 
     local actor = Instance.wrap(args[2].value)
@@ -577,7 +577,7 @@ Callback.add("onDamageBlocked", "RMT-Buff.onDamageBlocked", function(self, other
 end)
 
 
-Callback.add("onInteractableActivate", "RMT-Buff.onInteractableActivate", function(self, other, result, args)
+Callback_Raw.add("onInteractableActivate", "RMT-Buff.onInteractableActivate", function(self, other, result, args)
     if not callbacks["onInteractableActivate"] then return end
 
     local actor = Instance.wrap(args[3].value)
@@ -596,7 +596,7 @@ Callback.add("onInteractableActivate", "RMT-Buff.onInteractableActivate", functi
 end)
 
 
-Callback.add("onPickupCollected", "RMT-Buff.onPickupCollected", function(self, other, result, args)
+Callback_Raw.add("onPickupCollected", "RMT-Buff.onPickupCollected", function(self, other, result, args)
     if not callbacks["onPickupCollected"] then return end
 
     local actor = Instance.wrap(args[3].value)
@@ -615,7 +615,7 @@ Callback.add("onPickupCollected", "RMT-Buff.onPickupCollected", function(self, o
 end)
 
 
-Callback.add("onEquipmentUse", "RMT-Buff.onEquipmentUse", function(self, other, result, args)
+Callback_Raw.add("onEquipmentUse", "RMT-Buff.onEquipmentUse", function(self, other, result, args)
     if not callbacks["onEquipmentUse"] then return end
 
     local actor = Instance.wrap(args[2].value)
@@ -635,7 +635,7 @@ Callback.add("onEquipmentUse", "RMT-Buff.onEquipmentUse", function(self, other, 
 end)
 
 
-Callback.add("onStageStart", "RMT-Buff.onStageStart", function(self, other, result, args)
+Callback_Raw.add("onStageStart", "RMT-Buff.onStageStart", function(self, other, result, args)
     for actor_id, _ in pairs(has_custom_buff) do
         if not Instance.exists(actor_id) then
             has_custom_buff[actor_id] = nil
