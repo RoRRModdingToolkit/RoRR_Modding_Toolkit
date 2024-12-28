@@ -98,8 +98,13 @@ gm.post_script_hook(gm.constants.callback_execute, function(self, other, result,
             elseif  atype:match("AttackInfo")   then wrapped = Attack_Info.wrap(wrapped)
             elseif  atype:match("HitInfo")      then wrapped = Hit_Info.wrap(wrapped)
             elseif  atype:match("Equipment")    then wrapped = Equipment.wrap(wrapped)
-            -- elseif  key:match("packet")         then wrapped = Packet.wrap(wrapped)
-            -- elseif  key:match("message")        then wrapped = Message.wrap(wrapped)
+            end
+
+            -- Packet and Message edge cases (41 - net_message_onReceived)
+            if _type == Callback.TYPE.net_message_onReceived then
+                if      i == 1 then wrapped = Packet.wrap(wrapped)
+                elseif  i == 2 then wrapped = Message.wrap(wrapped)
+                end
             end
 
             wrapped_args[i] = wrapped
