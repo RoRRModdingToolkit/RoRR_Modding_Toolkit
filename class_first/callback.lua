@@ -66,7 +66,7 @@ Callback.add = function(callback, id, func)
     -- Check if func has correct arg count for that callback
     local count = GM.variable_global_get("class_callback"):get(_type):get(2):size()
     local getinfo = debug.getinfo(func, "u")
-    if getinfo.nparams ~= count and (not getinfo.isvararg) then log.error("Callback func has incorrect argument count", 2) end
+    if getinfo.nparams ~= count and (not getinfo.isvararg) then log.error("Callback func has incorrect argument count (should be "..math.floor(count)..")", 2) end
 
     if not callbacks[_type] then callbacks[_type] = {} end
     if callbacks[_type][id] and id:sub(1, 3) == "RMT" then log.error("Cannot overwrite RMT callbacks", 2) end
@@ -116,7 +116,7 @@ gm.post_script_hook(gm.constants.callback_execute, function(self, other, result,
         end
 
         -- Call functions
-        for _, fn in pairs(callbacks[_type]) do
+        for id, fn in pairs(callbacks[_type]) do
             fn(table.unpack(wrapped_args))
         end
 
