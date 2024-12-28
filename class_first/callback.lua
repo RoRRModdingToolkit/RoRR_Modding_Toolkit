@@ -56,53 +56,6 @@ Callback.TYPE = Proxy.new({
 }):lock()
 
 
-Callback.arg_keys = Proxy.new({
-    {}, -- 0
-    {}, -- 1
-    {}, -- 2
-    {}, -- 3
-    {}, -- 4
-    {}, -- 5
-    {}, -- 6
-    {}, -- 7
-    {}, -- 8
-    {}, -- 9
-    {}, -- 10
-    {}, -- 11
-    {}, -- 12
-    {}, -- 13
-    {}, -- 14
-    {"", ""},                                       -- 15
-    {"", ""},                                       -- 16
-    {"attack_info"},                                -- 17
-    {"hit_info"},                                   -- 18
-    {"attack_info"},                                -- 19
-    {"attack_info"},                                -- 20
-    {"player", "", "damage"},                       -- 21
-    {"actor"},                                      -- 22
-    {"actor"},                                      -- 23
-    {"actor", "out_of_bounds"},                     -- 24
-    {"player"},                                     -- 25
-    {"player"},                                     -- 26
-    {"player", "", ""},                             -- 27
-    {"player", "", ""},                             -- 28
-    {"player"},                                     -- 29
-    {"player"},                                     -- 30
-    {"player"},                                     -- 31
-    {""},                                           -- 32
-    {"pickup_instance", "player"},                  -- 33
-    {""},                                           -- 34
-    {"player", "equipment", "", "direction"},       -- 35
-    {"player", "equipment", "", "direction"},       -- 36
-    {"interactable", "player"},                     -- 37
-    {"actor", "victim", "hit_info"},                -- 38
-    {"actor", "hit_info"},                          -- 39
-    {"victim", "actor"},                            -- 40
-    {"packet", "message", "buffer_pos", "sending_player"},  -- 41
-    {"string"}                                      -- 42
-}):lock()
-
-
 
 -- ========== Functions ==========
 
@@ -135,45 +88,26 @@ gm.post_script_hook(gm.constants.callback_execute, function(self, other, result,
     local _type = args[1].value
     if callbacks[_type] then
 
-        -- Create wrapped arg_map table out of args
+        -- Create wrapped_args table out of args
         local arg_types = GM.variable_global_get("class_callback"):get(_type):get(2)    -- Array
-        local arg_keys = Callback.arg_keys[_type + 1]
-        local arg_map = {}
-        local arg_order = {}
+        local wrapped_args = {}
         for i, atype in ipairs(arg_types) do
-            local key = arg_keys[i]
             local wrapped = args[i + 1].value
 
             if      atype:match("Instance")     then wrapped = Instance.wrap(wrapped)
             elseif  atype:match("AttackInfo")   then wrapped = Attack_Info.wrap(wrapped)
             elseif  atype:match("HitInfo")      then wrapped = Hit_Info.wrap(wrapped)
             elseif  atype:match("Equipment")    then wrapped = Equipment.wrap(wrapped)
-            elseif  key:match("packet")         then wrapped = Packet.wrap(wrapped)
-            elseif  key:match("message")        then wrapped = Message.wrap(wrapped)
+            -- elseif  key:match("packet")         then wrapped = Packet.wrap(wrapped)
+            -- elseif  key:match("message")        then wrapped = Message.wrap(wrapped)
             end
 
-            arg_map[key] = wrapped
-            table.insert(arg_order, key)
+            wrapped_args[i] = wrapped
         end
 
-        -- Call functions with arg_map
+        -- Call functions
         for _, fn in pairs(callbacks[_type]) do
-            fn(arg_map)
-
-            -- Modify arg_map string keys if numerical keys were modified instead
-            -- This allows for modifying in arg order like was done before (e.g., "arg_map[1]", similar to "args[2].value")
-            -- and exists because not all of args have descriptive key names
-            for j = 1, #arg_order do
-                if arg_map[j] then
-                    arg_map[arg_order[j]] = arg_map[j]
-                    arg_map[j] = nil
-                end
-            end
-        end
-
-        -- Slot arg_map changes back into args
-        for i, v in ipairs(arg_order) do
-            args[i + 1].value = Wrap.unwrap(arg_map[v])
+            fn(table.unpack(wrapped_args))
         end
 
     end
