@@ -72,28 +72,28 @@ Callback.type_args = Proxy.new({
     {}, -- 12
     {}, -- 13
     {}, -- 14
-    {"arg1", "arg2"},                               -- 15
-    {"arg1", "arg2"},                               -- 16
+    {"", ""},                                       -- 15
+    {"", ""},                                       -- 16
     {"attack_info"},                                -- 17
     {"hit_info"},                                   -- 18
     {"attack_info"},                                -- 19
     {"attack_info"},                                -- 20
-    {"player", "arg2", "damage"},                   -- 21
+    {"player", "", "damage"},                       -- 21
     {"actor"},                                      -- 22
     {"actor"},                                      -- 23
     {"actor", "out_of_bounds"},                     -- 24
     {"player"},                                     -- 25
     {"player"},                                     -- 26
-    {"player", "arg2", "arg3"},                     -- 27
-    {"player", "arg2", "arg3"},                     -- 28
+    {"player", "", ""},                             -- 27
+    {"player", "", ""},                             -- 28
     {"player"},                                     -- 29
     {"player"},                                     -- 30
     {"player"},                                     -- 31
-    {"arg1"},                                       -- 32
+    {""},                                           -- 32
     {"pickup_instance", "player"},                  -- 33
-    {"arg1"},                                       -- 34
-    {"player", "equipment", "arg3", "direction"},   -- 35
-    {"player", "equipment", "arg3", "direction"},   -- 36
+    {""},                                           -- 34
+    {"player", "equipment", "", "direction"},       -- 35
+    {"player", "equipment", "", "direction"},       -- 36
     {"interactable", "player"},                     -- 37
     {"actor", "victim", "hit_info"},                -- 38
     {"actor", "hit_info"},                          -- 39
@@ -159,6 +159,16 @@ gm.post_script_hook(gm.constants.callback_execute, function(self, other, result,
         -- Call functions with arg_map
         for _, fn in pairs(callbacks[_type]) do
             fn(arg_map)
+
+            -- Modify arg_map string keys if indexed values were modified instead
+            -- This allows for modifying in arg order like was done before (e.g., "args[2].value")
+            -- and exists because not all of args have been figured out yet
+            for j = 1, #arg_order do
+                if arg_map[j] then
+                    arg_map[arg_order[j]] = arg_map[j]
+                    arg_map[j] = nil
+                end
+            end
         end
 
         -- Slot arg_map changes back into args
