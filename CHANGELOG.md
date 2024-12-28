@@ -1,3 +1,8 @@
+### v1.2.7
+* Callback
+    * Previously existing class renamed to Callback_Raw.
+    * Callback now passes wrapped and labelled args.
+
 ### v1.2.6
 * Item, Equipment : `toggle_loot` and related methods can now modify pools while in a run.
 * Instance : Getting from an invalid instance will now return `nil`.
