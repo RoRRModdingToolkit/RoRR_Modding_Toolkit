@@ -1,3 +1,6 @@
+### v1.2.8
+* Callback, Callback_Raw : `add` can now accept numbers from `Callback.TYPE` enum.
+
 ### v1.2.7
 * Callback
     * Previously existing class renamed to Callback_Raw.

@@ -9,12 +9,13 @@ local callbacks = {}
 -- ========== Functions ==========
 
 Callback_Raw.add = function(callback, id, func)
-    local callback_id = Callback.TYPE[callback]
-    if not callback_id then log.error("Invalid callback name", 2) end
+    local _type = callback
+    if type(callback) == "string" then _type = Callback.TYPE[callback] end
+    if not _type then log.error("Invalid callback name", 2) end
 
-    if not callbacks[callback_id] then callbacks[callback_id] = {} end
-    if callbacks[callback_id][id] and id:sub(1, 3) == "RMT" then log.error("Cannot overwrite RMT callbacks", 2) end
-    callbacks[callback_id][id] = func
+    if not callbacks[_type] then callbacks[_type] = {} end
+    if callbacks[_type][id] and id:sub(1, 3) == "RMT" then log.error("Cannot overwrite RMT callbacks", 2) end
+    callbacks[_type][id] = func
 end
 
 

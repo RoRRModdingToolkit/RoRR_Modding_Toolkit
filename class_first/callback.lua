@@ -60,7 +60,8 @@ Callback.TYPE = Proxy.new({
 -- ========== Functions ==========
 
 Callback.add = function(callback, id, func)
-    local _type = Callback.TYPE[callback]
+    local _type = callback
+    if type(callback) == "string" then _type = Callback.TYPE[callback] end
     if not _type then log.error("Invalid callback name", 2) end
 
     -- Check if func has correct arg count for that callback
