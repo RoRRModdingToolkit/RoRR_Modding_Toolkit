@@ -56,7 +56,7 @@ Callback.TYPE = Proxy.new({
 }):lock()
 
 
-Callback.type_args = Proxy.new({
+Callback.arg_keys = Proxy.new({
     {}, -- 0
     {}, -- 1
     {}, -- 2
@@ -137,7 +137,7 @@ gm.post_script_hook(gm.constants.callback_execute, function(self, other, result,
 
         -- Create wrapped arg_map table out of args
         local arg_types = GM.variable_global_get("class_callback"):get(_type):get(2)    -- Array
-        local arg_keys = Callback.type_args[_type + 1]
+        local arg_keys = Callback.arg_keys[_type + 1]
         local arg_map = {}
         local arg_order = {}
         for i, atype in ipairs(arg_types) do
