@@ -6,7 +6,7 @@ local callbacks = {}
 
 
 
--- ========== Enums ==========
+-- ========== Enums and Tables ==========
 
 -- Manual population due to at least one report of "callback_names" being empty at runtime
 Callback.TYPE = Proxy.new({
@@ -56,6 +56,53 @@ Callback.TYPE = Proxy.new({
 }):lock()
 
 
+Callback.type_args = Proxy.new({
+    {}, -- 0
+    {}, -- 1
+    {}, -- 2
+    {}, -- 3
+    {}, -- 4
+    {}, -- 5
+    {}, -- 6
+    {}, -- 7
+    {}, -- 8
+    {}, -- 9
+    {}, -- 10
+    {}, -- 11
+    {}, -- 12
+    {}, -- 13
+    {}, -- 14
+    {"arg1", "arg2"},                               -- 15
+    {"arg1", "arg2"},                               -- 16
+    {"attack_info"},                                -- 17
+    {"hit_info"},                                   -- 18
+    {"attack_info"},                                -- 19
+    {"attack_info"},                                -- 20
+    {"player", "arg2", "damage"},                   -- 21
+    {"actor"},                                      -- 22
+    {"actor"},                                      -- 23
+    {"actor", "out_of_bounds"},                     -- 24
+    {"player"},                                     -- 25
+    {"player"},                                     -- 26
+    {"player", "arg2", "arg3"},                     -- 27
+    {"player", "arg2", "arg3"},                     -- 28
+    {"player"},                                     -- 29
+    {"player"},                                     -- 30
+    {"player"},                                     -- 31
+    {"arg1"},                                       -- 32
+    {"pickup_instance", "player"},                  -- 33
+    {"arg1"},                                       -- 34
+    {"player", "equipment", "arg3", "direction"},   -- 35
+    {"player", "equipment", "arg3", "direction"},   -- 36
+    {"interactable", "player"},                     -- 37
+    {"actor", "victim", "hit_info"},                -- 38
+    {"actor", "hit_info"},                          -- 39
+    {"victim", "actor"},                            -- 40
+    {"packet", "message", "buffer_pos", "sending_player"},  -- 41
+    {"string"}                                      -- 42
+}):lock()
+
+
 
 -- ========== Functions ==========
 
@@ -85,10 +132,40 @@ end
 -- ========== Hooks ==========
 
 gm.post_script_hook(gm.constants.callback_execute, function(self, other, result, args)
-    if callbacks[args[1].value] then
-        for _, fn in pairs(callbacks[args[1].value]) do
-            fn(self, other, result, args)
+    local _type = args[1].value
+    if callbacks[_type] then
+
+        -- Create wrapped arg_map table out of args
+        local arg_types = GM.variable_global_get("class_callback"):get(_type):get(2)    -- Array
+        local arg_keys = Callback.type_args[_type + 1]
+        local arg_map = {}
+        local arg_order = {}
+        for i, atype in ipairs(arg_types) do
+            local key = arg_keys[i]
+            local wrapped = args[i + 1].value
+
+            if      atype:match("Instance")     then wrapped = Instance.wrap(wrapped)
+            elseif  atype:match("AttackInfo")   then wrapped = Attack_Info.wrap(wrapped)
+            elseif  atype:match("HitInfo")      then wrapped = Hit_Info.wrap(wrapped)
+            elseif  atype:match("Equipment")    then wrapped = Equipment.wrap(wrapped)
+            elseif  key:match("packet")         then wrapped = Packet.wrap(wrapped)
+            elseif  key:match("message")        then wrapped = Message.wrap(wrapped)
+            end
+
+            arg_map[key] = wrapped
+            table.insert(arg_order, key)
         end
+
+        -- Call functions with arg_map
+        for _, fn in pairs(callbacks[_type]) do
+            fn(arg_map)
+        end
+
+        -- Slot arg_map changes back into args
+        for i, v in ipairs(arg_order) do
+            args[i + 1].value = Wrap.unwrap(arg_map[v])
+        end
+
     end
 end)
 
