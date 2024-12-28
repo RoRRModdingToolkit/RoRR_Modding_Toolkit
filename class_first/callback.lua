@@ -161,7 +161,7 @@ gm.post_script_hook(gm.constants.callback_execute, function(self, other, result,
             fn(arg_map)
 
             -- Modify arg_map string keys if numerical keys were modified instead
-            -- This allows for modifying in arg order like was done before (e.g., "args[2].value")
+            -- This allows for modifying in arg order like was done before (e.g., "arg_map[1]", similar to "args[2].value")
             -- and exists because not all of args have been figured out yet
             for j = 1, #arg_order do
                 if arg_map[j] then
