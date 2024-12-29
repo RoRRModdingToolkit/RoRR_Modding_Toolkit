@@ -336,11 +336,39 @@ methods_actor = {
     end,
 
 
-    -- reduce_skill_cooldown = function(self, slot, amount)
-    --     if type(slot) ~= "number" or slot < 0 or slot > 3 then log.error("Skill slot must be between 0 and 3 (inclusive)", 2) end
-    --     local struct = self.skills:get(slot).active_skill
-    --     -- struct.cooldown_reset_frame = struct.cooldown_reset_frame - amount
-    -- end,
+    freeze_default_skill = function(self, slot)
+        local struct = self:get_default_skill(slot)
+        struct.freeze_cooldown(struct, self.value)
+    end,
+
+
+    freeze_other_overrides = function(self, slot)
+        local skills_slot = self.skills:get(slot)
+        local overrides = skills_slot.overrides
+        local size = gm.array_length(overrides)
+        if size > 0 then
+            -- Freeze other override cds
+            local struct = skills_slot.active_skill
+            for i = 0, size - 1 do
+                local override_skill = gm.array_get(overrides, i).skill
+                if struct ~= override_skill then
+                    override_skill.freeze_cooldown(override_skill, self.value)
+                end
+            end
+        end
+    end,
+
+
+    override_default_cooldown = function(self, slot, value)
+        local struct = self:get_default_skill(slot)
+        struct.override_cooldown(struct, self.value, value)
+    end,
+
+
+    override_active_cooldown = function(self, slot, value)
+        local struct = self:get_active_skill(slot)
+        struct.override_cooldown(struct, self.value, value)
+    end,
 
 
     enter_state = function(self, state)

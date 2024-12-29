@@ -183,27 +183,27 @@ Callback_Raw.add("onGameStart", "RMT-player_addAutoCallbacks", function(self, ot
     end, 1)
 end)
 
-Player:onPreStep("RMT-player_skillOverrideFreezePrevSkillCooldown", function(actor)
-    for slot = 0, 3 do
-        local skills_slot = actor.skills:get(slot)
-        local overrides = skills_slot.overrides
-        local size = gm.array_length(overrides)
-        if size > 0 then
-            -- Freeze default skill cd
-            local struct = skills_slot.default_skill
-            struct.freeze_cooldown(struct, actor.value)
+-- Player:onPreStep("RMT-player_skillOverrideFreezePrevSkillCooldown", function(actor)
+--     for slot = 0, 3 do
+--         local skills_slot = actor.skills:get(slot)
+--         local overrides = skills_slot.overrides
+--         local size = gm.array_length(overrides)
+--         if size > 0 then
+--             -- Freeze default skill cd
+--             local struct = skills_slot.default_skill
+--             struct.freeze_cooldown(struct, actor.value)
 
-            -- Freeze other override cds
-            local struct = skills_slot.active_skill
-            for i = 0, size - 1 do
-                local override_skill = gm.array_get(overrides, i).skill
-                if struct ~= override_skill then
-                    override_skill.freeze_cooldown(override_skill, actor.value)
-                end
-            end
-        end
-    end
-end)
+--             -- Freeze other override cds
+--             local struct = skills_slot.active_skill
+--             for i = 0, size - 1 do
+--                 local override_skill = gm.array_get(overrides, i).skill
+--                 if struct ~= override_skill then
+--                     override_skill.freeze_cooldown(override_skill, actor.value)
+--                 end
+--             end
+--         end
+--     end
+-- end)
 
 
 
