@@ -2,8 +2,8 @@
 * Player : Removed internal callback that automatically froze default skill cooldown while an override was active.
     * Even though this is most likely desired in 99% of cases, it is better to allow the user control over it.
 * Actor
-    * Added `freeze_default_skill` and `freeze_other_overrides` (to aid with the above)
-    * Added `override_default_cooldown` and `override_active_cooldown`
+    * Added `freeze_default_skill`, `freeze_active_skill`, and `freeze_other_overrides` (to aid with the above)
+    * Added `override_default_skill_cooldown` and `override_active_skill_cooldown`
 
 ### v1.2.9
 * Actor : `fire_` methods now default to `sNone` instead of `-1` if no sprite is provided.

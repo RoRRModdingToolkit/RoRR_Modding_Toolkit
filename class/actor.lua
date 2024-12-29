@@ -342,6 +342,12 @@ methods_actor = {
     end,
 
 
+    freeze_active_skill = function(self, slot)
+        local struct = self:get_active_skill(slot)
+        struct.freeze_cooldown(struct, self.value)
+    end,
+
+
     freeze_other_overrides = function(self, slot)
         local skills_slot = self.skills:get(slot)
         local overrides = skills_slot.overrides
@@ -359,13 +365,13 @@ methods_actor = {
     end,
 
 
-    override_default_cooldown = function(self, slot, value)
+    override_default_skill_cooldown = function(self, slot, value)
         local struct = self:get_default_skill(slot)
         struct.override_cooldown(struct, self.value, value)
     end,
 
 
-    override_active_cooldown = function(self, slot, value)
+    override_active_skill_cooldown = function(self, slot, value)
         local struct = self:get_active_skill(slot)
         struct.override_cooldown(struct, self.value, value)
     end,
