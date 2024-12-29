@@ -1,6 +1,6 @@
 ### v1.2.9
 * Actor : `fire_` methods now default to `sNone` instead of `-1` if no sprite is provided.
-    * Otherwise damage numbers do not show for clients for whatever reason.
+    * Otherwise damage numbers do not show for clients.
 
 ### v1.2.8
 * Callback, Callback_Raw : `add` can now accept numbers from `Callback.TYPE` enum.
