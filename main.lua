@@ -39,7 +39,7 @@ class_refs["Colour"] = Color
 
 -- Lock public classes after finalization
 for _, ref in pairs(class_refs) do
-    ref:lock()
+    if ref.__metatable == "Proxy" then ref:lock() end
 end
 
 

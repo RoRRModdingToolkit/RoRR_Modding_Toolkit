@@ -1,6 +1,6 @@
 -- Global
 
-Global = Proxy.new()
+Global = {}
 
 
 
@@ -16,9 +16,12 @@ metatable_global = {
     -- Setter
     __newindex = function(table, key, value)
         GM.variable_global_set(key, value)
-    end
+    end,
+
+
+    __metatable = "Global"
 }
-Global:setmetatable(metatable_global)
+setmetatable(Global, metatable_global)
 
 
 

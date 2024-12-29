@@ -46,7 +46,7 @@ local metatable_proxy = {
         return next, _proxy[t], nil
     end,
 
-    __metatable = "proxy"
+    __metatable = "Proxy"
 }
 
 local new = function(t)
