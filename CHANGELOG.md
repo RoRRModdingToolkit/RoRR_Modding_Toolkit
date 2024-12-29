@@ -75,6 +75,8 @@
 * Minor optimizations in various callbacks.
 * Now prevents online play if any (RMT-dependent) incompatible mods are loaded.
 
+---
+
 ### v1.1.32
 * Actor : Added `apply_dot`
 * Survivor : Fixed some default sprites being wrong.
@@ -287,6 +289,8 @@
 * Complete rewrite of the wiki
     * Added a custom sidebar
     * Changed the changelog to show latest releases first
+
+---
 
 ### v1.0.16
 * Fixed Actor.damage displaying "0" for damage number.
