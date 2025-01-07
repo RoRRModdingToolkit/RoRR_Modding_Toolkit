@@ -1,3 +1,6 @@
+### v1.2.11
+* Alarm : Fixed `create` args being `nil` for args past the first one.
+
 ### v1.2.10
 * Player : Removed internal callback that automatically froze default skill cooldown while an override was active.
     * Even though this is most likely desired in 99% of cases, it is better to allow the user control over it.

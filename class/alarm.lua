@@ -13,7 +13,7 @@ Alarm.create = function(func, time, ...)
     if not alarms[future_frame] then alarms[future_frame] = {} end
     local alarm = {
         fn = func,
-        args = select(1, ...),
+        args = {...},
         src = envy.getfenv(2)["!guid"],
         frame = future_frame
     }
@@ -33,7 +33,7 @@ gm.post_script_hook(gm.constants.__input_system_tick, function()
     if not gm.variable_global_get("pause") then current_frame = current_frame + 1 end
     if not alarms[current_frame] then return end
     for i=1, #alarms[current_frame] do
-        local status, err = pcall(alarms[current_frame][i].fn, alarms[current_frame][i].args)
+        local status, err = pcall(alarms[current_frame][i].fn, table.unpack(alarms[current_frame][i].args))
         if not status then
             log.error("Alarm error from "..alarms[current_frame][i].src.."\n"..err)
         end
