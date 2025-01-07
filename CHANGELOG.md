@@ -1,3 +1,6 @@
+### v1.2.12
+* Message : Added `read`/`write` for `double`.
+
 ### v1.2.11
 * Alarm : Fixed `create` args being `nil` for args past the first one.
 * Skill : Now overwrites `callback_execute` `result.value` if a non-`nil` value is returned.

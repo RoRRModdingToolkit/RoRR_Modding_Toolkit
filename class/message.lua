@@ -113,7 +113,8 @@ local write_num = {
     write_uhalf     = GM.writeuhalf_direct,
     write_int       = GM.writeint_direct,
     write_uint      = GM.writeuint_direct,
-    write_float     = GM.writefloat_direct
+    write_float     = GM.writefloat_direct,
+    write_double    = GM.writedouble_direct
 }
 local read_num = {
     read_short      = GM.readshort_direct,
@@ -122,7 +123,8 @@ local read_num = {
     read_uhalf      = GM.readuhalf_direct,
     read_int        = GM.readint_direct,
     read_uint       = GM.readuint_direct,
-    read_float      = GM.readfloat_direct
+    read_float      = GM.readfloat_direct,
+    read_double     = GM.readdouble_direct
 }
 
 for k, fn in pairs(write_num) do
