@@ -379,11 +379,17 @@ gm.pre_script_hook(gm.constants.actor_transform, function(self, other, result, a
 end)
 
 
-gm.pre_script_hook(gm.constants.apply_buff_internal, function(self, other, result, args)
+-- gm.pre_script_hook(gm.constants.apply_buff_internal, function(self, other, result, args)
+--     -- Extend buff_stack if necessary
+--     if gm.typeof(args[1].value) == "struct" then
+--         if gm.array_length(args[1].value.buff_stack) <= args[2].value then gm.array_resize(args[1].value.buff_stack, args[2].value + 1) end
+--     end
+-- end)
+
+
+gm.post_script_hook(gm.constants.init_actor_default, function(self, other, result, args)
     -- Extend buff_stack if necessary
-    if gm.typeof(args[1].value) == "struct" then
-        if gm.array_length(args[1].value.buff_stack) <= args[2].value then gm.array_resize(args[1].value.buff_stack, args[2].value + 1) end
-    end
+    gm.array_resize(self.buff_stack, Global.count_buff)
 end)
 
 

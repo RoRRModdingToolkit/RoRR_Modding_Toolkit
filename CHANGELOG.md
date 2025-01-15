@@ -1,5 +1,6 @@
 ### v1.2.12
 * Message : Added `read`/`write` for `double`.
+* Buff : Buff array extension now uses `init_actor_default` and runs only once per actor.
 
 ### v1.2.11
 * Alarm : Fixed `create` args being `nil` for args past the first one.
