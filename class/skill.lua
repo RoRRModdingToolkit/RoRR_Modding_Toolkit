@@ -272,6 +272,7 @@ end)
 
 
 gm.post_script_hook(gm.constants.callback_is_bound, function(self, other, result, args)
+    -- Allow the game to recognize lua onStep callbacks
     if callbacks[args[1].value] then
         result.value = true
     end
