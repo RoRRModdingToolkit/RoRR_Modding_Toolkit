@@ -3,7 +3,8 @@
     * Added `read`/`write` for `double`.
     * Removed `read`/`write` for `uhalf`.
 * Buff : Buff array extension now uses `init_actor_default` and runs only once per actor.
-* Skill : Added `onStep` callback, which uses the vanilla callback system.
+* Skill
+    * Added `onStep` callback, which uses the vanilla callback system.
     * Removed previously existing `onPreStep` and `onPostStep`.
 
 ### v1.2.11
