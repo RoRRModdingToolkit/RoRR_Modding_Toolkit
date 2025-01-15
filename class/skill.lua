@@ -3,10 +3,10 @@
 Skill = class_refs["Skill"]
 
 local callbacks = {}
-local other_callbacks = {
-    "onPreStep",
-    "onPostStep"
-}
+-- local other_callbacks = {
+--     "onPreStep",
+--     "onPostStep"
+-- }
 
 local achievement_map = {}
 
@@ -93,18 +93,19 @@ methods_skill = {
     add_callback = function(self, callback, func)
         local callback_id = nil
         if      callback == "onCanActivate" then callback_id = self.on_can_activate
-        elseif  callback == "onActivate" then callback_id = self.on_activate
-        elseif  callback == "onEquipped" then callback_id = self.on_equipped
-        elseif  callback == "onUnequipped" then callback_id = self.on_unequipped
+        elseif  callback == "onActivate"    then callback_id = self.on_activate
+        elseif  callback == "onStep"        then callback_id = self.on_step
+        elseif  callback == "onEquipped"    then callback_id = self.on_equipped
+        elseif  callback == "onUnequipped"  then callback_id = self.on_unequipped
         end
 
         if callback_id then
             if not callbacks[callback_id] then callbacks[callback_id] = {} end
             table.insert(callbacks[callback_id], func)
         
-        elseif Helper.table_has(other_callbacks, callback) then
-            if not callbacks[callback] then callbacks[callback] = {} end
-            table.insert(callbacks[callback], {self.value, func})
+        -- elseif Helper.table_has(other_callbacks, callback) then
+        --     if not callbacks[callback] then callbacks[callback] = {} end
+        --     table.insert(callbacks[callback], {self.value, func})
 
         else log.error("Invalid callback name", 2)
         end
@@ -224,8 +225,9 @@ methods_skill = {
     -- Callbacks
     onCanActivate   = function(self, func) self:add_callback("onCanActivate", func) end,
     onActivate      = function(self, func) self:add_callback("onActivate", func) end,
-    onPreStep       = function(self, func) self:add_callback("onPreStep", func) end,
-    onPostStep      = function(self, func) self:add_callback("onPostStep", func) end,
+    onStep          = function(self, func) self:add_callback("onStep", func) end,
+    -- onPreStep       = function(self, func) self:add_callback("onPreStep", func) end,
+    -- onPostStep      = function(self, func) self:add_callback("onPostStep", func) end,
     onEquipped      = function(self, func) self:add_callback("onEquipped", func) end,
     onUnequipped    = function(self, func) self:add_callback("onUnequipped", func) end
     
@@ -269,65 +271,73 @@ gm.post_script_hook(gm.constants.callback_execute, function(self, other, result,
 end)
 
 
+gm.post_script_hook(gm.constants.callback_is_bound, function(self, other, result, args)
+    if callbacks[args[1].value] then
+        result.value = true
+    end
+end)
+
+
 
 -- ========== Callbacks ==========
 
 -- These currently only apply to Player skills to prevent lag
 -- Should be fine until someone complains about it
+-- Jan 14, 2025: Removed
 
-local function skill_onPreStep(self, other, result, args)
-    if gm.variable_global_get("pause") then return end
+-- local function skill_onPreStep(self, other, result, args)
+--     if gm.variable_global_get("pause") then return end
     
-    if callbacks["onPreStep"] then
-        local actors = Instance.find_all(gm.constants.oP)
-        for n, actor in ipairs(actors) do
+--     if callbacks["onPreStep"] then
+--         local actors = Instance.find_all(gm.constants.oP)
+--         for n, actor in ipairs(actors) do
 
-            -- Loop through active skills
-            for slot = 0, 3 do
-                local active_skill = actor:get_active_skill(slot)
+--             -- Loop through active skills
+--             for slot = 0, 3 do
+--                 local active_skill = actor:get_active_skill(slot)
 
-                -- Loop through callbacks
-                for _, c in ipairs(callbacks["onPreStep"]) do
-                    if c[1] == active_skill.skill_id then
-                        c[2](actor, active_skill, slot)  -- Actor, ActorSkill struct, index
-                    end
-                end
-            end
+--                 -- Loop through callbacks
+--                 for _, c in ipairs(callbacks["onPreStep"]) do
+--                     if c[1] == active_skill.skill_id then
+--                         c[2](actor, active_skill, slot)  -- Actor, ActorSkill struct, index
+--                     end
+--                 end
+--             end
 
-        end
-    end
-end
+--         end
+--     end
+-- end
 
 
-local function skill_onPostStep(self, other, result, args)
-    if gm.variable_global_get("pause") then return end
+-- local function skill_onPostStep(self, other, result, args)
+--     if gm.variable_global_get("pause") then return end
     
-    if callbacks["onPostStep"] then
-        local actors = Instance.find_all(gm.constants.oP)
-        for n, actor in ipairs(actors) do
+--     if callbacks["onPostStep"] then
+--         local actors = Instance.find_all(gm.constants.oP)
+--         for n, actor in ipairs(actors) do
 
-            -- Loop through active skills
-            for slot = 0, 3 do
-                local active_skill = actor:get_active_skill(slot)
+--             -- Loop through active skills
+--             for slot = 0, 3 do
+--                 local active_skill = actor:get_active_skill(slot)
 
-                -- Loop through callbacks
-                for _, c in ipairs(callbacks["onPostStep"]) do
-                    if c[1] == active_skill.skill_id then
-                        c[2](actor, active_skill, slot)  -- Actor, ActorSkill struct, index
-                    end
-                end
-            end
+--                 -- Loop through callbacks
+--                 for _, c in ipairs(callbacks["onPostStep"]) do
+--                     if c[1] == active_skill.skill_id then
+--                         c[2](actor, active_skill, slot)  -- Actor, ActorSkill struct, index
+--                     end
+--                 end
+--             end
 
-        end
-    end
-end
+--         end
+--     end
+-- end
 
 
 
 -- ========== Initialize ==========
 
-Callback_Raw.add("preStep", "RMT-skill_onPreStep", skill_onPreStep)
-Callback_Raw.add("postStep", "RMT-skill_onPostStep", skill_onPostStep)
+-- Callback_Raw.add("preStep", "RMT-skill_onPreStep", skill_onPreStep)
+-- Callback_Raw.add("postStep", "RMT-skill_onPostStep", skill_onPostStep)
 
 
 
