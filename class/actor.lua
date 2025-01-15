@@ -784,5 +784,23 @@ Actor:onDamagedProc("RMT-actorAllowStun", function(actor, attacker, hit_info)
 end)
 
 
+Callback_Raw.add(Callback.TYPE.onDeath, "RMT-customCognantEliteFix", function(self, other, result, args)
+    if args[3].value then return end    -- Do not spawn clone if out of bounds
+    local actor = args[2].value
+
+    if  actor.team ~= 1
+    and gm._mod_net_isHost()
+    and gm.bool(Class.ARTIFACT:get(13):get(8))
+    and actor.elite_type ~= 7
+    then
+        local obj_id = Instance.wrap(actor):get_object_index_self()
+        if obj_id >= Object.CUSTOM_START then
+            local new = gm.instance_create(actor.x, actor.y, obj_id)
+            gm.elite_set(new, 7)
+        end
+    end
+end)
+
+
 
 return Actor

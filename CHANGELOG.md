@@ -1,4 +1,5 @@
 ### v1.2.12
+* Fixed Cognition artifact incorrectly spawning with custom actors.
 * Message
     * Added `read`/`write` for `double`.
     * Removed `read`/`write` for `uhalf`.

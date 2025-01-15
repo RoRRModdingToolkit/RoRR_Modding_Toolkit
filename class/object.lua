@@ -55,6 +55,10 @@ Object.new = function(namespace, identifier, parent)
     if obj then return obj end
 
     local obj = gm.object_add_w(namespace, identifier, Wrap.unwrap(parent))
+
+    -- Add to Cognition artifact blacklist
+    gm.ds_map_set(Global.artifact_cognation_enemy_blacklist, obj, true)
+
     return Object.wrap(obj)
 end
 
