@@ -257,7 +257,7 @@ methods_actor = {
 
     buff_apply = function(self, buff, duration, count)
         buff = Wrap.unwrap(buff)
-        if self.buff_stack:size() <= buff then self.buff_stack:resize(buff + 1) end
+        -- if self.buff_stack:size() <= buff then self.buff_stack:resize(buff + 1) end  -- No longer needed
 
         gm.apply_buff(self.value, buff, duration, count or 1)
 
@@ -270,7 +270,7 @@ methods_actor = {
 
     buff_remove = function(self, buff, count)
         buff = Wrap.unwrap(buff)
-        if self.buff_stack:size() <= buff then self.buff_stack:resize(buff + 1) end
+        -- if self.buff_stack:size() <= buff then self.buff_stack:resize(buff + 1) end  -- No longer needed
 
         local stack_count = self:buff_stack_count(buff)
         if (not count) or count >= stack_count then gm.remove_buff(self.value, buff)
@@ -283,7 +283,7 @@ methods_actor = {
 
     buff_stack_count = function(self, buff)
         buff = Wrap.unwrap(buff)
-        if self.buff_stack:size() <= buff then self.buff_stack:resize(buff + 1) end
+        -- if self.buff_stack:size() <= buff then self.buff_stack:resize(buff + 1) end  -- No longer needed
 
         local count = self.buff_stack:get(buff)
         if count == nil then return 0 end
@@ -794,7 +794,9 @@ Callback_Raw.add(Callback.TYPE.onDeath, "RMT-customCognantEliteFix", function(se
     and actor.elite_type ~= 7
     then
         local obj_id = Instance.wrap(actor):get_object_index_self()
-        if obj_id >= Object.CUSTOM_START then
+        if obj_id >= Object.CUSTOM_START
+        and (not object_cognant_blacklist[obj_id])
+        then
             local new = gm.instance_create(actor.x, actor.y, obj_id)
             gm.elite_set(new, 7)
         end

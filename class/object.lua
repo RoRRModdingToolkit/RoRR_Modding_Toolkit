@@ -10,6 +10,8 @@ local other_callbacks = {
     "onDraw"
 }
 
+object_cognant_blacklist = {}
+
 
 
 -- ========== Enums ==========
@@ -185,6 +187,26 @@ methods_object = {
         -- Does not apply retroactively to existing instances
         local depths = Array.wrap(gm.variable_global_get("object_depths"))
         depths:set(self.value, depth)
+    end,
+
+
+    allow_cognant = function(self, bool)
+        -- Vanilla
+        if self.value < Object.CUSTOM_START then
+            if bool then
+                gm.ds_map_set(Global.artifact_cognation_enemy_blacklist, self.value, false)
+                return
+            end
+            gm.ds_map_set(Global.artifact_cognation_enemy_blacklist, self.value, true)
+            return
+        end
+
+        -- Custom
+        if bool then
+            object_cognant_blacklist[self.value] = nil
+            return
+        end
+        object_cognant_blacklist[self.value] = true
     end,
 
 

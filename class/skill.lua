@@ -114,19 +114,20 @@ methods_skill = {
     clear_callbacks = function(self)
         callbacks[self.on_can_activate] = nil
         callbacks[self.on_activate] = nil
+        callbacks[self.on_step] = nil
         callbacks[self.on_equipped] = nil
         callbacks[self.on_unequipped] = nil
         
-        for _, c in ipairs(other_callbacks) do
-            local c_table = callbacks[c]
-            if c_table then
-                for i, v in ipairs(c_table) do
-                    if v[1] == self.value then
-                        table.remove(c_table, i)
-                    end
-                end
-            end
-        end
+        -- for _, c in ipairs(other_callbacks) do
+        --     local c_table = callbacks[c]
+        --     if c_table then
+        --         for i, v in ipairs(c_table) do
+        --             if v[1] == self.value then
+        --                 table.remove(c_table, i)
+        --             end
+        --         end
+        --     end
+        -- end
     end,
 
     set_skill = function(self, name, desc, sprite, subimage, damage, cooldown)
