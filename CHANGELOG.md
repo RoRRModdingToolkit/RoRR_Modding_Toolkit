@@ -1,3 +1,6 @@
+### v1.2.25
+* Moved custom_drone_upgrade_fix.lua to unused due to dynamic hook no longer working
+
 ### v1.2.24
 * Instance
     * Updated the custom object checks from 800 to 900, in accordance with the new custom object start
