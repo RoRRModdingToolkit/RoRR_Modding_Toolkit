@@ -1,3 +1,4 @@
+if mods["ReturnsAPI-ReturnsAPI"] then return end
 
 -- packet ids used for instance serialization
 local packet_ids = {
