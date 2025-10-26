@@ -1,7 +1,11 @@
+**[ReturnsAPI](https://thunderstore.io/c/risk-of-rain-returns/p/ReturnsAPI/ReturnsAPI/) should be used instead over this.**
+
+---
+
 Friendly abstractions of the game's internal functions for easier modding.  
 Documentation can be found [here](https://github.com/ReturnsAPI/RoRR_Modding_Toolkit/wiki).  
 
-Include `RoRRModdingToolkit-RoRR_Modding_Toolkit-1.2.25` as a dependency in `manifest.json`.
+Include `RoRRModdingToolkit-RoRR_Modding_Toolkit-1.2.26` as a dependency in `manifest.json`.
 
 To auto-add RMT class references directly to your workspace, place the following line in your code:  
 ```lua

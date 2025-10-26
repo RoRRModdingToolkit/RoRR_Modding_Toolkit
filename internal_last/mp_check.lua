@@ -64,10 +64,16 @@ gm.post_code_execute("gml_Object_oStartMenu_Draw_73", function(self, other, code
     if (not text_x) or (not text_y) then return end
 
     -- "x incompatible mod(s)" text
-    gm.draw_set_font(2.0)
+    gm.draw_set_font(1)
     gm.draw_set_halign(1)
     gm.draw_set_valign(1)
+
     local str = #incomp.." incompatible mod"..((#incomp > 1) and "s" or "")
+    if mods["ReturnsAPI-ReturnsAPI"] then
+        -- Add label if ReturnsAPI is loaded
+        str = str.." (RMT)"
+    end
+
     local col = {Color.ORANGE, Color.BLACK, Color.BLACK}
     for i = 3, 1, -1 do
         local c = col[i]
@@ -110,6 +116,12 @@ gm.post_script_hook(gm.constants._ui_draw_box_text, function(self, other, result
         text_y = args[2].value - 2 + args[4].value/2
         box_x, box_y, box_w, box_h = args[1].value, args[2].value, args[3].value, args[4].value
         if not initial_fadein then initial_fadein = 0 end
+
+        -- Shift over to the right if ReturnsAPI is loaded
+        -- Not very pleasing but at least it's readable
+        if mods["ReturnsAPI-ReturnsAPI"] then
+            text_x = text_x + 288
+        end
     end
     ui_hook = ui_hook - 1
 end)

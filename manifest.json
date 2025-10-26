@@ -1,10 +1,10 @@
 ﻿{
 	"name": "RoRR_Modding_Toolkit",
-	"version_number": "1.2.25",
+	"version_number": "1.2.26",
 	"website_url": "https://github.com/ReturnsAPI/RoRR_Modding_Toolkit/wiki",
 	"description": "Friendly abstractions of the game's internal functions for easier modding.",
 	"dependencies": [
-		"ReturnOfModding-ReturnOfModding-1.1.3",
+		"ReturnOfModding-ReturnOfModding-1.1.6",
 		"LuaENVY-ENVY-1.2.0"
 	]
 }

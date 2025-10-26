@@ -1,3 +1,7 @@
+### v1.2.26
+* Fix incorrect font used for online multiplayer compatibility check.
+* Disable some things if ReturnsAPI is loaded.
+
 ### v1.2.25
 * Moved custom_drone_upgrade_fix.lua to unused due to dynamic hook no longer working
 
